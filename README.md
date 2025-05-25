@@ -71,7 +71,7 @@ Perfect for fitness enthusiasts who want professional-grade workout tracking wit
    ```bash
    cd backend
    npm install
-   # Configure your MongoDB connection in config files
+   # Configure your MongoDB connection in .env file in backend
    npm run dev
    ```
 
