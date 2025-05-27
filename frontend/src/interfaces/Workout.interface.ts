@@ -9,10 +9,23 @@ export interface Workout {
 }
 
 export interface Exercise {
-  exerciseId: string;
   order: number;
-  pauseSeconds: number;
   sets: number;
   reps: number;
   weight: number;
+  pauseSeconds: number;
+  exercise: {
+    _id: string;
+    name: string;
+    description: string;
+    img: string;
+    muscleGroups: string[];
+    defaultSets: number;
+    defaultReps: number;
+    defaultPauseSeconds: number;
+    createdBy: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
 }
