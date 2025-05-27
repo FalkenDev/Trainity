@@ -3,32 +3,34 @@
     <div class="d-flex ga-3 align-center">
       <img width="45" height="45" style="border-radius: 10px" />
       <div>
-        <h1 class="text-h6">Kasper Falk</h1>
+        <h1 class="text-h6">
+          {{ user ? user.firstName + " " + user.lastName : "Guest" }}
+        </h1>
         <p class="text-body-2">Lets Get Ready 💪</p>
       </div>
     </div>
     <v-btn
       icon
       size="45"
-      id="menu-activator"
       color="grey-darken-3"
       variant="flat"
       density="compact"
     >
       <v-icon>mdi-menu</v-icon>
+      <v-menu activator="parent">
+        <v-list>
+          <v-list-item @click="authStore.logout">
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-btn>
-
-    <v-menu activator="#menu-activator">
-      <v-list>
-        <v-list-item
-          v-for="(item, index) in sortBy"
-          :key="index"
-          :value="index"
-        >
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu>
   </div>
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { useAuthStore } from "@/stores/auth.store";
+import type { User } from "@/interfaces/User.interface";
+const authStore = useAuthStore();
+
+const user = computed<User | null>(() => authStore.user);
+</script>
