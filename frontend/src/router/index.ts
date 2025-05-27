@@ -34,6 +34,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/workout/:workoutId",
+    name: "WorkoutDetails",
+    component: Home,
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/calendar",
     name: "Calendar",
     component: Home,
