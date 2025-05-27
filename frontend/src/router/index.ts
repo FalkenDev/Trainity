@@ -3,6 +3,7 @@ import Home from "../pages/index.vue";
 import { useAuthStore } from "@/stores/auth.store";
 import Login from "@/pages/Login.vue";
 import Register from "@/pages/Register.vue";
+import WorkoutDetails from "@/pages/WorkoutDetails.vue";
 
 const routes = [
   {
@@ -36,7 +37,7 @@ const routes = [
   {
     path: "/workout/:workoutId",
     name: "WorkoutDetails",
-    component: Home,
+    component: WorkoutDetails,
     meta: { requiresAuth: true },
   },
   {
