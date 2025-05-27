@@ -7,8 +7,24 @@ const workoutModel = {
     try {
       await mongoose.connect(process.env.DBURI);
       console.log("Connected to MongoDB with Mongoose");
-      const workouts = await Workout.find({ createdBy: req.user.id });
-      res.status(200).json(workouts);
+      const workouts = await Workout.find({ createdBy: req.user.id }).populate(
+        "exercises.exerciseId"
+      );
+
+      const result = workouts.map((workout) => ({
+        ...workout.toObject(),
+        exercises: workout.exercises.map((e) => ({
+          _id: e._id,
+          order: e.order,
+          sets: e.sets,
+          reps: e.reps,
+          weight: e.weight,
+          pauseSeconds: e.pauseSeconds,
+          exercise: e.exerciseId ? e.exerciseId.toObject() : null,
+        })),
+      }));
+
+      res.status(200).json(result); // <-- return the transformed data!
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
