@@ -5,19 +5,24 @@
  */
 
 // Plugins
-import { registerPlugins } from '@/plugins'
+import { registerPlugins } from "@/plugins";
+import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
+import { createPinia } from "pinia";
 
 // Components
-import App from './App.vue'
+import App from "./App.vue";
 
 // Composables
-import { createApp } from 'vue'
+import { createApp } from "vue";
+
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 
 // Styles
-import 'unfonts.css'
+import "unfonts.css";
 
-const app = createApp(App)
+const app = createApp(App);
 
-registerPlugins(app)
+registerPlugins(app);
 
-app.mount('#app')
+app.mount("#app");
