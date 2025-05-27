@@ -17,6 +17,7 @@
         :key="index"
         class="mb-4 d-flex pa-2 align-center justify-space-between"
         style="border-radius: 5px;"
+        @click="routeTo(workout._id)"
       >
         <div class="d-flex ga-5 align-center">
           <img style="width: 65px; height: 65px;" class="bg-grey"></img>
@@ -24,7 +25,7 @@
             <h2 class="text-h6">{{ workout.title }}</h2>
             <div class="text-body-2 d-flex align-center ga-1" style="line-height: 1.1rem !important;">
               <v-icon>mdi-clock-outline</v-icon>
-              <p>{{ workout.duration }} minutes</p>
+              <p>{{ workout.time }} minutes</p>
             </div>
           </div>
         </div>
@@ -41,24 +42,16 @@
   </div>
 </template>
 <script lang="ts" setup>
-const workouts = [
-  {
-    title: "Morning Run",
-    date: "2023-10-01",
-    duration: 30,
-    calories: 300,
-  },
-  {
-    title: "Evening Yoga",
-    date: "2023-10-02",
-    duration: 60,
-    calories: 200,
-  },
-  {
-    title: "Strength Training",
-    date: "2023-10-03",
-    duration: 45,
-    calories: 400,
-  },
-];
+import type { Workout } from '@/interfaces/Workout.interface';
+import router from '@/router';
+import { useWorkoutStore } from '@/stores/workout.store';
+const workoutStore = useWorkoutStore();
+
+const workouts = computed<Workout[]>(() => workoutStore.workouts);
+
+const routeTo = (id: string) => {
+  console.log('Navigating to workout with ID:', id);
+  workoutStore.setCurrentWorkout(id);
+  router.push(`/workout/${id}`);
+};
 </script>
