@@ -9,7 +9,7 @@ export const useAuthStore = defineStore(
     const router = useRouter();
     const loading = ref(false);
     const isAuthenticated = ref(false);
-    const user = ref(null);
+    const user = ref();
     const token = ref("");
 
     const login = async (email: string, password: string) => {
