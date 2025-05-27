@@ -47,12 +47,11 @@ const userModel = {
     try {
       await mongoose.connect(process.env.DBURI);
       console.log("Connected to MongoDB with Mongoose");
-      const { username, email, password, firstName, lastName, avatar } =
-        req.body;
+      const { email, password, firstName, lastName, avatar } = req.body;
 
       // Check if user already exists
       const existingUser = await User.findOne({
-        $or: [{ email }, { username }],
+        $or: [{ email }],
       });
       if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
@@ -64,7 +63,6 @@ const userModel = {
 
       // Create user
       const newUser = new User({
-        username,
         email,
         password: hashedPassword,
         firstName,
@@ -74,7 +72,6 @@ const userModel = {
 
       await newUser.save();
 
-      // Never return the password!
       const userToReturn = newUser.toObject();
       delete userToReturn.password;
 
