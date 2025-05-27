@@ -1,7 +1,12 @@
 <template>
   <div class="d-flex justify-space-between align-center">
     <div class="d-flex ga-3 align-center">
-      <img width="45" height="45" style="border-radius: 10px" />
+      <v-avatar
+        color="white"
+        width="45"
+        height="45"
+        style="border-radius: 8px"
+      />
       <div>
         <h1 class="text-h6">
           {{ user ? user.firstName + " " + user.lastName : "Guest" }}
