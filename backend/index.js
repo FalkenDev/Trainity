@@ -40,6 +40,8 @@ app.use(apiLimiter);
 
 app.disable("x-powered-by");
 
+app.use(express.json());
+
 app.set("view engine", "ejs");
 
 app.use(
