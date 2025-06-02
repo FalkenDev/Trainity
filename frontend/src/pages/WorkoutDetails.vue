@@ -3,16 +3,16 @@
     <BackHeader :show-menu="true" title="Workout">
       <template #menuAppend>
         <v-list>
-          <v-list-item @click="workoutStore.clearCurrentWorkout">
+          <v-list-item >
             <v-list-item-title>Weight and reps</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="workoutStore.clearCurrentWorkout">
+          <v-list-item >
             <v-list-item-title>Edit</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="workoutStore.clearCurrentWorkout">
+          <v-list-item >
             <v-list-item-title>Dublicate</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="workoutStore.clearCurrentWorkout">
+          <v-list-item >
             <v-list-item-title>Delete</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -29,7 +29,7 @@
         </div>
       </div>
       <v-divider />
-      <v-btn class="w-100" color="primary">Start Session</v-btn>
+      <v-btn class="w-100" color="primary" @click="startSession">Start Session</v-btn>
       <div class="mt-4">
         <v-card
           v-for="(exercise, index) in workout?.exercises"
@@ -61,8 +61,11 @@
   import BackHeader from '@/components/BackHeader.vue';
   import router from '@/router';
   import { useWorkoutStore } from '@/stores/workout.store';
+  import { startWorkoutSession } from '@/services/workoutSession.service';
+  import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 
   const workoutStore = useWorkoutStore();
+  const workoutSessionStore = useWorkoutSessionStore();
 
   const workout = computed(() => workoutStore.currentWorkout);
 
@@ -71,5 +74,17 @@
   const routeTo = (exerciseId: string) => {
     console.log('Navigating to exercise with ID:', exerciseId);
     router.push(`/exercise/${exerciseId}`);
+  };
+
+  const startSession = async () => {
+    if (workout.value) {
+      const response = await startWorkoutSession(workout.value._id);
+      if (response && response._id) {
+        await workoutSessionStore.fetchSelectedWorkoutSession(response._id);
+        router.push(`/session/${response._id}`);
+      } else {
+        console.error('Failed to start session:', response);
+      }
+    }
   };
 </script>
