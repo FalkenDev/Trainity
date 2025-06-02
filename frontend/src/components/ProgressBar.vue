@@ -2,7 +2,7 @@
   <v-card class="pa-5" style="border-radius: 10px">
     <div class="d-flex justify-space-between align-center">
       <h1 class="text-h6">Your Progress</h1>
-      <v-btn color="grey-darken-3" variant="flat" density="compact">
+      <v-btn color="grey-darken-3" density="compact" variant="flat">
         Days
         <v-icon>mdi-chevron-down</v-icon>
         <v-menu activator="parent">
@@ -20,7 +20,7 @@
     </div>
     <div class="d-flex justify-space-between align-center my-5">
       <div v-for="day in ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']" :key="day">
-        <v-avatar size="35" color="grey-darken-3">
+        <v-avatar color="grey-darken-3" size="35">
           <span class="text-body-2">{{ day }}</span>
         </v-avatar>
       </div>
@@ -42,12 +42,12 @@
   </v-card>
 </template>
 <script lang="ts" setup>
-const selectedSort = ref(0);
+  const selectedSort = ref(0);
 
-const sortBy = [
-  { title: "Days" },
-  { title: "Weeks" },
-  { title: "Months" },
-  { title: "Years" },
-];
+  const sortBy = [
+    { title: 'Days' },
+    { title: 'Weeks' },
+    { title: 'Months' },
+    { title: 'Years' },
+  ];
 </script>

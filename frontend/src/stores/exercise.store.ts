@@ -1,9 +1,9 @@
 // stores/authStore.ts
-import { defineStore } from "pinia";
-import * as exerciseService from "@/services/exercise.service";
+import { defineStore } from 'pinia';
+import * as exerciseService from '@/services/exercise.service';
 
 export const useExerciseStore = defineStore(
-  "exerciseStore",
+  'exerciseStore',
   () => {
     const exercises = ref([]);
     const isLoading = ref<boolean>(false);
@@ -26,7 +26,7 @@ export const useExerciseStore = defineStore(
         exercises.value = await exerciseService.fetchAllExercises();
         lastFetched.value = now;
       } catch (error) {
-        console.error("Error fetching exercises:", error);
+        console.error('Error fetching exercises:', error);
       } finally {
         isLoading.value = false;
       }
