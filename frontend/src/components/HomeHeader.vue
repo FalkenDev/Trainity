@@ -3,9 +3,9 @@
     <div class="d-flex ga-3 align-center">
       <v-avatar
         color="white"
-        width="45"
         height="45"
         style="border-radius: 8px"
+        width="45"
       />
       <div>
         <h1 class="text-h6">
@@ -15,11 +15,11 @@
       </div>
     </div>
     <v-btn
+      color="grey-darken-3"
+      density="compact"
       icon
       size="45"
-      color="grey-darken-3"
       variant="flat"
-      density="compact"
     >
       <v-icon>mdi-menu</v-icon>
       <v-menu activator="parent">
@@ -33,9 +33,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { useAuthStore } from "@/stores/auth.store";
-import type { User } from "@/interfaces/User.interface";
-const authStore = useAuthStore();
+  import { useAuthStore } from '@/stores/auth.store';
+  import type { User } from '@/interfaces/User.interface';
+  const authStore = useAuthStore();
 
-const user = computed<User | null>(() => authStore.user);
+  const user = computed<User | null>(() => authStore.user);
 </script>

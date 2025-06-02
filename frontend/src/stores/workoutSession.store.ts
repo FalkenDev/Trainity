@@ -1,9 +1,9 @@
 // stores/authStore.ts
-import { defineStore } from "pinia";
-import * as workoutSessionService from "@/services/workoutSession.service";
+import { defineStore } from 'pinia';
+import * as workoutSessionService from '@/services/workoutSession.service';
 
 export const useWorkoutSessionStore = defineStore(
-  "workoutSessionStore",
+  'workoutSessionStore',
   () => {
     const workoutSessions = ref([]);
     const isLoading = ref<boolean>(false);
@@ -27,7 +27,7 @@ export const useWorkoutSessionStore = defineStore(
           await workoutSessionService.fetchAllWorkoutSessions();
         lastFetched.value = now;
       } catch (error) {
-        console.error("Error fetching workout sessions:", error);
+        console.error('Error fetching workout sessions:', error);
       } finally {
         isLoading.value = false;
       }

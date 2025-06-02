@@ -5,8 +5,8 @@
       <v-btn
         id="menu-activator"
         color="grey-darken-3"
-        variant="flat"
         density="compact"
+        variant="flat"
       >
         Lägg till
       </v-btn>
@@ -20,7 +20,7 @@
         @click="routeTo(workout._id)"
       >
         <div class="d-flex ga-5 align-center">
-          <img style="width: 65px; height: 65px;" class="bg-grey"></img>
+          <img class="bg-grey" style="width: 65px; height: 65px;"></img>
           <div class="d-flex flex-column ga-1">
             <h2 class="text-h6">{{ workout.title }}</h2>
             <div class="text-body-2 d-flex align-center ga-1" style="line-height: 1.1rem !important;">
@@ -30,10 +30,10 @@
           </div>
         </div>
         <v-btn
+          class="d-flex justify-center align-center mx-2"
+          color="orange-darken-2"
           icon
           size="35"
-          color="orange-darken-2"
-          class="d-flex justify-center align-center mx-2"
         >
           <v-icon>mdi-play</v-icon>
         </v-btn>
@@ -42,16 +42,16 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type { Workout } from '@/interfaces/Workout.interface';
-import router from '@/router';
-import { useWorkoutStore } from '@/stores/workout.store';
-const workoutStore = useWorkoutStore();
+  import type { Workout } from '@/interfaces/Workout.interface';
+  import router from '@/router';
+  import { useWorkoutStore } from '@/stores/workout.store';
+  const workoutStore = useWorkoutStore();
 
-const workouts = computed<Workout[]>(() => workoutStore.workouts);
+  const workouts = computed<Workout[]>(() => workoutStore.workouts);
 
-const routeTo = (id: string) => {
-  console.log('Navigating to workout with ID:', id);
-  workoutStore.setCurrentWorkout(id);
-  router.push(`/workout/${id}`);
-};
+  const routeTo = (id: string) => {
+    console.log('Navigating to workout with ID:', id);
+    workoutStore.setCurrentWorkout(id);
+    router.push(`/workout/${id}`);
+  };
 </script>

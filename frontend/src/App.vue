@@ -7,8 +7,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from "./stores/auth.store";
-import { VSonner, toast } from "vuetify-sonner";
-import "vuetify-sonner/style.css";
-const authStore = useAuthStore();
+  import { useAuthStore } from './stores/auth.store';
+  import { toast, VSonner } from 'vuetify-sonner';
+  import 'vuetify-sonner/style.css';
+  const authStore = useAuthStore();
 </script>
