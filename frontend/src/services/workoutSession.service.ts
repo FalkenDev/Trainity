@@ -49,3 +49,23 @@ export const getWorkoutSessionById = async (sessionId: string) => {
     throw error;
   }
 };
+
+export const finnishWorkoutSession = async (sessionId: string) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  try {
+    const response = await fetchWrapper(
+      `${apiUrl}/workoutsessions/${sessionId}/complete`,
+      {
+        method: "POST",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to finish workout session");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error finishing workout session:", error);
+    throw error;
+  }
+};
