@@ -95,30 +95,6 @@ Docker configuration is planned for easier deployment. Stay tuned!
 
 _Screenshots and demo will be available as development progresses_
 
-## 🗺️ Development Roadmap
-
-### Phase 1: Core Foundation _(Current)_
-
-- [x] Project architecture setup
-- [ ] Exercise management system
-- [ ] Workout creation interface
-- [ ] Session tracking functionality
-- [ ] Basic statistics dashboard
-
-### Phase 2: Enhanced Features
-
-- [ ] User authentication & profiles
-- [ ] Advanced analytics
-- [ ] Data export/import
-- [ ] Docker containerization
-
-### Phase 3: Advanced Capabilities
-
-- [ ] AI-powered recommendations
-- [ ] Mobile application
-- [ ] Wearable device integration
-- [ ] Enhanced desktop interface
-
 ## 👨‍💻 Developer
 
 **Kasper Falk** ([@FalkenDev](https://github.com/FalkenDev))
