@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 
 import MuscleGroup from "../v1/schemas/MuscleGroupSchema.js";
 import Exercise from "../v1/schemas/ExerciseSchema.js";
@@ -10,8 +11,11 @@ dotenv.config();
 
 const usersToSeed = [
   {
-    email: "test@test.com",
+    email: "test@test.se",
     password: "test1234",
+    firstName: "Seed",
+    lastName: "User",
+    avatar: "https://i.pravatar.cc/150?u=seeduser",
   },
 ];
 
@@ -150,9 +154,29 @@ const seedDatabase = async () => {
 
     // --- Seed User ---
     console.log("👤 Seeding user...");
-    const createdUsers = await User.insertMany(usersToSeed);
+    const createdUsers = [];
+    for (const userData of usersToSeed) {
+      // 1. Hash the plain-text password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(userData.password, salt);
+
+      // 2. Create the user with the hashed password
+      const user = await User.create({
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        avatar: userData.avatar,
+        password: hashedPassword, // Use the hashed password
+      });
+      createdUsers.push(user);
+      console.log(`   -> Created user: ${user.email}`);
+    }
+
+    if (createdUsers.length === 0) {
+      throw new Error("No users were seeded. Halting script.");
+    }
     const mainUserId = createdUsers[0]._id;
-    console.log(`✅ User seeded with ID: ${mainUserId}`);
+    console.log(`✅ User seeding complete. Main user ID: ${mainUserId}`);
 
     // --- Seed Muscle Groups ---
     console.log("💪 Seeding muscle groups...");
