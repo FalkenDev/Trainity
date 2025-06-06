@@ -1,7 +1,9 @@
 <template>
   <v-app>
     <VSonner position="top-center" />
-    <router-view />
+    <v-main>
+      <router-view />
+    </v-main>
     <BottomNavigation v-if="authStore.isAuthenticated" />
   </v-app>
 </template>
