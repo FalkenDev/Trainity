@@ -1,12 +1,15 @@
 <template>
-  <div class="d-flex justify-space-between align-center px-5 py-3" @click="routeTo">
+  <div
+    class="d-flex justify-space-between align-center px-5 py-3"
+    @click="routeTo"
+  >
     <v-btn
-      v-if="showMenu"
       color="grey-darken-4"
       density="compact"
       icon
       size="40"
       variant="flat"
+      @click="emit('close')"
     >
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
@@ -27,22 +30,26 @@
         </template>
       </v-menu>
     </v-btn>
+    <div v-else style="width: 40px" />
   </div>
 </template>
 <script lang="ts" setup>
-  import router from '@/router';
+import router from "@/router";
 
-  const props = defineProps<{
-    title: string;
-    showMenu?: boolean;
-    routeTo?: string;
+const props = defineProps<{
+  title: string;
+  showMenu?: boolean;
+  routeTo?: string;
+}>();
 
-  }>();
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
 
-  const routeTo = () => {
-    if (props.routeTo) {
-      console.log('Navigating to:', props.routeTo);
-      router.push(props.routeTo);
-    }
-  };
+const routeTo = () => {
+  if (props.routeTo) {
+    console.log("Navigating to:", props.routeTo);
+    router.push(props.routeTo);
+  }
+};
 </script>
