@@ -1,4 +1,8 @@
 import { fetchWrapper } from "@/utils/fetchWrapper";
+import type {
+  WorkoutExercise,
+  WorkoutSession,
+} from "@/interfaces/workoutSession.interface";
 
 export const fetchAllWorkoutSessions = async () => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
@@ -33,6 +37,30 @@ export const startWorkoutSession = async (workoutId: string) => {
   }
 };
 
+export const addFinnishedExerciseToSession = async (
+  sessionId: string,
+  workoutExercise: WorkoutExercise
+) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  try {
+    const response = await fetchWrapper(
+      `${apiUrl}/workoutsessions/${sessionId}/exercises`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(workoutExercise),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to add finished exercise to session");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error adding finished exercise to session:", error);
+    throw error;
+  }
+};
+
 export const getWorkoutSessionById = async (sessionId: string) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
@@ -46,6 +74,30 @@ export const getWorkoutSessionById = async (sessionId: string) => {
     return data;
   } catch (error) {
     console.error("Error fetching workout session:", error);
+    throw error;
+  }
+};
+
+export const updateWorkoutSession = async (
+  sessionId: string,
+  sessionData: WorkoutSession
+) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  try {
+    const response = await fetchWrapper(
+      `${apiUrl}/workoutsessions/${sessionId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(sessionData),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to update workout session");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating workout session:", error);
     throw error;
   }
 };
@@ -66,6 +118,25 @@ export const finnishWorkoutSession = async (sessionId: string) => {
     return data;
   } catch (error) {
     console.error("Error finishing workout session:", error);
+    throw error;
+  }
+};
+
+export const deleteWorkoutSession = async (sessionId: string) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  try {
+    const response = await fetchWrapper(
+      `${apiUrl}/workoutsessions/${sessionId}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to delete workout session");
+    }
+    return true; // Assuming deletion is successful if no error is thrown
+  } catch (error) {
+    console.error("Error deleting workout session:", error);
     throw error;
   }
 };

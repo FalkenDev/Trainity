@@ -14,3 +14,16 @@ export interface WorkoutSession {
   __v: number;
   workout: Workout;
 }
+
+export interface WorkoutExercise {
+  exerciseId: string;
+  sets: [
+    {
+      setNumber: number;
+      weight: number;
+      reps: number;
+      rpe: number;
+      notes?: string;
+    }
+  ];
+}
