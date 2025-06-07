@@ -23,9 +23,16 @@
       <div class="py-4">
         <h1 class="text-h5 font-weight-bold">{{ workout?.title }}</h1>
         <p>{{ workout?.description }}</p>
-        <div class="d-flex ga-2 align-center mt-2">
-          <v-chip label>{{ workout?.time }} min</v-chip>
-          <v-chip label>Upper body</v-chip>
+        <div class="d-flex ga-2 align-center mt-2 flex-wrap">
+          <v-chip label color="orange-lighten-1">{{ workout?.time }} min</v-chip>
+          <v-chip
+          color="green-lighten-1"
+            label
+              v-for="group in getMuscleGroupsForWorkout()"
+              :key="group"
+            >
+              {{ group }}
+            </v-chip>
         </div>
       </div>
       <v-divider />
@@ -54,8 +61,15 @@
           </div>
         </v-card>
       </div>
+      <div class="pb-5">
+
+        <v-btn class="w-100" color="green-lighten-1" @click="isAddExerciseOpen = true">Add exercise</v-btn>
+      </div>
     </div>
   </div>
+  <v-dialog v-model="isAddExerciseOpen" fullscreen>
+    <AddExerciseList @close="isAddExerciseOpen = false" :selected-exercises="workout?.exercises" />
+  </v-dialog>
 </template>
 <script lang="ts" setup>
   import BackHeader from '@/components/BackHeader.vue';
@@ -63,13 +77,41 @@
   import { useWorkoutStore } from '@/stores/workout.store';
   import { startWorkoutSession } from '@/services/workoutSession.service';
   import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
+  import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
+  import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
+  import type { Workout } from '@/interfaces/Workout.interface';
 
+  const isAddExerciseOpen = ref(false);
+  const muscleGroupStore = useMuscleGroupStore();
   const workoutStore = useWorkoutStore();
   const workoutSessionStore = useWorkoutSessionStore();
+  const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 
-  const workout = computed(() => workoutStore.currentWorkout);
+  // TODO: Show all data from exercise, like sets, reps, weight, etc.
 
-  console.log('Current workout:', workout.value);
+  // TODO: Make it easy to edit exercises in the workout
+
+  // TODO: remove exercises from workout
+
+  // TODO: when click on exercise, show a dialog with the exercise details maybe here insert the remove exercise button
+
+  // TODO: Make it easy to edit a workout, like changing the title, description, time, etc.
+
+  const getMuscleGroupsForWorkout = (): string[] => {
+    if (!workout.value?.exercises || workout.value.exercises.length === 0) {
+      return [];
+    }
+
+    const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
+
+    return workout.value?.exercises
+      .flatMap(exercise => exercise.exercise.muscleGroups || [])
+      .map(muscleGroupId => {
+        const group = muscleGroup.find(group => group._id === muscleGroupId);
+        return group ? group.name : "Unknown";
+      })
+      .filter((value, index, self) => self.indexOf(value) === index);
+  };
 
   const routeTo = (exerciseId: string) => {
     console.log('Navigating to exercise with ID:', exerciseId);
