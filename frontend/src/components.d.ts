@@ -9,9 +9,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AcceptDialog: typeof import('./components/basicUI/AcceptDialog.vue')['default']
+    AddExerciseList: typeof import('./components/Exercise/AddExerciseList.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     BackHeader: typeof import('./components/BackHeader.vue')['default']
     BottomNavigation: typeof import('./components/BottomNavigation.vue')['default']
+    ExerciseList: typeof import('./components/Exercise/ExerciseList.vue')['default']
+    ExitHeader: typeof import('./components/basicUI/ExitHeader.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     HomeHeader: typeof import('./components/HomeHeader.vue')['default']
