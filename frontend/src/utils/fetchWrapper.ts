@@ -20,7 +20,6 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
     options.headers = headers;
 
     const response = await fetch(url, options);
-    console.log(`Fetch request to ${url} with options:`, response);
 
     if (response.status === 401) {
       handleForbidden();
