@@ -12,3 +12,13 @@ export interface Exercise {
   updatedAt: string;
   __v: number;
 }
+
+export interface CreateExercise {
+  name: string;
+  description: string;
+  img: string;
+  muscleGroups: string[];
+  defaultSets: number;
+  defaultReps: number;
+  defaultPauseSeconds: number;
+}
