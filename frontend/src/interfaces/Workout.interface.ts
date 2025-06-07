@@ -29,3 +29,28 @@ export interface Exercise {
     __v: number;
   };
 }
+
+export interface CreateWorkout {
+  title: string;
+  time: number;
+  description?: string;
+  exercises: [
+    {
+      exerciseId: string;
+      order: number;
+      sets: number;
+      reps: number;
+      weight: number;
+      pauseSeconds: number;
+    }
+  ];
+}
+
+export interface AddExerciseToWorkout {
+  exerciseId: string;
+  order: number;
+  sets: number;
+  reps: number;
+  weight: number;
+  pauseSeconds: number;
+}
