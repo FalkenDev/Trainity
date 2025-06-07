@@ -7,3 +7,10 @@ export interface User {
   updatedAt: string;
   __v: number;
 }
+
+export interface CreateUser {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
