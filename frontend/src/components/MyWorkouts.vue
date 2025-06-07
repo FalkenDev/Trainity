@@ -19,7 +19,7 @@
         @click="routeTo(workout._id)"
         style="
           border-radius: 16px;
-          background: linear-gradient(135deg, #2c2c2c 0%, #1e1e1e 100%);
+          background: linear-gradient(135deg, #1a1a1a 50%, #0f0f0f 100%);
           border: 1px solid rgba(255, 255, 255, 0.1);
         "
       >
