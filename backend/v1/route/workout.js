@@ -9,5 +9,16 @@ router.post("/", auth, workoutModel.createWorkout);
 router.get("/:id", auth, workoutModel.getWorkout);
 router.put("/:id", auth, workoutModel.updateWorkout);
 router.delete("/:id", auth, workoutModel.deleteWorkout);
+router.post("/:id/exercise", auth, workoutModel.addExerciseToWorkout);
+router.delete(
+  "/:id/exercise/:exerciseId",
+  auth,
+  workoutModel.removeExerciseFromWorkout
+);
+router.put(
+  "/:id/exercise/:exerciseId",
+  auth,
+  workoutModel.updateExerciseInWorkout
+);
 
 export default router;
