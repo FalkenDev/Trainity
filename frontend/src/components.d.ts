@@ -13,6 +13,7 @@ declare module 'vue' {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     BackHeader: typeof import('./components/BackHeader.vue')['default']
     BottomNavigation: typeof import('./components/BottomNavigation.vue')['default']
+    EditExercise: typeof import('./components/Exercise/EditExercise.vue')['default']
     ExerciseList: typeof import('./components/Exercise/ExerciseList.vue')['default']
     ExitHeader: typeof import('./components/basicUI/ExitHeader.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
