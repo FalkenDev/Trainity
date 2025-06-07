@@ -1,6 +1,7 @@
 import Workout from "../schemas/WorkoutSchema.js";
 import mongoose from "mongoose";
 import WorkoutSession from "../schemas/WorkoutSessionSchema.js";
+import Exercise from "../schemas/ExerciseSchema.js";
 
 const workoutModel = {
   getWorkoutList: async function (req, res) {
@@ -24,7 +25,7 @@ const workoutModel = {
         })),
       }));
 
-      res.status(200).json(result); // <-- return the transformed data!
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -39,6 +40,143 @@ const workoutModel = {
       res.status(201).json(newWorkout);
     } catch (error) {
       res.status(400).json({ error: error.message });
+    }
+  },
+
+  addExerciseToWorkout: async function (req, res) {
+    const { exerciseId, order, sets, reps, weight, pauseSeconds } = req.body;
+    console.log("Adding exercise to workout:", {
+      exerciseId,
+      order,
+      sets,
+      reps,
+      weight,
+      pauseSeconds,
+    });
+    try {
+      await mongoose.connect(process.env.DBURI);
+      console.log("Connected to MongoDB with Mongoose");
+
+      const workout = await Workout.findOne({
+        _id: req.params.id,
+        createdBy: req.user.id,
+      });
+
+      if (!workout) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
+
+      const exercise = await Exercise.findById(exerciseId);
+
+      if (!exercise) {
+        return res.status(404).json({ message: "Exercise not found" });
+      }
+
+      const newExercise = {
+        exerciseId,
+        order: order || workout.exercises.length + 1, // Default to next order if not provided
+        sets: sets || exercise.defaultSets,
+        reps: reps || exercise.defaultReps,
+        weight: weight || 0, // Default to 0 if not provided
+        pauseSeconds: pauseSeconds || exercise.defaultPauseSeconds,
+      };
+
+      workout.exercises.push(newExercise);
+      await workout.save();
+
+      res.status(201).json(workout);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  updateExerciseInWorkout: async function (req, res) {
+    const { order, sets, reps, weight, pauseSeconds } = req.body;
+
+    try {
+      await mongoose.connect(process.env.DBURI);
+
+      const workout = await Workout.findOne({
+        _id: req.params.id,
+        createdBy: req.user.id,
+      });
+
+      if (!workout) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
+
+      const oldIndex = workout.exercises.findIndex(
+        (e) => e.exerciseId.toString() === req.params.exerciseId
+      );
+
+      if (oldIndex === -1) {
+        return res
+          .status(404)
+          .json({ message: "Exercise not found in workout" });
+      }
+
+      if (order !== undefined && order !== workout.exercises[oldIndex].order) {
+        const [itemToMove] = workout.exercises.splice(oldIndex, 1);
+
+        itemToMove.sets = sets ?? itemToMove.sets;
+        itemToMove.reps = reps ?? itemToMove.reps;
+        itemToMove.weight = weight ?? itemToMove.weight;
+        itemToMove.pauseSeconds = pauseSeconds ?? itemToMove.pauseSeconds;
+
+        const numExercises = workout.exercises.length;
+        const newOrder = Math.max(1, Math.min(order, numExercises + 1));
+        const newIndex = newOrder - 1;
+
+        workout.exercises.splice(newIndex, 0, itemToMove);
+
+        workout.exercises.forEach((ex, index) => {
+          ex.order = index + 1;
+        });
+      } else {
+        const exerciseToUpdate = workout.exercises[oldIndex];
+        exerciseToUpdate.sets = sets ?? exerciseToUpdate.sets;
+        exerciseToUpdate.reps = reps ?? exerciseToUpdate.reps;
+        exerciseToUpdate.weight = weight ?? exerciseToUpdate.weight;
+        exerciseToUpdate.pauseSeconds =
+          pauseSeconds ?? exerciseToUpdate.pauseSeconds;
+      }
+
+      await workout.save();
+      res.status(200).json(workout);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  removeExerciseFromWorkout: async function (req, res) {
+    try {
+      await mongoose.connect(process.env.DBURI);
+      console.log("Connected to MongoDB with Mongoose");
+
+      const workout = await Workout.findOne({
+        _id: req.params.id,
+        createdBy: req.user.id,
+      });
+
+      if (!workout) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
+
+      const exerciseIndex = workout.exercises.findIndex(
+        (e) => e.exerciseId.toString() === req.params.exerciseId
+      );
+
+      if (exerciseIndex === -1) {
+        return res
+          .status(404)
+          .json({ message: "Exercise not found in workout" });
+      }
+
+      workout.exercises.splice(exerciseIndex, 1);
+      await workout.save();
+      res.status(200).json({ message: "Exercise removed from workout" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 
@@ -81,7 +219,6 @@ const workoutModel = {
     try {
       const workoutId = req.params.id;
 
-      // Delete the workout
       const deletedWorkout = await Workout.findOneAndDelete({
         _id: workoutId,
         createdBy: req.user.id,
@@ -90,7 +227,6 @@ const workoutModel = {
         return res.status(404).json({ message: "Workout not found" });
       }
 
-      // Remove workoutId reference from all WorkoutSessions
       await WorkoutSession.updateMany(
         { workoutId: workoutId },
         { $unset: { workoutId: "" } }
