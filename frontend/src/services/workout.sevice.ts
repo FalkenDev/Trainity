@@ -1,6 +1,7 @@
 import type {
   AddExerciseToWorkout,
   CreateWorkout,
+  UpdateWorkout,
 } from "@/interfaces/Workout.interface";
 import { fetchWrapper } from "@/utils/fetchWrapper";
 
@@ -52,11 +53,11 @@ export const getWorkoutById = async (id: string) => {
   }
 };
 
-export const updateWorkout = async (id: string, workout: CreateWorkout) => {
+export const updateWorkout = async (id: string, workout: UpdateWorkout) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
-      method: "PUT",
+      method: "PATCH",
       body: JSON.stringify(workout),
     });
     if (!response.ok) {
