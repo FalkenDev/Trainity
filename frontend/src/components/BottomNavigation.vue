@@ -1,5 +1,4 @@
 <template>
-  <!-- A bottom navigation with routes to home, statistics, add workout, calendar and profile -->
   <v-bottom-navigation class="d-flex justify-space-around">
     <v-btn icon to="/">
       <v-icon>mdi-home</v-icon>
