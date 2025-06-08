@@ -11,6 +11,11 @@ export const useWorkoutSessionStore = defineStore(
     const lastFetched = ref<number | null>(null);
     const cacheDuration = 10 * 1000;
 
+    // TODO: Maybe needed or will the selectedWorkoutSession only be in need ?
+    const hasActiveSession = ref(false);
+
+    // TODO: We need to set the clock to the last time the user was working out if the user refreshes the page / finding the active workout session.
+    // This is to keep track of the time elapsed during the workout session.
     const secondsElapsed = ref(0);
     let intervalId: ReturnType<typeof setInterval> | null = null;
     const isRunning = ref(false);
@@ -23,6 +28,8 @@ export const useWorkoutSessionStore = defineStore(
       return `${formattedMinutes}:${formattedSeconds}`;
     });
 
+    // TODO: When initializing the store, we should check if there are a current workout session and if so, set it as the selectedWorkoutSession.
+    // This is bcs if the user refreshes the page, we want to keep the current workout session in progress.
     const setWorkoutSessions = async (reload = false) => {
       const now = Date.now();
       if (
@@ -99,7 +106,7 @@ export const useWorkoutSessionStore = defineStore(
           stopClock();
         }
       },
-      { immediate: true }
+      { immediate: true },
     );
 
     return {
@@ -127,5 +134,5 @@ export const useWorkoutSessionStore = defineStore(
         "lastFetched",
       ],
     },
-  }
+  },
 );
