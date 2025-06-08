@@ -2,8 +2,8 @@
   <v-dialog
     :model-value="modelValue"
     @update:model-value="onDialogUpdate"
-    persistent
     max-width="600px"
+    @close="emit('update:modelValue', false)"
   >
     <v-card>
       <v-card-title class="headline">{{ title }}</v-card-title>
