@@ -1,7 +1,16 @@
 <template>
   <v-app>
     <VSonner position="top-center" />
-    <v-main>
+    <v-main
+      :style="{
+        paddingBottom:
+          authStore.isAuthenticated &&
+          workoutSessionStore.selectedWorkoutSession &&
+          checkPath()
+            ? '101px'
+            : '',
+      }"
+    >
       <router-view />
     </v-main>
     <v-card
