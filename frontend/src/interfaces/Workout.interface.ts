@@ -42,8 +42,14 @@ export interface CreateWorkout {
       reps: number;
       weight: number;
       pauseSeconds: number;
-    }
+    },
   ];
+}
+
+export interface UpdateWorkout {
+  title?: string;
+  time?: number;
+  description?: string;
 }
 
 export interface AddExerciseToWorkout {

@@ -17,7 +17,7 @@
         <v-icon>mdi-arrow-left</v-icon>
       </template>
     </v-btn>
-    <h1 class="text-h5">{{ title }}</h1>
+    <h1 class="text-h6">{{ title }}</h1>
     <v-btn
       v-if="showMenu"
       color="grey-darken-4"
@@ -28,7 +28,6 @@
     >
       <v-icon>mdi-menu</v-icon>
       <v-menu activator="parent">
-        <!-- A slot to use in other pages -->
         <template v-if="$slots.menuAppend">
           <slot name="menuAppend" />
         </template>

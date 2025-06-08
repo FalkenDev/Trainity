@@ -3,16 +3,19 @@
     <BackHeader :show-menu="true" title="Workout">
       <template #menuAppend>
         <v-list>
-          <v-list-item>
+          <v-list-item @click="isWeightAndRepsOpen = true">
             <v-list-item-title>Weight and reps</v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item @click="isAddExerciseOpen = true">
+            <v-list-item-title>Add exercise</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="isEditWorkoutOpen = true">
             <v-list-item-title>Edit</v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title>Duplicate</v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item @click="() => (isDeleteDialogOpen = true)">
             <v-list-item-title>Delete</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -66,14 +69,6 @@
           </div>
         </v-card>
       </div>
-      <div class="pb-5">
-        <v-btn
-          class="w-100"
-          color="green-lighten-1"
-          @click="isAddExerciseOpen = true"
-          >Add exercise</v-btn
-        >
-      </div>
     </div>
   </div>
   <v-dialog v-model="isAddExerciseOpen" fullscreen>
@@ -91,6 +86,27 @@
       :isViewExercise="false"
     />
   </v-dialog>
+  <v-dialog v-model="isEditWorkoutOpen" fullscreen>
+    <EditWorkout
+      @close="isEditWorkoutOpen = false"
+      :workout="workout"
+      @save="workoutStore.setWorkouts(true)"
+    />
+  </v-dialog>
+  <v-dialog v-model="isWeightAndRepsOpen" fullscreen>
+    <WeightAndRepsSettings
+      @close="isWeightAndRepsOpen = false"
+      :workoutId="workout?._id || ''"
+      :exercises="workout?.exercises || []"
+    />
+  </v-dialog>
+  <AcceptDialog
+    v-model="isDeleteDialogOpen"
+    title="Delete Exercise"
+    description="Are you sure you want to delete this exercise?"
+    @accept="deleteExercise"
+    @cancel="isDeleteDialogOpen = false"
+  />
 </template>
 <script lang="ts" setup>
 import BackHeader from "@/components/BackHeader.vue";
@@ -101,9 +117,14 @@ import { useWorkoutSessionStore } from "@/stores/workoutSession.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { Workout, Exercise } from "@/interfaces/Workout.interface";
+import { deleteWorkout } from "@/services/workout.sevice";
+import { toast } from "vuetify-sonner";
 
-const isAddExerciseOpen = ref(false);
-const isEditExerciseOpen = ref(false);
+const isAddExerciseOpen = ref<boolean>(false);
+const isEditExerciseOpen = ref<boolean>(false);
+const isDeleteDialogOpen = ref<boolean>(false);
+const isEditWorkoutOpen = ref<boolean>(false);
+const isWeightAndRepsOpen = ref<boolean>(false);
 const muscleGroupStore = useMuscleGroupStore();
 const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
@@ -111,6 +132,27 @@ const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
 
 // TODO: Make it easy to edit a workout, like changing the title, description, time, etc.
+
+const deleteExercise = async () => {
+  try {
+    if (workout.value) {
+      const response = await deleteWorkout(workout.value._id);
+      if (response) {
+        workoutStore.setWorkouts(true);
+        workoutStore.currentWorkout = null;
+        isDeleteDialogOpen.value = false;
+        toast.success("Exercise deleted successfully", { progressBar: true });
+        router.push("/");
+      } else {
+        console.error("Failed to delete exercise");
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting exercise:", error);
+    toast.error("Failed to delete exercise", { progressBar: true });
+    isDeleteDialogOpen.value = false;
+  }
+};
 
 const selectExercise = (exercise: Exercise) => {
   selectedExercise.value = exercise;
