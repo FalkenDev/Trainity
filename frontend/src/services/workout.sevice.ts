@@ -88,15 +88,15 @@ export const deleteWorkout = async (id: string) => {
 
 export const addExerciseToWorkout = async (
   workoutId: string,
-  exercise: AddExerciseToWorkout,
+  exerciseId: string,
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercises`,
+      `${apiUrl}/workouts/${workoutId}/exercise`,
       {
         method: "POST",
-        body: JSON.stringify({ exercise }),
+        body: JSON.stringify({ exerciseId }),
       },
     );
     if (!response.ok) {
