@@ -7,7 +7,7 @@
     >
       <template #menuAppend>
         <v-list>
-          <v-list-item>
+          <v-list-item @click="removeExercise">
             <v-list-item-title>Delete</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -34,38 +34,39 @@
           </div>
         </div>
         <v-divider />
-        <v-form v-if="editExercise" class="py-4">
+        <v-btn class="w-100 my-4" color="primary" @click="updateExercise">
+          Save Changes
+        </v-btn>
+        <v-form v-if="editExercise" class="pt-2 d-flex ga-5 flex-column">
           <v-text-field
             v-model="editExercise.sets"
             label="Sets"
             type="number"
             variant="outlined"
-            class="mb-4"
+            hide-details
           />
           <v-text-field
             v-model="editExercise.reps"
             label="Reps"
             type="number"
             variant="outlined"
-            class="mb-4"
-          />
-          <v-text-field
-            v-model="editExercise.pauseSeconds"
-            label="Pause (seconds)"
-            type="number"
-            variant="outlined"
+            hide-details
           />
           <v-text-field
             v-model="editExercise.weight"
             label="Weight (kg)"
             type="number"
             variant="outlined"
-            class="mt-4"
+            hide-details
+          />
+          <v-text-field
+            v-model="editExercise.pauseSeconds"
+            label="Pause (seconds)"
+            type="number"
+            variant="outlined"
+            hide-details
           />
         </v-form>
-        <v-btn class="w-100" color="primary" @click="updateExercise">
-          Save Changes
-        </v-btn>
       </div>
     </div>
   </div>
@@ -75,8 +76,14 @@ import type { Exercise } from "@/interfaces/Workout.interface";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { AddExerciseToWorkout } from "@/interfaces/Workout.interface";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
-import { updateExerciseInWorkout } from "@/services/workout.sevice";
+import {
+  updateExerciseInWorkout,
+  removeExerciseFromWorkout,
+} from "@/services/workout.sevice";
+import { useWorkoutStore } from "@/stores/workout.store";
+import { toast } from "vuetify-sonner";
 
+const workoutStore = useWorkoutStore();
 const muscleGroupStore = useMuscleGroupStore();
 const props = defineProps<{
   workoutId: string;
@@ -107,6 +114,28 @@ const getMuscleGroupsForExercise = (): string[] => {
     .filter((name): name is string => !!name);
 };
 
+const removeExercise = async () => {
+  try {
+    if (!props.selectedExercise || !props.workoutId) {
+      console.error("No exercise or workout ID provided.");
+      return;
+    }
+    const response = await removeExerciseFromWorkout(
+      props.workoutId,
+      props.selectedExercise.exercise._id,
+    );
+    if (response) {
+      toast.success("Exercise removed successfully!", { progressBar: true });
+      await workoutStore.setWorkouts(true);
+      emit("close");
+    } else {
+      console.error("Failed to remove exercise.");
+    }
+  } catch (error) {
+    console.error("Error in removeExerciseFromWorkout:", error);
+  }
+};
+
 const updateExercise = async () => {
   try {
     if (!editExercise.value) {
@@ -123,7 +152,8 @@ const updateExercise = async () => {
       editExercise.value as AddExerciseToWorkout,
     );
     if (repsponse) {
-      console.log("Exercise updated successfully:", repsponse);
+      toast.success("Exercise updated successfully!", { progressBar: true });
+      await workoutStore.setWorkouts(true);
       emit("close");
     } else {
       console.error("Failed to update exercise.");

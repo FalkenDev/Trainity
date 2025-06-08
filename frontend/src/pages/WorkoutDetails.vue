@@ -60,6 +60,7 @@
                 <p class="text-body-2">
                   {{ exercise.pauseSeconds }} sec pauses
                 </p>
+                <p class="text-body-2">{{ exercise.weight }}kg</p>
               </div>
             </div>
           </div>
@@ -106,12 +107,6 @@ const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
-
-// TODO: Show all data from exercise, like sets, reps, weight, etc.
-
-// TODO: Make it easy to edit exercises in the workout
-
-// TODO: remove exercises from workout
 
 // TODO: when click on exercise, show a dialog with the exercise details maybe here insert the remove exercise button
 
