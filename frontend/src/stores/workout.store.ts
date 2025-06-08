@@ -1,10 +1,10 @@
 // stores/authStore.ts
-import { defineStore } from 'pinia';
-import * as workoutService from '@/services/workout.sevice';
-import type { Workout } from '@/interfaces/Workout.interface';
+import { defineStore } from "pinia";
+import * as workoutService from "@/services/workout.sevice";
+import type { Workout } from "@/interfaces/Workout.interface";
 
 export const useWorkoutStore = defineStore(
-  'workoutStore',
+  "workoutStore",
   () => {
     const workouts = ref<Workout[]>([]);
     const currentWorkout = ref<Workout | null>(null);
@@ -26,10 +26,21 @@ export const useWorkoutStore = defineStore(
       try {
         isLoading.value = true;
         workouts.value = await workoutService.fetchAllWorkouts();
+        if (currentWorkout.value) {
+          const currentWorkoutId = currentWorkout.value._id;
+          const foundWorkout = workouts.value.find(
+            (w) => w._id === currentWorkoutId,
+          );
+          if (foundWorkout) {
+            currentWorkout.value = foundWorkout;
+          } else {
+            currentWorkout.value = null; // Reset if not found
+          }
+        }
         lastFetched.value = now;
-        console.log('Workouts fetched:', workouts.value);
+        console.log("Workouts fetched:", workouts.value);
       } catch (error) {
-        console.error('Error fetching workouts:', error);
+        console.error("Error fetching workouts:", error);
       } finally {
         isLoading.value = false;
       }
@@ -38,7 +49,7 @@ export const useWorkoutStore = defineStore(
     setWorkouts();
 
     const setCurrentWorkout = (workoutId: string) => {
-      const workout = workouts.value.find(w => w._id === workoutId);
+      const workout = workouts.value.find((w) => w._id === workoutId);
       if (workout) {
         currentWorkout.value = workout;
       } else {
@@ -56,5 +67,5 @@ export const useWorkoutStore = defineStore(
   },
   {
     persist: true,
-  }
+  },
 );

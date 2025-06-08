@@ -88,7 +88,7 @@ export const deleteWorkout = async (id: string) => {
 
 export const addExerciseToWorkout = async (
   workoutId: string,
-  exercise: AddExerciseToWorkout
+  exercise: AddExerciseToWorkout,
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
@@ -97,7 +97,7 @@ export const addExerciseToWorkout = async (
       {
         method: "POST",
         body: JSON.stringify({ exercise }),
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to add exercise to workout");
@@ -112,15 +112,15 @@ export const addExerciseToWorkout = async (
 
 export const removeExerciseFromWorkout = async (
   workoutId: string,
-  exerciseId: string
+  exerciseId: string,
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercises/${exerciseId}`,
+      `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
       {
         method: "DELETE",
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to remove exercise from workout");
@@ -135,16 +135,17 @@ export const removeExerciseFromWorkout = async (
 export const updateExerciseInWorkout = async (
   workoutId: string,
   exerciseId: string,
-  exerciseData: AddExerciseToWorkout
+  exerciseData: AddExerciseToWorkout,
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
+    console.log("Updating exercise in workout:", exerciseData);
     const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercises/${exerciseId}`,
+      `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
       {
         method: "PUT",
-        body: JSON.stringify({ exercise: exerciseData }),
-      }
+        body: JSON.stringify(exerciseData),
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to update exercise in workout");
