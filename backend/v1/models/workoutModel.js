@@ -201,11 +201,21 @@ const workoutModel = {
     try {
       await mongoose.connect(process.env.DBURI);
       console.log("Connected to MongoDB with Mongoose");
+
+      const allowedUpdates = ["title", "description", "time"];
+      const updates = {};
+      allowedUpdates.forEach((field) => {
+        if (req.body[field] !== undefined) {
+          updates[field] = req.body[field];
+        }
+      });
+
       const updatedWorkout = await Workout.findOneAndUpdate(
         { _id: req.params.id, createdBy: req.user.id },
-        req.body,
+        updates,
         { new: true, runValidators: true }
       );
+
       if (!updatedWorkout) {
         return res.status(404).json({ message: "Workout not found" });
       }
