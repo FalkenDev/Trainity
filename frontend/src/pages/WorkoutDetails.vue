@@ -80,6 +80,7 @@
     <AddExerciseList
       @close="isAddExerciseOpen = false"
       :selected-exercises="workout?.exercises"
+      :workoutId="workout?._id || ''"
     />
   </v-dialog>
   <v-dialog v-model="isEditExerciseOpen" fullscreen>
@@ -87,6 +88,7 @@
       @close="isEditExerciseOpen = false"
       :selectedExercise="selectedExercise"
       :workout-id="workout?._id || ''"
+      :isViewExercise="false"
     />
   </v-dialog>
 </template>
@@ -107,8 +109,6 @@ const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
-
-// TODO: when click on exercise, show a dialog with the exercise details maybe here insert the remove exercise button
 
 // TODO: Make it easy to edit a workout, like changing the title, description, time, etc.
 
