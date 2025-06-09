@@ -133,6 +133,8 @@ const selectedExercise = ref<Exercise | null>(null);
 
 // TODO: Make it easy to edit a workout, like changing the title, description, time, etc.
 
+// TODO: If a workout is already started, give a dialog to end the current session and start a new one
+
 const deleteExercise = async () => {
   try {
     if (workout.value) {
