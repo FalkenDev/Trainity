@@ -22,13 +22,14 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
     const response = await fetch(url, options);
 
     if (response.status === 401) {
-      handleForbidden();
+      // TODO: Fix Error when not logged in and this is running 24/7
+      //handleForbidden();
       return Promise.reject("401 Unauthorized");
     }
 
     // Check if the response is 403
     if (response.status === 403) {
-      handleForbidden();
+      //handleForbidden();
       return Promise.reject("403 Forbidden");
     }
 
