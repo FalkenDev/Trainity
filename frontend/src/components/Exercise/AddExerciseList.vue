@@ -1,11 +1,19 @@
 <template>
   <div class="h-100 w-100 bg-grey-darken-4">
-    <ExitHeader
+    <BackHeader
       title="Add Exercises"
       showMenu
       @close="close"
       :loading="isLoading"
-    />
+    >
+      <template #menuAppend>
+        <v-list>
+          <v-list-item @click="isCreateExerciseOpen = true">
+            <v-list-item-title>Create exercise</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </template>
+    </BackHeader>
     <v-text-field
       v-model="searchQuery"
       variant="outlined"
@@ -55,6 +63,9 @@
       :isViewExercise="true"
     />
   </v-dialog>
+  <v-dialog v-model="isCreateExerciseOpen" fullscreen>
+    <CreateExercise @close="isCreateExerciseOpen = false" />
+  </v-dialog>
 </template>
 <script lang="ts" setup>
 import type { Exercise } from "@/interfaces/Exercise.interface";
@@ -85,6 +96,7 @@ const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
 const viewExercise = ref<Exercise | null>(null);
 const isViewExerciseOpen = ref<boolean>(false);
+const isCreateExerciseOpen = ref<boolean>(false);
 
 const openViewExercise = (exercise: Exercise) => {
   viewExercise.value = exercise;
