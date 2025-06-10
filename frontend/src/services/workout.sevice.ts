@@ -158,3 +158,20 @@ export const updateExerciseInWorkout = async (
     throw error;
   }
 };
+
+export const dublicateWorkout = async (id: string) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  try {
+    const response = await fetchWrapper(`${apiUrl}/workouts/${id}/duplicate`, {
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to duplicate workout");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error duplicating workout:", error);
+    throw error;
+  }
+};
