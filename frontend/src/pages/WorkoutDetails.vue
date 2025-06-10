@@ -12,7 +12,7 @@
           <v-list-item @click="isEditWorkoutOpen = true">
             <v-list-item-title>Edit</v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item @click="dublicate">
             <v-list-item-title>Duplicate</v-list-item-title>
           </v-list-item>
           <v-list-item @click="() => (isDeleteDialogOpen = true)">
@@ -97,7 +97,7 @@
     <WeightAndRepsSettings
       @close="isWeightAndRepsOpen = false"
       :workoutId="workout?._id || ''"
-      :exercises="workout?.exercises || []"
+      :defaultWeightAndReps="workout?.defaultWeightAndReps ?? ''"
     />
   </v-dialog>
   <AcceptDialog
@@ -117,7 +117,7 @@ import { useWorkoutSessionStore } from "@/stores/workoutSession.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { Workout, Exercise } from "@/interfaces/Workout.interface";
-import { deleteWorkout } from "@/services/workout.sevice";
+import { deleteWorkout, dublicateWorkout } from "@/services/workout.sevice";
 import { toast } from "vuetify-sonner";
 
 const isAddExerciseOpen = ref<boolean>(false);
@@ -131,7 +131,20 @@ const workoutSessionStore = useWorkoutSessionStore();
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
 
-// TODO: Make it easy to edit a workout, like changing the title, description, time, etc.
+const dublicate = async () => {
+  if (workout.value) {
+    const response = await dublicateWorkout(workout.value._id);
+    console.log("Duplicating workout:", response);
+    if (response && response._id) {
+      await workoutStore.setWorkouts(true);
+      workoutStore.setCurrentWorkout(response._id);
+      toast.success("Workout duplicated successfully", { progressBar: true });
+      router.push(`/workout/${response._id}`);
+    } else {
+      console.error("Failed to duplicate workout");
+    }
+  }
+};
 
 // TODO: If a workout is already started, give a dialog to end the current session and start a new one
 

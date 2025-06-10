@@ -20,5 +20,6 @@ router.put(
   auth,
   workoutModel.updateExerciseInWorkout
 );
+router.post("/:id/duplicate", auth, workoutModel.duplicateWorkout);
 
 export default router;

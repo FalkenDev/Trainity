@@ -202,7 +202,12 @@ const workoutModel = {
       await mongoose.connect(process.env.DBURI);
       console.log("Connected to MongoDB with Mongoose");
 
-      const allowedUpdates = ["title", "description", "time"];
+      const allowedUpdates = [
+        "title",
+        "description",
+        "time",
+        "defaultWeightAndReps",
+      ];
       const updates = {};
       allowedUpdates.forEach((field) => {
         if (req.body[field] !== undefined) {
@@ -246,6 +251,57 @@ const workoutModel = {
         .status(200)
         .json({ message: "Workout deleted and references removed" });
     } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  duplicateWorkout: async function (req, res) {
+    try {
+      await mongoose.connect(process.env.DBURI);
+      console.log("Connected to MongoDB with Mongoose");
+
+      const originalWorkout = await Workout.findOne({
+        _id: req.params.id,
+        createdBy: req.user.id,
+      });
+
+      if (!originalWorkout) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
+
+      const baseTitle = originalWorkout.title.replace(/\s\(\d+\)$/, "");
+      const regex = new RegExp(`^${baseTitle}( \\(\\d+\\))?$`);
+      const existingCopies = await Workout.find({
+        title: regex,
+        createdBy: req.user.id,
+      });
+
+      let copyNumber = 1;
+      if (existingCopies.length > 0) {
+        const numbers = existingCopies.map((w) => {
+          const match = w.title.match(/\((\d+)\)$/);
+          return match ? parseInt(match[1], 10) : 0;
+        });
+        copyNumber = Math.max(...numbers) + 1;
+      }
+
+      const { _id, ...workoutData } = originalWorkout.toObject();
+
+      const newWorkout = new Workout({
+        ...workoutData,
+        title: `${baseTitle} (${copyNumber})`,
+        createdBy: req.user.id,
+      });
+
+      await newWorkout.save();
+      res.status(201).json(newWorkout);
+    } catch (error) {
+      // Check for the specific duplicate key error for a more precise message
+      if (error.code === 11000) {
+        return res
+          .status(409)
+          .json({ error: "A document with this key already exists." });
+      }
       res.status(500).json({ error: error.message });
     }
   },
