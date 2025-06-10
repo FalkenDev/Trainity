@@ -23,6 +23,12 @@ const WorkoutSchema = new Schema(
     description: { type: String, trim: true },
     time: { type: Number, required: true },
     exercises: { type: [WorkoutExerciseSchema], required: true, default: [] },
+    defaultWeightAndReps: {
+      type: String,
+      required: true,
+      default: "default",
+      enum: ["default", "latest", "exercise"],
+    },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
