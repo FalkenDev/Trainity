@@ -4,6 +4,7 @@ export interface Workout {
   time: number;
   description?: string;
   exercises: Exercise[];
+  defaultWeightAndReps: "default" | "latest" | "exercise";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,6 +51,7 @@ export interface UpdateWorkout {
   title?: string;
   time?: number;
   description?: string;
+  defaultWeightAndReps: "default" | "latest" | "exercise";
 }
 
 export interface AddExerciseToWorkout {
