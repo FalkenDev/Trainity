@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import User from "../schemas/UserSchema.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -9,8 +8,6 @@ import WorkoutSession from "../schemas/WorkoutSessionSchema.js";
 const userModel = {
   loginUser: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const { email, password } = req.body;
 
       // Find user by email
@@ -45,8 +42,6 @@ const userModel = {
 
   createUser: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const { email, password, firstName, lastName, avatar } = req.body;
 
       // Check if user already exists
@@ -83,8 +78,6 @@ const userModel = {
 
   getUserProfile: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const user = await User.findById(req.user.id).select("-password");
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -97,8 +90,6 @@ const userModel = {
 
   updateUserProfile: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const updatedUser = await User.findByIdAndUpdate(req.user.id, req.body, {
         new: true,
         runValidators: true,

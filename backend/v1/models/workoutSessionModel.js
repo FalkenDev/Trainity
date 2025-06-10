@@ -1,13 +1,10 @@
 import WorkoutSession from "../schemas/WorkoutSessionSchema.js";
-import mongoose from "mongoose";
 import Workout from "../schemas/WorkoutSchema.js";
 import Exercise from "../schemas/ExerciseSchema.js";
 
 const workoutSessionModel = {
   getWorkoutSessionList: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const sessions = await WorkoutSession.find({ userId: req.user.id });
       res.status(200).json(sessions);
     } catch (error) {
@@ -192,8 +189,6 @@ const workoutSessionModel = {
 
   updateWorkoutSession: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const updatedSession = await WorkoutSession.findOneAndUpdate(
         { _id: req.params.id, userId: req.user.id },
         req.body,
@@ -210,8 +205,6 @@ const workoutSessionModel = {
 
   deleteWorkoutSession: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const deletedSession = await WorkoutSession.findOneAndDelete({
         _id: req.params.id,
         userId: req.user.id,
