@@ -5,7 +5,7 @@ const ExerciseSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
-    img: { type: String, trim: true },
+    image: { type: String, trim: true },
     muscleGroups: [
       {
         type: Schema.Types.ObjectId,
