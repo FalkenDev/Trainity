@@ -1,13 +1,10 @@
 import MuscleGroup from "../schemas/MuscleGroupSchema.js";
-import mongoose from "mongoose";
 import Exercise from "../schemas/ExerciseSchema.js";
 import WorkoutSession from "../schemas/WorkoutSessionSchema.js";
 
 const muscleGroupModel = {
   getMuscleGroupList: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const muscleGroups = await MuscleGroup.find();
       res.status(200).json(muscleGroups);
     } catch (error) {
@@ -17,8 +14,6 @@ const muscleGroupModel = {
 
   createMuscleGroup: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const newMuscleGroup = new MuscleGroup(req.body);
       await newMuscleGroup.save();
       res.status(201).json(newMuscleGroup);
@@ -29,8 +24,6 @@ const muscleGroupModel = {
 
   getMuscleGroup: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const muscleGroup = await MuscleGroup.findById(req.params.id);
       if (!muscleGroup) {
         return res.status(404).json({ message: "Muscle group not found" });
@@ -43,8 +36,6 @@ const muscleGroupModel = {
 
   updateMuscleGroup: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const updatedMuscleGroup = await MuscleGroup.findByIdAndUpdate(
         req.params.id,
         req.body,

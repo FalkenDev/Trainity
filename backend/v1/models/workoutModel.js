@@ -1,13 +1,10 @@
 import Workout from "../schemas/WorkoutSchema.js";
-import mongoose from "mongoose";
 import WorkoutSession from "../schemas/WorkoutSessionSchema.js";
 import Exercise from "../schemas/ExerciseSchema.js";
 
 const workoutModel = {
   getWorkoutList: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const workouts = await Workout.find({ createdBy: req.user.id }).populate(
         "exercises.exerciseId"
       );
@@ -33,8 +30,6 @@ const workoutModel = {
 
   createWorkout: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const newWorkout = new Workout({ ...req.body, createdBy: req.user.id });
       await newWorkout.save();
       res.status(201).json(newWorkout);
@@ -54,9 +49,6 @@ const workoutModel = {
       pauseSeconds,
     });
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
-
       const workout = await Workout.findOne({
         _id: req.params.id,
         createdBy: req.user.id,
@@ -94,8 +86,6 @@ const workoutModel = {
     const { order, sets, reps, weight, pauseSeconds } = req.body;
 
     try {
-      await mongoose.connect(process.env.DBURI);
-
       const workout = await Workout.findOne({
         _id: req.params.id,
         createdBy: req.user.id,
@@ -150,9 +140,6 @@ const workoutModel = {
 
   removeExerciseFromWorkout: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
-
       const workout = await Workout.findOne({
         _id: req.params.id,
         createdBy: req.user.id,
@@ -182,8 +169,6 @@ const workoutModel = {
 
   getWorkout: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const workout = await Workout.findOne({
         _id: req.params.id,
         createdBy: req.user.id,
@@ -199,9 +184,6 @@ const workoutModel = {
 
   updateWorkout: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
-
       const allowedUpdates = [
         "title",
         "description",
@@ -257,9 +239,6 @@ const workoutModel = {
 
   duplicateWorkout: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
-
       const originalWorkout = await Workout.findOne({
         _id: req.params.id,
         createdBy: req.user.id,

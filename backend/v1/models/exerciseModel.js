@@ -1,5 +1,4 @@
 import Exercise from "../schemas/ExerciseSchema.js";
-import mongoose from "mongoose";
 import Workout from "../schemas/WorkoutSchema.js";
 import WorkoutSession from "../schemas/WorkoutSessionSchema.js";
 
@@ -7,8 +6,6 @@ const exerciseModel = {
   // GET all exercises for the user
   getExerciseList: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const exercises = await Exercise.find({ createdBy: req.user.id });
       res.status(200).json(exercises);
     } catch (error) {
@@ -19,8 +16,6 @@ const exerciseModel = {
   // POST a new exercise
   createExercise: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const newExercise = new Exercise({ ...req.body, createdBy: req.user.id });
       await newExercise.save();
       res.status(201).json(newExercise);
@@ -32,8 +27,6 @@ const exerciseModel = {
   // GET a specific exercise by ID
   getExercise: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const exercise = await Exercise.findOne({
         _id: req.params.id,
         createdBy: req.user.id,
@@ -50,8 +43,6 @@ const exerciseModel = {
   // PUT (update) a specific exercise by ID
   updateExercise: async function (req, res) {
     try {
-      await mongoose.connect(process.env.DBURI);
-      console.log("Connected to MongoDB with Mongoose");
       const updatedExercise = await Exercise.findOneAndUpdate(
         { _id: req.params.id, createdBy: req.user.id },
         req.body,

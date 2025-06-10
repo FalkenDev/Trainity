@@ -17,11 +17,14 @@ import morgan from "morgan";
 import RateLimit from "express-rate-limit";
 import passport from "passport";
 import os from "os";
+import connectDB from "./db/connection.js";
 
 // Using version 1
 import v1 from "./v1/index.js";
 
 dotenv.config();
+
+connectDB();
 
 // Server port
 const port = 8393;
