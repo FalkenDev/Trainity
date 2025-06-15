@@ -1,6 +1,9 @@
 <template>
   <div>
-    <BackHeader :show-menu="true" title="Workout Session">
+    <BackHeader
+      :show-menu="true"
+      title="Workout Session"
+    >
       <template #menuAppend>
         <v-list>
           <v-list-item>
@@ -12,36 +15,55 @@
     <div
       class="my-3 d-flex justify-space-between align-center bg-grey-darken-4 pa-5"
     >
-      <p class="text-h6">{{ clock }}</p>
-      <v-btn color="primary" @click="finnishSession">Finnish</v-btn>
+      <p class="text-h6">
+        {{ clock }}
+      </p>
+      <v-btn
+        color="primary"
+        @click="finnishSession"
+      >
+        Finnish
+      </v-btn>
     </div>
-    <div class="ma-5">
+    <div
+      v-if="!isExerciseStarted"
+      class="ma-5"
+    >
       <v-card
-        v-if="!isExerciseStarted"
         v-for="(exercise, index) in workoutSession?.workout?.exercises"
         :key="index"
         class="mb-4 d-flex pa-2 align-center justify-space-between"
         style="border-radius: 5px"
       >
         <div class="d-flex ga-5 align-center">
-          <img class="bg-grey" style="width: 65px; height: 65px" />
+          <img
+            class="bg-grey"
+            style="width: 65px; height: 65px"
+          >
           <div class="d-flex flex-column ga-1">
-            <h2 class="text-h6">{{ exercise.exercise?.name }}</h2>
+            <h2 class="text-h6">
+              {{ exercise.exercise?.name }}
+            </h2>
             <div class="d-flex ga-2">
               <p class="text-body-2">
                 {{ exercise.sets }} x {{ exercise.reps }} Reps
               </p>
-              <p class="text-body-2">{{ exercise.pauseSeconds }} sec pauses</p>
-              <v-btn color="primary" @click="startExercise(exercise.exerciseId)"
-                >Start</v-btn
+              <p class="text-body-2">
+                {{ exercise.pauseSeconds }} sec pauses
+              </p>
+              <v-btn
+                color="primary"
+                @click="startExercise(exercise.exerciseId)"
               >
+                Start
+              </v-btn>
             </div>
           </div>
         </div>
       </v-card>
-      <div v-else>
-        <h1>{{ selectedExercise.name }}</h1>
-      </div>
+    </div>
+    <div v-else>
+      <h1>{{ selectedExercise.name }}</h1>
     </div>
   </div>
 </template>

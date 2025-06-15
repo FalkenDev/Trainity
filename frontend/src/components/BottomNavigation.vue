@@ -1,18 +1,38 @@
 <template>
   <v-bottom-navigation class="d-flex justify-space-around">
-    <v-btn icon to="/">
+    <v-btn
+      icon
+      to="/"
+    >
       <v-icon>mdi-home</v-icon>
     </v-btn>
-    <v-btn icon to="/statistics">
+    <v-btn
+      icon
+      to="/statistics"
+    >
       <v-icon>mdi-chart-bar</v-icon>
     </v-btn>
-    <v-btn icon to="/add-workout">
-      <v-icon color="orange-darken-1" size="40">mdi-plus-circle</v-icon>
+    <v-btn
+      icon
+      to="/add-workout"
+    >
+      <v-icon
+        color="orange-darken-1"
+        size="40"
+      >
+        mdi-plus-circle
+      </v-icon>
     </v-btn>
-    <v-btn icon to="/calendar">
+    <v-btn
+      icon
+      to="/calendar"
+    >
       <v-icon>mdi-calendar</v-icon>
     </v-btn>
-    <v-btn icon to="/account">
+    <v-btn
+      icon
+      to="/account"
+    >
       <v-icon>mdi-account</v-icon>
     </v-btn>
   </v-bottom-navigation>

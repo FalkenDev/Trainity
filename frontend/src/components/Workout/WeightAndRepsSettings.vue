@@ -2,7 +2,7 @@
   <div class="bg-grey-darken-4 h-100 w-100">
     <ExitHeader
       title="Weight and Reps Settings"
-      showMenu
+      show-menu
       @close="$emit('close')"
     />
     <v-list>
@@ -24,10 +24,16 @@
               {{ option.description }}
             </v-list-item-subtitle>
           </div>
-          <v-icon color="primary" v-if="defaultWeightAndReps === option.value"
-            >mdi-check</v-icon
+          <v-icon
+            v-if="defaultWeightAndReps === option.value"
+            color="primary"
           >
-          <div v-else style="width: 24px" />
+            mdi-check
+          </v-icon>
+          <div
+            v-else
+            style="width: 24px"
+          />
         </div>
       </v-list-item>
     </v-list>
@@ -36,6 +42,10 @@
 <script lang="ts" setup>
 import { updateWorkout } from "@/services/workout.sevice";
 import { useWorkoutStore } from "@/stores/workout.store";
+
+defineEmits<{
+  (e: "close"): void;
+}>();
 
 const workoutStore = useWorkoutStore();
 

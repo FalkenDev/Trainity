@@ -1,6 +1,8 @@
 <template>
   <div class="d-flex justify-space-between align-center">
-    <h1 class="text-h5 font-weight-bold">My Workouts</h1>
+    <h1 class="text-h5 font-weight-bold">
+      My Workouts
+    </h1>
   </div>
   <div v-if="!workouts.length">
     <v-skeleton-loader
@@ -8,7 +10,7 @@
       :key="n"
       type="list-item-two-line"
       class="mb-4"
-    ></v-skeleton-loader>
+    />
   </div>
   <div v-else>
     <v-card
@@ -16,16 +18,18 @@
       :key="workout._id"
       class="mb-4 pa-4"
       variant="flat"
-      @click="routeTo(workout._id)"
       style="
         border-radius: 16px;
         background: linear-gradient(135deg, #1a1a1a 50%, #0f0f0f 100%);
         border: 1px solid rgba(255, 255, 255, 0.1);
       "
+      @click="routeTo(workout._id)"
     >
       <div class="d-flex justify-space-between align-center">
         <div class="d-flex flex-column ga-2">
-          <h2 class="text-h6 font-weight-bold">{{ workout.title }}</h2>
+          <h2 class="text-h6 font-weight-bold">
+            {{ workout.title }}
+          </h2>
           <div class="d-flex flex-wrap align-center ga-2">
             <v-chip
               v-for="group in getMuscleGroupsForWorkout(workout)"
@@ -40,11 +44,18 @@
           </div>
           <div class="text-body-2 d-flex align-center ga-2 text-grey-lighten-1">
             <span>{{ workout.exercises.length }} exercises</span>
-            <v-icon size="4">mdi-circle</v-icon>
+            <v-icon size="4">
+              mdi-circle
+            </v-icon>
             <span>{{ workout.time }} min</span>
           </div>
         </div>
-        <v-icon color="grey-darken-1" size="32">mdi-chevron-right</v-icon>
+        <v-icon
+          color="grey-darken-1"
+          size="32"
+        >
+          mdi-chevron-right
+        </v-icon>
       </div>
     </v-card>
   </div>

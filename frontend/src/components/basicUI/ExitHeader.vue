@@ -10,14 +10,16 @@
       icon
       size="40"
       variant="flat"
-      @click.stop="emit('close')"
       :loading="isLoading"
+      @click.stop="emit('close')"
     >
       <template v-if="!isLoading">
         <v-icon>mdi-arrow-left</v-icon>
       </template>
     </v-btn>
-    <h1 class="text-h6">{{ title }}</h1>
+    <h1 class="text-h6">
+      {{ title }}
+    </h1>
     <v-btn
       v-if="showMenu"
       color="grey-darken-4"

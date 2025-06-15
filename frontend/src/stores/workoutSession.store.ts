@@ -12,7 +12,7 @@ export const useWorkoutSessionStore = defineStore(
     const cacheDuration = 10 * 1000;
 
     // TODO: Maybe needed or will the selectedWorkoutSession only be in need ?
-    const hasActiveSession = ref(false);
+    // const hasActiveSession = ref(false);
 
     // TODO: We need to set the clock to the last time the user was working out if the user refreshes the page / finding the active workout session.
     // This is to keep track of the time elapsed during the workout session.

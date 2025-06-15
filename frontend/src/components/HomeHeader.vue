@@ -11,7 +11,9 @@
         <h1 class="text-h6">
           {{ user ? user.firstName + " " + user.lastName : "Guest" }}
         </h1>
-        <p class="text-body-2">Lets Get Ready 💪</p>
+        <p class="text-body-2">
+          Lets Get Ready 💪
+        </p>
       </div>
     </div>
     <v-btn

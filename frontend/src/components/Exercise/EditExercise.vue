@@ -15,7 +15,10 @@
     </BackHeader>
 
     <div v-if="selectedExercise">
-      <v-card height="200" class="bg-white" />
+      <v-card
+        height="200"
+        class="bg-white"
+      />
       <div class="mx-5">
         <div class="py-4">
           <h1 class="text-h5 font-weight-bold">
@@ -34,10 +37,10 @@
           </p>
           <div class="d-flex ga-2 align-center mt-2 flex-wrap">
             <v-chip
-              color="green-lighten-1"
-              label
               v-for="group in getMuscleGroupsForExercise()"
               :key="group"
+              color="green-lighten-1"
+              label
             >
               {{ group }}
             </v-chip>
@@ -48,7 +51,9 @@
           <v-list lines="one">
             <v-list-item>
               <template #prepend>
-                <v-icon color="primary">mdi-numeric</v-icon>
+                <v-icon color="primary">
+                  mdi-numeric
+                </v-icon>
               </template>
               <v-list-item-title>
                 <span class="font-weight-medium">Default Sets:</span>
@@ -63,7 +68,9 @@
             </v-list-item>
             <v-list-item>
               <template #prepend>
-                <v-icon color="primary">mdi-repeat</v-icon>
+                <v-icon color="primary">
+                  mdi-repeat
+                </v-icon>
               </template>
               <v-list-item-title>
                 <span class="font-weight-medium">Default Reps:</span>
@@ -78,7 +85,9 @@
             </v-list-item>
             <v-list-item>
               <template #prepend>
-                <v-icon color="primary">mdi-timer-outline</v-icon>
+                <v-icon color="primary">
+                  mdi-timer-outline
+                </v-icon>
               </template>
               <v-list-item-title>
                 <span class="font-weight-medium">Default Pause:</span>
@@ -95,7 +104,9 @@
             <v-divider class="my-2" />
             <v-list-item>
               <template #prepend>
-                <v-icon color="grey">mdi-calendar-plus</v-icon>
+                <v-icon color="grey">
+                  mdi-calendar-plus
+                </v-icon>
               </template>
               <v-list-item-title>
                 <span class="font-weight-medium">Created at:</span>
@@ -103,18 +114,20 @@
                   {{
                     isWorkoutExercise(selectedExercise)
                       ? new Date(
-                          selectedExercise.exercise.createdAt,
-                        ).toLocaleDateString()
+                        selectedExercise.exercise.createdAt,
+                      ).toLocaleDateString()
                       : new Date(
-                          selectedExercise.createdAt,
-                        ).toLocaleDateString()
+                        selectedExercise.createdAt,
+                      ).toLocaleDateString()
                   }}
                 </span>
               </v-list-item-title>
             </v-list-item>
             <v-list-item>
               <template #prepend>
-                <v-icon color="grey">mdi-calendar-edit</v-icon>
+                <v-icon color="grey">
+                  mdi-calendar-edit
+                </v-icon>
               </template>
               <v-list-item-title>
                 <span class="font-weight-medium">Updated at:</span>
@@ -122,11 +135,11 @@
                   {{
                     isWorkoutExercise(selectedExercise)
                       ? new Date(
-                          selectedExercise.exercise.updatedAt,
-                        ).toLocaleDateString()
+                        selectedExercise.exercise.updatedAt,
+                      ).toLocaleDateString()
                       : new Date(
-                          selectedExercise.updatedAt,
-                        ).toLocaleDateString()
+                        selectedExercise.updatedAt,
+                      ).toLocaleDateString()
                   }}
                 </span>
               </v-list-item-title>
@@ -137,12 +150,15 @@
           <v-btn
             class="w-100 my-4"
             color="primary"
-            @click="updateExercise"
             :loading="isLoading"
+            @click="updateExercise"
           >
             Save Changes
           </v-btn>
-          <v-form v-if="editExercise" class="pt-2 d-flex ga-5 flex-column">
+          <v-form
+            v-if="editExercise"
+            class="pt-2 d-flex ga-5 flex-column"
+          >
             <v-text-field
               v-model="editExercise.sets"
               label="Sets"

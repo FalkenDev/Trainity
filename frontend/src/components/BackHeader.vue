@@ -13,7 +13,9 @@
     >
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
-    <h1 class="text-h5">{{ title }}</h1>
+    <h1 class="text-h5">
+      {{ title }}
+    </h1>
     <v-btn
       v-if="showMenu"
       color="grey-darken-4"
@@ -30,7 +32,10 @@
         </template>
       </v-menu>
     </v-btn>
-    <div v-else style="width: 40px" />
+    <div
+      v-else
+      style="width: 40px"
+    />
   </div>
 </template>
 <script lang="ts" setup>
