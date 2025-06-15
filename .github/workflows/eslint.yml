@@ -1,4 +1,4 @@
-name: ESLint
+name: ESLint Frontend
 
 on:
   push:
@@ -27,15 +27,6 @@ jobs:
           npm install
           # Run linter and output results to the root directory
           npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file ../eslint-frontend-results.sarif
-        continue-on-error: true
-
-      - name: Lint Backend
-        working-directory: ./backend
-        run: |
-          # Install backend dependencies
-          npm install
-          # Run linter and output results to the root directory
-          npx eslint . --ext .js,.ts --format @microsoft/eslint-formatter-sarif --output-file ../eslint-backend-results.sarif
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
