@@ -1,7 +1,10 @@
 <template>
-    <v-sheet>
-        <v-calendar ref="calendar" v-model="mockCalendarData"></v-calendar>
-    </v-sheet>
+  <v-sheet>
+    <v-calendar
+      ref="calendar"
+      v-model="mockCalendarData"
+    />
+  </v-sheet>
 </template>
 <script lang="ts" setup>
 const mockCalendarData = [

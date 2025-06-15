@@ -1,6 +1,9 @@
 <template>
   <div>
-    <BackHeader :show-menu="true" title="Workout">
+    <BackHeader
+      :show-menu="true"
+      title="Workout"
+    >
       <template #menuAppend>
         <v-list>
           <v-list-item @click="isWeightAndRepsOpen = true">
@@ -24,26 +27,35 @@
     <v-card height="300" />
     <div class="px-5">
       <div class="py-4">
-        <h1 class="text-h5 font-weight-bold">{{ workout?.title }}</h1>
+        <h1 class="text-h5 font-weight-bold">
+          {{ workout?.title }}
+        </h1>
         <p>{{ workout?.description }}</p>
         <div class="d-flex ga-2 align-center mt-2 flex-wrap">
-          <v-chip label color="orange-lighten-1"
-            >{{ workout?.time }} min</v-chip
-          >
           <v-chip
-            color="green-lighten-1"
             label
+            color="orange-lighten-1"
+          >
+            {{ workout?.time }} min
+          </v-chip>
+          <v-chip
             v-for="group in getMuscleGroupsForWorkout()"
             :key="group"
+            color="green-lighten-1"
+            label
           >
             {{ group }}
           </v-chip>
         </div>
       </div>
       <v-divider />
-      <v-btn class="w-100" color="primary" @click="startSession"
-        >Start Session</v-btn
+      <v-btn
+        class="w-100"
+        color="primary"
+        @click="startSession"
       >
+        Start Session
+      </v-btn>
       <div class="mt-4">
         <v-card
           v-for="(exercise, index) in workout?.exercises"
@@ -53,9 +65,14 @@
           @click="selectExercise(exercise)"
         >
           <div class="d-flex ga-5 align-center">
-            <img class="bg-grey" style="width: 65px; height: 65px" />
+            <img
+              class="bg-grey"
+              style="width: 65px; height: 65px"
+            >
             <div class="d-flex flex-column ga-1">
-              <h2 class="text-h6">{{ exercise.exercise?.name }}</h2>
+              <h2 class="text-h6">
+                {{ exercise.exercise?.name }}
+              </h2>
               <div class="d-flex ga-2">
                 <p class="text-body-2">
                   {{ exercise.sets }} x {{ exercise.reps }} Reps
@@ -63,7 +80,9 @@
                 <p class="text-body-2">
                   {{ exercise.pauseSeconds }} sec pauses
                 </p>
-                <p class="text-body-2">{{ exercise.weight }}kg</p>
+                <p class="text-body-2">
+                  {{ exercise.weight }}kg
+                </p>
               </div>
             </div>
           </div>
@@ -71,33 +90,45 @@
       </div>
     </div>
   </div>
-  <v-dialog v-model="isAddExerciseOpen" fullscreen>
+  <v-dialog
+    v-model="isAddExerciseOpen"
+    fullscreen
+  >
     <AddExerciseList
-      @close="isAddExerciseOpen = false"
       :selected-exercises="workout?.exercises"
-      :workoutId="workout?._id || ''"
-    />
-  </v-dialog>
-  <v-dialog v-model="isEditExerciseOpen" fullscreen>
-    <EditExercise
-      @close="isEditExerciseOpen = false"
-      :selectedExercise="selectedExercise"
       :workout-id="workout?._id || ''"
-      :isViewExercise="false"
+      @close="isAddExerciseOpen = false"
     />
   </v-dialog>
-  <v-dialog v-model="isEditWorkoutOpen" fullscreen>
+  <v-dialog
+    v-model="isEditExerciseOpen"
+    fullscreen
+  >
+    <EditExercise
+      :selected-exercise="selectedExercise"
+      :workout-id="workout?._id || ''"
+      :is-view-exercise="false"
+      @close="isEditExerciseOpen = false"
+    />
+  </v-dialog>
+  <v-dialog
+    v-model="isEditWorkoutOpen"
+    fullscreen
+  >
     <EditWorkout
-      @close="isEditWorkoutOpen = false"
       :workout="workout"
+      @close="isEditWorkoutOpen = false"
       @save="workoutStore.setWorkouts(true)"
     />
   </v-dialog>
-  <v-dialog v-model="isWeightAndRepsOpen" fullscreen>
+  <v-dialog
+    v-model="isWeightAndRepsOpen"
+    fullscreen
+  >
     <WeightAndRepsSettings
+      :workout-id="workout?._id || ''"
+      :default-weight-and-reps="workout?.defaultWeightAndReps ?? ''"
       @close="isWeightAndRepsOpen = false"
-      :workoutId="workout?._id || ''"
-      :defaultWeightAndReps="workout?.defaultWeightAndReps ?? ''"
     />
   </v-dialog>
   <AcceptDialog
@@ -188,11 +219,6 @@ const getMuscleGroupsForWorkout = (): string[] => {
       return group ? group.name : "Unknown";
     })
     .filter((value, index, self) => self.indexOf(value) === index);
-};
-
-const routeTo = (exerciseId: string) => {
-  console.log("Navigating to exercise with ID:", exerciseId);
-  router.push(`/exercise/${exerciseId}`);
 };
 
 const startSession = async () => {
