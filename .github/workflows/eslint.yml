@@ -35,14 +35,16 @@ jobs:
           npm install eslint@8.10.0
           npm install @microsoft/eslint-formatter-sarif@3.1.0
 
-      - name: Run ESLint
-        env:
-          SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
-        run: npx eslint .
-          --config .eslintrc.js
-          --ext .js,.jsx,.ts,.tsx
-          --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
+      - name: Lint Frontend
+        working-directory: ./frontend
+        run: |
+          npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file ../eslint-frontend-results.sarif
+        continue-on-error: true
+    
+      - name: Lint Backend
+        working-directory: ./backend
+        run: |
+          npx eslint . --ext .js,.ts --format @microsoft/eslint-formatter-sarif --output-file ../eslint-backend-results.sarif
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
