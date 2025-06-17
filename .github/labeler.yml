@@ -1,7 +1,8 @@
 # .github/labeler.yml
 
 frontend:
-  - "frontend/**/*"
+  - changed-files:
+      - any-glob-to-any-file: ["frontend/**/*"]
 
 backend:
   - any:
