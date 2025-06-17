@@ -76,19 +76,16 @@ router.beforeEach(async (to, from, next) => {
   const isAuthenticated = authStore.isAuthenticated;
 
   console.log(isAuthenticated, 'isAuthenticated in guard');
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
 
   if (requiresAuth && !isAuthenticated) {
     console.log(`Guard: Auth required for ${to.path}, redirecting to /login`);
     next({
       path: '/login',
-      query: { redirect: to.fullPath }, // Optional: redirect back after login
+      query: { redirect: to.fullPath },
     });
   } else if (requiresGuest && isAuthenticated) {
-    console.log(
-      `Guard: Guest route ${to.path} accessed while authenticated, redirecting to /dashboard`
-    );
     next('/dashboard');
   } else {
     console.log(`Guard: Allowing navigation to ${to.path}`);
