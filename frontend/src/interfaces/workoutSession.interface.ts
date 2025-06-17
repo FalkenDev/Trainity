@@ -5,10 +5,10 @@ export interface WorkoutSession {
   userId: string;
   startedAt: string;
   status: string;
-  exercises: any[];
+  exercises: unknown[];
   totalWeight: number;
   notes: string;
-  exerciseStats: any[];
+  exerciseStats: unknown[];
   createdAt: string;
   updatedAt: string;
   __v: number;

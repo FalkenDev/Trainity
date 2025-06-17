@@ -1,5 +1,8 @@
 <template>
-  <v-container class="fill-height pa-0 primary-gradient-bg" fluid>
+  <v-container
+    class="fill-height pa-0 primary-gradient-bg"
+    fluid
+  >
     <v-row
       class="fill-height ma-0 background-image"
       :class="smAndUp ? 'align-center' : 'align-end'"
@@ -21,7 +24,11 @@
           <v-card-title
             class="text-h4 font-weight-bold text-center mb-2 primary--text"
           >
-            <v-icon class="mr-2" color="primary" size="large">
+            <v-icon
+              class="mr-2"
+              color="primary"
+              size="large"
+            >
               mdi-dumbbell
             </v-icon>
             Gym Access
@@ -30,7 +37,10 @@
             Welcome back! Fuel your journey.
           </v-card-subtitle>
 
-          <v-form ref="form" @submit.prevent="handleLogin">
+          <v-form
+            ref="form"
+            @submit.prevent="handleLogin"
+          >
             <v-text-field
               v-model="email"
               class="mb-4"
@@ -67,7 +77,12 @@
               size="large"
               type="submit"
             >
-              <v-icon class="mr-2" left>mdi-login-variant</v-icon>
+              <v-icon
+                class="mr-2"
+                left
+              >
+                mdi-login-variant
+              </v-icon>
               Login
             </v-btn>
           </v-form>

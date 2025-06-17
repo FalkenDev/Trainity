@@ -9,12 +9,11 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --ext .vue,.js,.ts --fix"
   },
   "dependencies": {
     "@fontsource/roboto": "5.2.5",
     "@mdi/font": "7.4.47",
-    "@typescript-eslint/parser": "^8.33.0",
     "pinia-plugin-persistedstate": "^4.3.0",
     "prettier": "^3.5.3",
     "prettier-eslint": "^16.4.2",
@@ -25,12 +24,18 @@
     "vuetify-sonner": "^0.3.21"
   },
   "devDependencies": {
+    "@microsoft/eslint-formatter-sarif": "^3.1.0",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.9.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
-    "eslint": "^9.28.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-config-vuetify": "^3.0.3",
+    "eslint-plugin-vue": "^10.2.0",
+    "eslint-plugin-vuetify": "^2.5.2",
     "npm-run-all2": "^7.0.2",
     "pinia": "^3.0.1",
     "sass-embedded": "^1.86.3",

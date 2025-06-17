@@ -2,9 +2,9 @@
   <div class="h-100 w-100 bg-grey-darken-4">
     <BackHeader
       title="Edit Workout"
-      showMenu
+      show-menu
+      :is-loading="isLoading"
       @close="$emit('close')"
-      :isLoading="isLoading"
     />
     <v-form class="px-5 d-flex flex-column ga-5">
       <v-text-field
@@ -28,7 +28,11 @@
         type="number"
         hide-details
       />
-      <v-btn class="w-100" color="primary" @click="saveWorkout">
+      <v-btn
+        class="w-100"
+        color="primary"
+        @click="saveWorkout"
+      >
         Save Workout
       </v-btn>
     </v-form>

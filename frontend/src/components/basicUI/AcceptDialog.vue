@@ -1,26 +1,38 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    @update:model-value="onDialogUpdate"
     max-width="600px"
+    @update:model-value="onDialogUpdate"
     @close="emit('update:modelValue', false)"
   >
     <v-card>
-      <v-card-title class="headline">{{ title }}</v-card-title>
+      <v-card-title class="headline">
+        {{ title }}
+      </v-card-title>
       <v-card-text>
         <p>{{ description }}</p>
       </v-card-text>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="handleAccept">Accept</v-btn>
-        <v-btn color="secondary" @click="handleCancel">Cancel</v-btn>
+        <v-spacer />
+        <v-btn
+          color="primary"
+          @click="handleAccept"
+        >
+          Accept
+        </v-btn>
+        <v-btn
+          color="secondary"
+          @click="handleCancel"
+        >
+          Cancel
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{
+defineProps<{
   modelValue: boolean;
   title: string;
   description: string;

@@ -1,5 +1,8 @@
 <template>
-  <v-container class="fill-height pa-0 primary-gradient-bg" fluid>
+  <v-container
+    class="fill-height pa-0 primary-gradient-bg"
+    fluid
+  >
     <v-row
       class="fill-height ma-0 background-image"
       :class="smAndUp ? 'align-center' : 'align-end'"
@@ -21,7 +24,11 @@
           <v-card-title
             class="text-h4 font-weight-bold text-center mb-2 primary--text"
           >
-            <v-icon class="mr-2" color="primary" size="large">
+            <v-icon
+              class="mr-2"
+              color="primary"
+              size="large"
+            >
               mdi-account-plus-outline
             </v-icon>
             Join The Movement
@@ -30,7 +37,10 @@
             Create your account to start your fitness journey.
           </v-card-subtitle>
 
-          <v-form ref="form" @submit.prevent="handleCreateAccount">
+          <v-form
+            ref="form"
+            @submit.prevent="handleCreateAccount"
+          >
             <v-text-fieldcd
               v-model="fullName"
               autocomplete="name"
@@ -111,7 +121,12 @@
               size="large"
               type="submit"
             >
-              <v-icon class="mr-2" left>mdi-check-circle-outline</v-icon>
+              <v-icon
+                class="mr-2"
+                left
+              >
+                mdi-check-circle-outline
+              </v-icon>
               Create Account
             </v-btn>
           </v-form>
@@ -132,9 +147,14 @@
       </v-col>
     </v-row>
 
-    <v-dialog v-model="showTermsDialog" max-width="600px">
+    <v-dialog
+      v-model="showTermsDialog"
+      max-width="600px"
+    >
       <v-card rounded="lg">
-        <v-card-title class="text-h5 primary--text">Terms & Conditions</v-card-title>
+        <v-card-title class="text-h5 primary--text">
+          Terms & Conditions
+        </v-card-title>
         <v-card-text>
           <p class="mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -148,7 +168,9 @@
             color="primary"
             text
             @click="showTermsDialog = false"
-          >Close</v-btn>
+          >
+            Close
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

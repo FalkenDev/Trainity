@@ -2,9 +2,9 @@
   <div class="h-100 w-100 bg-grey-darken-4">
     <BackHeader
       title="Add Exercises"
-      showMenu
-      @close="close"
+      show-menu
       :loading="isLoading"
+      @close="close"
     >
       <template #menuAppend>
         <v-list>
@@ -46,31 +46,37 @@
           </div>
           <div>
             <v-icon
-              @click.stop="openViewExercise(exercise)"
               color="grey-lighten-1"
-              >mdi-information-outline</v-icon
+              @click.stop="openViewExercise(exercise)"
             >
+              mdi-information-outline
+            </v-icon>
           </div>
         </div>
       </v-list-item>
     </v-list>
   </div>
-  <v-dialog v-model="isViewExerciseOpen" fullscreen>
+  <v-dialog
+    v-model="isViewExerciseOpen"
+    fullscreen
+  >
     <EditExercise
       :selected-exercise="viewExercise"
       :workout-id="props.workoutId"
+      :is-view-exercise="true"
       @close="isViewExerciseOpen = false"
-      :isViewExercise="true"
     />
   </v-dialog>
-  <v-dialog v-model="isCreateExerciseOpen" fullscreen>
+  <v-dialog
+    v-model="isCreateExerciseOpen"
+    fullscreen
+  >
     <CreateExercise @close="isCreateExerciseOpen = false" />
   </v-dialog>
 </template>
 <script lang="ts" setup>
 import type { Exercise } from "@/interfaces/Exercise.interface";
 import { useExerciseStore } from "@/stores/exercise.store";
-import ExitHeader from "../basicUI/ExitHeader.vue";
 import {
   addExerciseToWorkout,
   removeExerciseFromWorkout,
