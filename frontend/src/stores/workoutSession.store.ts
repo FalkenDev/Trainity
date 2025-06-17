@@ -1,6 +1,7 @@
 // stores/authStore.ts
 import { defineStore } from "pinia";
 import * as workoutSessionService from "@/services/workoutSession.service";
+import { useAuthStore } from "./auth.store";
 
 export const useWorkoutSessionStore = defineStore(
   "workoutSessionStore",
@@ -10,6 +11,7 @@ export const useWorkoutSessionStore = defineStore(
     const isLoading = ref<boolean>(false);
     const lastFetched = ref<number | null>(null);
     const cacheDuration = 10 * 1000;
+    const authStore = useAuthStore();
 
     // TODO: Maybe needed or will the selectedWorkoutSession only be in need ?
     const hasActiveSession = ref(false);
@@ -53,7 +55,10 @@ export const useWorkoutSessionStore = defineStore(
       }
     };
 
-    setWorkoutSessions();
+    // Bugfix: when user is not authenticated, and is in login page, the store is still initialized and tries to fetch workout sessions and makes the page re-render because of the fetchWrapper.
+    if (authStore.isAuthenticated) {
+      setWorkoutSessions();
+    }
 
     const fetchSelectedWorkoutSession = async (sessionId: string) => {
       if (!sessionId) {

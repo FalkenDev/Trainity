@@ -1,4 +1,5 @@
-import { useAuthStore } from "@/stores/auth.store";
+import router from '@/router';
+import { useAuthStore } from '@/stores/auth.store';
 
 export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
   try {
@@ -7,35 +8,33 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
 
     const headers = new Headers(options.headers || {});
     if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
+      headers.set('Authorization', `Bearer ${token}`);
     }
 
     if (
       options.body &&
-      typeof options.body === "string" &&
-      !headers.has("Content-Type")
+      typeof options.body === 'string' &&
+      !headers.has('Content-Type')
     ) {
-      headers.set("Content-Type", "application/json");
+      headers.set('Content-Type', 'application/json');
     }
     options.headers = headers;
 
     const response = await fetch(url, options);
 
     if (response.status === 401) {
-      // TODO: Fix Error when not logged in and this is running 24/7
-      //handleForbidden();
-      return Promise.reject("401 Unauthorized");
+      handleForbidden();
+      return Promise.reject('401 Unauthorized');
     }
 
-    // Check if the response is 403
     if (response.status === 403) {
-      //handleForbidden();
-      return Promise.reject("403 Forbidden");
+      handleForbidden();
+      return Promise.reject('403 Forbidden');
     }
 
     if (response.status === 405) {
-      console.error("405 Method Not Allowed");
-      return Promise.reject("405 Method Not Allowed");
+      console.error('405 Method Not Allowed');
+      return Promise.reject('405 Method Not Allowed');
     }
 
     if (response.status === 409) {
@@ -46,8 +45,8 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
         errorData = JSON.parse(responseText);
       } catch (_e) {
         errorData = {
-          type: "unknown",
-          message: responseText || "Conflict detected",
+          type: 'unknown',
+          message: responseText || 'Conflict detected',
         };
       }
 
@@ -58,8 +57,8 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
     }
 
     if (response.status === 500) {
-      console.error("500 Internal Server Error");
-      return Promise.reject("500 Internal Server Error");
+      console.error('500 Internal Server Error');
+      return Promise.reject('500 Internal Server Error');
     }
 
     // Check if response is not OK (but not 403)
@@ -69,7 +68,7 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
 
     return response;
   } catch (error) {
-    console.error("Fetch error:", error);
+    console.error('Fetch error:', error);
     throw error;
   }
 };
@@ -78,7 +77,6 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
 const handleForbidden = async () => {
   const authStore = useAuthStore();
   await authStore.logout();
-  console.warn("403 Forbidden: Redirecting to login...");
-  // Example: Redirect to login page
-  window.location.href = "/login";
+  console.warn('403 Forbidden: Redirecting to login...');
+  router.push('/login');
 };
