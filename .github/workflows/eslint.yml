@@ -1,0 +1,37 @@
+name: ESLint Frontend
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "21 10 * * 4"
+
+jobs:
+  eslint:
+    name: Run ESLint Scanning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lint Frontend
+        working-directory: ./frontend
+        run: |
+          # Install frontend dependencies (including ESLint plugins)
+          npm install
+          # Run linter and output results to the root directory
+          npx eslint . --ext .js,.jsx,.ts,.tsx --format @microsoft/eslint-formatter-sarif --output-file ../eslint-frontend-results.sarif
+        continue-on-error: true
+
+      - name: Upload analysis results to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: |
+            eslint-frontend-results.sarif
+          wait-for-processing: true

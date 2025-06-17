@@ -16,8 +16,8 @@
     <v-card
       v-if="
         authStore.isAuthenticated &&
-        workoutSessionStore.selectedWorkoutSession &&
-        checkPath()
+          workoutSessionStore.selectedWorkoutSession &&
+          checkPath()
       "
       class="resume-card d-flex align-center justify-space-between px-5 border-b-md"
       height="45"
@@ -27,8 +27,12 @@
       rounded="0"
       @click="routeToSelectedWorkoutSession"
     >
-      <v-icon color="primary">mdi-chevron-up</v-icon>
-      <h1 class="text-body-1 text-primary">Resume workout</h1>
+      <v-icon color="primary">
+        mdi-chevron-up
+      </v-icon>
+      <h1 class="text-body-1 text-primary">
+        Resume workout
+      </h1>
       <div style="width: 40px" />
     </v-card>
     <BottomNavigation v-if="authStore.isAuthenticated" />
@@ -37,7 +41,7 @@
 
 <script lang="ts" setup>
 import { useAuthStore } from "./stores/auth.store";
-import { toast, VSonner } from "vuetify-sonner";
+import { VSonner } from "vuetify-sonner";
 import { useWorkoutSessionStore } from "./stores/workoutSession.store";
 import "vuetify-sonner/style.css";
 import router from "./router";

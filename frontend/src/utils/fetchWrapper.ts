@@ -44,6 +44,7 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
       try {
         errorData = JSON.parse(responseText);
       } catch (_e) {
+        console.error("Failed to parse JSON from 409 response:", _e);
         errorData = {
           type: 'unknown',
           message: responseText || 'Conflict detected',
@@ -74,9 +75,19 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
 };
 
 // Function to handle 403 Forbidden responses
+<<<<<<< bugfix-authorization-re-render
 const handleForbidden = async () => {
   const authStore = useAuthStore();
   await authStore.logout();
   console.warn('403 Forbidden: Redirecting to login...');
   router.push('/login');
 };
+=======
+// const handleForbidden = async () => {
+//   const authStore = useAuthStore();
+//   await authStore.logout();
+//   console.warn("403 Forbidden: Redirecting to login...");
+//   // Example: Redirect to login page
+//   window.location.href = "/login";
+// };
+>>>>>>> main
