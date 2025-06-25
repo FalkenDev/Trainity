@@ -31,9 +31,9 @@
     </v-btn>
     <v-btn
       icon
-      to="/account"
+      to="/settings"
     >
-      <v-icon>mdi-account</v-icon>
+      <v-icon>mdi-cog</v-icon>
     </v-btn>
   </v-bottom-navigation>
 </template>
