@@ -207,7 +207,7 @@ import { useWorkoutStore } from "@/stores/workout.store";
 import { toast } from "vuetify-sonner";
 
 const props = defineProps<{
-  workoutId: string;
+  workoutId?: string;
   selectedExercise: workoutExercise | Exercise | null;
   isViewExercise: boolean;
 }>();
@@ -262,6 +262,7 @@ const getMuscleGroupsForExercise = (): string[] => {
   return [];
 };
 
+// TODO: Change this to remove the exercise from the Exercises and not from the workout
 const removeExercise = async () => {
   try {
     if (!props.selectedExercise || !props.workoutId) {
@@ -298,6 +299,7 @@ const getSanitizedExerciseData = (): AddExerciseToWorkout => {
   };
 };
 
+// TODO: Change this to update the exercise in the Exercises and not in the workout
 const updateExercise = async () => {
   try {
     isLoading.value = true;
