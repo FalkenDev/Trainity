@@ -70,6 +70,7 @@ const saveWorkout = async () => {
       title: editWorkout.name,
       description: editWorkout.description,
       time: editWorkout.time,
+      defaultWeightAndReps: selectedWorkout.value?.defaultWeightAndReps ?? "default",
     });
     if (response) {
       workoutStore.setWorkouts(true);
