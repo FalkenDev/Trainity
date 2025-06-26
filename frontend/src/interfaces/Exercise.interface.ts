@@ -22,3 +22,13 @@ export interface CreateExercise {
   defaultReps: number;
   defaultPauseSeconds: number;
 }
+
+export interface UpdateExercise {
+  name: string;
+  description: string;
+  image?: string | null;
+  muscleGroups: string[];
+  defaultSets: number;
+  defaultReps: number;
+  defaultPauseSeconds: number;
+}

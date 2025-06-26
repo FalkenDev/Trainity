@@ -2,11 +2,20 @@
   <div class="h-100 w-100 bg-grey-darken-4">
     <BackHeader
       :show-menu="true"
-      :title="isViewExercise ? 'Exercise' : 'Edit Exercise in workout'"
+      :title="
+        isViewExercise
+          ? 'Exercise'
+          : isViewWorkoutExercise
+            ? 'Edit Exercise in workout'
+            : 'Edit Exercise'
+      "
       @close="emit('close')"
     >
       <template #menuAppend>
         <v-list>
+          <v-list-item @click="isViewExercise = false">
+            <v-list-item-title>Edit</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="removeExercise">
             <v-list-item-title>Delete</v-list-item-title>
           </v-list-item>
@@ -174,6 +183,7 @@
               hide-details
             />
             <v-text-field
+              v-if="isViewWorkoutExercise"
               v-model="editExercise.weight"
               label="Weight (kg)"
               type="number"
@@ -194,23 +204,33 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Exercise as workoutExercise } from "@/interfaces/Workout.interface";
-import type { Exercise } from "@/interfaces/Exercise.interface";
-import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
-import type { AddExerciseToWorkout } from "@/interfaces/Workout.interface";
-import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
+import type { Exercise as workoutExercise } from '@/interfaces/Workout.interface';
+import type { Exercise } from '@/interfaces/Exercise.interface';
+import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface';
+import type { AddExerciseToWorkout } from '@/interfaces/Workout.interface';
+import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
+import { useExerciseStore } from '@/stores/exercise.store';
 import {
   updateExerciseInWorkout,
   removeExerciseFromWorkout,
-} from "@/services/workout.sevice";
-import { useWorkoutStore } from "@/stores/workout.store";
-import { toast } from "vuetify-sonner";
+} from '@/services/workout.sevice';
+import {
+  updateExercise as updateExerciseInExercise,
+  deleteExercise,
+} from '@/services/exercise.service';
+import { useWorkoutStore } from '@/stores/workout.store';
+import { toast } from 'vuetify-sonner';
 
 const props = defineProps<{
   workoutId?: string;
   selectedExercise: workoutExercise | Exercise | null;
   isViewExercise: boolean;
+  isViewWorkoutExercise: boolean;
 }>();
+
+const isViewExercise = ref(props.isViewExercise);
+
+const exerciseStore = useExerciseStore();
 const workoutStore = useWorkoutStore();
 const muscleGroupStore = useMuscleGroupStore();
 const isLoading = ref<boolean>(false);
@@ -218,16 +238,16 @@ const isLoading = ref<boolean>(false);
 const editExercise = ref<AddExerciseToWorkout | null>({
   exerciseId: isWorkoutExercise(props.selectedExercise)
     ? props.selectedExercise.exercise._id
-    : "",
+    : props.selectedExercise?._id || '',
   sets: isWorkoutExercise(props.selectedExercise)
     ? props.selectedExercise.sets
-    : 0,
+    : props.selectedExercise?.defaultSets || 0,
   reps: isWorkoutExercise(props.selectedExercise)
     ? props.selectedExercise.reps
-    : 0,
+    : props.selectedExercise?.defaultReps || 0,
   pauseSeconds: isWorkoutExercise(props.selectedExercise)
     ? props.selectedExercise?.pauseSeconds
-    : 0,
+    : props.selectedExercise?.defaultPauseSeconds || 0,
   order: isWorkoutExercise(props.selectedExercise)
     ? props.selectedExercise?.order
     : 0,
@@ -239,11 +259,11 @@ const editExercise = ref<AddExerciseToWorkout | null>({
 function isWorkoutExercise(
   exercise: workoutExercise | Exercise | null,
 ): exercise is workoutExercise {
-  return !!exercise && "exercise" in exercise;
+  return !!exercise && 'exercise' in exercise;
 }
 
 const emit = defineEmits<{
-  (e: "close"): void;
+  (e: 'close'): void;
 }>();
 
 const getMuscleGroupsForExercise = (): string[] => {
@@ -262,32 +282,46 @@ const getMuscleGroupsForExercise = (): string[] => {
   return [];
 };
 
-// TODO: Change this to remove the exercise from the Exercises and not from the workout
 const removeExercise = async () => {
   try {
-    if (!props.selectedExercise || !props.workoutId) {
-      console.error("No exercise or workout ID provided.");
+    if (!props.selectedExercise || props.isViewWorkoutExercise && !props.workoutId) {
+      console.error('No exercise or workout ID provided.');
       return;
     }
-    const response = await removeExerciseFromWorkout(
-      props.workoutId,
-      isWorkoutExercise(props.selectedExercise)
-        ? props.selectedExercise.exercise._id
-        : "",
-    );
-    if (response) {
-      toast.success("Exercise removed successfully!", { progressBar: true });
-      await workoutStore.setWorkouts(true);
-      emit("close");
+
+    let response = null;
+    if (props.isViewWorkoutExercise) {
+      response = await removeExerciseFromWorkout(
+        props.workoutId || '',
+        isWorkoutExercise(props.selectedExercise)
+          ? props.selectedExercise.exercise._id
+          : '',
+      );
     } else {
-      console.error("Failed to remove exercise.");
+      response = await deleteExercise(
+        isWorkoutExercise(props.selectedExercise)
+          ? props.selectedExercise.exercise._id
+          : props.selectedExercise?._id || '',
+      );
+    }
+
+    if (response) {
+      toast.success('Exercise removed successfully!', { progressBar: true });
+      if (props.isViewWorkoutExercise) {
+        await workoutStore.setWorkouts(true);
+      } else {
+        await exerciseStore.setExercises(true);
+      }
+      emit('close');
+    } else {
+      console.error('Failed to remove exercise.');
     }
   } catch (error) {
-    console.error("Error in removeExerciseFromWorkout:", error);
+    console.error('Error in removeExerciseFromWorkout:', error);
   }
 };
 
-const getSanitizedExerciseData = (): AddExerciseToWorkout => {
+const getSanitizedExerciseDataForWorkout = () => {
   return {
     ...editExercise.value,
     sets: Number(editExercise.value?.sets || 0),
@@ -295,41 +329,86 @@ const getSanitizedExerciseData = (): AddExerciseToWorkout => {
     pauseSeconds: Number(editExercise.value?.pauseSeconds || 0),
     order: Number(editExercise.value?.order || 0),
     weight: Number(editExercise.value?.weight || 0),
-    exerciseId: editExercise.value?.exerciseId || "",
+    exerciseId: editExercise.value?.exerciseId || '',
   };
 };
 
-// TODO: Change this to update the exercise in the Exercises and not in the workout
+const getSanitizedExerciseData = () => {
+  return {
+    ...editExercise.value,
+    name: isWorkoutExercise(props.selectedExercise)
+      ? props.selectedExercise.exercise.name
+      : props.selectedExercise?.name || '',
+    description: isWorkoutExercise(props.selectedExercise)
+      ? props.selectedExercise.exercise.description
+      : props.selectedExercise?.description || '',
+    defaultSets: Number(editExercise.value?.sets || 0),
+    defaultReps: Number(editExercise.value?.reps || 0),
+    defaultPauseSeconds: Number(editExercise.value?.pauseSeconds || 0),
+    muscleGroups: isWorkoutExercise(props.selectedExercise)
+      ? props.selectedExercise.exercise.muscleGroups
+      : props.selectedExercise?.muscleGroups || [],
+  };
+};
+
 const updateExercise = async () => {
-  try {
-    isLoading.value = true;
-    if (!editExercise.value) {
-      toast.error("No exercise data to update.");
-      return;
+  if (props.isViewWorkoutExercise) {
+    try {
+      isLoading.value = true;
+      if (!editExercise.value) {
+        toast.error('No exercise data to update.');
+        return;
+      }
+      if (!props.workoutId) {
+        toast.error('No workout ID provided.');
+        return;
+      }
+      const response = await updateExerciseInWorkout(
+        props.workoutId,
+        isWorkoutExercise(props.selectedExercise)
+          ? props.selectedExercise.exercise._id
+          : '',
+        getSanitizedExerciseDataForWorkout() || {},
+      );
+      if (response) {
+        toast.success('Exercise updated successfully!', { progressBar: true });
+        await workoutStore.setWorkouts(true);
+        emit('close');
+      } else {
+        toast.error('Failed to update exercise.');
+      }
+    } catch (error) {
+      toast.error('Error in updateExercise.');
+      console.error('Error in updateExercise:', error);
+    } finally {
+      isLoading.value = false;
     }
-    if (!props.workoutId) {
-      toast.error("No workout ID provided.");
-      return;
+  } else {
+    try {
+      isLoading.value = true;
+      if (!editExercise.value) {
+        toast.error('No exercise data to update.');
+        return;
+      }
+      const response = await updateExerciseInExercise(
+        isWorkoutExercise(props.selectedExercise)
+          ? props.selectedExercise.exercise._id
+          : props.selectedExercise?._id || '',
+        getSanitizedExerciseData() || {},
+      );
+      if (response) {
+        toast.success('Exercise updated successfully!', { progressBar: true });
+        await exerciseStore.setExercises(true);
+        isViewExercise.value = true;
+      } else {
+        toast.error('Failed to update exercise.');
+      }
+    } catch (error) {
+      toast.error('Error in updateExercise.');
+      console.error('Error in updateExercise:', error);
+    } finally {
+      isLoading.value = false;
     }
-    const response = await updateExerciseInWorkout(
-      props.workoutId,
-      isWorkoutExercise(props.selectedExercise)
-        ? props.selectedExercise.exercise._id
-        : "",
-      getSanitizedExerciseData() || {},
-    );
-    if (response) {
-      toast.success("Exercise updated successfully!", { progressBar: true });
-      await workoutStore.setWorkouts(true);
-      emit("close");
-    } else {
-      toast.error("Failed to update exercise.");
-    }
-  } catch (error) {
-    toast.error("Error in updateExercise.");
-    console.error("Error in updateExercise:", error);
-  } finally {
-    isLoading.value = false;
   }
 };
 </script>

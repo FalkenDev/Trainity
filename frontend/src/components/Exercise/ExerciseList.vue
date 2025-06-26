@@ -79,6 +79,7 @@
     <EditExercise
       :selected-exercise="viewExercise"
       :is-view-exercise="true"
+      :is-view-workout-exercise="false"
       @close="isViewExerciseOpen = false"
     />
   </v-dialog>
@@ -99,6 +100,7 @@ const emit = defineEmits<{
 }>();
 
 const openViewExercise = (exercise: Exercise) => {
+  console.log("Opening view exercise:", exercise);
   viewExercise.value = exercise;
   isViewExerciseOpen.value = true;
 };
