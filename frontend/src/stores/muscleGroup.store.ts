@@ -1,11 +1,12 @@
 // stores/authStore.ts
 import { defineStore } from 'pinia';
 import * as muscleGroupsService from '@/services/muscleGroup.service';
+import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface';
 
 export const useMuscleGroupStore = defineStore(
   'muscleGroupStore',
   () => {
-    const muscleGroups = ref([]);
+    const muscleGroups = ref<MuscleGroup[]>([]);
     const isLoading = ref<boolean>(false);
     const lastFetched = ref<number | null>(null);
     const cacheDuration = 10 * 1000;
