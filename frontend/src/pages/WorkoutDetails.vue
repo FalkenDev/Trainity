@@ -108,6 +108,7 @@
       :selected-exercise="selectedExercise"
       :workout-id="workout?._id || ''"
       :is-view-exercise="false"
+      :is-view-workout-exercise="true"
       @close="isEditExerciseOpen = false"
     />
   </v-dialog>

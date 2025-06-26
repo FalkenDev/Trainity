@@ -6,6 +6,7 @@ import Register from '@/pages/Register.vue';
 import WorkoutDetails from '@/pages/WorkoutDetails.vue';
 import Session from '@/pages/Session.vue';
 import Calendar from '@/pages/Calendar.vue';
+import Settings from '@/pages/Settings.vue';
 
 const routes = [
   {
@@ -55,9 +56,9 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/account',
-    name: 'Account',
-    component: Home,
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
     meta: { requiresAuth: true },
   },
   {

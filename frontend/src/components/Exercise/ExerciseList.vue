@@ -1,10 +1,10 @@
 <template>
   <div class="h-100 w-100 bg-grey-darken-4">
     <BackHeader
-      title="Add Exercises"
+      title="Exercises"
       show-menu
       :loading="isLoading"
-      @close="close"
+      @close="emit('close')"
     >
       <template #menuAppend>
         <v-list>
@@ -80,17 +80,10 @@
         :key="exercise._id"
         class="border-t-sm border-b-sm py-2"
         two-line
-        @click="selectExercise(exercise._id)"
+        @click.stop="openViewExercise(exercise)"
       >
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-3">
-            <v-checkbox
-              v-model="newSelectedExercises"
-              :value="exercise._id"
-              color="primary"
-              hide-details
-              density="compact"
-            />
             <v-list-item-title class="text-body-1 font-weight-bold">
               {{ exercise.name }}
             </v-list-item-title>
@@ -98,9 +91,28 @@
           <div>
             <v-icon
               color="grey-lighten-1"
-              @click.stop="openViewExercise(exercise)"
             >
-              mdi-information-outline
+              mdi-chevron-right
+            </v-icon>
+          </div>
+        </div>
+      </v-list-item>
+      <v-list-item
+        class="border-t-sm border-b-sm py-2"
+        two-line
+        @click="isCreateExerciseOpen = true"
+      >
+        <div class="d-flex justify-space-between align-center w-100">
+          <div class="d-flex align-center ga-3">
+            <v-list-item-title class="text-body-1 font-weight-bold text-grey-lighten-1">
+              Create new exercise
+            </v-list-item-title>
+          </div>
+          <div>
+            <v-icon
+              color="grey-lighten-1"
+            >
+              mdi-plus
             </v-icon>
           </div>
         </div>
@@ -108,61 +120,39 @@
     </v-list>
   </div>
   <v-dialog
-    v-model="isViewExerciseOpen"
-    fullscreen
-  >
-    <EditExercise
-      :selected-exercise="viewExercise"
-      :workout-id="props.workoutId"
-      :is-view-exercise="true"
-      :is-view-workout-exercise="true"
-      @close="isViewExerciseOpen = false"
-    />
-  </v-dialog>
-  <v-dialog
     v-model="isCreateExerciseOpen"
     fullscreen
   >
     <CreateExercise @close="isCreateExerciseOpen = false" />
   </v-dialog>
+  <v-dialog
+    v-model="isViewExerciseOpen"
+    fullscreen
+  >
+    <EditExercise
+      :selected-exercise="viewExercise"
+      :is-view-exercise="true"
+      :is-view-workout-exercise="false"
+      @close="isViewExerciseOpen = false"
+    />
+  </v-dialog>
 </template>
 <script lang="ts" setup>
 import type { Exercise } from "@/interfaces/Exercise.interface";
 import { useExerciseStore } from "@/stores/exercise.store";
-import {
-  addExerciseToWorkout,
-  removeExerciseFromWorkout,
-} from "@/services/workout.sevice";
-import { useWorkoutStore } from "@/stores/workout.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 
-// TODO: View exercise details in a modal
-
-const props = defineProps<{
-  selectedExercises?: Array<{
-    exercise: Exercise;
-    sets: number;
-    reps: number;
-    pauseSeconds: number;
-  }>;
-  workoutId: string;
-}>();
-
 const muscleGroupStore = useMuscleGroupStore();
-const workoutStore = useWorkoutStore();
 const searchQuery = ref<string>("");
-const newSelectedExercises = ref<string[]>([]);
 const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
 const viewExercise = ref<Exercise | null>(null);
 const isViewExerciseOpen = ref<boolean>(false);
 const isCreateExerciseOpen = ref<boolean>(false);
-const selectedMuscleGroups = ref<string[]>([]);
 
-const openViewExercise = (exercise: Exercise) => {
-  viewExercise.value = exercise;
-  isViewExerciseOpen.value = true;
-};
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
 
 const muscleGroups = computed(() => {
   return muscleGroupStore.muscleGroups.map((group) => ({
@@ -170,6 +160,14 @@ const muscleGroups = computed(() => {
     _id: group._id,
   }));
 });
+
+const selectedMuscleGroups = ref<string[]>([]);
+
+const openViewExercise = (exercise: Exercise) => {
+  console.log("Opening view exercise:", exercise);
+  viewExercise.value = exercise;
+  isViewExerciseOpen.value = true;
+};
 
 const exercises = computed<Exercise[]>(() =>
   exerciseStore.exercises.filter((exercise: Exercise) => {
@@ -188,69 +186,4 @@ const exercises = computed<Exercise[]>(() =>
     return matchesSearch && matchesMuscleGroup;
   }),
 );
-
-const emit = defineEmits<{
-  (e: "close"): void;
-}>();
-
-const selectExercise = (id: string) => {
-  if (newSelectedExercises.value.includes(id)) {
-    newSelectedExercises.value = newSelectedExercises.value.filter(
-      (ex: string) => ex !== id,
-    );
-  } else {
-    newSelectedExercises.value.push(id);
-  }
-};
-
-const close = async () => {
-  await addExercisesToWorkout();
-  emit("close");
-};
-
-const addExercisesToWorkout = async () => {
-  isLoading.value = true;
-  let hasBeenUpdated = false;
-  try {
-    if (props.selectedExercises) {
-      const existingExerciseIds = props.selectedExercises.map(
-        (item) => item.exercise._id,
-      );
-
-      const newExercises = newSelectedExercises.value.filter(
-        (id) => !existingExerciseIds.includes(id),
-      );
-
-      const removedExercises = existingExerciseIds.filter(
-        (id) => !newSelectedExercises.value.includes(id),
-      );
-
-      for (const exerciseId of newExercises) {
-        await addExerciseToWorkout(props.workoutId, exerciseId);
-        hasBeenUpdated = true;
-      }
-
-      for (const exerciseId of removedExercises) {
-        await removeExerciseFromWorkout(props.workoutId, exerciseId);
-        hasBeenUpdated = true;
-      }
-
-      if (hasBeenUpdated) {
-        await workoutStore.setWorkouts(true);
-      }
-    }
-  } catch (error) {
-    console.error("Error adding exercises to workout:", error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-onMounted(() => {
-  if (props.selectedExercises) {
-    newSelectedExercises.value = props.selectedExercises.map(
-      (item) => item.exercise._id,
-    );
-  }
-});
 </script>

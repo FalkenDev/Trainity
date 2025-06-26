@@ -1,6 +1,10 @@
 <template>
   <div class="w-100 h-100 bg-grey-darken-4">
-    <BackHeader title="Add Exercises" />
+    <BackHeader
+      title="Add Exercises"
+      :show-menu="false"
+      @close="emit('close')"
+    />
     <v-form class="mx-5">
       <h1 class="text-h4 mb-4">
         Create Exercise
@@ -72,6 +76,7 @@ import type { CreateExercise } from "@/interfaces/Exercise.interface";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 import { useExerciseStore } from "@/stores/exercise.store";
 import { toast } from "vuetify-sonner";
+import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 
 const emit = defineEmits<{
   (e: "close"): void;
@@ -82,13 +87,20 @@ const muscleGroupStore = useMuscleGroupStore();
 const newExercise = ref<CreateExercise>({
   name: "",
   description: "",
-  muscleGroups: [],
+  muscleGroups: [] as string[],
   defaultSets: 1,
   defaultReps: 1,
   defaultPauseSeconds: 0,
 });
 
-const muscleGroupItems = computed(() => muscleGroupStore.muscleGroups);
+
+const muscleGroupItems = computed(() =>
+  muscleGroupStore.muscleGroups.map((group: MuscleGroup) => ({
+    ...group,
+    name: group.name,
+    _id: group._id,
+  }))
+);
 
 const createNewExercise = async () => {
   try {
