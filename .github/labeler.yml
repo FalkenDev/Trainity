@@ -5,38 +5,44 @@ frontend:
       - any-glob-to-any-file: ["frontend/**/*"]
 
 backend:
-  - any:
-      - "backend/v1/index.js"
-      - "backend/v1/route/**/*"
-      - "backend/v1/middleware/**/*"
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/v1/index.js"
+          - "backend/v1/route/**/*"
+          - "backend/v1/middleware/**/*"
+          - "backend/v1/models/**/*"
 
-# Label for database changes (Mongoose models/schemas)
 database:
-  - "backend/v1/models/**/*"
-  - "backend/v1/schemas/**/*"
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/v1/schemas/**/*"
 
-# Label for documentation changes (root README and API docs)
 documentation:
-  - "*.md"
-  - "backend/v1/documentation/**/*"
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "backend/v1/documentation/**/*"
 
-# Label for CI/CD and deployment changes
 "ci/cd":
-  - ".github/workflows/*"
-  - "Dockerfile"
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/*"
+          - "Dockerfile"
 
-# Label for dependency updates in either frontend or backend
 dependencies:
-  - "**/package.json"
-  - "**/pnpm-lock.yaml"
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/package.json"
+          - "**/pnpm-lock.yaml"
 
-# Label for core project configuration changes
 configuration:
-  - "backend/tsconfig.json"
-  - "backend/.env.example"
-  - "frontend/.env.example"
-  - "frontend/vite.config.ts"
-  - "frontend/tsconfig.json"
-  - "frontend/eslint.config.js"
-  - "frontend/.eslintrc.js"
-  - "frontend/vite.config.mts"
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/tsconfig.json"
+          - "backend/.env.example"
+          - "frontend/.env.example"
+          - "frontend/vite.config.ts"
+          - "frontend/tsconfig.json"
+          - "frontend/eslint.config.js"
+          - "frontend/.eslintrc.js"
+          - "frontend/vite.config.mts"
