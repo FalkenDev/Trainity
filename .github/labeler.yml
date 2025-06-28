@@ -1,41 +1,38 @@
 # .github/labeler.yml
-
-frontend:
+"client: web-mobile":
   - changed-files:
       - any-glob-to-any-file: ["frontend/**/*"]
 
-backend:
+"platform: backend":
   - changed-files:
       - any-glob-to-any-file:
-          - "backend/v1/index.js"
-          - "backend/v1/route/**/*"
-          - "backend/v1/middleware/**/*"
-          - "backend/v1/models/**/*"
+          - "backend/**/*"
+          - "!backend/v1/models/**/*"
+          - "!backend/v1/schemas/**/*"
+          - "!backend/v1/documentation/**/*"
 
-database:
+# Maps to 'topic: database'
+"topic: database":
   - changed-files:
       - any-glob-to-any-file:
           - "backend/v1/schemas/**/*"
 
-documentation:
+# Maps to 'type: docs'
+"type: docs":
   - changed-files:
       - any-glob-to-any-file:
           - "*.md"
           - "backend/v1/documentation/**/*"
 
-"ci/cd":
+# Maps to 'topic: ci-cd'
+"topic: ci-cd":
   - changed-files:
       - any-glob-to-any-file:
           - ".github/workflows/*"
           - "Dockerfile"
 
-dependencies:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "**/package.json"
-          - "**/pnpm-lock.yaml"
-
-configuration:
+# Maps to 'topic: config'
+"topic: config":
   - changed-files:
       - any-glob-to-any-file:
           - "backend/tsconfig.json"
@@ -46,3 +43,11 @@ configuration:
           - "frontend/eslint.config.js"
           - "frontend/.eslintrc.js"
           - "frontend/vite.config.mts"
+
+# Suggestion: Create a 'topic: dependencies' label for this
+# Or map it to 'type: refactor' if you prefer
+"type: refactor":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/package.json"
+          - "**/pnpm-lock.yaml"
