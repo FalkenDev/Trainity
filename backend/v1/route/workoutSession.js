@@ -9,7 +9,6 @@ router.post("/", auth, workoutSessionModel.createWorkoutSession);
 router.get("/:id", auth, workoutSessionModel.getWorkoutSession);
 router.put("/:id", auth, workoutSessionModel.updateWorkoutSession);
 router.delete("/:id", auth, workoutSessionModel.deleteWorkoutSession);
-router.patch("/:id/exercises", auth, workoutSessionModel.addExerciseToSession);
-router.post("/:id/complete", auth, workoutSessionModel.completeWorkoutSession);
+router.post("/:id/finish", auth, workoutSessionModel.finishWorkoutSession);
 
 export default router;
