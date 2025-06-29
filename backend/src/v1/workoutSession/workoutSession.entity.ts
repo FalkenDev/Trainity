@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Workout } from '../workout/workout.entity';
-import { WorkoutStatus } from '../types/WorkoutStatus.type';
 import { WorkoutSessionExercise } from './workoutSessionExercise.entity';
 
 @Entity()
@@ -17,26 +16,14 @@ export class WorkoutSession {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Workout, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Workout, { onDelete: 'CASCADE' })
   workout: Workout;
 
-  @Column('json', { nullable: true })
-  workoutSnapshot: {
-    title: string;
-    description?: string;
-    time?: number;
-    exercises: {
-      exerciseId: number;
-      order: number;
-      sets: number;
-      reps: number;
-      weight: number;
-      pauseSeconds?: number;
-    }[];
-  };
+  @Column({ type: 'jsonb', nullable: true })
+  workoutSnapshot: any;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   startedAt: Date;
@@ -46,27 +33,24 @@ export class WorkoutSession {
     enum: ['in_progress', 'finished', 'abandoned'],
     default: 'in_progress',
   })
-  status: WorkoutStatus;
+  status: 'in_progress' | 'finished' | 'abandoned';
 
   @Column({ type: 'timestamp', nullable: true })
   endedAt: Date;
 
-  @OneToMany(() => WorkoutSessionExercise, (e) => e.session, {
+  @OneToMany(() => WorkoutSessionExercise, (ex) => ex.session, {
     cascade: true,
     eager: true,
   })
   exercises: WorkoutSessionExercise[];
 
-  @Column({ type: 'float', default: 0 })
+  @Column({ default: 0 })
   totalWeight: number;
 
-  @Column('json', { nullable: true })
-  exerciseStats: {
-    exerciseId: number;
-    totalWeight: number;
-  }[];
+  @Column({ type: 'jsonb', nullable: true })
+  exerciseStats: { exerciseId: number; totalWeight: number }[];
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   notes: string;
 
   @CreateDateColumn()

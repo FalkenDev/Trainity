@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsBoolean, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class CreateWorkoutDto {
   @ApiProperty({ example: 'Push Day A' })
@@ -22,6 +22,5 @@ export class CreateWorkoutDto {
 
   @ApiProperty({ example: true, required: false })
   @IsOptional()
-  @IsBoolean()
-  defaultWeightAndReps?: boolean;
+  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
 }

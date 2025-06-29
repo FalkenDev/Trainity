@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.api
+    container_name: backend
+    ports:
+      - "3000:3000"
+    # volumes:
+    #   - ./backend:/app
+    #   - /app/node_modules
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./backend
+          target: /app
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: trainitydb
+    volumes:
+      - trainity_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  trainity_postgres_data:

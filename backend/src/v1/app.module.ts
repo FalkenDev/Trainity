@@ -6,6 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './strategies/Jwt.strategy';
+import { WorkoutModule } from './workout/workout.module';
+import { WorkoutSessionModule } from './workoutSession/workoutSession.module';
+import { MuscleGroupModule } from './muscleGroup/muscleGroup.module';
 
 @Module({
   imports: [
@@ -26,9 +29,12 @@ import { JwtStrategy } from './strategies/Jwt.strategy';
       }),
       inject: [ConfigService],
     }),
-    ExerciseModule,
-    UserModule,
     AuthModule,
+    ExerciseModule,
+    MuscleGroupModule,
+    UserModule,
+    WorkoutModule,
+    WorkoutSessionModule,
   ],
   providers: [AppService, JwtStrategy],
 })

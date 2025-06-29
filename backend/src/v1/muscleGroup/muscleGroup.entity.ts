@@ -19,12 +19,12 @@ export class MuscleGroup {
   @Column({ nullable: true })
   description: string;
 
+  @ManyToMany(() => Exercise, (exercise) => exercise.muscleGroups)
+  exercises: Exercise[];
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ManyToMany(() => Exercise, (exercise) => exercise.muscleGroups)
-  exercises: Exercise[];
 }
