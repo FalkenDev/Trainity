@@ -6,23 +6,23 @@ export class WorkoutSessionSet {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => WorkoutSessionExercise, (exercise) => exercise.sets, {
+  @ManyToOne(() => WorkoutSessionExercise, (ex) => ex.sets, {
     onDelete: 'CASCADE',
   })
-  exercise: WorkoutSessionExercise;
+  sessionExercise: WorkoutSessionExercise;
 
   @Column()
   setNumber: number;
 
-  @Column('float')
+  @Column()
   weight: number;
 
-  @Column('int')
+  @Column()
   reps: number;
 
-  @Column('float', { nullable: true })
+  @Column({ nullable: true })
   rpe: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ nullable: true })
   notes: string;
 }

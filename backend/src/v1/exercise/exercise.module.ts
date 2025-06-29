@@ -8,5 +8,6 @@ import { Exercise } from './exercise.entity';
   imports: [TypeOrmModule.forFeature([Exercise])],
   controllers: [ExerciseController],
   providers: [ExerciseService],
+  exports: [TypeOrmModule],
 })
 export class ExerciseModule {}

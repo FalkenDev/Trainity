@@ -19,18 +19,18 @@ export class WorkoutSessionExercise {
   })
   session: WorkoutSession;
 
-  @ManyToOne(() => Exercise, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => Exercise)
   exercise: Exercise;
 
-  @Column('json', { nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   exerciseSnapshot: {
     name: string;
     description?: string;
     img?: string;
-    muscleGroups?: string[]; // or number[] if you're linking them
+    muscleGroups?: string[];
   };
 
-  @OneToMany(() => WorkoutSessionSet, (s) => s.exercise, {
+  @OneToMany(() => WorkoutSessionSet, (set) => set.sessionExercise, {
     cascade: true,
     eager: true,
   })
