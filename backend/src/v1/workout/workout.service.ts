@@ -15,7 +15,7 @@ export class WorkoutService {
     private workoutRepo: Repository<Workout>,
 
     @InjectRepository(WorkoutSession)
-    private sessionRepo: Repository<WorkoutSession>,
+    private readonly workoutSessionRepository: Repository<WorkoutSession>,
   ) {}
 
   async getWorkoutList(userId: number): Promise<WorkoutResponseDto[]> {
@@ -74,7 +74,10 @@ export class WorkoutService {
     });
     if (!workout) throw new NotFoundException('Workout not found');
 
-    await this.sessionRepo.update({ workout: { id } }, { workout: undefined });
+    await this.workoutSessionRepository.update(
+      { workout: { id } },
+      { workout: undefined },
+    );
     await this.workoutRepo.remove(workout);
 
     return { message: 'Workout deleted and references removed' };

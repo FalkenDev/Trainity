@@ -1,3 +1,5 @@
+// workoutExercise.entity.ts
+
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Workout } from './workout.entity';
 import { Exercise } from '../exercise/exercise.entity';
@@ -18,15 +20,15 @@ export class WorkoutExercise {
   @Column()
   order: number;
 
-  @Column({ default: 3 })
+  @Column()
   sets: number;
 
-  @Column({ default: 10 })
+  @Column()
   reps: number;
 
-  @Column({ default: 0 })
+  @Column()
   weight: number;
 
-  @Column({ default: 60 }) // seconds
+  @Column()
   pauseSeconds: number;
 }
