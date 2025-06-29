@@ -21,13 +21,17 @@ export class Workout {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ nullable: true })
+  @Column()
   time: number;
 
-  @Column({ default: false })
-  defaultWeightAndReps: boolean;
+  @Column({
+    type: 'enum',
+    enum: ['default', 'latest', 'exercise'],
+    default: 'default',
+  })
+  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
 
-  @ManyToOne(() => User, (user) => user.workouts, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   createdBy: User;
 
   @OneToMany(() => WorkoutExercise, (we) => we.workout, {

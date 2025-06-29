@@ -15,7 +15,7 @@ export class WorkoutResponseDto {
   time?: number;
 
   @ApiProperty()
-  defaultWeightAndReps: boolean;
+  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
 
   @ApiProperty({ type: [WorkoutExerciseSnapshotDto], required: false })
   exercises?: WorkoutExerciseSnapshotDto[];

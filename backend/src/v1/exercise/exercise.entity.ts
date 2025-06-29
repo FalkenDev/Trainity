@@ -24,21 +24,19 @@ export class Exercise {
   @Column({ nullable: true })
   image: string;
 
-  @Column({ type: 'int', nullable: true })
+  @Column()
   defaultSets: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column()
   defaultReps: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column()
   defaultPauseSeconds: number;
 
-  @ManyToOne(() => User, (user) => user.exercises, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   createdBy: User;
 
-  @ManyToMany(() => MuscleGroup, (muscleGroup) => muscleGroup.exercises, {
-    cascade: true,
-  })
+  @ManyToMany(() => MuscleGroup, (mg) => mg.exercises, { cascade: true })
   @JoinTable()
   muscleGroups: MuscleGroup[];
 

@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import * as dotenv from 'dotenv';
+
 import { User } from './user/user.entity';
 import { Exercise } from './exercise/exercise.entity';
 import { Workout } from './workout/workout.entity';
@@ -9,13 +11,16 @@ import { MuscleGroup } from './muscleGroup/muscleGroup.entity';
 import { WorkoutSessionExercise } from './workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from './workoutSession/workoutSessionSet.entity';
 
+// Load .env
+dotenv.config();
+
 export const AppDataSource = new DataSource({
-  type: 'postgres', // or 'mysql', 'sqlite', etc
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres', // or your DB user
-  password: 'password', // your password
-  database: 'fitness_db', // your DB name
+  type: 'postgres',
+  host: process.env.DATABASE_HOST,
+  port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+  username: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME,
   synchronize: true,
   logging: false,
   entities: [
