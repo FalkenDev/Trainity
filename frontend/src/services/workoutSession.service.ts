@@ -1,142 +1,116 @@
-import { fetchWrapper } from "@/utils/fetchWrapper";
+import { fetchWrapper } from '@/utils/fetchWrapper';
 import type {
-  WorkoutExercise,
+  FinishSessionPayload,
   WorkoutSession,
-} from "@/interfaces/workoutSession.interface";
+} from '@/interfaces/workoutSession.interface';
 
 export const fetchAllWorkoutSessions = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutSessions`);
     if (!response.ok) {
-      throw new Error("Failed to fetch workout sessions");
+      throw new Error('Failed to fetch workout sessions');
     }
     const data = await response.json();
     return data || [];
   } catch (error) {
-    console.error("Error fetching workout sessions:", error);
+    console.error('Error fetching workout sessions:', error);
     throw error;
   }
 };
 
 export const startWorkoutSession = async (workoutId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutsessions`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({ workoutId: workoutId }),
     });
     if (!response.ok) {
-      throw new Error("Failed to start workout session");
+      throw new Error('Failed to start workout session');
     }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error starting workout session:", error);
-    throw error;
-  }
-};
-
-export const addFinnishedExerciseToSession = async (
-  sessionId: string,
-  workoutExercise: WorkoutExercise
-) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
-  try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workoutsessions/${sessionId}/exercises`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(workoutExercise),
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to add finished exercise to session");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error adding finished exercise to session:", error);
+    console.error('Error starting workout session:', error);
     throw error;
   }
 };
 
 export const getWorkoutSessionById = async (sessionId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
   try {
     const response = await fetchWrapper(
-      `${apiUrl}/workoutsessions/${sessionId}`
+      `${apiUrl}/workoutsessions/${sessionId}`,
     );
     if (!response.ok) {
-      throw new Error("Failed to fetch workout session");
+      throw new Error('Failed to fetch workout session');
     }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error fetching workout session:", error);
+    console.error('Error fetching workout session:', error);
     throw error;
   }
 };
 
 export const updateWorkoutSession = async (
   sessionId: string,
-  sessionData: WorkoutSession
+  sessionData: WorkoutSession,
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,
       {
-        method: "PUT",
+        method: 'PUT',
         body: JSON.stringify(sessionData),
-      }
+      },
     );
     if (!response.ok) {
-      throw new Error("Failed to update workout session");
+      throw new Error('Failed to update workout session');
     }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error updating workout session:", error);
+    console.error('Error updating workout session:', error);
     throw error;
   }
 };
 
-export const finnishWorkoutSession = async (sessionId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
-  try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workoutsessions/${sessionId}/complete`,
-      {
-        method: "POST",
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to finish workout session");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error finishing workout session:", error);
-    throw error;
+export const finishWorkoutSession = async (
+  sessionId: string,
+  payload: FinishSessionPayload,
+) => {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
+  const response = await fetchWrapper(
+    `${apiUrl}/workoutsessions/${sessionId}/finish`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
+  if (!response.ok) {
+    throw new Error('Failed to finish workout session');
   }
+  return await response.json();
 };
 
 export const deleteWorkoutSession = async (sessionId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,
       {
-        method: "DELETE",
-      }
+        method: 'DELETE',
+      },
     );
     if (!response.ok) {
-      throw new Error("Failed to delete workout session");
+      throw new Error('Failed to delete workout session');
     }
     return true; // Assuming deletion is successful if no error is thrown
   } catch (error) {
-    console.error("Error deleting workout session:", error);
+    console.error('Error deleting workout session:', error);
     throw error;
   }
 };
