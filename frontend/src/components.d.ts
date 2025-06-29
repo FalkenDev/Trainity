@@ -15,6 +15,7 @@ declare module 'vue' {
     BottomNavigation: typeof import('./components/BottomNavigation.vue')['default']
     CreateExercise: typeof import('./components/Exercise/CreateExercise.vue')['default']
     EditExercise: typeof import('./components/Exercise/EditExercise.vue')['default']
+    EditSetDialog: typeof import('./components/Session/EditSetDialog.vue')['default']
     EditWorkout: typeof import('./components/Workout/EditWorkout.vue')['default']
     ExerciseList: typeof import('./components/Exercise/ExerciseList.vue')['default']
     ExitHeader: typeof import('./components/basicUI/ExitHeader.vue')['default']
@@ -25,6 +26,8 @@ declare module 'vue' {
     ProgressBar: typeof import('./components/ProgressBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TimerDialog: typeof import('./components/Session/TimerDialog.vue')['default']
     WeightAndRepsSettings: typeof import('./components/Workout/WeightAndRepsSettings.vue')['default']
+    WorkoutExerciseCard: typeof import('./components/Session/WorkoutExerciseCard.vue')['default']
   }
 }
