@@ -150,7 +150,7 @@ import { useWorkoutSessionStore } from "@/stores/workoutSession.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { Workout, Exercise } from "@/interfaces/Workout.interface";
-import { deleteWorkout, dublicateWorkout, removeExercisesFromWorkout, addExercisesToWorkout } from "@/services/workout.sevice";
+import { deleteWorkout, dublicateWorkout, removeExercisesFromWorkout, addExercisesToWorkout } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
 
 const isAddExerciseOpen = ref<boolean>(false);

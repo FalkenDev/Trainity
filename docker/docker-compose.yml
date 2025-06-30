@@ -1,11 +1,11 @@
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile.api
+      context: ..
+      dockerfile: docker/Dockerfile.api
     container_name: backend
     ports:
-      - "3000:3000"
+      - "1337:1337"
     # volumes:
     #   - ./backend:/app
     #   - /app/node_modules
@@ -15,8 +15,28 @@ services:
       - .env
     develop:
       watch:
-        - action: sync+restart
-          path: ./backend
+        - action: sync
+          path: ../backend
+          target: /app
+    
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    develop:
+      watch:
+        - action: sync
+          path: ../frontend
           target: /app
   postgres:
     image: postgres:latest

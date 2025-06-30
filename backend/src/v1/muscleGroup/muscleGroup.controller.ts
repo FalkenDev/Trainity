@@ -24,7 +24,7 @@ import { MuscleGroupResponseDto } from './dto/muscleGroupResponse.dto';
 @ApiTags('musclegroups')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('musclegroups')
+@Controller('muscleGroups')
 export class MuscleGroupController {
   constructor(private readonly muscleGroupService: MuscleGroupService) {}
 
