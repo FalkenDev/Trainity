@@ -49,7 +49,10 @@
       />
     </div>
     <div class="d-flex flex-column justify-space-between my-5 mx-5 ga-5">
-      <v-btn color="secondary">
+      <v-btn
+        color="secondary"
+        @click="isAddExerciseOpen = true"
+      >
         Add Exercise
       </v-btn>
       <v-btn
@@ -60,6 +63,17 @@
         Finish Session
       </v-btn>
     </div>
+    <v-dialog
+      v-model="isAddExerciseOpen"
+      fullscreen
+    >
+      <AddExerciseList
+        v-if="isAddExerciseOpen"
+        :initial-selected-ids="processedExercises.map(e => e.exerciseId)"
+        @close="isAddExerciseOpen = false"
+        @save="updateWorkoutSessionExercises"
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -82,6 +96,7 @@ import { toast } from 'vuetify-sonner';
 import router from '@/router';
 import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface';
 
+const isAddExerciseOpen = ref(false);
 const workoutSessionStore = useWorkoutSessionStore();
 const processedExercises = ref<Exercise[]>([]);
 const workoutSession = computed<WorkoutSession | null>(
@@ -143,6 +158,40 @@ onMounted(() => {
     workoutSessionStore.startClock();
   }
 });
+
+function updateWorkoutSessionExercises(
+  newExerciseIds: string[],
+) {
+  if (!workoutSession.value) return;
+
+  isLoading.value = true;
+  try {
+    const existingExerciseIds = processedExercises.value.map(
+      (e) => e.exerciseId,
+    );
+
+    const exercisesToAdd = newExerciseIds.filter(
+      (id) => !existingExerciseIds.includes(id),
+    );
+
+    const exercisesToRemove = existingExerciseIds.filter(
+      (id) => !newExerciseIds.includes(id),
+    );
+
+    if (exercisesToRemove.length > 0) {
+      console.log('Exercises to remove:', exercisesToRemove);
+    }
+
+    if (exercisesToAdd.length > 0) {
+      console.log('Exercises to add:', exercisesToAdd);
+    }
+  } catch (error) {
+    console.error('Error updating workout session exercises:', error);
+    toast.error('Failed to update workout session exercises.');
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 function handleExerciseDelete(exerciseId: string) {
   const exerciseIndex = processedExercises.value.findIndex(

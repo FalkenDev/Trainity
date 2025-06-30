@@ -30,8 +30,8 @@
           offset-y
           transition="slide-y-transition"
         >
-          <template #activator="{ props }">
-            <v-icon v-bind="props">
+          <template #activator="{ props: activatorProps }">
+            <v-icon v-bind="activatorProps">
               mdi-dots-horizontal
             </v-icon>
           </template>
@@ -73,7 +73,8 @@
           hide-default-footer
           @click:row="handleRowClick"
         >
-          <template #item.done="{ item }">
+          <!-- @es-ignore-->
+          <template #['item.done']="{ item }"> 
             <v-checkbox
               :model-value="item.done"
               color="primary"
