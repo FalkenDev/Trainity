@@ -82,6 +82,59 @@ const workoutModel = {
     }
   },
 
+  addExercisesToWorkout: async function (req, res) {
+    try {
+      const { exerciseIds } = req.body;
+
+      if (!Array.isArray(exerciseIds) || exerciseIds.length === 0) {
+        return res.status(400).json({ message: "exerciseIds must be a non-empty array." });
+      }
+
+      const workout = await Workout.findOne({
+        _id: req.params.id,
+        createdBy: req.user.id,
+      });
+
+      if (!workout) {
+        return res.status(404).json({ message: "Workout not found" });
+      }
+
+      const newExercises = [];
+      for (const exerciseId of exerciseIds) {
+        const exercise = await Exercise.findById(exerciseId);
+        if (exercise) {
+          newExercises.push({
+            exerciseId: exercise._id,
+            order: workout.exercises.length + newExercises.length + 1,
+            sets: exercise.defaultSets || 3,
+            reps: exercise.defaultReps || 10,
+            weight: 0,
+            pauseSeconds: exercise.defaultPauseSeconds || 60,
+          });
+        }
+      }
+
+      if (newExercises.length === 0) {
+        return res.status(404).json({ message: "None of the provided exercise IDs were found." });
+      }
+      
+      await Workout.updateOne(
+        { _id: workout._id },
+        {
+          $push: {
+            exercises: { $each: newExercises }
+          }
+        }
+      );
+      
+      const updatedWorkout = await Workout.findById(workout._id);
+
+      res.status(201).json(updatedWorkout);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
   updateExerciseInWorkout: async function (req, res) {
     const { order, sets, reps, weight, pauseSeconds } = req.body;
 
@@ -162,6 +215,40 @@ const workoutModel = {
       workout.exercises.splice(exerciseIndex, 1);
       await workout.save();
       res.status(200).json({ message: "Exercise removed from workout" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  removeExercisesFromWorkout: async function (req, res) {
+    try {
+      const workoutId = req.params.id;
+      const { exerciseIds } = req.body;
+
+      if (!Array.isArray(exerciseIds) || exerciseIds.length === 0) {
+        return res.status(400).json({ message: "exerciseIds must be a non-empty array." });
+      }
+
+      const result = await Workout.updateOne(
+        { _id: workoutId, createdBy: req.user.id },
+        {
+          $pull: {
+            exercises: {
+              exerciseId: { $in: exerciseIds }
+            }
+          }
+        }
+      );
+
+      if (result.matchedCount === 0) {
+        return res.status(404).json({ message: "Workout not found." });
+      }
+      if (result.modifiedCount === 0) {
+        return res.status(200).json({ message: "No matching exercises found to remove, but workout exists." });
+      }
+
+      res.status(200).json({ message: "Exercises removed successfully." });
+
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
