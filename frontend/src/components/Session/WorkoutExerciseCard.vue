@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="d-flex flex-row justify-space-between align-center pa-3">
-      <h1 class="text-h5">{{ resolvedExercise?.name || 'Loading...' }}</h1>
+      <h1 class="text-h5">
+        {{ resolvedExercise?.name || 'Loading...' }}
+      </h1>
       <div class="d-flex flex-row ga-5 align-center">
         <v-chip
           v-if="allSetsDone"
@@ -12,15 +14,26 @@
         >
           Done
         </v-chip>
-        <v-icon v-if="allSetsDone" @click="showDetails = !showDetails">
+        <v-icon
+          v-if="allSetsDone"
+          @click="showDetails = !showDetails"
+        >
           {{ showDetails ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
         </v-icon>
-        <v-icon v-if="!allSetsDone" @click="isTimerVisible = true"
-          >mdi-timer-play-outline</v-icon
+        <v-icon
+          v-if="!allSetsDone"
+          @click="isTimerVisible = true"
         >
-        <v-menu offset-y transition="slide-y-transition">
+          mdi-timer-play-outline
+        </v-icon>
+        <v-menu
+          offset-y
+          transition="slide-y-transition"
+        >
           <template #activator="{ props }">
-            <v-icon v-bind="props">mdi-dots-horizontal</v-icon>
+            <v-icon v-bind="props">
+              mdi-dots-horizontal
+            </v-icon>
           </template>
           <v-list>
             <v-list-item disabled>
@@ -42,7 +55,12 @@
         <div
           class="d-flex flex-row ga-2 px-5 py-2 align-center bg-blue-darken-4"
         >
-          <v-icon size="18" color="grey">mdi-lightbulb-outline</v-icon>
+          <v-icon
+            size="18"
+            color="grey"
+          >
+            mdi-lightbulb-outline
+          </v-icon>
           <p class="text-subtitle-2 text-grey">
             {{ resolvedExercise?.description || 'No description available.' }}
           </p>
@@ -55,13 +73,13 @@
           hide-default-footer
           @click:row="handleRowClick"
         >
-          <template v-slot:item.done="{ item }">
+          <template #item.done="{ item }">
             <v-checkbox
               :model-value="item.done"
-              @update:model-value="onDoneChanged(item, $event ?? false)"
               color="primary"
               hide-details
               class="ma-0 pa-0"
+              @update:model-value="onDoneChanged(item, $event ?? false)"
               @click.stop
             />
           </template>
@@ -70,21 +88,21 @@
           <v-slider
             label="RPE (Rate of Perceived Exertion)"
             :model-value="props.rpe"
-            @update:model-value="$emit('update:rpe', $event)"
             thumb-label
             step="1"
             min="1"
             max="10"
             hide-details
-          ></v-slider>
+            @update:model-value="$emit('update:rpe', $event)"
+          />
           <v-text-field
             label="Exercise Notes"
             :model-value="props.notes"
-            @update:model-value="$emit('update:notes', $event)"
             variant="outlined"
             density="compact"
             hide-details
-          ></v-text-field>
+            @update:model-value="$emit('update:notes', $event)"
+          />
         </div>
       </div>
     </v-expand-transition>

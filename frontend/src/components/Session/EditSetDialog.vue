@@ -1,20 +1,30 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
     fullscreen
     :scrim="false"
     transition="dialog-bottom-transition"
+    @update:model-value="$emit('update:modelValue', $event)"
   >
-    <v-card v-if="editableSet" class="d-flex flex-column">
+    <v-card
+      v-if="editableSet"
+      class="d-flex flex-column"
+    >
       <v-toolbar color="primary">
         <v-toolbar-title>Edit Set {{ editableSet.set }}</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn variant="text" @click="onSave">Save</v-btn>
+        <v-spacer />
+        <v-btn
+          variant="text"
+          @click="onSave"
+        >
+          Save
+        </v-btn>
       </v-toolbar>
 
       <v-card-text class="pa-5">
-        <p class="text-grey-lighten-1 mb-2">WEIGHT</p>
+        <p class="text-grey-lighten-1 mb-2">
+          WEIGHT
+        </p>
         <v-text-field
           v-model.number="editableSet.weight"
           type="number"
@@ -24,9 +34,11 @@
           class="mb-4"
           autofocus
           single-line
-        ></v-text-field>
+        />
 
-        <p class="text-grey-lighten-1 mb-2">REPETITIONS</p>
+        <p class="text-grey-lighten-1 mb-2">
+          REPETITIONS
+        </p>
         <v-text-field
           v-model.number="editableSet.reps"
           type="number"
@@ -34,10 +46,10 @@
           flat
           suffix="reps"
           single-line
-        ></v-text-field>
+        />
       </v-card-text>
 
-      <v-spacer></v-spacer>
+      <v-spacer />
 
       <div class="pa-4">
         <v-btn

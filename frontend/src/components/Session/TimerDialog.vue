@@ -1,15 +1,19 @@
 <template>
   <v-dialog
     :model-value="modelValue"
-    @update:model-value="closeDialog"
     fullscreen
     :scrim="false"
     transition="dialog-bottom-transition"
+    @update:model-value="closeDialog"
   >
     <v-card class="d-flex flex-column text-center">
       <v-toolbar color="transparent">
-        <v-spacer></v-spacer>
-        <v-btn icon="mdi-close" variant="text" @click="closeDialog"></v-btn>
+        <v-spacer />
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          @click="closeDialog"
+        />
       </v-toolbar>
 
       <v-card-text class="d-flex flex-grow-1 justify-center align-center">
@@ -20,7 +24,7 @@
             :width="12"
             color="primary"
             class="progress-circle"
-          ></v-progress-circular>
+          />
 
           <div class="time-text-container">
             <span class="time-text">{{ formattedTime }}</span>
@@ -32,16 +36,16 @@
         <v-btn
           size="large"
           :color="isRunning ? 'orange' : 'green'"
-          @click="toggleTimer"
           class="font-weight-bold flex-grow-1"
+          @click="toggleTimer"
         >
           {{ isRunning ? 'Pause' : 'Start' }}
         </v-btn>
         <v-btn
           size="large"
           color="grey"
-          @click="resetTimer"
           class="font-weight-bold flex-grow-1"
+          @click="resetTimer"
         >
           Reset
         </v-btn>

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <BackHeader :show-menu="true" title="Workout Session">
+    <BackHeader
+      :show-menu="true"
+      title="Workout Session"
+    >
       <template #menuAppend>
         <v-list>
           <v-list-item>
@@ -18,7 +21,11 @@
       <p class="text-h6">
         {{ clock }}
       </p>
-      <v-btn color="primary" @click="finnishSession" :loading="isLoading">
+      <v-btn
+        color="primary"
+        :loading="isLoading"
+        @click="finnishSession"
+      >
         Finnish
       </v-btn>
     </div>
@@ -42,8 +49,14 @@
       />
     </div>
     <div class="d-flex flex-column justify-space-between my-5 mx-5 ga-5">
-      <v-btn color="secondary">Add Exercise</v-btn>
-      <v-btn color="primary" @click="finnishSession" :loading="isLoading">
+      <v-btn color="secondary">
+        Add Exercise
+      </v-btn>
+      <v-btn
+        color="primary"
+        :loading="isLoading"
+        @click="finnishSession"
+      >
         Finish Session
       </v-btn>
     </div>
@@ -216,23 +229,19 @@ const finnishSession = async () => {
       });
     }
   }
-
-  if (completedExercises.length === 0) {
-    abandonWorkoutSession(sessionId);
-    toast.info('No exercises completed. Session abandoned.');
-    workoutSessionStore.stopClock();
-    workoutSessionStore.selectedWorkoutSession = null;
-    workoutSessionStore.resetClock();
-    router.push('/');
-    return;
-  }
-
   try {
-    const finalPayload = { completedExercises, notes: '' };
-
-    await finishWorkoutSession(sessionId, finalPayload);
-
-    toast.success('Workout session finished successfully!');
+    if (completedExercises.length === 0) {
+      await abandonWorkoutSession(sessionId);
+      toast.info('No exercises completed. Session abandoned.');
+      workoutSessionStore.stopClock();
+      workoutSessionStore.selectedWorkoutSession = null;
+      workoutSessionStore.resetClock();
+      router.push('/');
+    } else {
+      const finalPayload = { completedExercises, notes: '' };
+      await finishWorkoutSession(sessionId, finalPayload);
+      toast.success('Workout session finished successfully!');
+    }
     workoutSessionStore.stopClock();
     workoutSessionStore.selectedWorkoutSession = null;
     workoutSessionStore.resetClock();
