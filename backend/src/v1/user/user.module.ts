@@ -13,6 +13,6 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService],
+  exports: [UserService, TypeOrmModule],
 })
 export class UserModule {}

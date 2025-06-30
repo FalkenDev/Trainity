@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Request } from 'express';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UserService } from 'src/v1/user/user.service';
+import { ConfigService } from '@nestjs/config';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -11,20 +11,26 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
   ) {
+    const jwtSecret = configService.get<string>('JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not defined in the environment variables');
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          return request?.cookies?.['auth_token'] ?? null;
+        (req: Request) => {
+          const cookies = req.cookies as Record<string, string>;
+          console.log('Extracting JWT from cookies:', cookies);
+          return cookies?.['auth_token'];
         },
       ]),
+      secretOrKey: jwtSecret,
       ignoreExpiration: false,
-      secretOrKeyProvider: async () => {
-        return configService.get<string>('JWT_SECRET');
-      },
     });
   }
 
   async validate(payload: any) {
+    console.log('🎯 JWT payload:', payload);
     if (!payload) {
       throw new UnauthorizedException('Invalid token payload');
     }

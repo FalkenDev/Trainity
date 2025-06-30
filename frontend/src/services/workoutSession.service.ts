@@ -4,8 +4,9 @@ import type {
   WorkoutSession,
 } from "@/interfaces/workoutSession.interface";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+
 export const fetchAllWorkoutSessions = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutSessions`);
     if (!response.ok) {
@@ -20,7 +21,6 @@ export const fetchAllWorkoutSessions = async () => {
 };
 
 export const startWorkoutSession = async (workoutId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutsessions`, {
       method: "POST",
@@ -41,7 +41,6 @@ export const addFinnishedExerciseToSession = async (
   sessionId: string,
   workoutExercise: WorkoutExercise
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}/exercises`,
@@ -62,7 +61,6 @@ export const addFinnishedExerciseToSession = async (
 };
 
 export const getWorkoutSessionById = async (sessionId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`
@@ -82,7 +80,6 @@ export const updateWorkoutSession = async (
   sessionId: string,
   sessionData: WorkoutSession
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,
@@ -103,7 +100,6 @@ export const updateWorkoutSession = async (
 };
 
 export const finnishWorkoutSession = async (sessionId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}/complete`,
@@ -123,7 +119,6 @@ export const finnishWorkoutSession = async (sessionId: string) => {
 };
 
 export const deleteWorkoutSession = async (sessionId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,

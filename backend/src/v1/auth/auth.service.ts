@@ -8,10 +8,10 @@ import { Repository } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { UserWithoutPasswordDto } from './dto/UserWithoutPassword.dto';
 import { User } from '../user/user.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +19,7 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
     private readonly configService: ConfigService,
+    private jwtService: JwtService,
   ) {}
 
   async register(dto: RegisterDto): Promise<UserWithoutPasswordDto> {
@@ -44,14 +45,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const secret = this.configService.get<string>('JWT_SECRET');
-    if (!secret) throw new Error('JWT_SECRET is not defined');
-
     const userDto = new UserWithoutPasswordDto(user);
 
-    const token = jwt.sign({ id: user.id, email: user.email }, secret, {
-      expiresIn: '7d',
-    });
+    const token = this.jwtService.sign({ id: user.id, email: user.email });
 
     return {
       token,

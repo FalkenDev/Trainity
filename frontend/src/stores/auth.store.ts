@@ -3,6 +3,8 @@ import { useRouter } from 'vue-router';
 import { defineStore } from 'pinia';
 import { toast } from 'vuetify-sonner';
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+
 export const useAuthStore = defineStore(
   'authStore',
   () => {
@@ -14,9 +16,8 @@ export const useAuthStore = defineStore(
 
     const login = async (email: string, password: string) => {
       loading.value = true;
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
       try {
-        const response = await fetch(`${apiUrl}/users/login`, {
+        const response = await fetch(`${apiUrl}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -61,14 +62,13 @@ export const useAuthStore = defineStore(
       password: string;
     }) => {
       loading.value = true;
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
       try {
         console.log('Creating account with data:', registerData);
         console.log('fullname:', registerData.fullName);
         const firstName = registerData.fullName.split(' ')[0];
         const lastName = registerData.fullName.split(' ')[1] || '';
 
-        const response = await fetch(`${apiUrl}/users/register`, {
+        const response = await fetch(`${apiUrl}/auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
