@@ -26,9 +26,15 @@
         :exercise="exercise"
         :default-weight-and-reps="workoutSession?.workout.defaultWeightAndReps"
         :workout-sets="allWorkoutSets[exercise.exerciseId] || []"
+        :rpe="exerciseMetadata[exercise.exerciseId]?.rpe"
+        :notes="exerciseMetadata[exercise.exerciseId]?.notes"
         @update:set="handleSetUpdate(exercise.exerciseId, $event)"
         @delete:set="handleSetDelete(exercise.exerciseId, $event)"
         @add:set="handleSetAdd(exercise.exerciseId)"
+        @update:rpe="handleMetadataUpdate(exercise.exerciseId, { rpe: $event })"
+        @update:notes="
+          handleMetadataUpdate(exercise.exerciseId, { notes: $event })
+        "
       />
     </div>
   </div>
@@ -45,6 +51,7 @@ import { finishWorkoutSession } from '@/services/workoutSession.service';
 import { toast } from 'vuetify-sonner';
 import router from '@/router';
 import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface';
+import { ref, computed, watchEffect, onMounted } from 'vue';
 
 const workoutSessionStore = useWorkoutSessionStore();
 const processedExercises = ref<Exercise[]>([]);
@@ -54,6 +61,9 @@ const workoutSession = computed<WorkoutSession | null>(
 
 const allWorkoutSets = ref<Record<string, WorkoutSet[]>>({});
 const isLoading = ref(false);
+const exerciseMetadata = ref<Record<string, { rpe?: number; notes?: string }>>(
+  {},
+);
 
 const clock = computed(() => workoutSessionStore.formattedClock);
 
@@ -61,6 +71,7 @@ watchEffect(async () => {
   if (!workoutSession.value) {
     processedExercises.value = [];
     allWorkoutSets.value = {};
+    exerciseMetadata.value = {};
     return;
   }
 
@@ -88,6 +99,12 @@ watchEffect(async () => {
     }),
   );
 
+  const newMetadata: Record<string, { rpe?: number; notes?: string }> = {};
+  for (const exercise of exercisesWithDetails) {
+    newMetadata[exercise.exerciseId] = { rpe: undefined, notes: '' };
+  }
+  exerciseMetadata.value = newMetadata;
+
   processedExercises.value = exercisesWithDetails;
   allWorkoutSets.value = newAllSets;
 });
@@ -97,6 +114,18 @@ onMounted(() => {
     workoutSessionStore.startClock();
   }
 });
+
+function handleMetadataUpdate(
+  exerciseId: string,
+  data: { rpe?: number; notes?: string },
+) {
+  if (exerciseMetadata.value[exerciseId]) {
+    exerciseMetadata.value[exerciseId] = {
+      ...exerciseMetadata.value[exerciseId],
+      ...data,
+    };
+  }
+}
 
 function handleSetUpdate(exerciseId: string, updatedSet: WorkoutSet) {
   const sets = allWorkoutSets.value[exerciseId];
@@ -148,14 +177,15 @@ const finnishSession = async () => {
         setNumber: set.set,
         weight: set.weight,
         reps: set.reps,
-        rpe: typeof set.rpe === 'number' ? set.rpe : 0,
-        notes: set.notes || '',
       }));
 
     if (performedSets.length > 0) {
+      const metadata = exerciseMetadata.value[exercise.exerciseId];
       completedExercises.push({
         exerciseId: exercise.exerciseId,
         sets: performedSets,
+        rpe: metadata?.rpe,
+        notes: metadata?.notes,
       });
     }
   }
@@ -167,7 +197,7 @@ const finnishSession = async () => {
   }
 
   try {
-    const finalPayload = { completedExercises, notes: 'test' }; // TODO: Add notes input for session maybe in the hamburger menu
+    const finalPayload = { completedExercises, notes: '' };
 
     await finishWorkoutSession(sessionId, finalPayload);
 

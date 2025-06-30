@@ -38,16 +38,12 @@ export interface WorkoutSet {
   weight: number;
   reps: number;
   done: boolean;
-  rpe?: number;
-  notes?: string;
 }
 
 type FinishedSetPayload = {
   setNumber: number;
   weight: number;
   reps: number;
-  rpe: number;
-  notes?: string;
 };
 
 export interface WorkoutExercisePayload {

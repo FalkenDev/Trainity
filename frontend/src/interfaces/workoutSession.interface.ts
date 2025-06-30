@@ -3,12 +3,12 @@ export interface PerformedSet {
   setNumber: number;
   weight: number;
   reps: number;
-  rpe: number;
-  notes?: string;
 }
 
 export interface FinishedExercisePayload {
   exerciseId: string;
+  rpe?: number;
+  notes?: string;
   sets: PerformedSet[];
 }
 

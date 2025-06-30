@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex flex-row justify-space-between align-center pa-3">
       <h1 class="text-h5">{{ resolvedExercise?.name || 'Loading...' }}</h1>
-      <div class="d-flex flex-row ga-3 align-center">
+      <div class="d-flex flex-row ga-5 align-center">
         <v-chip
           v-if="allSetsDone"
           color="green"
@@ -36,7 +36,7 @@
         <v-data-table
           :headers="headers"
           :items="workoutSets"
-          class="elevation-1 bg-transparent"
+          class="elevation-1 bg-transparent border-b"
           hide-default-footer
           @click:row="handleRowClick"
         >
@@ -51,17 +51,33 @@
             />
           </template>
         </v-data-table>
+        <div class="d-flex flex-row justify-end my-5 mx-5">
+          <v-btn size="small" x color="orange-darken-4" @click="addSet">
+            Add set
+          </v-btn>
+        </div>
+        <div class="pa-4 pt-2 d-flex flex-column ga-3 bg-grey-darken-4">
+          <v-slider
+            label="RPE (Rate of Perceived Exertion)"
+            :model-value="props.rpe"
+            @update:model-value="$emit('update:rpe', $event)"
+            thumb-label
+            step="1"
+            min="1"
+            max="10"
+            hide-details
+          ></v-slider>
+          <v-text-field
+            label="Exercise Notes"
+            :model-value="props.notes"
+            @update:model-value="$emit('update:notes', $event)"
+            variant="outlined"
+            density="compact"
+            hide-details
+          ></v-text-field>
+        </div>
       </div>
     </v-expand-transition>
-
-    <div class="px-5 py-2 d-flex" v-if="showDetails">
-      <v-btn
-        icon="mdi-plus"
-        size="small"
-        color="orange-darken-4"
-        @click="addSet"
-      ></v-btn>
-    </div>
 
     <EditSetDialog
       v-if="isEditDialogVisible"
@@ -93,12 +109,22 @@ const props = defineProps({
     type: Array as PropType<WorkoutSet[]>,
     required: true,
   },
+  rpe: {
+    type: Number,
+    default: undefined,
+  },
+  notes: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits<{
   (e: 'update:set', payload: WorkoutSet): void;
   (e: 'delete:set', payload: WorkoutSet): void;
   (e: 'add:set'): void;
+  (e: 'update:rpe', value: number): void;
+  (e: 'update:notes', value: string): void;
 }>();
 
 const resolvedExercise = computed(() => props.exercise.exercise);
