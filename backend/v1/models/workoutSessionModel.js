@@ -158,6 +158,30 @@ const workoutSessionModel = {
     }
   },
 
+  abandonWorkoutSession: async function (req, res) {
+    try {
+      const sessionId = req.params.id;
+      const session = await WorkoutSession.findOne({
+        _id: sessionId,
+        userId: req.user.id,
+      });
+      if (!session) {
+        return res.status(404).json({ message: "Workout session not found" });
+      }
+      if (session.status === "abandoned") {
+        return res
+          .status(400)
+          .json({ message: "Session is already abandoned." });
+      }
+      session.status = "abandoned";
+      session.endedAt = new Date();
+      await session.save();
+      res.status(200).json(session);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
   getWorkoutSession: async function (req, res) {
     try {
       const session = await WorkoutSession.findOne({
