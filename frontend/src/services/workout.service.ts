@@ -5,8 +5,9 @@ import type {
 } from "@/interfaces/Workout.interface";
 import { fetchWrapper } from "@/utils/fetchWrapper";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+
 export const fetchAllWorkouts = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts`);
     if (!response.ok) {
@@ -21,7 +22,6 @@ export const fetchAllWorkouts = async () => {
 };
 
 export const createWorkout = async (workout: CreateWorkout) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts`, {
       method: "POST",
@@ -39,7 +39,6 @@ export const createWorkout = async (workout: CreateWorkout) => {
 };
 
 export const getWorkoutById = async (id: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`);
     if (!response.ok) {
@@ -54,7 +53,6 @@ export const getWorkoutById = async (id: string) => {
 };
 
 export const updateWorkout = async (id: string, workout: UpdateWorkout) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
       method: "PATCH",
@@ -72,7 +70,6 @@ export const updateWorkout = async (id: string, workout: UpdateWorkout) => {
 };
 
 export const deleteWorkout = async (id: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
       method: "DELETE",
@@ -91,7 +88,6 @@ export const addExerciseToWorkout = async (
   workoutId: string,
   exerciseId: string,
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workouts/${workoutId}/exercise`,
@@ -115,7 +111,6 @@ export const removeExerciseFromWorkout = async (
   workoutId: string,
   exerciseId: string,
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
@@ -138,7 +133,6 @@ export const updateExerciseInWorkout = async (
   exerciseId: string,
   exerciseData: AddExerciseToWorkout,
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     console.log("Updating exercise in workout:", exerciseData);
     const response = await fetchWrapper(
@@ -160,7 +154,6 @@ export const updateExerciseInWorkout = async (
 };
 
 export const dublicateWorkout = async (id: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}/duplicate`, {
       method: "POST",

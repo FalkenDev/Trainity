@@ -1,8 +1,9 @@
 import type { CreateUser } from "@/interfaces/User.interface";
 import { fetchWrapper } from "@/utils/fetchWrapper";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+
 export const createUser = async (user: CreateUser) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/users`, {
       method: "POST",
@@ -20,7 +21,6 @@ export const createUser = async (user: CreateUser) => {
 };
 
 export const getUser = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/users/me`);
     if (!response.ok) {
@@ -35,7 +35,6 @@ export const getUser = async () => {
 };
 
 export const updateUser = async (userData: CreateUser) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/users/me`, {
       method: "PUT",
@@ -53,7 +52,6 @@ export const updateUser = async (userData: CreateUser) => {
 };
 
 export const deleteUser = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/users/me`, {
       method: "DELETE",

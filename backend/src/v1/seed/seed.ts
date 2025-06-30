@@ -144,10 +144,19 @@ async function seed() {
     console.log('✅ Database connected');
 
     // Clear tables
-    await AppDataSource.getRepository(Workout).delete({});
-    await AppDataSource.getRepository(Exercise).delete({});
-    await AppDataSource.getRepository(MuscleGroup).delete({});
-    await AppDataSource.getRepository(User).delete({});
+    await AppDataSource.query(`
+  TRUNCATE TABLE
+    "workout_session_set",
+    "workout_session_exercise",
+    "workout_session",
+    "workout_exercise",
+    "workout",
+    "exercise",
+    "muscle_group",
+    "user"
+  RESTART IDENTITY CASCADE
+`);
+
     console.log('🧹 Cleared existing data');
 
     // Seed users
