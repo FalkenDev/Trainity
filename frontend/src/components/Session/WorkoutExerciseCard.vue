@@ -18,7 +18,19 @@
         <v-icon v-if="!allSetsDone" @click="isTimerVisible = true"
           >mdi-timer-play-outline</v-icon
         >
-        <v-icon v-if="!allSetsDone">mdi-dots-horizontal</v-icon>
+        <v-menu offset-y transition="slide-y-transition">
+          <template #activator="{ props }">
+            <v-icon v-bind="props">mdi-dots-horizontal</v-icon>
+          </template>
+          <v-list>
+            <v-list-item @click="addSet">
+              <v-list-item-title>Add Set</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="$emit('delete:exercise', resolvedExercise)">
+              <v-list-item-title>Delete Exercise</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
     </div>
 
@@ -51,11 +63,6 @@
             />
           </template>
         </v-data-table>
-        <div class="d-flex flex-row justify-end my-5 mx-5">
-          <v-btn size="small" x color="orange-darken-4" @click="addSet">
-            Add set
-          </v-btn>
-        </div>
         <div class="pa-4 pt-2 d-flex flex-column ga-3 bg-grey-darken-4">
           <v-slider
             label="RPE (Rate of Perceived Exertion)"
@@ -125,6 +132,7 @@ const emit = defineEmits<{
   (e: 'add:set'): void;
   (e: 'update:rpe', value: number): void;
   (e: 'update:notes', value: string): void;
+  (e: 'delete:exercise', payload: ExerciseProp['exercise']): void;
 }>();
 
 const resolvedExercise = computed(() => props.exercise.exercise);
