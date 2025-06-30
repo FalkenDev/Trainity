@@ -53,6 +53,7 @@
 <script lang="ts" setup>
 // TODO: Save workout session state to local storage or store when leaving the page so it can be resumed later
 // TODO: Add functionality to add exercises to the session
+// TODO: Maybe change RPE to a div with buttons for 1-10 instead of a slider or a text input
 
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 import type {
