@@ -4,7 +4,7 @@
       <template #menuAppend>
         <v-list>
           <v-list-item>
-            <v-list-item-title>Test</v-list-item-title>
+            <v-list-item-title>Add Notes</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
@@ -47,7 +47,10 @@ import type {
   WorkoutSession,
 } from '@/interfaces/workoutSession.interface';
 import { fetchExerciseById } from '@/services/exercise.service';
-import { finishWorkoutSession } from '@/services/workoutSession.service';
+import {
+  abandonWorkoutSession,
+  finishWorkoutSession,
+} from '@/services/workoutSession.service';
 import { toast } from 'vuetify-sonner';
 import router from '@/router';
 import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface';
@@ -191,8 +194,12 @@ const finnishSession = async () => {
   }
 
   if (completedExercises.length === 0) {
-    toast.info('No sets were marked as done.');
-    isLoading.value = false;
+    abandonWorkoutSession(sessionId);
+    toast.info('No exercises completed. Session abandoned.');
+    workoutSessionStore.stopClock();
+    workoutSessionStore.selectedWorkoutSession = null;
+    workoutSessionStore.resetClock();
+    router.push('/');
     return;
   }
 
