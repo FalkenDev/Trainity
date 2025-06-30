@@ -51,6 +51,9 @@
 </template>
 
 <script lang="ts" setup>
+// TODO: Save workout session state to local storage or store when leaving the page so it can be resumed later
+// TODO: Add functionality to add exercises to the session
+
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 import type {
   FinishedExercisePayload,
@@ -64,7 +67,6 @@ import {
 import { toast } from 'vuetify-sonner';
 import router from '@/router';
 import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface';
-import { ref, computed, watchEffect, onMounted } from 'vue';
 
 const workoutSessionStore = useWorkoutSessionStore();
 const processedExercises = ref<Exercise[]>([]);

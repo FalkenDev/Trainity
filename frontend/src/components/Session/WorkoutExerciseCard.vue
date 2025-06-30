@@ -23,6 +23,9 @@
             <v-icon v-bind="props">mdi-dots-horizontal</v-icon>
           </template>
           <v-list>
+            <v-list-item disabled>
+              <v-list-item-title>Exercise details</v-list-item-title>
+            </v-list-item>
             <v-list-item @click="addSet">
               <v-list-item-title>Add Set</v-list-item-title>
             </v-list-item>
@@ -101,7 +104,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, type PropType } from 'vue';
+// TODO: Add functionality to view exercise details
+// TODO: Maybe have a info icon that shows exercise details in a dialog instead of a dropdown
+
 import type {
   Exercise as ExerciseProp,
   WorkoutSet,
