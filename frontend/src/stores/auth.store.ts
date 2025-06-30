@@ -22,7 +22,7 @@ export const useAuthStore = defineStore(
           headers: {
             'Content-Type': 'application/json',
           },
-          credentials: 'include', // Include cookies for authentication
+          credentials: 'include',
           body: JSON.stringify({
             email,
             password,
