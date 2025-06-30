@@ -30,7 +30,7 @@ import { UpdateWorkoutSessionDto } from './dto/updateWorkoutSession.dto';
 @ApiTags('workout-sessions')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller('workout-sessions')
+@Controller('workoutSessions')
 export class WorkoutSessionController {
   constructor(private readonly sessionService: WorkoutSessionService) {}
 
@@ -44,6 +44,7 @@ export class WorkoutSessionController {
   @ApiOperation({ summary: 'Get all workout sessions for the user' })
   @ApiOkResponse({ type: [WorkoutSession] })
   getAll(@Req() req: RequestWithUser): Promise<WorkoutSession[]> {
+    console.log('Fetching all workout sessions for user:', this.getUserId(req));
     return this.sessionService.getAllSessions(this.getUserId(req));
   }
 

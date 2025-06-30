@@ -28,6 +28,7 @@ export class WorkoutSessionService {
   ) {}
 
   async getAllSessions(userId: number): Promise<WorkoutSession[]> {
+    console.log('Fetching all workout sessions for user:', userId);
     return this.sessionRepo.find({ where: { user: { id: userId } } });
   }
 

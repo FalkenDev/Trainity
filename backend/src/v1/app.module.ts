@@ -25,7 +25,7 @@ import { MuscleGroupModule } from './muscleGroup/muscleGroup.module';
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
         autoLoadEntities: true,
-        synchronize: false, // True is for development purposes only, disable in production
+        synchronize: true, // True is for development purposes only, disable in production
       }),
       inject: [ConfigService],
     }),

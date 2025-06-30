@@ -1,7 +1,8 @@
 import { fetchWrapper } from "@/utils/fetchWrapper";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+
 export const fetchAllMuscleGroups = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/muscleGroups`);
     if (!response.ok) {
@@ -19,7 +20,6 @@ export const createMuscleGroup = async (muscleGroup: {
   name: string;
   description?: string;
 }) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/muscleGroups`, {
       method: "POST",
@@ -37,7 +37,6 @@ export const createMuscleGroup = async (muscleGroup: {
 };
 
 export const getMuscleGroupById = async (id: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/muscleGroups/${id}`);
     if (!response.ok) {
@@ -55,7 +54,6 @@ export const updateMuscleGroup = async (
   id: string,
   muscleGroup: { name: string; description?: string }
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/muscleGroups/${id}`, {
       method: "PUT",
@@ -73,7 +71,6 @@ export const updateMuscleGroup = async (
 };
 
 export const deleteMuscleGroup = async (id: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/muscleGroups/${id}`, {
       method: "DELETE",
