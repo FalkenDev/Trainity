@@ -3,8 +3,7 @@
     <BackHeader
       title="Add Exercises"
       show-menu
-      :loading="isLoading"
-      @close="close"
+      @close="saveAndClose"
     >
       <template #menuAppend>
         <v-list>
@@ -14,6 +13,7 @@
         </v-list>
       </template>
     </BackHeader>
+
     <div class="d-flex flex-row mx-2 ga-5 mb-3">
       <v-text-field
         v-model="searchQuery"
@@ -80,12 +80,11 @@
         :key="exercise._id"
         class="border-t-sm border-b-sm py-2"
         two-line
-        @click="selectExercise(exercise._id)"
       >
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-3">
             <v-checkbox
-              v-model="newSelectedExercises"
+              v-model="selectedIds"
               :value="exercise._id"
               color="primary"
               hide-details
@@ -113,9 +112,8 @@
   >
     <EditExercise
       :selected-exercise="viewExercise"
-      :workout-id="props.workoutId"
       :is-view-exercise="true"
-      :is-view-workout-exercise="true"
+      :is-view-workout-exercise="false"
       @close="isViewExerciseOpen = false"
     />
   </v-dialog>
@@ -126,34 +124,26 @@
     <CreateExercise @close="isCreateExerciseOpen = false" />
   </v-dialog>
 </template>
+
 <script lang="ts" setup>
 import type { Exercise } from "@/interfaces/Exercise.interface";
 import { useExerciseStore } from "@/stores/exercise.store";
-import {
-  addExerciseToWorkout,
-  removeExerciseFromWorkout,
-} from "@/services/workout.sevice";
-import { useWorkoutStore } from "@/stores/workout.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 
-// TODO: View exercise details in a modal
-
 const props = defineProps<{
-  selectedExercises?: Array<{
-    exercise: Exercise;
-    sets: number;
-    reps: number;
-    pauseSeconds: number;
-  }>;
-  workoutId: string;
+  initialSelectedIds: string[];
+}>();
+
+const emit = defineEmits<{
+  (e: "close"): void;
+  (e: "save", selectedIds: string[]): void;
 }>();
 
 const muscleGroupStore = useMuscleGroupStore();
-const workoutStore = useWorkoutStore();
-const searchQuery = ref<string>("");
-const newSelectedExercises = ref<string[]>([]);
 const exerciseStore = useExerciseStore();
-const isLoading = ref<boolean>(false);
+
+const searchQuery = ref<string>("");
+const selectedIds = ref<string[]>([...props.initialSelectedIds]);
 const viewExercise = ref<Exercise | null>(null);
 const isViewExerciseOpen = ref<boolean>(false);
 const isCreateExerciseOpen = ref<boolean>(false);
@@ -189,68 +179,9 @@ const exercises = computed<Exercise[]>(() =>
   }),
 );
 
-const emit = defineEmits<{
-  (e: "close"): void;
-}>();
-
-const selectExercise = (id: string) => {
-  if (newSelectedExercises.value.includes(id)) {
-    newSelectedExercises.value = newSelectedExercises.value.filter(
-      (ex: string) => ex !== id,
-    );
-  } else {
-    newSelectedExercises.value.push(id);
-  }
-};
-
-const close = async () => {
-  await addExercisesToWorkout();
+const saveAndClose = () => {
+  emit("save", selectedIds.value);
   emit("close");
 };
 
-const addExercisesToWorkout = async () => {
-  isLoading.value = true;
-  let hasBeenUpdated = false;
-  try {
-    if (props.selectedExercises) {
-      const existingExerciseIds = props.selectedExercises.map(
-        (item) => item.exercise._id,
-      );
-
-      const newExercises = newSelectedExercises.value.filter(
-        (id) => !existingExerciseIds.includes(id),
-      );
-
-      const removedExercises = existingExerciseIds.filter(
-        (id) => !newSelectedExercises.value.includes(id),
-      );
-
-      for (const exerciseId of newExercises) {
-        await addExerciseToWorkout(props.workoutId, exerciseId);
-        hasBeenUpdated = true;
-      }
-
-      for (const exerciseId of removedExercises) {
-        await removeExerciseFromWorkout(props.workoutId, exerciseId);
-        hasBeenUpdated = true;
-      }
-
-      if (hasBeenUpdated) {
-        await workoutStore.setWorkouts(true);
-      }
-    }
-  } catch (error) {
-    console.error("Error adding exercises to workout:", error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-onMounted(() => {
-  if (props.selectedExercises) {
-    newSelectedExercises.value = props.selectedExercises.map(
-      (item) => item.exercise._id,
-    );
-  }
-});
 </script>
