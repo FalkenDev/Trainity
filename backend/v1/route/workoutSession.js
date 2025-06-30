@@ -10,5 +10,6 @@ router.get("/:id", auth, workoutSessionModel.getWorkoutSession);
 router.put("/:id", auth, workoutSessionModel.updateWorkoutSession);
 router.delete("/:id", auth, workoutSessionModel.deleteWorkoutSession);
 router.post("/:id/finish", auth, workoutSessionModel.finishWorkoutSession);
+router.post("/:id/abandon", auth, workoutSessionModel.abandonWorkoutSession);
 
 export default router;
