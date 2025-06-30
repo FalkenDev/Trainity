@@ -6,6 +6,9 @@
           <v-list-item>
             <v-list-item-title>Add Notes</v-list-item-title>
           </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Add Exercise</v-list-item-title>
+          </v-list-item>
         </v-list>
       </template>
     </BackHeader>
@@ -30,12 +33,19 @@
         :notes="exerciseMetadata[exercise.exerciseId]?.notes"
         @update:set="handleSetUpdate(exercise.exerciseId, $event)"
         @delete:set="handleSetDelete(exercise.exerciseId, $event)"
+        @delete:exercise="handleExerciseDelete(exercise.exerciseId)"
         @add:set="handleSetAdd(exercise.exerciseId)"
         @update:rpe="handleMetadataUpdate(exercise.exerciseId, { rpe: $event })"
         @update:notes="
           handleMetadataUpdate(exercise.exerciseId, { notes: $event })
         "
       />
+    </div>
+    <div class="d-flex flex-column justify-space-between my-5 mx-5 ga-5">
+      <v-btn color="secondary">Add Exercise</v-btn>
+      <v-btn color="primary" @click="finnishSession" :loading="isLoading">
+        Finish Session
+      </v-btn>
     </div>
   </div>
 </template>
@@ -117,6 +127,17 @@ onMounted(() => {
     workoutSessionStore.startClock();
   }
 });
+
+function handleExerciseDelete(exerciseId: string) {
+  const exerciseIndex = processedExercises.value.findIndex(
+    (e) => e.exerciseId === exerciseId,
+  );
+  if (exerciseIndex !== -1) {
+    processedExercises.value.splice(exerciseIndex, 1);
+    delete allWorkoutSets.value[exerciseId];
+    delete exerciseMetadata.value[exerciseId];
+  }
+}
 
 function handleMetadataUpdate(
   exerciseId: string,
