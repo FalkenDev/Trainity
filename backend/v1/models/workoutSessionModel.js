@@ -90,7 +90,7 @@ const workoutSessionModel = {
 
   finishWorkoutSession: async function (req, res) {
     try {
-      const { completedExercises, notes } = req.body;
+      const { completedExercises, notes: sessionNotes } = req.body;
       const sessionId = req.params.id;
 
       const session = await WorkoutSession.findOne({
@@ -120,6 +120,8 @@ const workoutSessionModel = {
         return {
           exerciseId: completedEx.exerciseId,
           sets: completedEx.sets,
+          rpe: completedEx.rpe || null,
+          notes: completedEx.notes,
           exerciseSnapshot: {
             name: details.name,
             description: details.description,
@@ -145,12 +147,11 @@ const workoutSessionModel = {
       session.exercises = sessionExercises;
       session.status = "finished";
       session.endedAt = new Date();
-      session.notes = notes || session.notes;
+      session.notes = sessionNotes || session.notes;
       session.totalWeight = totalWeight;
       session.exerciseStats = exerciseStats;
 
       await session.save();
-
       res.status(200).json(session);
     } catch (error) {
       res.status(500).json({ error: error.message });
