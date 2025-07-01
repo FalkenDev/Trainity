@@ -21,6 +21,7 @@ router.delete(
   auth,
   workoutModel.removeExercisesFromWorkout
 );
+
 router.put(
   "/:id/exercise/:exerciseId",
   auth,

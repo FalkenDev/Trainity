@@ -6,6 +6,8 @@ import type {
 
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+
 export const fetchAllWorkoutSessions = async () => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutSessions`);
@@ -111,6 +113,7 @@ export const finishWorkoutSession = async (
   );
   if (!response.ok) {
     throw new Error('Failed to finish workout session');
+
   }
   return await response.json();
 };

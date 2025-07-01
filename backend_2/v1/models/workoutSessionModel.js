@@ -91,6 +91,7 @@ const workoutSessionModel = {
   finishWorkoutSession: async function (req, res) {
     try {
       const { completedExercises, notes: sessionNotes } = req.body;
+
       const sessionId = req.params.id;
 
       const session = await WorkoutSession.findOne({
@@ -148,6 +149,26 @@ const workoutSessionModel = {
       session.status = "finished";
       session.endedAt = new Date();
       session.notes = sessionNotes || session.notes;
+
+      // Calculate stats
+      let totalWeight = 0;
+      const exerciseStats = [];
+
+      for (const ex of session.exercises) {
+        let exTotal = 0;
+        for (const set of ex.sets) {
+          exTotal += set.weight * set.reps;
+        }
+        exerciseStats.push({
+          exerciseId: ex.exerciseId,
+          totalWeight: exTotal,
+        });
+        totalWeight += exTotal;
+      }
+
+      // Update session fields
+      session.status = "finished";
+      session.endedAt = new Date();
       session.totalWeight = totalWeight;
       session.exerciseStats = exerciseStats;
 
