@@ -1,42 +1,45 @@
 # .github/labeler.yml
-
-frontend:
+"client: web-mobile":
   - changed-files:
       - any-glob-to-any-file: ["frontend/**/*"]
 
-backend:
-  - any:
-      - "backend/v1/index.js"
-      - "backend/v1/route/**/*"
-      - "backend/v1/middleware/**/*"
+"platform: backend":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/**/*"
+          - "!backend/v1/models/**/*"
+          - "!backend/v1/schemas/**/*"
+          - "!backend/v1/documentation/**/*"
 
-# Label for database changes (Mongoose models/schemas)
-database:
-  - "backend/v1/models/**/*"
-  - "backend/v1/schemas/**/*"
+# Maps to 'topic: database'
+"topic: database":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/v1/schemas/**/*"
 
-# Label for documentation changes (root README and API docs)
-documentation:
-  - "*.md"
-  - "backend/v1/documentation/**/*"
+# Maps to 'type: docs'
+"type: docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "backend/v1/documentation/**/*"
 
-# Label for CI/CD and deployment changes
-"ci/cd":
-  - ".github/workflows/*"
-  - "Dockerfile"
+# Maps to 'topic: ci-cd'
+"topic: ci-cd":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/*"
+          - "Dockerfile"
 
-# Label for dependency updates in either frontend or backend
-dependencies:
-  - "**/package.json"
-  - "**/pnpm-lock.yaml"
-
-# Label for core project configuration changes
-configuration:
-  - "backend/tsconfig.json"
-  - "backend/.env.example"
-  - "frontend/.env.example"
-  - "frontend/vite.config.ts"
-  - "frontend/tsconfig.json"
-  - "frontend/eslint.config.js"
-  - "frontend/.eslintrc.js"
-  - "frontend/vite.config.mts"
+# Maps to 'topic: config'
+"topic: config":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "backend/tsconfig.json"
+          - "backend/.env.example"
+          - "frontend/.env.example"
+          - "frontend/vite.config.ts"
+          - "frontend/tsconfig.json"
+          - "frontend/eslint.config.js"
+          - "frontend/.eslintrc.js"
+          - "frontend/vite.config.mts"
