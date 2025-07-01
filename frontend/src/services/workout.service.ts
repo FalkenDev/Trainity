@@ -84,29 +84,6 @@ export const deleteWorkout = async (id: string) => {
   }
 };
 
-export const addExerciseToWorkout = async (
-  workoutId: string,
-  exerciseId: string,
-) => {
-  try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercise`,
-      {
-        method: "POST",
-        body: JSON.stringify({ exerciseId }),
-      },
-    );
-    if (!response.ok) {
-      throw new Error("Failed to add exercise to workout");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error adding exercise to workout:", error);
-    throw error;
-  }
-};
-
 export const addExercisesToWorkout = async (
   workoutId: string,
   exerciseIds: string[],
@@ -130,27 +107,6 @@ export const addExercisesToWorkout = async (
     return data;
   } catch (error) {
     console.error("Error adding exercises to workout:", error);
-    throw error;
-  }
-};
-
-export const removeExerciseFromWorkout = async (
-  workoutId: string,
-  exerciseId: string,
-) => {
-  try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
-      {
-        method: "DELETE",
-      },
-    );
-    if (!response.ok) {
-      throw new Error("Failed to remove exercise from workout");
-    }
-    return true;
-  } catch (error) {
-    console.error("Error removing exercise from workout:", error);
     throw error;
   }
 };
