@@ -17,7 +17,7 @@ export interface CreateExercise {
   name: string;
   description: string;
   image?: string | null;
-  muscleGroups: string[];
+  muscleGroupIds: number[];
   defaultSets: number;
   defaultReps: number;
   defaultPauseSeconds: number;
