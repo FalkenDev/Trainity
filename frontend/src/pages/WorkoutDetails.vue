@@ -107,7 +107,7 @@
   >
     <EditExercise
       :selected-exercise="selectedExercise"
-      :workout-id="workout?.id || ''"
+      :workout-id="workout?.id ? Number(workout.id) : undefined"
       :is-view-exercise="false"
       :is-view-workout-exercise="true"
       @close="isEditExerciseOpen = false"
@@ -193,11 +193,11 @@ const updateWorkoutExercises = async (newExerciseIds: string[]) => {
     );
 
     if (exercisesToRemove.length > 0) {
-      await removeExercisesFromWorkout(workout.value.id, exercisesToRemove);
+      await removeExercisesFromWorkout(+workout.value.id, exercisesToRemove);
     }
 
     if (exercisesToAdd.length > 0) {
-      await addExercisesToWorkout(workout.value!.id, exercisesToAdd);
+      await addExercisesToWorkout(+workout.value!.id, exercisesToAdd);
     }
     
     const hasBeenUpdated = exercisesToAdd.length > 0 || exercisesToRemove.length > 0;

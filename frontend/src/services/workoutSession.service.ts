@@ -20,7 +20,7 @@ export const fetchAllWorkoutSessions = async () => {
   }
 };
 
-export const startWorkoutSession = async (workoutId: string) => {
+export const startWorkoutSession = async (workoutId: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutsessions`, {
       method: 'POST',
@@ -37,7 +37,7 @@ export const startWorkoutSession = async (workoutId: string) => {
   }
 };
 
-export const abandonWorkoutSession = async (sessionId: string) => {
+export const abandonWorkoutSession = async (sessionId: number) => {
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}/abandon`,
@@ -78,7 +78,7 @@ export const abandonWorkoutSession = async (sessionId: string) => {
 //   }
 // };
 
-export const getWorkoutSessionById = async (sessionId: string) => {
+export const getWorkoutSessionById = async (sessionId: number) => {
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,
@@ -95,7 +95,7 @@ export const getWorkoutSessionById = async (sessionId: string) => {
 };
 
 export const updateWorkoutSession = async (
-  sessionId: string,
+  sessionId: number,
   sessionData: WorkoutSession,
 ) => {
   try {
@@ -118,7 +118,7 @@ export const updateWorkoutSession = async (
 };
 
 export const finishWorkoutSession = async (
-  sessionId: string,
+  sessionId: number,
   payload: FinishSessionPayload,
 ) => {
   const response = await fetchWrapper(
@@ -135,7 +135,7 @@ export const finishWorkoutSession = async (
   return await response.json();
 };
 
-export const deleteWorkoutSession = async (sessionId: string) => {
+export const deleteWorkoutSession = async (sessionId: number) => {
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,

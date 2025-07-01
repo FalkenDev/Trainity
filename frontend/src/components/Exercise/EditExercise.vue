@@ -212,7 +212,7 @@ import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
 import { useExerciseStore } from '@/stores/exercise.store';
 import {
   updateExerciseInWorkout,
-  removeExerciseFromWorkout,
+  removeExercisesFromWorkout,
 } from '@/services/workout.service';
 import {
   updateExercise as updateExerciseInExercise,
@@ -222,7 +222,7 @@ import { useWorkoutStore } from '@/stores/workout.store';
 import { toast } from 'vuetify-sonner';
 
 const props = defineProps<{
-  workoutId?: string;
+  workoutId?: number;
   selectedExercise: workoutExercise | Exercise | null;
   isViewExercise: boolean;
   isViewWorkoutExercise: boolean;
@@ -275,7 +275,7 @@ const getMuscleGroupsForExercise = (): string[] => {
   if (isWorkoutExercise(props.selectedExercise)) {
     return props.selectedExercise.exercise.muscleGroups
       .map(
-        (groupId) => muscleGroup.find((group) => group.id === groupId)?.name,
+        (groupId) => muscleGroup.find((group) => group.id === +groupId)?.name,
       )
       .filter((name): name is string => !!name);
   }
@@ -291,18 +291,22 @@ const removeExercise = async () => {
 
     let response = null;
     if (props.isViewWorkoutExercise) {
-      response = await removeExerciseFromWorkout(
-        props.workoutId || '',
+      if (!props.workoutId) {
+        console.error('No workout ID provided for removing exercise from workout.');
+        return;
+      }
+      response = await removeExercisesFromWorkout(
+        props.workoutId,
         isWorkoutExercise(props.selectedExercise)
-          ? props.selectedExercise.exercise.id
-          : '',
+          ? [props.selectedExercise.exercise.id]
+          : [],
       );
     } else {
       response = await deleteExercise(
         isWorkoutExercise(props.selectedExercise)
           ? props.selectedExercise.exercise.id
-          : props.selectedExercise?.id || '',
-      );
+          : props.selectedExercise?.id ?? 0,
+            );
     }
 
     if (response) {
@@ -335,7 +339,6 @@ const getSanitizedExerciseDataForWorkout = () => {
 
 const getSanitizedExerciseData = () => {
   return {
-    ...editExercise.value,
     name: isWorkoutExercise(props.selectedExercise)
       ? props.selectedExercise.exercise.name
       : props.selectedExercise?.name || '',
@@ -345,9 +348,9 @@ const getSanitizedExerciseData = () => {
     defaultSets: Number(editExercise.value?.sets || 0),
     defaultReps: Number(editExercise.value?.reps || 0),
     defaultPauseSeconds: Number(editExercise.value?.pauseSeconds || 0),
-    muscleGroups: isWorkoutExercise(props.selectedExercise)
-      ? props.selectedExercise.exercise.muscleGroups
-      : props.selectedExercise?.muscleGroups || [],
+    muscleGroupIds: isWorkoutExercise(props.selectedExercise)
+      ? props.selectedExercise.exercise.muscleGroups?.map(Number) || []
+      : props.selectedExercise?.muscleGroups?.map(Number) || [],
   };
 };
 

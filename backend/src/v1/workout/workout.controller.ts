@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
   UnauthorizedException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,6 +24,7 @@ import { CreateWorkoutDto } from './dto/createWorkout.dto';
 import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
 import { WorkoutResponseDto } from './dto/workoutResponse.dto';
 import { RequestWithUser } from '../types/requestWithUser.type';
+import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
 
 @ApiTags('workouts')
 @ApiBearerAuth()
@@ -83,5 +85,37 @@ export class WorkoutController {
   @ApiCreatedResponse({ type: WorkoutResponseDto })
   duplicateWorkout(@Param('id') id: number, @Req() req: RequestWithUser) {
     return this.workoutService.duplicateWorkout(id, this.getUserId(req));
+  }
+
+  @Post(':id/exercises')
+  @ApiOperation({ summary: 'Add one or more exercises to a workout' })
+  @ApiOkResponse({ type: WorkoutResponseDto })
+  addExercisesToWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddRemoveExercisesDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.workoutService.addExercisesToWorkout(
+      id,
+      dto,
+      this.getUserId(req),
+    );
+  }
+
+  @Delete(':id/exercises')
+  @ApiOperation({ summary: 'Remove one or more exercises from a workout' })
+  @ApiOkResponse({
+    schema: { example: { message: 'Exercises removed successfully' } },
+  })
+  removeExercisesFromWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddRemoveExercisesDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.workoutService.removeExercisesFromWorkout(
+      id,
+      dto,
+      this.getUserId(req),
+    );
   }
 }
