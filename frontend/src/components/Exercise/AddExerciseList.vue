@@ -132,7 +132,7 @@ import { useExerciseStore } from "@/stores/exercise.store";
 import {
   addExerciseToWorkout,
   removeExerciseFromWorkout,
-} from "@/services/workout.sevice";
+} from "@/services/workout.service";
 import { useWorkoutStore } from "@/stores/workout.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 

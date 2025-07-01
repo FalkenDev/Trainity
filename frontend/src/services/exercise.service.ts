@@ -1,8 +1,9 @@
 import { fetchWrapper } from "@/utils/fetchWrapper";
 import type { CreateExercise } from "@/interfaces/Exercise.interface";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+
 export const fetchAllExercises = async () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/exercises`);
     if (!response.ok) {
@@ -17,7 +18,6 @@ export const fetchAllExercises = async () => {
 };
 
 export const fetchExerciseById = async (exerciseId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/exercises/${exerciseId}`);
     if (!response.ok) {
@@ -32,7 +32,6 @@ export const fetchExerciseById = async (exerciseId: string) => {
 };
 
 export const createExercise = async (exercise: CreateExercise) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/exercises`, {
       method: "POST",
@@ -53,7 +52,6 @@ export const updateExercise = async (
   exerciseId: string,
   exercise: CreateExercise
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/exercises/${exerciseId}`, {
       method: "PUT",
@@ -71,7 +69,6 @@ export const updateExercise = async (
 };
 
 export const deleteExercise = async (exerciseId: string) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
     const response = await fetchWrapper(`${apiUrl}/exercises/${exerciseId}`, {
       method: "DELETE",

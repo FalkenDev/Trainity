@@ -40,7 +40,7 @@
 </template>
 <script lang="ts" setup>
 import { useWorkoutStore } from "@/stores/workout.store";
-import { updateWorkout } from "@/services/workout.sevice";
+import { updateWorkout } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
 
 const isLoading = ref<boolean>(false);

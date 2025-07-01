@@ -1,0 +1,54 @@
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: trainity-docker/Dockerfile.api
+    container_name: trainity_backend
+    ports:
+      - "1337:1337"
+    # volumes:
+    #   - ./backend:/app
+    #   - /app/node_modules
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    develop:
+      watch:
+        - action: sync
+          path: ../backend
+          target: /app
+    
+  frontend:
+    build:
+      context: ..
+      dockerfile: trainity-docker/Dockerfile.frontend
+    container_name: trainity_frontend
+    ports:
+      - "3000:3000"
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    develop:
+      watch:
+        - action: sync
+          path: ../frontend
+          target: /app
+  postgres:
+    image: postgres:latest
+    container_name: trainity_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: trainitydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

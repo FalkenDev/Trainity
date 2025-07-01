@@ -1,0 +1,20 @@
+FROM node:20.12-alpine
+
+# Install optional dependencies (like fs tools that help file watching work better)
+RUN apk add --no-cache bash curl git
+
+WORKDIR /app
+
+COPY ./backend/package*.json ./
+
+# install devDependencies too (for ts-node-dev)
+RUN npm install
+
+# copy rest of the code
+COPY ./backend .
+
+# expose if not already
+EXPOSE 1337
+
+# run dev script (with hot reload)
+CMD ["npm", "run", "start:dev"]

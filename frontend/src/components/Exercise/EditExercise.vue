@@ -213,7 +213,7 @@ import { useExerciseStore } from '@/stores/exercise.store';
 import {
   updateExerciseInWorkout,
   removeExerciseFromWorkout,
-} from '@/services/workout.sevice';
+} from '@/services/workout.service';
 import {
   updateExercise as updateExerciseInExercise,
   deleteExercise,
