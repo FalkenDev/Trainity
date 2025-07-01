@@ -2,8 +2,8 @@ services:
   backend:
     build:
       context: ..
-      dockerfile: docker/Dockerfile.api
-    container_name: backend
+      dockerfile: trainity-docker/Dockerfile.api
+    container_name: trainity_backend
     ports:
       - "1337:1337"
     # volumes:
@@ -22,8 +22,8 @@ services:
   frontend:
     build:
       context: ..
-      dockerfile: docker/Dockerfile.frontend
-    container_name: frontend
+      dockerfile: trainity-docker/Dockerfile.frontend
+    container_name: trainity_frontend
     ports:
       - "3000:3000"
     # volumes:
@@ -40,7 +40,7 @@ services:
           target: /app
   postgres:
     image: postgres:latest
-    container_name: postgres
+    container_name: trainity_postgres
     ports:
       - "5432:5432"
     environment:
@@ -48,7 +48,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: trainitydb
     volumes:
-      - trainity_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  trainity_postgres_data:
+  postgres_data:
