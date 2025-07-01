@@ -131,23 +131,23 @@ import { useExerciseStore } from "@/stores/exercise.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 
 const props = defineProps<{
-  initialSelectedIds: string[];
+  initialSelectedIds: number[];
 }>();
 
 const emit = defineEmits<{
   (e: "close"): void;
-  (e: "save", selectedIds: string[]): void;
+  (e: "save", selectedIds: number[]): void;
 }>();
 
 const muscleGroupStore = useMuscleGroupStore();
 const exerciseStore = useExerciseStore();
 
 const searchQuery = ref<string>("");
-const selectedIds = ref<string[]>([...props.initialSelectedIds]);
+const selectedIds = ref<number[]>([...props.initialSelectedIds]);
 const viewExercise = ref<Exercise | null>(null);
 const isViewExerciseOpen = ref<boolean>(false);
 const isCreateExerciseOpen = ref<boolean>(false);
-const selectedMuscleGroups = ref<string[]>([]);
+const selectedMuscleGroups = ref<number[]>([]);
 
 const openViewExercise = (exercise: Exercise) => {
   viewExercise.value = exercise;
@@ -171,7 +171,7 @@ const exercises = computed<Exercise[]>(() =>
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
-      exercise.muscleGroups?.some((mg: string) =>
+      exercise.muscleGroups?.some((mg: number) =>
         selectedMuscleGroups.value.includes(mg)
       );
 

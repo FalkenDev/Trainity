@@ -29,18 +29,17 @@ export interface WorkoutSession {
     exerciseSnapshot: {
       name: string;
       description: string;
-      muscleGroups: string[];
+      muscleGroups: number[];
     };
     exerciseId: number;
     sets: PerformedSet[];
   }[];
   totalWeight: number;
   exerciseStats: {
-    exerciseId: string;
+    exerciseId: number;
     totalWeight: number;
     id: number;
   }[];
   createdAt: string;
   updatedAt: string;
-  __v: number;
 }

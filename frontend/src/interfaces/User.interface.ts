@@ -5,7 +5,6 @@ export interface User {
   lastName: string;
   createdAt: string;
   updatedAt: string;
-  __v: number;
 }
 
 export interface CreateUser {

@@ -60,7 +60,7 @@ export const useWorkoutSessionStore = defineStore(
       setWorkoutSessions();
     }
 
-    const fetchSelectedWorkoutSession = async (sessionId: string) => {
+    const fetchSelectedWorkoutSession = async (sessionId: number) => {
       if (!sessionId) {
         selectedWorkoutSession.value = null;
         return;

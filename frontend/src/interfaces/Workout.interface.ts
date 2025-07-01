@@ -21,14 +21,13 @@ export interface Exercise {
     name: string;
     description: string;
     img: string;
-    muscleGroups: string[];
+    muscleGroups: number[];
     defaultSets: number;
     defaultReps: number;
     defaultPauseSeconds: number;
     createdBy: string;
     createdAt: string;
     updatedAt: string;
-    __v: number;
   };
 }
 

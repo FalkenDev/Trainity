@@ -103,7 +103,7 @@ const workoutSession = computed<WorkoutSession | null>(
   () => workoutSessionStore.selectedWorkoutSession,
 );
 
-const allWorkoutSets = ref<Record<string, WorkoutSet[]>>({});
+const allWorkoutSets = ref<Record<number, WorkoutSet[]>>({});
 const isLoading = ref(false);
 const exerciseMetadata = ref<Record<string, { rpe?: number; notes?: string }>>(
   {},
@@ -120,7 +120,7 @@ watchEffect(async () => {
   }
 
   const baseExercises = workoutSession.value.workout.exercises;
-  const newAllSets: Record<string, WorkoutSet[]> = {};
+  const newAllSets: Record<number, WorkoutSet[]> = {};
 
   const exercisesWithDetails = await Promise.all(
     baseExercises.map(async (baseExercise) => {
@@ -143,7 +143,7 @@ watchEffect(async () => {
     }),
   );
 
-  const newMetadata: Record<string, { rpe?: number; notes?: string }> = {};
+  const newMetadata: Record<number, { rpe?: number; notes?: string }> = {};
   for (const exercise of exercisesWithDetails) {
     newMetadata[exercise.exerciseId] = { rpe: undefined, notes: '' };
   }
@@ -160,7 +160,7 @@ onMounted(() => {
 });
 
 function updateWorkoutSessionExercises(
-  newExerciseIds: string[],
+  newExerciseIds: number[],
 ) {
   if (!workoutSession.value) return;
 
@@ -193,7 +193,7 @@ function updateWorkoutSessionExercises(
   }
 }
 
-function handleExerciseDelete(exerciseId: string) {
+function handleExerciseDelete(exerciseId: number) {
   const exerciseIndex = processedExercises.value.findIndex(
     (e) => e.exerciseId === exerciseId,
   );
@@ -205,7 +205,7 @@ function handleExerciseDelete(exerciseId: string) {
 }
 
 function handleMetadataUpdate(
-  exerciseId: string,
+  exerciseId: number,
   data: { rpe?: number; notes?: string },
 ) {
   if (exerciseMetadata.value[exerciseId]) {
@@ -216,7 +216,7 @@ function handleMetadataUpdate(
   }
 }
 
-function handleSetUpdate(exerciseId: string, updatedSet: WorkoutSet) {
+function handleSetUpdate(exerciseId: number, updatedSet: WorkoutSet) {
   const sets = allWorkoutSets.value[exerciseId];
   const setIndex = sets.findIndex((s) => s.set === updatedSet.set);
   if (setIndex !== -1) {
@@ -224,7 +224,7 @@ function handleSetUpdate(exerciseId: string, updatedSet: WorkoutSet) {
   }
 }
 
-function handleSetDelete(exerciseId: string, setToDelete: WorkoutSet) {
+function handleSetDelete(exerciseId: number, setToDelete: WorkoutSet) {
   const sets = allWorkoutSets.value[exerciseId];
   const setIndex = sets.findIndex((s) => s.set === setToDelete.set);
   if (setIndex !== -1) {
@@ -233,7 +233,7 @@ function handleSetDelete(exerciseId: string, setToDelete: WorkoutSet) {
   }
 }
 
-function handleSetAdd(exerciseId: string) {
+function handleSetAdd(exerciseId: number) {
   const sets = allWorkoutSets.value[exerciseId];
   const lastSet =
     sets.length > 0 ? sets[sets.length - 1] : { weight: 0, reps: 0 };

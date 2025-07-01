@@ -266,7 +266,7 @@ const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
-const getMuscleGroupsForExercise = (): string[] => {
+const getMuscleGroupsForExercise = (): number[] => {
   if (!props.selectedExercise) {
     return [];
   }

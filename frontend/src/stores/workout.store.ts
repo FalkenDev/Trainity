@@ -48,7 +48,7 @@ export const useWorkoutStore = defineStore(
 
     setWorkouts();
 
-    const setCurrentWorkout = (workoutId: string) => {
+    const setCurrentWorkout = (workoutId: number) => {
       const workout = workouts.value.find((w) => w.id === workoutId);
       if (workout) {
         currentWorkout.value = workout;
