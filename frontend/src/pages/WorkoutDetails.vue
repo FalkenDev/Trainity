@@ -128,7 +128,7 @@
     fullscreen
   >
     <WeightAndRepsSettings
-      :workout-id="workout?.id || ''"
+      :workout-id="workout?.id || undefined"
       :default-weight-and-reps="workout?.defaultWeightAndReps ?? ''"
       @close="isWeightAndRepsOpen = false"
     />
@@ -168,13 +168,13 @@ const selectedExercise = ref<Exercise | null>(null);
 
 // TODO: If a workout is already started, give a dialog to end the current session and start a new one
 
-const selectedExerciseIds = computed<string[]>(() => {
+const selectedExerciseIds = computed<number[]>(() => {
   return workout.value?.exercises
     .map((item) => item.exercise?.id)
-    .filter((id): id is string => !!id) ?? [];
+    .filter((id): id is number => !!id) ?? [];
 });
 
-const updateWorkoutExercises = async (newExerciseIds: string[]) => {
+const updateWorkoutExercises = async (newExerciseIds: number[]) => {
   if (!workout.value) return;
 
   isUpdatingWorkout.value = true;
@@ -255,7 +255,7 @@ const selectExercise = (exercise: Exercise) => {
   isEditExerciseOpen.value = true;
 };
 
-const getMuscleGroupsForWorkout = (): string[] => {
+const getMuscleGroupsForWorkout = (): number[] => {
   if (!workout.value?.exercises || workout.value.exercises.length === 0) {
     return [];
   }
