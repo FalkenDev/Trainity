@@ -248,13 +248,13 @@ function handleSetAdd(exerciseId: string) {
 
 const finnishSession = async () => {
   if (isLoading.value) return;
-  if (!workoutSession.value?._id) {
+  if (!workoutSession.value?.id) {
     toast.error('Active session not found.');
     return;
   }
 
   isLoading.value = true;
-  const sessionId = workoutSession.value._id;
+  const sessionId = workoutSession.value.id;
 
   const completedExercises: FinishedExercisePayload[] = [];
 

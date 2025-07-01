@@ -18,7 +18,7 @@ export interface FinishSessionPayload {
 }
 
 export interface WorkoutSession {
-  _id: string;
+  id: string;
   userId: string;
   startedAt: string;
   endedAt?: string;
@@ -38,7 +38,7 @@ export interface WorkoutSession {
   exerciseStats: {
     exerciseId: string;
     totalWeight: number;
-    _id: string;
+    id: string;
   }[];
   createdAt: string;
   updatedAt: string;

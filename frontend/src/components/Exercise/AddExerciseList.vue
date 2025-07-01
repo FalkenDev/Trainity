@@ -57,8 +57,8 @@
               <v-divider />
               <v-list-item
                 v-for="muscleGroup in muscleGroups"
-                :key="muscleGroup._id"
-                :value="muscleGroup._id"
+                :key="muscleGroup.id"
+                :value="muscleGroup.id"
               >
                 <template #prepend="{ isActive }">
                   <v-list-item-action start>
@@ -77,7 +77,7 @@
     <v-list>
       <v-list-item
         v-for="exercise in exercises"
-        :key="exercise._id"
+        :key="exercise.id"
         class="border-t-sm border-b-sm py-2"
         two-line
       >
@@ -85,7 +85,7 @@
           <div class="d-flex align-center ga-3">
             <v-checkbox
               v-model="selectedIds"
-              :value="exercise._id"
+              :value="exercise.id"
               color="primary"
               hide-details
               density="compact"
@@ -157,7 +157,7 @@ const openViewExercise = (exercise: Exercise) => {
 const muscleGroups = computed(() => {
   return muscleGroupStore.muscleGroups.map((group) => ({
     name: group.name,
-    _id: group._id,
+    id: group.id,
   }));
 });
 

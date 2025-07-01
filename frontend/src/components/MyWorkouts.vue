@@ -15,7 +15,7 @@
   <div v-else>
     <v-card
       v-for="workout in workouts"
-      :key="workout._id"
+      :key="workout.id"
       class="mb-4 pa-4"
       variant="flat"
       style="
@@ -23,7 +23,7 @@
         background: linear-gradient(135deg, #1a1a1a 50%, #0f0f0f 100%);
         border: 1px solid rgba(255, 255, 255, 0.1);
       "
-      @click="routeTo(workout._id)"
+      @click="routeTo(workout.id)"
     >
       <div class="d-flex justify-space-between align-center">
         <div class="d-flex flex-column ga-2">
@@ -84,7 +84,7 @@ const getMuscleGroupsForWorkout = (workout: Workout): string[] => {
   return workout.exercises
     .flatMap((exercise) => exercise.exercise.muscleGroups || [])
     .map((muscleGroupId) => {
-      const group = muscleGroup.find((group) => group._id === muscleGroupId);
+      const group = muscleGroup.find((group) => group.id === muscleGroupId);
       return group ? group.name : "Unknown";
     })
     .filter((value, index, self) => self.indexOf(value) === index);

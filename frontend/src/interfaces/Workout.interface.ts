@@ -1,5 +1,5 @@
 export interface Workout {
-  _id: string;
+  id: string;
   title: string;
   time: number;
   description?: string;
@@ -17,7 +17,7 @@ export interface Exercise {
   pauseSeconds: number;
   exerciseId: string;
   exercise: {
-    _id: string;
+    id: string;
     name: string;
     description: string;
     img: string;

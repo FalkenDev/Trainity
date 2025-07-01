@@ -14,7 +14,7 @@ const WorkoutExerciseSchema = new Schema(
     weight: { type: Number, required: true },
     pauseSeconds: { type: Number, required: true },
   },
-  { _id: false }
+  { id: false }
 );
 
 const WorkoutSchema = new Schema(

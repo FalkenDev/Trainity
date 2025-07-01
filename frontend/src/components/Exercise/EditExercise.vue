@@ -237,8 +237,8 @@ const isLoading = ref<boolean>(false);
 
 const editExercise = ref<AddExerciseToWorkout | null>({
   exerciseId: isWorkoutExercise(props.selectedExercise)
-    ? props.selectedExercise.exercise._id
-    : props.selectedExercise?._id || '',
+    ? props.selectedExercise.exercise.id
+    : props.selectedExercise?.id || '',
   sets: isWorkoutExercise(props.selectedExercise)
     ? props.selectedExercise.sets
     : props.selectedExercise?.defaultSets || 0,
@@ -275,7 +275,7 @@ const getMuscleGroupsForExercise = (): string[] => {
   if (isWorkoutExercise(props.selectedExercise)) {
     return props.selectedExercise.exercise.muscleGroups
       .map(
-        (groupId) => muscleGroup.find((group) => group._id === groupId)?.name,
+        (groupId) => muscleGroup.find((group) => group.id === groupId)?.name,
       )
       .filter((name): name is string => !!name);
   }
@@ -294,14 +294,14 @@ const removeExercise = async () => {
       response = await removeExerciseFromWorkout(
         props.workoutId || '',
         isWorkoutExercise(props.selectedExercise)
-          ? props.selectedExercise.exercise._id
+          ? props.selectedExercise.exercise.id
           : '',
       );
     } else {
       response = await deleteExercise(
         isWorkoutExercise(props.selectedExercise)
-          ? props.selectedExercise.exercise._id
-          : props.selectedExercise?._id || '',
+          ? props.selectedExercise.exercise.id
+          : props.selectedExercise?.id || '',
       );
     }
 
@@ -366,7 +366,7 @@ const updateExercise = async () => {
       const response = await updateExerciseInWorkout(
         props.workoutId,
         isWorkoutExercise(props.selectedExercise)
-          ? props.selectedExercise.exercise._id
+          ? props.selectedExercise.exercise.id
           : '',
         getSanitizedExerciseDataForWorkout() || {},
       );
@@ -392,8 +392,8 @@ const updateExercise = async () => {
       }
       const response = await updateExerciseInExercise(
         isWorkoutExercise(props.selectedExercise)
-          ? props.selectedExercise.exercise._id
-          : props.selectedExercise?._id || '',
+          ? props.selectedExercise.exercise.id
+          : props.selectedExercise?.id || '',
         getSanitizedExerciseData() || {},
       );
       if (response) {
