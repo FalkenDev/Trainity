@@ -40,7 +40,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { updateWorkout } from "@/services/workout.sevice";
+import { updateWorkout } from "@/services/workout.service";
 import { useWorkoutStore } from "@/stores/workout.store";
 
 defineEmits<{

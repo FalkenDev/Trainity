@@ -3,13 +3,9 @@ import { useAuthStore } from '@/stores/auth.store';
 
 export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
   try {
-    const authStore = useAuthStore();
-    const token = authStore.token;
+    options.credentials = 'include';
 
     const headers = new Headers(options.headers || {});
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
 
     if (
       options.body &&
@@ -18,6 +14,7 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
     ) {
       headers.set('Content-Type', 'application/json');
     }
+
     options.headers = headers;
 
     const response = await fetch(url, options);

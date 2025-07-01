@@ -1,6 +1,6 @@
 // stores/authStore.ts
 import { defineStore } from "pinia";
-import * as workoutService from "@/services/workout.sevice";
+import * as workoutService from "@/services/workout.service";
 import type { Workout } from "@/interfaces/Workout.interface";
 
 export const useWorkoutStore = defineStore(
