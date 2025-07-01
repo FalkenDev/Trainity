@@ -161,7 +161,7 @@ const muscleGroups = computed(() => {
   }));
 });
 
-const selectedMuscleGroups = ref<string[]>([]);
+const selectedMuscleGroups = ref<number[]>([]);
 
 const openViewExercise = (exercise: Exercise) => {
   console.log("Opening view exercise:", exercise);
@@ -179,7 +179,7 @@ const exercises = computed<Exercise[]>(() =>
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
-      exercise.muscleGroups?.some((mg: string) =>
+      exercise.muscleGroups?.some((mg: number) =>
         selectedMuscleGroups.value.includes(mg)
       );
 

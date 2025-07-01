@@ -74,7 +74,7 @@ const workoutStore = useWorkoutStore();
 
 const workouts = computed<Workout[]>(() => workoutStore.workouts);
 
-const getMuscleGroupsForWorkout = (workout: Workout): string[] => {
+const getMuscleGroupsForWorkout = (workout: Workout): number[] => {
   if (!workout.exercises || workout.exercises.length === 0) {
     return [];
   }
@@ -84,13 +84,13 @@ const getMuscleGroupsForWorkout = (workout: Workout): string[] => {
   return workout.exercises
     .flatMap((exercise) => exercise.exercise.muscleGroups || [])
     .map((muscleGroupId) => {
-      const group = muscleGroup.find((group) => group.id === muscleGroupId);
+      const group = muscleGroup.find((group) => group.id === +muscleGroupId);
       return group ? group.name : "Unknown";
     })
     .filter((value, index, self) => self.indexOf(value) === index);
 };
 
-const routeTo = (id: string) => {
+const routeTo = (id: number) => {
   workoutStore.setCurrentWorkout(id);
   router.push(`/workout/${id}`);
 };

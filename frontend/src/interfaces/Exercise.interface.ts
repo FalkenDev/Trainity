@@ -3,14 +3,13 @@ export interface Exercise {
   name: string;
   description: string;
   img: string;
-  muscleGroups: string[];
+  muscleGroups: number[];
   defaultSets: number;
   defaultReps: number;
   defaultPauseSeconds: number;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  __v: number;
 }
 
 export interface CreateExercise {
@@ -27,7 +26,7 @@ export interface UpdateExercise {
   name: string;
   description: string;
   image?: string | null;
-  muscleGroups: string[];
+  muscleGroups: number[];
   defaultSets: number;
   defaultReps: number;
   defaultPauseSeconds: number;
