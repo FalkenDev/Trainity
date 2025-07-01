@@ -7,7 +7,10 @@
       <template #menuAppend>
         <v-list>
           <v-list-item>
-            <v-list-item-title>Test</v-list-item-title>
+            <v-list-item-title>Add Notes</v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Add Exercise</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
@@ -20,101 +23,283 @@
       </p>
       <v-btn
         color="primary"
+        :loading="isLoading"
         @click="finnishSession"
       >
         Finnish
       </v-btn>
     </div>
-    <div
-      v-if="!isExerciseStarted"
-      class="ma-5"
-    >
-      <v-card
-        v-for="(exercise, index) in workoutSession?.workout?.exercises"
-        :key="index"
-        class="mb-4 d-flex pa-2 align-center justify-space-between"
-        style="border-radius: 5px"
+    <div class="d-flex flex-column ga-5">
+      <WorkoutExerciseCard
+        v-for="exercise in processedExercises"
+        :key="exercise.exerciseId"
+        :exercise="exercise"
+        :default-weight-and-reps="workoutSession?.workout.defaultWeightAndReps"
+        :workout-sets="allWorkoutSets[exercise.exerciseId] || []"
+        :rpe="exerciseMetadata[exercise.exerciseId]?.rpe"
+        :notes="exerciseMetadata[exercise.exerciseId]?.notes"
+        @update:set="handleSetUpdate(exercise.exerciseId, $event)"
+        @delete:set="handleSetDelete(exercise.exerciseId, $event)"
+        @delete:exercise="handleExerciseDelete(exercise.exerciseId)"
+        @add:set="handleSetAdd(exercise.exerciseId)"
+        @update:rpe="handleMetadataUpdate(exercise.exerciseId, { rpe: $event })"
+        @update:notes="
+          handleMetadataUpdate(exercise.exerciseId, { notes: $event })
+        "
+      />
+    </div>
+    <div class="d-flex flex-column justify-space-between my-5 mx-5 ga-5">
+      <v-btn
+        color="secondary"
+        @click="isAddExerciseOpen = true"
       >
-        <div class="d-flex ga-5 align-center">
-          <img
-            class="bg-grey"
-            style="width: 65px; height: 65px"
-          >
-          <div class="d-flex flex-column ga-1">
-            <h2 class="text-h6">
-              {{ exercise.exercise?.name }}
-            </h2>
-            <div class="d-flex ga-2">
-              <p class="text-body-2">
-                {{ exercise.sets }} x {{ exercise.reps }} Reps
-              </p>
-              <p class="text-body-2">
-                {{ exercise.pauseSeconds }} sec pauses
-              </p>
-              <v-btn
-                color="primary"
-                @click="startExercise(exercise.exerciseId)"
-              >
-                Start
-              </v-btn>
-            </div>
-          </div>
-        </div>
-      </v-card>
+        Add Exercise
+      </v-btn>
+      <v-btn
+        color="primary"
+        :loading="isLoading"
+        @click="finnishSession"
+      >
+        Finish Session
+      </v-btn>
     </div>
-    <div v-else>
-      <h1>{{ selectedExercise.name }}</h1>
-    </div>
+    <v-dialog
+      v-model="isAddExerciseOpen"
+      fullscreen
+    >
+      <AddExerciseList
+        v-if="isAddExerciseOpen"
+        :initial-selected-ids="processedExercises.map(e => e.exerciseId)"
+        @close="isAddExerciseOpen = false"
+        @save="updateWorkoutSessionExercises"
+      />
+    </v-dialog>
   </div>
 </template>
+
 <script lang="ts" setup>
-import { useWorkoutSessionStore } from "@/stores/workoutSession.store";
-import type { WorkoutSession } from "@/interfaces/workoutSession.interface";
-import { fetchExerciseById } from "@/services/exercise.service";
-import { finnishWorkoutSession } from "@/services/workoutSession.service";
-import { toast } from "vuetify-sonner";
-import router from "@/router";
+// TODO: Save workout session state to local storage or store when leaving the page so it can be resumed later
+// TODO: Add functionality to add exercises to the session
+// TODO: Maybe change RPE to a div with buttons for 1-10 instead of a slider or a text input
 
+import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
+import type {
+  FinishedExercisePayload,
+  WorkoutSession,
+} from '@/interfaces/workoutSession.interface';
+import { fetchExerciseById } from '@/services/exercise.service';
+import {
+  abandonWorkoutSession,
+  finishWorkoutSession,
+} from '@/services/workoutSession.service';
+import { toast } from 'vuetify-sonner';
+import router from '@/router';
+import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface';
+
+const isAddExerciseOpen = ref(false);
 const workoutSessionStore = useWorkoutSessionStore();
-
+const processedExercises = ref<Exercise[]>([]);
 const workoutSession = computed<WorkoutSession | null>(
   () => workoutSessionStore.selectedWorkoutSession,
 );
 
+const allWorkoutSets = ref<Record<string, WorkoutSet[]>>({});
+const isLoading = ref(false);
+const exerciseMetadata = ref<Record<string, { rpe?: number; notes?: string }>>(
+  {},
+);
+
 const clock = computed(() => workoutSessionStore.formattedClock);
 
-const isExerciseStarted = ref(false);
-const selectedExercise = ref(null);
+watchEffect(async () => {
+  if (!workoutSession.value) {
+    processedExercises.value = [];
+    allWorkoutSets.value = {};
+    exerciseMetadata.value = {};
+    return;
+  }
+
+  const baseExercises = workoutSession.value.workout.exercises;
+  const newAllSets: Record<string, WorkoutSet[]> = {};
+
+  const exercisesWithDetails = await Promise.all(
+    baseExercises.map(async (baseExercise) => {
+      const exerciseDetails = await fetchExerciseById(baseExercise.exerciseId);
+      const setsArray: WorkoutSet[] = [];
+      for (let i = 1; i <= baseExercise.sets; i++) {
+        setsArray.push({
+          set: i,
+          previous: 'N/A',
+          weight: baseExercise.weight,
+          reps: baseExercise.reps,
+          done: false,
+        });
+      }
+      newAllSets[baseExercise.exerciseId] = setsArray;
+      return {
+        ...baseExercise,
+        exercise: exerciseDetails,
+      };
+    }),
+  );
+
+  const newMetadata: Record<string, { rpe?: number; notes?: string }> = {};
+  for (const exercise of exercisesWithDetails) {
+    newMetadata[exercise.exerciseId] = { rpe: undefined, notes: '' };
+  }
+  exerciseMetadata.value = newMetadata;
+
+  processedExercises.value = exercisesWithDetails;
+  allWorkoutSets.value = newAllSets;
+});
 
 onMounted(() => {
-  if (workoutSessionStore.formattedClock === "00:00") {
+  if (workoutSessionStore.formattedClock === '00:00') {
     workoutSessionStore.startClock();
   }
 });
 
-const startExercise = async (exerciseId: string) => {
-  console.log("Starting exercise with ID:", exerciseId);
-  isExerciseStarted.value = true;
-  const response = await fetchExerciseById(exerciseId);
-  if (response && response._id) {
-    selectedExercise.value = response;
-  } else {
-    console.error("Failed to fetch exercise:", response);
-  }
+function updateWorkoutSessionExercises(
+  newExerciseIds: string[],
+) {
+  if (!workoutSession.value) return;
 
-  console.log("Selected exercise:", selectedExercise.value);
-};
+  isLoading.value = true;
+  try {
+    const existingExerciseIds = processedExercises.value.map(
+      (e) => e.exerciseId,
+    );
+
+    const exercisesToAdd = newExerciseIds.filter(
+      (id) => !existingExerciseIds.includes(id),
+    );
+
+    const exercisesToRemove = existingExerciseIds.filter(
+      (id) => !newExerciseIds.includes(id),
+    );
+
+    if (exercisesToRemove.length > 0) {
+      console.log('Exercises to remove:', exercisesToRemove);
+    }
+
+    if (exercisesToAdd.length > 0) {
+      console.log('Exercises to add:', exercisesToAdd);
+    }
+  } catch (error) {
+    console.error('Error updating workout session exercises:', error);
+    toast.error('Failed to update workout session exercises.');
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+function handleExerciseDelete(exerciseId: string) {
+  const exerciseIndex = processedExercises.value.findIndex(
+    (e) => e.exerciseId === exerciseId,
+  );
+  if (exerciseIndex !== -1) {
+    processedExercises.value.splice(exerciseIndex, 1);
+    delete allWorkoutSets.value[exerciseId];
+    delete exerciseMetadata.value[exerciseId];
+  }
+}
+
+function handleMetadataUpdate(
+  exerciseId: string,
+  data: { rpe?: number; notes?: string },
+) {
+  if (exerciseMetadata.value[exerciseId]) {
+    exerciseMetadata.value[exerciseId] = {
+      ...exerciseMetadata.value[exerciseId],
+      ...data,
+    };
+  }
+}
+
+function handleSetUpdate(exerciseId: string, updatedSet: WorkoutSet) {
+  const sets = allWorkoutSets.value[exerciseId];
+  const setIndex = sets.findIndex((s) => s.set === updatedSet.set);
+  if (setIndex !== -1) {
+    sets[setIndex] = updatedSet;
+  }
+}
+
+function handleSetDelete(exerciseId: string, setToDelete: WorkoutSet) {
+  const sets = allWorkoutSets.value[exerciseId];
+  const setIndex = sets.findIndex((s) => s.set === setToDelete.set);
+  if (setIndex !== -1) {
+    sets.splice(setIndex, 1);
+    sets.forEach((s, i) => (s.set = i + 1));
+  }
+}
+
+function handleSetAdd(exerciseId: string) {
+  const sets = allWorkoutSets.value[exerciseId];
+  const lastSet =
+    sets.length > 0 ? sets[sets.length - 1] : { weight: 0, reps: 0 };
+  sets.push({
+    set: sets.length + 1,
+    previous: 'N/A',
+    weight: lastSet.weight,
+    reps: lastSet.reps,
+    done: false,
+  });
+}
 
 const finnishSession = async () => {
-  const response = await finnishWorkoutSession;
-  if (!response) {
-    toast.error("Failed to finish workout session.");
+  if (isLoading.value) return;
+  if (!workoutSession.value?._id) {
+    toast.error('Active session not found.');
     return;
   }
-  workoutSessionStore.stopClock();
-  workoutSessionStore.selectedWorkoutSession = null;
-  workoutSessionStore.resetClock();
-  toast.success("Workout session finished successfully!");
-  router.push("/");
+
+  isLoading.value = true;
+  const sessionId = workoutSession.value._id;
+
+  const completedExercises: FinishedExercisePayload[] = [];
+
+  for (const exercise of processedExercises.value) {
+    const setsForExercise = allWorkoutSets.value[exercise.exerciseId];
+    const performedSets = setsForExercise
+      .filter((set) => set.done)
+      .map((set) => ({
+        setNumber: set.set,
+        weight: set.weight,
+        reps: set.reps,
+      }));
+
+    if (performedSets.length > 0) {
+      const metadata = exerciseMetadata.value[exercise.exerciseId];
+      completedExercises.push({
+        exerciseId: exercise.exerciseId,
+        sets: performedSets,
+        rpe: metadata?.rpe,
+        notes: metadata?.notes,
+      });
+    }
+  }
+  try {
+    if (completedExercises.length === 0) {
+      await abandonWorkoutSession(sessionId);
+      toast.info('No exercises completed. Session abandoned.');
+      workoutSessionStore.stopClock();
+      workoutSessionStore.selectedWorkoutSession = null;
+      workoutSessionStore.resetClock();
+      router.push('/');
+    } else {
+      const finalPayload = { completedExercises, notes: '' };
+      await finishWorkoutSession(sessionId, finalPayload);
+      toast.success('Workout session finished successfully!');
+    }
+    workoutSessionStore.stopClock();
+    workoutSessionStore.selectedWorkoutSession = null;
+    workoutSessionStore.resetClock();
+    router.push('/');
+  } catch (error) {
+    console.error('Failed to finish workout session:', error);
+    toast.error('An error occurred while finishing the session.');
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>

@@ -6,8 +6,6 @@ const SetSchema = new Schema(
     setNumber: { type: Number, required: true },
     weight: { type: Number, required: true },
     reps: { type: Number, required: true },
-    rpe: { type: Number },
-    notes: { type: String, trim: true },
   },
   { _id: false }
 );
@@ -26,6 +24,8 @@ const WorkoutSessionExerciseSchema = new Schema(
       muscleGroups: [String],
     },
     sets: { type: [SetSchema], required: true, default: [] },
+    notes: { type: String, trim: true },
+    rpe: { type: Number, min: 1, max: 10 },
   },
   { _id: false }
 );

@@ -88,8 +88,10 @@ const workoutSessionModel = {
     }
   },
 
-  completeWorkoutSession: async function (req, res) {
+  finishWorkoutSession: async function (req, res) {
     try {
+      const { completedExercises, notes: sessionNotes } = req.body;
+
       const sessionId = req.params.id;
 
       const session = await WorkoutSession.findOne({
@@ -100,6 +102,53 @@ const workoutSessionModel = {
       if (!session) {
         return res.status(404).json({ message: "Workout session not found" });
       }
+      if (session.status === "finished") {
+        return res
+          .status(400)
+          .json({ message: "Session is already finished." });
+      }
+
+      const exerciseIds = completedExercises.map((ex) => ex.exerciseId);
+      const exerciseDetails = await Exercise.find({
+        _id: { $in: exerciseIds },
+      });
+      const exerciseMap = new Map(
+        exerciseDetails.map((ex) => [ex._id.toString(), ex])
+      );
+
+      const sessionExercises = completedExercises.map((completedEx) => {
+        const details = exerciseMap.get(completedEx.exerciseId);
+        return {
+          exerciseId: completedEx.exerciseId,
+          sets: completedEx.sets,
+          rpe: completedEx.rpe || null,
+          notes: completedEx.notes,
+          exerciseSnapshot: {
+            name: details.name,
+            description: details.description,
+            img: details.img,
+            muscleGroups: details.muscleGroups,
+          },
+        };
+      });
+
+      let totalWeight = 0;
+      const exerciseStats = sessionExercises.map((ex) => {
+        const exerciseTotalWeight = ex.sets.reduce(
+          (sum, set) => sum + set.weight * set.reps,
+          0
+        );
+        totalWeight += exerciseTotalWeight;
+        return {
+          exerciseId: ex.exerciseId,
+          totalWeight: exerciseTotalWeight,
+        };
+      });
+
+      session.exercises = sessionExercises;
+      session.status = "finished";
+      session.endedAt = new Date();
+      session.notes = sessionNotes || session.notes;
 
       // Calculate stats
       let totalWeight = 0;
@@ -124,20 +173,31 @@ const workoutSessionModel = {
       session.exerciseStats = exerciseStats;
 
       await session.save();
+      res.status(200).json(session);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 
-      // Calculate duration (in seconds)
-      const duration =
-        session.endedAt && session.startedAt
-          ? (session.endedAt - session.startedAt) / 1000
-          : null;
-
-      res.status(200).json({
-        message: "Workout session completed!",
-        session: {
-          ...session.toObject(),
-          duration,
-        },
+  abandonWorkoutSession: async function (req, res) {
+    try {
+      const sessionId = req.params.id;
+      const session = await WorkoutSession.findOne({
+        _id: sessionId,
+        userId: req.user.id,
       });
+      if (!session) {
+        return res.status(404).json({ message: "Workout session not found" });
+      }
+      if (session.status === "abandoned") {
+        return res
+          .status(400)
+          .json({ message: "Session is already abandoned." });
+      }
+      session.status = "abandoned";
+      session.endedAt = new Date();
+      await session.save();
+      res.status(200).json(session);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

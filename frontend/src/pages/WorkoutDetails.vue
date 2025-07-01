@@ -95,9 +95,10 @@
     fullscreen
   >
     <AddExerciseList
-      :selected-exercises="workout?.exercises"
-      :workout-id="workout?._id || ''"
+      v-if="isAddExerciseOpen"
+      :initial-selected-ids="selectedExerciseIds"
       @close="isAddExerciseOpen = false"
+      @save="updateWorkoutExercises"
     />
   </v-dialog>
   <v-dialog
@@ -149,7 +150,7 @@ import { useWorkoutSessionStore } from "@/stores/workoutSession.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { Workout, Exercise } from "@/interfaces/Workout.interface";
-import { deleteWorkout, dublicateWorkout } from "@/services/workout.service";
+import { deleteWorkout, dublicateWorkout, removeExercisesFromWorkout, addExercisesToWorkout } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
 
 const isAddExerciseOpen = ref<boolean>(false);
@@ -157,11 +158,61 @@ const isEditExerciseOpen = ref<boolean>(false);
 const isDeleteDialogOpen = ref<boolean>(false);
 const isEditWorkoutOpen = ref<boolean>(false);
 const isWeightAndRepsOpen = ref<boolean>(false);
+const isUpdatingWorkout = ref<boolean>(false);
+
 const muscleGroupStore = useMuscleGroupStore();
 const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
+
+// TODO: If a workout is already started, give a dialog to end the current session and start a new one
+
+const selectedExerciseIds = computed<string[]>(() => {
+  return workout.value?.exercises
+    .map((item) => item.exercise?._id)
+    .filter((id): id is string => !!id) ?? [];
+});
+
+const updateWorkoutExercises = async (newExerciseIds: string[]) => {
+  if (!workout.value) return;
+
+  isUpdatingWorkout.value = true;
+  try {
+    await workoutStore.setWorkouts(true);
+
+    const existingExerciseIds = selectedExerciseIds.value;
+    console.log("Existing exercise IDs:", existingExerciseIds);
+
+    const exercisesToAdd = newExerciseIds.filter(
+      (id) => !existingExerciseIds.includes(id),
+    );
+
+    const exercisesToRemove = existingExerciseIds.filter(
+      (id) => !newExerciseIds.includes(id),
+    );
+
+    if (exercisesToRemove.length > 0) {
+      await removeExercisesFromWorkout(workout.value._id, exercisesToRemove);
+    }
+
+    if (exercisesToAdd.length > 0) {
+      await addExercisesToWorkout(workout.value!._id, exercisesToAdd);
+    }
+    
+    const hasBeenUpdated = exercisesToAdd.length > 0 || exercisesToRemove.length > 0;
+
+    if (hasBeenUpdated) {
+      toast.success("Workout updated successfully");
+      await workoutStore.setWorkouts(true);
+    }
+  } catch (error) {
+    console.error("Error updating workout exercises:", error);
+    toast.error("Failed to update workout");
+  } finally {
+    isUpdatingWorkout.value = false;
+  }
+};
 
 const dublicate = async () => {
   if (workout.value) {
@@ -177,8 +228,6 @@ const dublicate = async () => {
     }
   }
 };
-
-// TODO: If a workout is already started, give a dialog to end the current session and start a new one
 
 const deleteExercise = async () => {
   try {

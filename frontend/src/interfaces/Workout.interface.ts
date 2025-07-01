@@ -4,7 +4,7 @@ export interface Workout {
   time: number;
   description?: string;
   exercises: Exercise[];
-  defaultWeightAndReps: "default" | "latest" | "exercise";
+  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +15,7 @@ export interface Exercise {
   reps: number;
   weight: number;
   pauseSeconds: number;
+  exerciseId: string;
   exercise: {
     _id: string;
     name: string;
@@ -29,6 +30,25 @@ export interface Exercise {
     updatedAt: string;
     __v: number;
   };
+}
+
+export interface WorkoutSet {
+  set: number;
+  previous: string;
+  weight: number;
+  reps: number;
+  done: boolean;
+}
+
+type FinishedSetPayload = {
+  setNumber: number;
+  weight: number;
+  reps: number;
+};
+
+export interface WorkoutExercisePayload {
+  exerciseId: string;
+  sets: [FinishedSetPayload, ...FinishedSetPayload[]];
 }
 
 export interface CreateWorkout {
@@ -51,7 +71,7 @@ export interface UpdateWorkout {
   title?: string;
   time?: number;
   description?: string;
-  defaultWeightAndReps: "default" | "latest" | "exercise";
+  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
 }
 
 export interface AddExerciseToWorkout {
