@@ -107,6 +107,33 @@ export const addExerciseToWorkout = async (
   }
 };
 
+export const addExercisesToWorkout = async (
+  workoutId: string,
+  exerciseIds: string[],
+) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  try {
+    const response = await fetchWrapper(
+      `${apiUrl}/workouts/${workoutId}/exercises`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ exerciseIds }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to add exercises to workout");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error adding exercises to workout:", error);
+    throw error;
+  }
+};
+
 export const removeExerciseFromWorkout = async (
   workoutId: string,
   exerciseId: string,
@@ -124,6 +151,33 @@ export const removeExerciseFromWorkout = async (
     return true;
   } catch (error) {
     console.error("Error removing exercise from workout:", error);
+    throw error;
+  }
+};
+
+export const removeExercisesFromWorkout = async (
+  workoutId: string,
+  exerciseIds: string[],
+) => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+  try {
+    const response = await fetchWrapper(
+      `${apiUrl}/workouts/${workoutId}/exercises`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ exerciseIds }),
+      },
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to remove exercises from workout");
+    }
+    return true;
+  } catch (error) {
+    console.error("Error removing exercises from workout:", error);
     throw error;
   }
 };
