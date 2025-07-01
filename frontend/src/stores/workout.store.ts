@@ -27,9 +27,9 @@ export const useWorkoutStore = defineStore(
         isLoading.value = true;
         workouts.value = await workoutService.fetchAllWorkouts();
         if (currentWorkout.value) {
-          const currentWorkoutId = currentWorkout.value._id;
+          const currentWorkoutId = currentWorkout.value.id;
           const foundWorkout = workouts.value.find(
-            (w) => w._id === currentWorkoutId,
+            (w) => w.id === currentWorkoutId,
           );
           if (foundWorkout) {
             currentWorkout.value = foundWorkout;
@@ -49,7 +49,7 @@ export const useWorkoutStore = defineStore(
     setWorkouts();
 
     const setCurrentWorkout = (workoutId: string) => {
-      const workout = workouts.value.find((w) => w._id === workoutId);
+      const workout = workouts.value.find((w) => w.id === workoutId);
       if (workout) {
         currentWorkout.value = workout;
       } else {

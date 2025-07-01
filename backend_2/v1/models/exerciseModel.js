@@ -28,7 +28,7 @@ const exerciseModel = {
   getExercise: async function (req, res) {
     try {
       const exercise = await Exercise.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         createdBy: req.user.id,
       });
       if (!exercise) {
@@ -44,7 +44,7 @@ const exerciseModel = {
   updateExercise: async function (req, res) {
     try {
       const updatedExercise = await Exercise.findOneAndUpdate(
-        { _id: req.params.id, createdBy: req.user.id },
+        { id: req.params.id, createdBy: req.user.id },
         req.body,
         { new: true, runValidators: true }
       );
@@ -64,7 +64,7 @@ const exerciseModel = {
 
       // Delete the exercise
       const deletedExercise = await Exercise.findOneAndDelete({
-        _id: exerciseId,
+        id: exerciseId,
         createdBy: req.user.id,
       });
       if (!deletedExercise) {

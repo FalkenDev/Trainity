@@ -175,7 +175,7 @@ const seedDatabase = async () => {
     if (createdUsers.length === 0) {
       throw new Error("No users were seeded. Halting script.");
     }
-    const mainUserId = createdUsers[0]._id;
+    const mainUserId = createdUsers[0].id;
     console.log(`✅ User seeding complete. Main user ID: ${mainUserId}`);
 
     // --- Seed Muscle Groups ---
@@ -187,7 +187,7 @@ const seedDatabase = async () => {
 
     // Create a lookup map for muscle group names to IDs
     const muscleGroupMap = createdMuscleGroups.reduce((map, group) => {
-      map[group.name] = group._id;
+      map[group.name] = group.id;
       return map;
     }, {});
 
@@ -208,7 +208,7 @@ const seedDatabase = async () => {
 
     // Create a lookup map for exercise names to IDs
     const exerciseMap = createdExercises.reduce((map, exercise) => {
-      map[exercise.name] = exercise._id;
+      map[exercise.name] = exercise.id;
       return map;
     }, {});
 

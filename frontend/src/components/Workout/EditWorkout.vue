@@ -66,7 +66,7 @@ const saveWorkout = async () => {
 
   isLoading.value = true;
   try {
-    const response = await updateWorkout(selectedWorkout.value._id, {
+    const response = await updateWorkout(selectedWorkout.value.id, {
       title: editWorkout.name,
       description: editWorkout.description,
       time: editWorkout.time,

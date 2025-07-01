@@ -1,5 +1,5 @@
 export interface MuscleGroup {
-  _id: string;
+  id: string;
   name: string;
   __v: number;
   createdAt: string;
