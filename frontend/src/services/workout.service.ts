@@ -38,7 +38,7 @@ export const createWorkout = async (workout: CreateWorkout) => {
   }
 };
 
-export const getWorkoutById = async (id: string) => {
+export const getWorkoutById = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`);
     if (!response.ok) {
@@ -52,7 +52,7 @@ export const getWorkoutById = async (id: string) => {
   }
 };
 
-export const updateWorkout = async (id: string, workout: UpdateWorkout) => {
+export const updateWorkout = async (id: number, workout: UpdateWorkout) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
       method: "PATCH",
@@ -69,7 +69,7 @@ export const updateWorkout = async (id: string, workout: UpdateWorkout) => {
   }
 };
 
-export const deleteWorkout = async (id: string) => {
+export const deleteWorkout = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
       method: "DELETE",
@@ -85,8 +85,8 @@ export const deleteWorkout = async (id: string) => {
 };
 
 export const addExercisesToWorkout = async (
-  workoutId: string,
-  exerciseIds: string[],
+  workoutId: number,
+  exerciseIds: number[],
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
@@ -112,8 +112,8 @@ export const addExercisesToWorkout = async (
 };
 
 export const removeExercisesFromWorkout = async (
-  workoutId: string,
-  exerciseIds: string[],
+  workoutId: number,
+  exerciseIds: number[],
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
@@ -139,8 +139,8 @@ export const removeExercisesFromWorkout = async (
 };
 
 export const updateExerciseInWorkout = async (
-  workoutId: string,
-  exerciseId: string,
+  workoutId: number,
+  exerciseId: number,
   exerciseData: AddExerciseToWorkout,
 ) => {
   try {
@@ -163,7 +163,7 @@ export const updateExerciseInWorkout = async (
   }
 };
 
-export const dublicateWorkout = async (id: string) => {
+export const dublicateWorkout = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}/duplicate`, {
       method: "POST",

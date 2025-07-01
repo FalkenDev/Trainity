@@ -6,7 +6,7 @@ export interface PerformedSet {
 }
 
 export interface FinishedExercisePayload {
-  exerciseId: string;
+  exerciseId: number;
   rpe?: number;
   notes?: string;
   sets: PerformedSet[];
@@ -18,8 +18,8 @@ export interface FinishSessionPayload {
 }
 
 export interface WorkoutSession {
-  id: string;
-  userId: string;
+  id: number;
+  userId: number;
   startedAt: string;
   endedAt?: string;
   status: 'in_progress' | 'finished' | 'abandoned';
@@ -31,14 +31,14 @@ export interface WorkoutSession {
       description: string;
       muscleGroups: string[];
     };
-    exerciseId: string;
+    exerciseId: number;
     sets: PerformedSet[];
   }[];
   totalWeight: number;
   exerciseStats: {
     exerciseId: string;
     totalWeight: number;
-    id: string;
+    id: number;
   }[];
   createdAt: string;
   updatedAt: string;

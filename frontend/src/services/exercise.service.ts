@@ -17,7 +17,7 @@ export const fetchAllExercises = async () => {
   }
 };
 
-export const fetchExerciseById = async (exerciseId: string) => {
+export const fetchExerciseById = async (exerciseId: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/exercises/${exerciseId}`);
     if (!response.ok) {
@@ -49,7 +49,7 @@ export const createExercise = async (exercise: CreateExercise) => {
 };
 
 export const updateExercise = async (
-  exerciseId: string,
+  exerciseId: number,
   exercise: CreateExercise
 ) => {
   try {
@@ -68,7 +68,7 @@ export const updateExercise = async (
   }
 };
 
-export const deleteExercise = async (exerciseId: string) => {
+export const deleteExercise = async (exerciseId: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/exercises/${exerciseId}`, {
       method: "DELETE",
