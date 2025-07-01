@@ -22,14 +22,14 @@
         variant="outlined"
       />
       <v-select
-        v-model="newExercise.muscleGroups"
+        v-model="newExercise.muscleGroupIds"
         label="Muscle Group"
         :items="muscleGroupItems"
         required
         class="mt-3"
         multiple
         item-title="name"
-        item-value="_id"
+        item-value="id"
         variant="outlined"
         :menu-props="{ maxHeight: '200px' }"
       />
@@ -87,7 +87,7 @@ const muscleGroupStore = useMuscleGroupStore();
 const newExercise = ref<CreateExercise>({
   name: "",
   description: "",
-  muscleGroups: [] as string[],
+  muscleGroupIds: [] as number[],
   defaultSets: 1,
   defaultReps: 1,
   defaultPauseSeconds: 0,
@@ -110,7 +110,7 @@ const createNewExercise = async () => {
       newExercise.value = {
         name: "",
         description: "",
-        muscleGroups: [],
+        muscleGroupIds: [],
         defaultSets: 1,
         defaultReps: 1,
         defaultPauseSeconds: 0,
