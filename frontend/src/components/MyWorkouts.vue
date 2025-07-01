@@ -74,12 +74,13 @@ const workoutStore = useWorkoutStore();
 
 const workouts = computed<Workout[]>(() => workoutStore.workouts);
 
-const getMuscleGroupsForWorkout = (workout: Workout): number[] => {
+const getMuscleGroupsForWorkout = (workout: Workout): string[] => {
   if (!workout.exercises || workout.exercises.length === 0) {
     return [];
   }
 
   const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
+  console.log("Muscle Groups:", muscleGroup);
 
   return workout.exercises
     .flatMap((exercise) => exercise.exercise.muscleGroups || [])
