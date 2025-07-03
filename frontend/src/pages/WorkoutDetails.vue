@@ -255,7 +255,7 @@ const selectExercise = (exercise: Exercise) => {
   isEditExerciseOpen.value = true;
 };
 
-const getMuscleGroupsForWorkout = (): number[] => {
+const getMuscleGroupsForWorkout = (): string[] => {
   if (!workout.value?.exercises || workout.value.exercises.length === 0) {
     return [];
   }

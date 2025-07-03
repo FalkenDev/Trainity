@@ -10,6 +10,7 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
 import { WorkoutExercise } from './workoutExercise.entity';
 import { Exercise } from '../exercise/exercise.entity';
+import { UpdateWorkoutExerciseDto } from './dto/updateWorkoutExercise.dto';
 
 @Injectable()
 export class WorkoutService {
@@ -42,15 +43,15 @@ export class WorkoutService {
     userId: number,
   ): Promise<WorkoutResponseDto> {
     const workout = await this.findWorkoutForUser(workoutId, userId);
-    const newExercises = dto.exerciseIds.map((exerciseId, index) =>
+    const newExercises = (dto.exerciseIds ?? []).map((exerciseId, index) =>
       this.workoutExerciseRepo.create({
         workout,
         exercise: { id: exerciseId } as Exercise,
         order: workout.exercises.length + index + 1,
-        sets: 3, // Default values
-        reps: 10, // Default values
-        weight: 10, // Default values
-        pauseSeconds: 60, // Default values
+        sets: 3,
+        reps: 10,
+        weight: 10,
+        pauseSeconds: 60,
       }),
     );
     await this.workoutExerciseRepo.save(newExercises);
@@ -69,7 +70,7 @@ export class WorkoutService {
     const workoutExercisesToRemove = await this.workoutExerciseRepo.find({
       where: {
         workout: { id: workout.id },
-        exercise: { id: In(dto.exerciseIds) },
+        exercise: { id: In(dto.exerciseIds ?? []) },
       },
     });
 
@@ -83,8 +84,32 @@ export class WorkoutService {
     return { message: 'Exercises removed successfully' };
   }
 
-  // ... existing service methods
-  // Make sure getWorkout is public if it isn't already
+  async updateExerciseInWorkout(
+    workoutId: number,
+    workoutExerciseId: number,
+    dto: UpdateWorkoutExerciseDto,
+    userId: number,
+  ): Promise<WorkoutResponseDto> {
+    await this.findWorkoutForUser(workoutId, userId);
+
+    const workoutExercise = await this.workoutExerciseRepo.findOne({
+      where: {
+        id: workoutExerciseId,
+        workout: { id: workoutId },
+      },
+    });
+
+    if (!workoutExercise) {
+      throw new NotFoundException('Exercise not found in this workout');
+    }
+
+    Object.assign(workoutExercise, dto);
+
+    await this.workoutExerciseRepo.save(workoutExercise);
+
+    return this.getWorkout(workoutId, userId);
+  }
+
   async getWorkout(id: number, userId: number): Promise<WorkoutResponseDto> {
     const workout = await this.workoutRepo.findOne({
       where: { id, createdBy: { id: userId } },
