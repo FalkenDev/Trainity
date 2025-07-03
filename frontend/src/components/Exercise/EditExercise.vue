@@ -237,8 +237,8 @@ const isLoading = ref<boolean>(false);
 
 const editExercise = ref<AddExerciseToWorkout | null>({
   exerciseId: isWorkoutExercise(props.selectedExercise)
-    ? props.selectedExercise.exercise.id
-    : props.selectedExercise?.id || '',
+    ? Number(props.selectedExercise.exercise.id)
+    : Number(props.selectedExercise?.id || 0),
   sets: isWorkoutExercise(props.selectedExercise)
     ? props.selectedExercise.sets
     : props.selectedExercise?.defaultSets || 0,
@@ -266,19 +266,28 @@ const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
-const getMuscleGroupsForExercise = (): number[] => {
+const getMuscleGroupsForExercise = (): string[] => {
   if (!props.selectedExercise) {
     return [];
   }
 
   const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
   if (isWorkoutExercise(props.selectedExercise)) {
-    return props.selectedExercise.exercise.muscleGroups
+    return (props.selectedExercise.exercise.muscleGroups || []) 
       .map(
         (groupId) => muscleGroup.find((group) => group.id === +groupId)?.name,
       )
       .filter((name): name is string => !!name);
   }
+
+  if (props.selectedExercise.muscleGroups) {
+    return (props.selectedExercise.muscleGroups || [])
+      .map(
+        (groupId) => muscleGroup.find((group) => group.id === +groupId)?.name,
+      )
+      .filter((name): name is string => !!name);
+  }
+
   return [];
 };
 
@@ -326,15 +335,33 @@ const removeExercise = async () => {
 };
 
 const getSanitizedExerciseDataForWorkout = () => {
-  return {
-    ...editExercise.value,
-    sets: Number(editExercise.value?.sets || 0),
-    reps: Number(editExercise.value?.reps || 0),
-    pauseSeconds: Number(editExercise.value?.pauseSeconds || 0),
-    order: Number(editExercise.value?.order || 0),
-    weight: Number(editExercise.value?.weight || 0),
-    exerciseId: editExercise.value?.exerciseId || '',
+  if (!props.selectedExercise || !editExercise.value) return {};
+
+  const original = isWorkoutExercise(props.selectedExercise)
+    ? {
+        sets: props.selectedExercise.sets,
+        reps: props.selectedExercise.reps,
+        pauseSeconds: props.selectedExercise.pauseSeconds,
+        order: props.selectedExercise.order,
+        weight: props.selectedExercise.weight,
+        exerciseId: Number(props.selectedExercise.exercise.id),
+      }
+    : {};
+
+  const edited = {
+    sets: Number(editExercise.value.sets || 0),
+    reps: Number(editExercise.value.reps || 0),
+    pauseSeconds: Number(editExercise.value.pauseSeconds || 0),
+    order: Number(editExercise.value.order || 0),
+    weight: Number(editExercise.value.weight || 0),
+    exerciseId: Number(editExercise.value.exerciseId || 0),
   };
+
+  return Object.fromEntries(
+    (Object.entries(edited) as [keyof typeof edited, number][]).filter(
+      ([key, value]) => (original as Record<string, number>)[key as string] !== value
+    )
+  );
 };
 
 const getSanitizedExerciseData = () => {
@@ -366,11 +393,20 @@ const updateExercise = async () => {
         toast.error('No workout ID provided.');
         return;
       }
+      if (!isWorkoutExercise(props.selectedExercise)) {
+        toast.error('Selected exercise is not a workout exercise.');
+        return;
+      }
+      console.log('Updating exercise in workout:', {
+        workoutId: props.workoutId,
+        exerciseId: props.selectedExercise.exercise.id,
+        exerciseData: getSanitizedExerciseDataForWorkout(),
+      });
       const response = await updateExerciseInWorkout(
         props.workoutId,
         isWorkoutExercise(props.selectedExercise)
           ? props.selectedExercise.exercise.id
-          : '',
+          : (props.selectedExercise as Exercise)?.id,
         getSanitizedExerciseDataForWorkout() || {},
       );
       if (response) {
@@ -393,10 +429,14 @@ const updateExercise = async () => {
         toast.error('No exercise data to update.');
         return;
       }
+      if (!props.selectedExercise) {
+        toast.error('No selected exercise to update.');
+        return;
+      }
       const response = await updateExerciseInExercise(
         isWorkoutExercise(props.selectedExercise)
           ? props.selectedExercise.exercise.id
-          : props.selectedExercise?.id || '',
+          : props.selectedExercise?.id,
         getSanitizedExerciseData() || {},
       );
       if (response) {

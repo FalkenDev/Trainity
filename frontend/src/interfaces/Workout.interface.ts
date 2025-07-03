@@ -81,3 +81,10 @@ export interface AddExerciseToWorkout {
   weight: number;
   pauseSeconds: number;
 }
+
+export interface UpdateWorkoutExercise {
+  sets?: number;
+  reps?: number;
+  weight?: number;
+  pauseSeconds?: number;
+}

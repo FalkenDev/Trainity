@@ -25,6 +25,7 @@ import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
 import { WorkoutResponseDto } from './dto/workoutResponse.dto';
 import { RequestWithUser } from '../types/requestWithUser.type';
 import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
+import { UpdateWorkoutExerciseDto } from './dto/updateWorkoutExercise.dto';
 
 @ApiTags('workouts')
 @ApiBearerAuth()
@@ -85,6 +86,23 @@ export class WorkoutController {
   @ApiCreatedResponse({ type: WorkoutResponseDto })
   duplicateWorkout(@Param('id') id: number, @Req() req: RequestWithUser) {
     return this.workoutService.duplicateWorkout(id, this.getUserId(req));
+  }
+
+  @Patch(':id/exercise/:workoutExerciseId')
+  @ApiOperation({ summary: 'Update an exercise in a workout' })
+  @ApiOkResponse({ type: WorkoutResponseDto })
+  updateExerciseInWorkout(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('workoutExerciseId', ParseIntPipe) workoutExerciseId: number,
+    @Body() dto: UpdateWorkoutExerciseDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.workoutService.updateExerciseInWorkout(
+      id,
+      workoutExerciseId,
+      dto,
+      this.getUserId(req),
+    );
   }
 
   @Post(':id/exercises')

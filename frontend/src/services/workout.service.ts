@@ -1,7 +1,7 @@
 import type {
-  AddExerciseToWorkout,
   CreateWorkout,
   UpdateWorkout,
+  UpdateWorkoutExercise,
 } from "@/interfaces/Workout.interface";
 import { fetchWrapper } from "@/utils/fetchWrapper";
 
@@ -141,14 +141,14 @@ export const removeExercisesFromWorkout = async (
 export const updateExerciseInWorkout = async (
   workoutId: number,
   exerciseId: number,
-  exerciseData: AddExerciseToWorkout,
+  exerciseData: UpdateWorkoutExercise,
 ) => {
   try {
-    console.log("Updating exercise in workout:", exerciseData);
+    console.log("Updating exercise in workout:", {exerciseData, workoutId, exerciseId});
     const response = await fetchWrapper(
       `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
       {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify(exerciseData),
       },
     );
