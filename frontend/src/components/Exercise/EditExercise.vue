@@ -397,16 +397,21 @@ const updateExercise = async () => {
         toast.error('Selected exercise is not a workout exercise.');
         return;
       }
-      console.log('Updating exercise in workout:', {
-        workoutId: props.workoutId,
-        exerciseId: props.selectedExercise.exercise.id,
-        exerciseData: getSanitizedExerciseDataForWorkout(),
-      });
+      const workoutExercise = workoutStore.currentWorkout?.exercises.find(
+        (ex) =>
+          isWorkoutExercise(props.selectedExercise)
+            ? ex.id === props.selectedExercise.id
+            : ex.exercise.id === props.selectedExercise?.id
+      );
+
+      if (!workoutExercise) {
+        toast.error('Could not find the exercise in the workout.');
+        return;
+      }
+
       const response = await updateExerciseInWorkout(
         props.workoutId,
-        isWorkoutExercise(props.selectedExercise)
-          ? props.selectedExercise.exercise.id
-          : (props.selectedExercise as Exercise)?.id,
+        workoutExercise.id,
         getSanitizedExerciseDataForWorkout() || {},
       );
       if (response) {

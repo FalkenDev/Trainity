@@ -10,6 +10,7 @@ export interface Workout {
 }
 
 export interface Exercise {
+  id: number;
   order: number;
   sets: number;
   reps: number;

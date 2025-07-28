@@ -217,6 +217,7 @@ export class WorkoutService {
       exercises:
         workout.exercises
           ?.map((e) => ({
+            id: e.id, // <-- Add this line!
             order: e.order,
             sets: e.sets,
             reps: e.reps,
@@ -228,7 +229,7 @@ export class WorkoutService {
               description: e.exercise.description,
             },
           }))
-          .sort((a, b) => a.order - b.order) || [], // Sort exercises by order
+          .sort((a, b) => a.order - b.order) || [],
       createdAt: workout.createdAt,
     };
   }

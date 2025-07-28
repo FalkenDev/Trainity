@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class WorkoutExerciseSnapshotDto {
   @ApiProperty()
+  id: number;
+
+  @ApiProperty()
   order: number;
 
   @ApiProperty()
