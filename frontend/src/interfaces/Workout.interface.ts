@@ -22,7 +22,7 @@ export interface Exercise {
     name: string;
     description: string;
     img: string;
-    muscleGroups: number[];
+    muscleGroups: MuscleGroup[];
     defaultSets: number;
     defaultReps: number;
     defaultPauseSeconds: number;
@@ -88,4 +88,12 @@ export interface UpdateWorkoutExercise {
   reps?: number;
   weight?: number;
   pauseSeconds?: number;
+}
+
+export interface MuscleGroup {
+  id: number;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }
