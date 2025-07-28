@@ -19,6 +19,9 @@ export class ExerciseService {
       name: exercise.name,
       description: exercise.description,
       createdAt: exercise.createdAt,
+      defaultPauseSeconds: exercise.defaultPauseSeconds,
+      defaultReps: exercise.defaultReps,
+      defaultSets: exercise.defaultSets,
       muscleGroups:
         exercise.muscleGroups?.map((mg) => ({
           id: mg.id,
