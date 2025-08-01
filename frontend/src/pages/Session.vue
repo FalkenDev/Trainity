@@ -119,7 +119,7 @@ watchEffect(async () => {
     return;
   }
 
-  const baseExercises = workoutSession.value.workout.exercises;
+  const baseExercises = workoutSession.value.workoutSnapshot.exercises;
   const newAllSets: Record<number, WorkoutSet[]> = {};
 
   const exercisesWithDetails = await Promise.all(
@@ -138,6 +138,7 @@ watchEffect(async () => {
       newAllSets[baseExercise.exerciseId] = setsArray;
       return {
         ...baseExercise,
+        id: baseExercise.exerciseId,
         exercise: exerciseDetails,
       };
     }),
