@@ -1,5 +1,8 @@
 <template>
-  <div class="h-100 w-100 bg-grey-darken-4">
+  <div
+    class="w-100 bg-grey-darken-4"
+    style="height: 150vh;"
+  >
     <BackHeader
       :show-menu="true"
       :title="
@@ -7,7 +10,7 @@
           ? 'Exercise'
           : 'Edit Exercise'
       "
-      @close="emit('close')"
+      @close="isViewExercise ? emit('close') : isViewExercise = true"
     >
       <template #menuAppend>
         <v-list>
@@ -21,7 +24,9 @@
       </template>
     </BackHeader>
 
-    <div v-if="selectedExercise">
+    <div
+      v-if="selectedExercise"
+    >
       <v-card
         height="200"
         class="bg-white"
@@ -49,7 +54,9 @@
           </div>
         </div>
         <v-divider />
-        <div v-if="isViewExercise">
+        <div
+          v-if="isViewExercise"
+        >
           <v-list lines="one">
             <v-list-item>
               <template #prepend>
@@ -128,7 +135,9 @@
             </v-list-item>
           </v-list>
         </div>
-        <div v-else>
+        <div
+          v-else
+        >
           <v-btn
             class="w-100 my-4"
             color="primary"
@@ -139,8 +148,32 @@
           </v-btn>
           <v-form
             v-if="editExercise"
-            class="pt-2 d-flex ga-5 flex-column"
+            class="py-4 d-flex ga-5 flex-column"
           >
+            <v-text-field
+              v-model="editExercise.name"
+              label="Name"
+              type="string"
+              variant="outlined"
+              hide-details
+            />
+            <v-text-field
+              v-model="editExercise.description"
+              label="Description"
+              type="string"
+              variant="outlined"
+              hide-details
+            />
+            <v-select
+              v-model="editExercise.muscleGroups"
+              :items="muscleGroupStore.muscleGroups"
+              label="Muscle Groups"
+              multiple
+              variant="outlined"
+              hide-details
+              item-title="name"
+              item-value="id"
+            />
             <v-text-field
               v-model="editExercise.defaultSets"
               label="Sets"
@@ -175,6 +208,7 @@ import {
   updateExercise as updateExerciseInExercise,
   deleteExercise,
 } from '@/services/exercise.service';
+import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
 import { toast } from 'vuetify-sonner';
 
 const props = defineProps<{
@@ -184,9 +218,11 @@ const props = defineProps<{
 }>();
 
 const isViewExercise = ref(props.isViewExercise);
-
+const muscleGroupStore = useMuscleGroupStore();
 const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
+
+console.log("muscleGroupStore", muscleGroupStore.muscleGroups);
 
 const editExercise = ref<UpdateExercise | null>({
   id:  Number(props.selectedExercise?.id || 0),
@@ -228,12 +264,12 @@ const removeExercise = async () => {
 
 const getSanitizedExerciseData = () => {
   return {
-    name: props.selectedExercise?.name || '',
-    description: props.selectedExercise?.description || '',
+    name: String(editExercise.value?.name || '').trim(),
+    description: String(editExercise.value?.description || '').trim(),
     defaultSets: Number(editExercise.value?.defaultSets || 0),
     defaultReps: Number(editExercise.value?.defaultReps || 0),
     defaultPauseSeconds: Number(editExercise.value?.defaultPauseSeconds || 0),
-    muscleGroupIds: props.selectedExercise?.muscleGroups?.map(Number) || [],
+    muscleGroupIds: editExercise.value?.muscleGroups?.map((id) => Number(id)) || [],
   };
 };
 
@@ -248,10 +284,12 @@ const updateExercise = async () => {
         toast.error('No selected exercise to update.');
         return;
       }
+      console.log("sanitizedExerciseData", getSanitizedExerciseData());
       const response = await updateExerciseInExercise(
         props.selectedExercise?.id,
         getSanitizedExerciseData() || {},
       );
+      console.log('Response from updateExercise:', response);
       if (response) {
         toast.success('Exercise updated successfully!', { progressBar: true });
         await exerciseStore.setExercises(true);
