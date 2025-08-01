@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WorkoutSession } from './workoutSession.entity';
@@ -187,5 +191,32 @@ export class WorkoutSessionService {
 
     await this.sessionRepo.remove(session);
     return { message: 'Workout session deleted' };
+  }
+
+  async abandonSession(
+    sessionId: number,
+    userId: number,
+  ): Promise<WorkoutSession> {
+    const session = await this.sessionRepo.findOne({
+      where: { id: sessionId, user: { id: userId } },
+    });
+
+    if (!session) {
+      throw new NotFoundException('Workout session not found');
+    }
+
+    if (
+      session.status === WorkoutStatus.FINISHED ||
+      session.status === WorkoutStatus.ABANDONED
+    ) {
+      throw new BadRequestException(
+        `Session is already ${session.status} and cannot be abandoned.`,
+      );
+    }
+
+    session.status = WorkoutStatus.ABANDONED;
+    session.endedAt = new Date();
+
+    return this.sessionRepo.save(session);
   }
 }
