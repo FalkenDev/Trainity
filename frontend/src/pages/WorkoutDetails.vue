@@ -106,8 +106,8 @@
     v-model="isEditExerciseOpen"
     fullscreen
   >
-    <EditExercise
-      :selected-exercise="selectedExercise"
+    <EditWorkoutExercise
+      :selected-exercise="selectedExercise!"
       :workout-id="workout?.id ? Number(workout.id) : undefined"
       :is-view-exercise="false"
       :is-view-workout-exercise="true"
@@ -153,6 +153,7 @@ import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { Workout, Exercise } from "@/interfaces/Workout.interface";
 import { deleteWorkout, dublicateWorkout, removeExercisesFromWorkout, addExercisesToWorkout } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
+import EditWorkoutExercise from "@/components/Workout/EditWorkoutExercise.vue";
 
 const isAddExerciseOpen = ref<boolean>(false);
 const isEditExerciseOpen = ref<boolean>(false);
@@ -264,7 +265,11 @@ const getMuscleGroupsForWorkout = (): string[] => {
   const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
 
   return workout.value?.exercises
-    .flatMap((exercise) => exercise.exercise.muscleGroups || [])
+    .flatMap((exercise) =>
+      (exercise.exercise.muscleGroups || []).map((mg) =>
+        typeof mg === "object" && mg !== null ? mg.id : mg
+      )
+    )
     .map((muscleGroupId) => {
       const group = muscleGroup.find((group) => group.id === muscleGroupId);
       return group ? group.name : "Unknown";
