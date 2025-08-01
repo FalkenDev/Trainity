@@ -17,7 +17,7 @@
           <v-list-item @click="isViewExercise = false">
             <v-list-item-title>Edit</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="removeExercise">
+          <v-list-item @click="isDeleteExerciseOpen = true">
             <v-list-item-title>Delete</v-list-item-title>
           </v-list-item>
         </v-list>
@@ -116,23 +116,6 @@
                 </span>
               </v-list-item-title>
             </v-list-item>
-            <v-list-item>
-              <template #prepend>
-                <v-icon color="grey">
-                  mdi-calendar-edit
-                </v-icon>
-              </template>
-              <v-list-item-title>
-                <span class="font-weight-medium">Updated at:</span>
-                <span class="ml-2">
-                  {{
-                    new Date(
-                      selectedExercise.updatedAt,
-                    ).toLocaleDateString()
-                  }}
-                </span>
-              </v-list-item-title>
-            </v-list-item>
           </v-list>
         </div>
         <div
@@ -199,6 +182,35 @@
         </div>
       </div>
     </div>
+    <v-dialog
+      v-model="isDeleteExerciseOpen"
+      max-width="500"
+      persistent
+    >
+      <v-card>
+        <v-card-title class="text-h6">
+          Delete Exercise
+        </v-card-title>
+        <v-card-text>
+          Are you sure you want to delete this exercise?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="grey"
+            @click="isDeleteExerciseOpen = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="red"
+            @click="removeExercise"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -221,6 +233,7 @@ const isViewExercise = ref(props.isViewExercise);
 const muscleGroupStore = useMuscleGroupStore();
 const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
+const isDeleteExerciseOpen = ref<boolean>(false);
 
 console.log("muscleGroupStore", muscleGroupStore.muscleGroups);
 
