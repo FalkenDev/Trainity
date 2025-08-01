@@ -119,4 +119,14 @@ export class WorkoutSessionController {
   ): Promise<WorkoutSession> {
     return this.sessionService.completeSession(id, this.getUserId(req));
   }
+
+  @Post(':id/abandon')
+  @ApiOperation({ summary: 'Mark session as abandoned' })
+  @ApiOkResponse({ type: WorkoutSession })
+  abandon(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: RequestWithUser,
+  ): Promise<WorkoutSession> {
+    return this.sessionService.abandonSession(id, this.getUserId(req));
+  }
 }
