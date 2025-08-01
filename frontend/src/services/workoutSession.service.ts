@@ -122,7 +122,7 @@ export const finishWorkoutSession = async (
   payload: FinishSessionPayload,
 ) => {
   const response = await fetchWrapper(
-    `${apiUrl}/workoutsessions/${sessionId}/finish`,
+    `${apiUrl}/workoutsessions/${sessionId}/complete`,
     {
       method: 'POST',
       body: JSON.stringify(payload),
