@@ -42,4 +42,17 @@ export interface WorkoutSession {
   }[];
   createdAt: string;
   updatedAt: string;
+  workoutSnapshot: {
+    title: string;
+    description: string;
+    time: number;
+    exercises: {
+      exerciseId: number;
+      order: number;
+      sets: number;
+      reps: number;
+      weight: number;
+      pauseSeconds?: number;
+    }[];
+  };
 }
