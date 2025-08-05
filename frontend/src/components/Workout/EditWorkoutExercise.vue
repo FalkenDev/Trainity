@@ -37,7 +37,7 @@
           </p>
           <div class="d-flex ga-2 align-center mt-2 flex-wrap">
             <v-chip
-              v-for="group in (props.selectedExercise?.muscleGroups || [])"
+              v-for="group in (props.selectedExercise?.exercise?.muscleGroups || [])"
               :key="group"
               color="green-lighten-1"
               label
