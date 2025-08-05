@@ -113,7 +113,12 @@ export class WorkoutService {
   async getWorkout(id: number, userId: number): Promise<WorkoutResponseDto> {
     const workout = await this.workoutRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['exercises', 'exercises.exercise', 'createdBy'],
+      relations: [
+        'exercises',
+        'exercises.exercise',
+        'exercises.exercise.muscleGroups',
+        'createdBy',
+      ],
     });
 
     if (!workout) throw new NotFoundException('Workout not found');
@@ -123,7 +128,12 @@ export class WorkoutService {
   async getWorkoutList(userId: number): Promise<WorkoutResponseDto[]> {
     const workouts = await this.workoutRepo.find({
       where: { createdBy: { id: userId } },
-      relations: ['exercises', 'exercises.exercise', 'createdBy'],
+      relations: [
+        'exercises',
+        'exercises.exercise',
+        'exercises.exercise.muscleGroups',
+        'createdBy',
+      ],
     });
 
     return workouts.map((w) => this.toResponseDto(w));
@@ -217,7 +227,7 @@ export class WorkoutService {
       exercises:
         workout.exercises
           ?.map((e) => ({
-            id: e.id, // <-- Add this line!
+            id: e.id,
             order: e.order,
             sets: e.sets,
             reps: e.reps,
@@ -227,6 +237,13 @@ export class WorkoutService {
               id: e.exercise.id,
               name: e.exercise.name,
               description: e.exercise.description,
+              muscleGroups:
+                e.exercise.muscleGroups?.map((mg) => ({
+                  id: mg.id,
+                  name: mg.name,
+                  createdAt: mg.createdAt,
+                  updatedAt: mg.updatedAt,
+                })) ?? [],
             },
           }))
           .sort((a, b) => a.order - b.order) || [],
