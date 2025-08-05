@@ -74,7 +74,7 @@
       transition="slide-y-transition"
       persistent
     >
-      <SessionList />
+      <SessionList @close="isSessionListOpen = false" />
     </v-dialog>
   </div>
 </template>
