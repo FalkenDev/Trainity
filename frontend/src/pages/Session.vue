@@ -140,6 +140,7 @@ watchEffect(async () => {
         ...baseExercise,
         id: baseExercise.exerciseId,
         exercise: exerciseDetails,
+        pauseSeconds: baseExercise.pauseSeconds ?? 0,
       };
     }),
   );
