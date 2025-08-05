@@ -116,8 +116,27 @@ export class WorkoutSessionController {
   complete(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: RequestWithUser,
+    @Body()
+    payload: {
+      completedExercises?: {
+        exerciseId: number;
+        notes?: string;
+        sets: {
+          setNumber: number;
+          weight: number;
+          reps: number;
+          rpe?: number;
+          notes?: string;
+        }[];
+      }[];
+      notes?: string;
+    },
   ): Promise<WorkoutSession> {
-    return this.sessionService.completeSession(id, this.getUserId(req));
+    return this.sessionService.completeSession(
+      id,
+      this.getUserId(req),
+      payload,
+    );
   }
 
   @Post(':id/abandon')
