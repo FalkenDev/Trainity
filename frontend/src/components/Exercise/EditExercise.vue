@@ -235,8 +235,6 @@ const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
 const isDeleteExerciseOpen = ref<boolean>(false);
 
-console.log("muscleGroupStore", muscleGroupStore.muscleGroups);
-
 const editExercise = ref<UpdateExercise | null>({
   id:  Number(props.selectedExercise?.id || 0),
   name: props.selectedExercise?.name || '',
@@ -297,12 +295,10 @@ const updateExercise = async () => {
         toast.error('No selected exercise to update.');
         return;
       }
-      console.log("sanitizedExerciseData", getSanitizedExerciseData());
       const response = await updateExerciseInExercise(
         props.selectedExercise?.id,
         getSanitizedExerciseData() || {},
       );
-      console.log('Response from updateExercise:', response);
       if (response) {
         toast.success('Exercise updated successfully!', { progressBar: true });
         await exerciseStore.setExercises(true);
