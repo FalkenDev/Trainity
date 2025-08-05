@@ -122,15 +122,15 @@ export const finishWorkoutSession = async (
   payload: FinishSessionPayload,
 ) => {
   const response = await fetchWrapper(
-    `${apiUrl}/workoutsessions/${sessionId}/complete`,
+    `${apiUrl}/workoutSessions/${sessionId}/complete`,
     {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     },
   );
   if (!response.ok) {
     throw new Error('Failed to finish workout session');
-
   }
   return await response.json();
 };
