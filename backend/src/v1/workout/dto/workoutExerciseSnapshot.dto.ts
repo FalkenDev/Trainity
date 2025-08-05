@@ -1,4 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MuscleGroupResponseDto } from 'src/v1/muscleGroup/dto/muscleGroupResponse.dto';
+
+export class ExerciseSnapshotDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty({ required: false })
+  description?: string;
+
+  @ApiProperty({ type: [MuscleGroupResponseDto] })
+  muscleGroups: MuscleGroupResponseDto[];
+}
 
 export class WorkoutExerciseSnapshotDto {
   @ApiProperty()
@@ -19,10 +34,6 @@ export class WorkoutExerciseSnapshotDto {
   @ApiProperty()
   pauseSeconds: number;
 
-  @ApiProperty()
-  exercise: {
-    id: number;
-    name: string;
-    description?: string;
-  };
+  @ApiProperty({ type: ExerciseSnapshotDto })
+  exercise: ExerciseSnapshotDto;
 }
