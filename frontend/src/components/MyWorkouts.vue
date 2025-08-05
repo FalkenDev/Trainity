@@ -66,10 +66,7 @@ import { computed } from "vue";
 import type { Workout } from "@/interfaces/Workout.interface";
 import router from "@/router";
 import { useWorkoutStore } from "@/stores/workout.store";
-import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
-import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 
-const muscleGroupStore = useMuscleGroupStore();
 const workoutStore = useWorkoutStore();
 
 const workouts = computed<Workout[]>(() => workoutStore.workouts);
@@ -79,15 +76,9 @@ const getMuscleGroupsForWorkout = (workout: Workout): string[] => {
     return [];
   }
 
-  const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
-  console.log("Muscle Groups:", muscleGroup);
-
   return workout.exercises
     .flatMap((exercise) => exercise.exercise.muscleGroups || [])
-    .map((muscleGroupId) => {
-      const group = muscleGroup.find((group) => group.id === +muscleGroupId);
-      return group ? group.name : "Unknown";
-    })
+    .map((mg) => typeof mg === "object" && mg.name ? mg.name : "Unknown")
     .filter((value, index, self) => self.indexOf(value) === index);
 };
 
