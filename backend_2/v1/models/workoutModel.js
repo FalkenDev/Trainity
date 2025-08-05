@@ -40,14 +40,7 @@ const workoutModel = {
 
   addExerciseToWorkout: async function (req, res) {
     const { exerciseId, order, sets, reps, weight, pauseSeconds } = req.body;
-    console.log("Adding exercise to workout:", {
-      exerciseId,
-      order,
-      sets,
-      reps,
-      weight,
-      pauseSeconds,
-    });
+
     try {
       const workout = await Workout.findOne({
         id: req.params.id,

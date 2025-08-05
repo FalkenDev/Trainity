@@ -64,8 +64,6 @@ export const useAuthStore = defineStore(
     }) => {
       loading.value = true;
       try {
-        console.log('Creating account with data:', registerData);
-        console.log('fullname:', registerData.fullName);
         const firstName = registerData.fullName.split(' ')[0];
         const lastName = registerData.fullName.split(' ')[1] || '';
 

@@ -144,7 +144,6 @@ export const updateExerciseInWorkout = async (
   exerciseData: UpdateWorkoutExercise,
 ) => {
   try {
-    console.log("Updating exercise in workout:", {exerciseData, workoutId, exerciseId});
     const response = await fetchWrapper(
       `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
       {

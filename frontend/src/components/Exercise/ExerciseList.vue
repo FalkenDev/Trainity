@@ -139,6 +139,7 @@
 </template>
 <script lang="ts" setup>
 import type { Exercise } from "@/interfaces/Exercise.interface";
+import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import { useExerciseStore } from "@/stores/exercise.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 
@@ -164,7 +165,6 @@ const muscleGroups = computed(() => {
 const selectedMuscleGroups = ref<number[]>([]);
 
 const openViewExercise = (exercise: Exercise) => {
-  console.log("Opening view exercise:", exercise);
   viewExercise.value = exercise;
   isViewExerciseOpen.value = true;
 };
@@ -179,8 +179,8 @@ const exercises = computed<Exercise[]>(() =>
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
-      exercise.muscleGroups?.some((mg: number) =>
-        selectedMuscleGroups.value.includes(mg)
+      exercise.muscleGroups?.some((mg: MuscleGroup) =>
+        selectedMuscleGroups.value.includes(mg.id)
       );
 
     return matchesSearch && matchesMuscleGroup;

@@ -44,7 +44,6 @@ export class WorkoutSessionController {
   @ApiOperation({ summary: 'Get all workout sessions for the user' })
   @ApiOkResponse({ type: [WorkoutSession] })
   getAll(@Req() req: RequestWithUser): Promise<WorkoutSession[]> {
-    console.log('Fetching all workout sessions for user:', this.getUserId(req));
     return this.sessionService.getAllSessions(this.getUserId(req));
   }
 

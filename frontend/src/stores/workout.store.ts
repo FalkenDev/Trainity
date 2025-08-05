@@ -38,7 +38,6 @@ export const useWorkoutStore = defineStore(
           }
         }
         lastFetched.value = now;
-        console.log("Workouts fetched:", workouts.value);
       } catch (error) {
         console.error("Error fetching workouts:", error);
       } finally {

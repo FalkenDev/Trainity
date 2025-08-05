@@ -38,7 +38,7 @@
           <div class="d-flex ga-2 align-center mt-2 flex-wrap">
             <v-chip
               v-for="group in (props.selectedExercise?.exercise?.muscleGroups || [])"
-              :key="group"
+              :key="group.id"
               color="green-lighten-1"
               label
             >
@@ -197,8 +197,6 @@ const props = defineProps<{
   isViewExercise: boolean;
   isViewWorkoutExercise: boolean;
 }>();
-
-console.log('selectedExercise', props.selectedExercise);
 
 const isViewExercise = ref(props.isViewExercise);
 

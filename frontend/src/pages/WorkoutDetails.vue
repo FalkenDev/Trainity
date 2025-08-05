@@ -184,7 +184,6 @@ const updateWorkoutExercises = async (newExerciseIds: number[]) => {
     await workoutStore.setWorkouts(true);
 
     const existingExerciseIds = selectedExerciseIds.value;
-    console.log("Existing exercise IDs:", existingExerciseIds);
 
     const exercisesToAdd = newExerciseIds.filter(
       (id) => !existingExerciseIds.includes(id),
@@ -219,7 +218,6 @@ const updateWorkoutExercises = async (newExerciseIds: number[]) => {
 const dublicate = async () => {
   if (workout.value) {
     const response = await dublicateWorkout(workout.value.id);
-    console.log("Duplicating workout:", response);
     if (response && response.id) {
       await workoutStore.setWorkouts(true);
       workoutStore.setCurrentWorkout(response.id);
