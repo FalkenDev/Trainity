@@ -11,6 +11,7 @@ import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
 import { WorkoutExercise } from './workoutExercise.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { UpdateWorkoutExerciseDto } from './dto/updateWorkoutExercise.dto';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class WorkoutService {
@@ -21,6 +22,7 @@ export class WorkoutService {
     private workoutExerciseRepo: Repository<WorkoutExercise>,
     @InjectRepository(WorkoutSession)
     private readonly workoutSessionRepository: Repository<WorkoutSession>,
+    private readonly dataSource: DataSource,
   ) {}
 
   private async findWorkoutForUser(
@@ -175,21 +177,25 @@ export class WorkoutService {
     });
     if (!workout) throw new NotFoundException('Workout not found');
 
-    await this.workoutSessionRepository.update(
-      { workout: { id } },
-      { workout: undefined },
-    );
+    await this.workoutSessionRepository
+      .createQueryBuilder()
+      .update()
+      .set({ workout: null as any })
+      .where('"workoutId" = :id', { id })
+      .execute();
+
     await this.workoutRepo.remove(workout);
 
     return { message: 'Workout deleted and references removed' };
   }
+
   async duplicateWorkout(
     id: number,
     userId: number,
   ): Promise<WorkoutResponseDto> {
     const original = await this.workoutRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['exercises', 'createdBy'],
+      relations: ['exercises', 'exercises.exercise', 'createdBy'],
     });
 
     if (!original) throw new NotFoundException('Workout not found');
@@ -206,15 +212,47 @@ export class WorkoutService {
       copyNumber = Math.max(copyNumber, number + 1);
     });
 
-    const duplicate = this.workoutRepo.create({
-      ...original,
-      title: `${baseTitle} (${copyNumber})`,
-      createdBy: original.createdBy,
-      id: undefined,
-    });
+    return await this.dataSource.transaction(async (manager) => {
+      const newWorkout = manager.create(Workout, {
+        title: `${baseTitle} (${copyNumber})`,
+        description: original.description,
+        time: original.time,
+        defaultWeightAndReps: original.defaultWeightAndReps,
+        createdBy: original.createdBy,
+      });
 
-    const saved = await this.workoutRepo.save(duplicate);
-    return this.toResponseDto(saved);
+      const savedWorkout = await manager.save(Workout, newWorkout);
+
+      const newWorkoutExercises = (original.exercises ?? [])
+        .sort((a, b) => a.order - b.order)
+        .map((we, idx) =>
+          manager.create(WorkoutExercise, {
+            workout: savedWorkout,
+            exercise: we.exercise,
+            order: we.order ?? idx + 1,
+            sets: we.sets,
+            reps: we.reps,
+            weight: we.weight,
+            pauseSeconds: we.pauseSeconds,
+          }),
+        );
+
+      if (newWorkoutExercises.length) {
+        await manager.save(WorkoutExercise, newWorkoutExercises);
+      }
+
+      const reloaded = await manager.findOneOrFail(Workout, {
+        where: { id: savedWorkout.id },
+        relations: [
+          'exercises',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+          'createdBy',
+        ],
+      });
+
+      return this.toResponseDto(reloaded);
+    });
   }
 
   private toResponseDto(workout: Workout): WorkoutResponseDto {
