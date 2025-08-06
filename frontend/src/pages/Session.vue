@@ -9,15 +9,14 @@
           <v-list-item>
             <v-list-item-title>Add Notes</v-list-item-title>
           </v-list-item>
-          <v-list-item>
+          <v-list-item @click="isAddExerciseOpen = true">
             <v-list-item-title>Add Exercise</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
     </BackHeader>
-    <div
-      class="my-3 d-flex justify-space-between align-center bg-grey-darken-4 pa-5"
-    >
+
+    <div class="my-3 d-flex justify-space-between align-center bg-grey-darken-4 pa-5">
       <p class="text-h6">
         {{ clock }}
       </p>
@@ -29,25 +28,25 @@
         Finnish
       </v-btn>
     </div>
+
     <div class="d-flex flex-column ga-5">
       <WorkoutExerciseCard
         v-for="exercise in processedExercises"
         :key="exercise.exerciseId"
         :exercise="exercise"
         :default-weight-and-reps="workoutSession?.workout.defaultWeightAndReps"
-        :workout-sets="allWorkoutSets[exercise.exerciseId] || []"
-        :rpe="exerciseMetadata[exercise.exerciseId]?.rpe"
-        :notes="exerciseMetadata[exercise.exerciseId]?.notes"
-        @update:set="handleSetUpdate(exercise.exerciseId, $event)"
-        @delete:set="handleSetDelete(exercise.exerciseId, $event)"
-        @delete:exercise="handleExerciseDelete(exercise.exerciseId)"
-        @add:set="handleSetAdd(exercise.exerciseId)"
-        @update:rpe="handleMetadataUpdate(exercise.exerciseId, { rpe: $event })"
-        @update:notes="
-          handleMetadataUpdate(exercise.exerciseId, { notes: $event })
-        "
+        :workout-sets="liveSets(exercise.exerciseId)"
+        :rpe="liveEx(exercise.exerciseId)?.rpe"
+        :notes="liveEx(exercise.exerciseId)?.notes"
+        @update:set="onUpdateSet(exercise.exerciseId, $event)"
+        @delete:set="onDeleteSet(exercise.exerciseId, $event)"
+        @delete:exercise="onDeleteExercise(exercise.exerciseId)"
+        @add:set="onAddSet(exercise.exerciseId)"
+        @update:rpe="onUpdateMeta(exercise.exerciseId, { rpe: $event })"
+        @update:notes="onUpdateMeta(exercise.exerciseId, { notes: $event })"
       />
     </div>
+
     <div class="d-flex flex-column justify-space-between my-5 mx-5 ga-5">
       <v-btn
         color="secondary"
@@ -63,13 +62,14 @@
         Finish Session
       </v-btn>
     </div>
+
     <v-dialog
       v-model="isAddExerciseOpen"
       fullscreen
     >
       <AddExerciseList
         v-if="isAddExerciseOpen"
-        :initial-selected-ids="processedExercises.map(e => e.exerciseId)"
+        :initial-selected-ids="processedExercises.map((e) => e.exerciseId)"
         @close="isAddExerciseOpen = false"
         @save="updateWorkoutSessionExercises"
       />
@@ -78,174 +78,167 @@
 </template>
 
 <script lang="ts" setup>
-// TODO: Save workout session state to local storage or store when leaving the page so it can be resumed later
-// TODO: Add functionality to add exercises to the session
-// TODO: Maybe change RPE to a div with buttons for 1-10 instead of a slider or a text input
-
+import { computed, onMounted, ref, watchEffect } from 'vue';
+import router from '@/router';
+import { toast } from 'vuetify-sonner';
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 import type {
   FinishedExercisePayload,
   WorkoutSession,
 } from '@/interfaces/workoutSession.interface';
+import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface';
+
 import { fetchExerciseById } from '@/services/exercise.service';
 import {
   abandonWorkoutSession,
   finishWorkoutSession,
 } from '@/services/workoutSession.service';
-import { toast } from 'vuetify-sonner';
-import router from '@/router';
-import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface';
 
 const isAddExerciseOpen = ref(false);
 const workoutSessionStore = useWorkoutSessionStore();
 const processedExercises = ref<Exercise[]>([]);
-const workoutSession = computed<WorkoutSession | null>(
-  () => workoutSessionStore.selectedWorkoutSession,
-);
-
-const allWorkoutSets = ref<Record<number, WorkoutSet[]>>({});
 const isLoading = ref(false);
-const exerciseMetadata = ref<Record<string, { rpe?: number; notes?: string }>>(
-  {},
+
+const workoutSession = computed<WorkoutSession | null>(
+  () => workoutSessionStore.selectedWorkoutSession as WorkoutSession | null,
 );
-
 const clock = computed(() => workoutSessionStore.formattedClock);
+const sessionId = computed(() => workoutSession.value?.id || 0);
 
-watchEffect(async () => {
-  if (!workoutSession.value) {
-    processedExercises.value = [];
-    allWorkoutSets.value = {};
-    exerciseMetadata.value = {};
-    return;
-  }
+function liveEx(exerciseId: number) {
+  return workoutSessionStore.getLiveSession(sessionId.value)?.exercises[exerciseId];
+}
 
-  const baseExercises = workoutSession.value.workoutSnapshot.exercises;
-  const newAllSets: Record<number, WorkoutSet[]> = {};
+function liveSets(exerciseId: number): WorkoutSet[] {
+  const ex = workoutSessionStore.getLiveSession(sessionId.value)?.exercises[exerciseId];
+  return ex ? ex.sets.map(s => ({
+    set: s.set,
+    weight: s.weight,
+    reps: s.reps,
+    done: s.done,
+    previous: s.previous ?? 'N/A',
+  })) : [];
+}
 
-  const exercisesWithDetails = await Promise.all(
-    baseExercises.map(async (baseExercise) => {
-      const exerciseDetails = await fetchExerciseById(baseExercise.exerciseId);
-      const setsArray: WorkoutSet[] = [];
-      for (let i = 1; i <= baseExercise.sets; i++) {
-        setsArray.push({
-          set: i,
-          previous: 'N/A',
-          weight: baseExercise.weight,
-          reps: baseExercise.reps,
-          done: false,
-        });
-      }
-      newAllSets[baseExercise.exerciseId] = setsArray;
-      return {
-        ...baseExercise,
-        id: baseExercise.exerciseId,
-        exercise: exerciseDetails,
-        pauseSeconds: baseExercise.pauseSeconds ?? 0,
-      };
-    }),
-  );
-
-  const newMetadata: Record<number, { rpe?: number; notes?: string }> = {};
-  for (const exercise of exercisesWithDetails) {
-    newMetadata[exercise.exerciseId] = { rpe: undefined, notes: '' };
-  }
-  exerciseMetadata.value = newMetadata;
-
-  processedExercises.value = exercisesWithDetails;
-  allWorkoutSets.value = newAllSets;
-});
-
-onMounted(() => {
-  if (workoutSessionStore.formattedClock === '00:00') {
-    workoutSessionStore.startClock();
-  }
-});
-
-function updateWorkoutSessionExercises(
-  newExerciseIds: number[],
-) {
+async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
   if (!workoutSession.value) return;
-
   isLoading.value = true;
   try {
-    const existingExerciseIds = processedExercises.value.map(
-      (e) => e.exerciseId,
-    );
+    const existingIds = processedExercises.value.map((e) => e.exerciseId);
+    const toAdd = newExerciseIds.filter((id) => !existingIds.includes(id));
+    const toRemove = existingIds.filter((id) => !newExerciseIds.includes(id));
 
-    const exercisesToAdd = newExerciseIds.filter(
-      (id) => !existingExerciseIds.includes(id),
-    );
-
-    const exercisesToRemove = existingExerciseIds.filter(
-      (id) => !newExerciseIds.includes(id),
-    );
-
-    if (exercisesToRemove.length > 0) {
-      console.log('Exercises to remove:', exercisesToRemove);
+    for (const id of toRemove) {
+      workoutSessionStore.removeExercise(sessionId.value, id);
+      const idx = processedExercises.value.findIndex((e) => e.exerciseId === id);
+      if (idx !== -1) processedExercises.value.splice(idx, 1);
     }
 
-    if (exercisesToAdd.length > 0) {
-      console.log('Exercises to add:', exercisesToAdd);
+    if (toAdd.length) {
+      const snapshotById = new Map<
+        number,
+        { sets: number; reps: number; weight: number; pauseSeconds?: number }
+      >();
+      for (const base of workoutSession.value.workoutSnapshot.exercises || []) {
+        snapshotById.set(base.exerciseId, {
+          sets: base.sets ?? 0,
+          reps: base.reps ?? 0,
+          weight: base.weight ?? 0,
+          pauseSeconds: base.pauseSeconds ?? 0,
+        });
+      }
+
+      for (const id of toAdd) {
+        const details = await fetchExerciseById(id);
+
+        const snap = snapshotById.get(id);
+        const plannedSets = (snap?.sets ?? 0) || details.defaultSets || 1;
+        const plannedReps = (snap?.reps ?? 0) || details.defaultReps || 8;
+        const plannedWeight = (snap?.weight ?? 0) || 0;
+        const pauseSeconds =
+          (snap?.pauseSeconds ?? undefined) ??
+          details.defaultPauseSeconds ??
+          60;
+
+        // 1) Upsert in live store
+        workoutSessionStore.upsertExercise(sessionId.value, id);
+
+        // 2) Seed sets in live store if empty
+        const live = workoutSessionStore.getLiveSession(sessionId.value);
+        const exLive = live?.exercises[id];
+        if (exLive && exLive.sets.length === 0) {
+          for (let i = 1; i <= plannedSets; i++) {
+            workoutSessionStore.addSet(sessionId.value, id);
+            workoutSessionStore.updateSet(sessionId.value, id, {
+              set: i,
+              weight: plannedWeight,
+              reps: plannedReps,
+              done: false,
+              previous: 'N/A',
+            });
+          }
+        }
+
+        // 3) Push to rendered list with real details
+        processedExercises.value.push({
+          exerciseId: id,
+          id,
+          order: 0,
+          sets: plannedSets,
+          reps: plannedReps,
+          weight: plannedWeight,
+          pauseSeconds,
+          exercise: {
+            id: details.id,
+            name: details.name,
+            description: details.description,
+            img: details.image ?? '',
+            muscleGroups: details.muscleGroups ?? [],
+            defaultSets: details.defaultSets ?? 0,
+            defaultReps: details.defaultReps ?? 0,
+            defaultPauseSeconds: details.defaultPauseSeconds ?? 0,
+            createdBy: details.createdBy ?? '',
+            createdAt: details.createdAt ?? '',
+            updatedAt: details.updatedAt ?? '',
+          },
+        } as Exercise);
+      }
     }
-  } catch (error) {
-    console.error('Error updating workout session exercises:', error);
-    toast.error('Failed to update workout session exercises.');
   } finally {
     isLoading.value = false;
+    isAddExerciseOpen.value = false;
   }
 }
 
-function handleExerciseDelete(exerciseId: number) {
-  const exerciseIndex = processedExercises.value.findIndex(
-    (e) => e.exerciseId === exerciseId,
-  );
-  if (exerciseIndex !== -1) {
-    processedExercises.value.splice(exerciseIndex, 1);
-    delete allWorkoutSets.value[exerciseId];
-    delete exerciseMetadata.value[exerciseId];
-  }
+function onDeleteExercise(exerciseId: number) {
+  workoutSessionStore.removeExercise(sessionId.value, exerciseId);
+  const idx = processedExercises.value.findIndex((e) => e.exerciseId === exerciseId);
+  if (idx !== -1) processedExercises.value.splice(idx, 1);
 }
 
-function handleMetadataUpdate(
+function onUpdateMeta(
   exerciseId: number,
   data: { rpe?: number; notes?: string },
 ) {
-  if (exerciseMetadata.value[exerciseId]) {
-    exerciseMetadata.value[exerciseId] = {
-      ...exerciseMetadata.value[exerciseId],
-      ...data,
-    };
-  }
+  workoutSessionStore.updateExerciseMeta(sessionId.value, exerciseId, data);
 }
 
-function handleSetUpdate(exerciseId: number, updatedSet: WorkoutSet) {
-  const sets = allWorkoutSets.value[exerciseId];
-  const setIndex = sets.findIndex((s) => s.set === updatedSet.set);
-  if (setIndex !== -1) {
-    sets[setIndex] = updatedSet;
-  }
-}
-
-function handleSetDelete(exerciseId: number, setToDelete: WorkoutSet) {
-  const sets = allWorkoutSets.value[exerciseId];
-  const setIndex = sets.findIndex((s) => s.set === setToDelete.set);
-  if (setIndex !== -1) {
-    sets.splice(setIndex, 1);
-    sets.forEach((s, i) => (s.set = i + 1));
-  }
-}
-
-function handleSetAdd(exerciseId: number) {
-  const sets = allWorkoutSets.value[exerciseId];
-  const lastSet =
-    sets.length > 0 ? sets[sets.length - 1] : { weight: 0, reps: 0 };
-  sets.push({
-    set: sets.length + 1,
-    previous: 'N/A',
-    weight: lastSet.weight,
-    reps: lastSet.reps,
-    done: false,
+function onUpdateSet(exerciseId: number, updatedSet: WorkoutSet) {
+  workoutSessionStore.updateSet(sessionId.value, exerciseId, {
+    set: updatedSet.set,
+    weight: updatedSet.weight,
+    reps: updatedSet.reps,
+    done: !!updatedSet.done,
+    previous: updatedSet.previous,
   });
+}
+
+function onDeleteSet(exerciseId: number, setToDelete: WorkoutSet) {
+  workoutSessionStore.deleteSet(sessionId.value, exerciseId, setToDelete.set);
+}
+
+function onAddSet(exerciseId: number) {
+  workoutSessionStore.addSet(sessionId.value, exerciseId);
 }
 
 const finnishSession = async () => {
@@ -256,52 +249,132 @@ const finnishSession = async () => {
   }
 
   isLoading.value = true;
-  const sessionId = workoutSession.value.id;
 
+  const live = workoutSessionStore.getLiveSession(sessionId.value);
   const completedExercises: FinishedExercisePayload[] = [];
 
-  for (const exercise of processedExercises.value) {
-    const setsForExercise = allWorkoutSets.value[exercise.exerciseId];
-    const performedSets = setsForExercise
-      .filter((set) => set.done)
-      .map((set) => ({
-        setNumber: set.set,
-        weight: set.weight,
-        reps: set.reps,
-      }));
-
-    if (performedSets.length > 0) {
-      const metadata = exerciseMetadata.value[exercise.exerciseId];
-      completedExercises.push({
-        exerciseId: exercise.exerciseId,
-        sets: performedSets,
-        rpe: metadata?.rpe,
-        notes: metadata?.notes,
-      });
+  if (live) {
+    for (const ex of Object.values(live.exercises)) {
+      const performed = (ex.sets || [])
+        .filter((s) => s.done)
+        .map((s) => ({ setNumber: s.set, weight: s.weight, reps: s.reps }));
+      if (performed.length > 0) {
+        completedExercises.push({
+          exerciseId: ex.exerciseId,
+          sets: performed,
+          rpe: ex.rpe,
+          notes: ex.notes,
+        });
+      }
     }
   }
+
   try {
     if (completedExercises.length === 0) {
-      await abandonWorkoutSession(sessionId);
+      await abandonWorkoutSession(sessionId.value);
       toast.info('No exercises completed. Session abandoned.');
       workoutSessionStore.stopClock();
       workoutSessionStore.selectedWorkoutSession = null;
       workoutSessionStore.resetClock();
+      workoutSessionStore.clearLiveSession(sessionId.value);
       router.push('/');
     } else {
       const finalPayload = { completedExercises, notes: '' };
-      await finishWorkoutSession(sessionId, finalPayload);
+      await finishWorkoutSession(sessionId.value, finalPayload);
       toast.success('Workout session finished successfully!');
+      workoutSessionStore.stopClock();
+      workoutSessionStore.selectedWorkoutSession = null;
+      workoutSessionStore.resetClock();
+      workoutSessionStore.clearLiveSession(sessionId.value);
+      router.push('/');
     }
-    workoutSessionStore.stopClock();
-    workoutSessionStore.selectedWorkoutSession = null;
-    workoutSessionStore.resetClock();
-    router.push('/');
-  } catch (error) {
-    console.error('Failed to finish workout session:', error);
+  } catch {
     toast.error('An error occurred while finishing the session.');
   } finally {
     isLoading.value = false;
   }
 };
+
+watchEffect(async () => {
+  const s = workoutSession.value;
+  if (!s) {
+    processedExercises.value = [];
+    return;
+  }
+
+  workoutSessionStore.initLiveSessionFromSnapshot(s);
+
+  const live = workoutSessionStore.getLiveSession(s.id);
+  const idsFromLive = live ? Object.keys(live.exercises).map(Number) : [];
+
+  let exerciseIds: number[];
+  if (idsFromLive.length) {
+    exerciseIds = idsFromLive;
+  } else {
+    exerciseIds = (s.workoutSnapshot.exercises || []).map((b) => b.exerciseId);
+  }
+
+  const detailsList = await Promise.all(
+    exerciseIds.map(async (id) => {
+      const d = await fetchExerciseById(id);
+      return { id, d };
+    }),
+  );
+
+  processedExercises.value = detailsList.map(({ id, d }) => {
+    const baseSnap = s.workoutSnapshot.exercises?.find((b) => b.exerciseId === id);
+    const liveEx = live?.exercises[id];
+
+    const plannedSets =
+      liveEx?.sets?.length ||
+      baseSnap?.sets ||
+      d.defaultSets ||
+      1;
+
+    const plannedReps =
+      (liveEx?.sets?.[0]?.reps ?? undefined) ||
+      baseSnap?.reps ||
+      d.defaultReps ||
+      8;
+
+    const plannedWeight =
+      (liveEx?.sets?.[0]?.weight ?? undefined) ||
+      baseSnap?.weight ||
+      0;
+
+    const pauseSeconds =
+      baseSnap?.pauseSeconds ??
+      d.defaultPauseSeconds ??
+      60;
+
+    return {
+      exerciseId: id,
+      id,
+      order: 0,
+      sets: plannedSets,
+      reps: plannedReps,
+      weight: plannedWeight,
+      pauseSeconds,
+      exercise: {
+        id: d.id,
+        name: d.name,
+        description: d.description,
+        img: d.image ?? '',
+        muscleGroups: d.muscleGroups ?? [],
+        defaultSets: d.defaultSets ?? 0,
+        defaultReps: d.defaultReps ?? 0,
+        defaultPauseSeconds: d.defaultPauseSeconds ?? 0,
+        createdBy: d.createdBy ?? '',
+        createdAt: d.createdAt ?? '',
+        updatedAt: d.updatedAt ?? '',
+      },
+    } as Exercise;
+  });
+});
+
+onMounted(() => {
+  if (workoutSessionStore.formattedClock === '00:00') {
+    workoutSessionStore.startClock();
+  }
+});
 </script>
