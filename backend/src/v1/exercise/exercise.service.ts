@@ -5,12 +5,14 @@ import { Exercise } from './exercise.entity';
 import { CreateExerciseDto } from './dto/createExercise.dto';
 import { UpdateExerciseDto } from './dto/updateExercise.dto';
 import { ExerciseResponseDto } from './dto/exerciseResponse.dto';
+import { MuscleGroupService } from '../muscleGroup/muscleGroup.service';
 
 @Injectable()
 export class ExerciseService {
   constructor(
     @InjectRepository(Exercise)
     private readonly exerciseRepo: Repository<Exercise>,
+    private readonly muscleGroupService: MuscleGroupService,
   ) {}
 
   private toResponseDto(exercise: Exercise): ExerciseResponseDto {
@@ -19,6 +21,9 @@ export class ExerciseService {
       name: exercise.name,
       description: exercise.description,
       createdAt: exercise.createdAt,
+      defaultPauseSeconds: exercise.defaultPauseSeconds,
+      defaultReps: exercise.defaultReps,
+      defaultSets: exercise.defaultSets,
       muscleGroups:
         exercise.muscleGroups?.map((mg) => ({
           id: mg.id,
@@ -74,16 +79,27 @@ export class ExerciseService {
     dto: UpdateExerciseDto,
     userId: number,
   ): Promise<ExerciseResponseDto> {
-    const existing = await this.exerciseRepo.findOne({
-      where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups'],
+    const { muscleGroupIds, ...exerciseData } = dto;
+
+    const existing = await this.exerciseRepo.findOneBy({
+      id,
+      createdBy: { id: userId },
     });
 
     if (!existing) {
       throw new NotFoundException('Exercise not found');
     }
 
-    Object.assign(existing, dto);
+    Object.assign(existing, exerciseData);
+
+    // Check if muscleGroupIds were provided in the DTO
+    if (muscleGroupIds) {
+      // Use the service to find the entities
+      const newMuscleGroups =
+        await this.muscleGroupService.findByIds(muscleGroupIds);
+      existing.muscleGroups = newMuscleGroups;
+    }
+
     const updated = await this.exerciseRepo.save(existing);
     return this.toResponseDto(updated);
   }

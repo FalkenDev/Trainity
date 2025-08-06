@@ -76,12 +76,10 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore(); // Get store instance inside the guard
   const isAuthenticated = authStore.isAuthenticated;
 
-  console.log(isAuthenticated, 'isAuthenticated in guard');
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
   const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
 
   if (requiresAuth && !isAuthenticated) {
-    console.log(`Guard: Auth required for ${to.path}, redirecting to /login`);
     next({
       path: '/login',
       query: { redirect: to.fullPath },
@@ -89,7 +87,6 @@ router.beforeEach(async (to, from, next) => {
   } else if (requiresGuest && isAuthenticated) {
     next('/dashboard');
   } else {
-    console.log(`Guard: Allowing navigation to ${to.path}`);
     next();
   }
 });
@@ -97,7 +94,6 @@ router.beforeEach(async (to, from, next) => {
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
     if (!localStorage.getItem('vuetify:dynamic-reload')) {
-      console.log('Reloading page to fix dynamic import error');
       localStorage.setItem('vuetify:dynamic-reload', 'true');
       location.assign(to.fullPath);
     } else {

@@ -6,8 +6,6 @@ import type {
 
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
-
 export const fetchAllWorkoutSessions = async () => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutSessions`);
@@ -22,7 +20,7 @@ export const fetchAllWorkoutSessions = async () => {
   }
 };
 
-export const startWorkoutSession = async (workoutId: string) => {
+export const startWorkoutSession = async (workoutId: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workoutsessions`, {
       method: 'POST',
@@ -35,6 +33,25 @@ export const startWorkoutSession = async (workoutId: string) => {
     return data;
   } catch (error) {
     console.error('Error starting workout session:', error);
+    throw error;
+  }
+};
+
+export const abandonWorkoutSession = async (sessionId: number) => {
+  try {
+    const response = await fetchWrapper(
+      `${apiUrl}/workoutsessions/${sessionId}/abandon`,
+      {
+        method: 'POST',
+      },
+    );
+    if (!response.ok) {
+      throw new Error('Failed to abandon workout session');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error abandoning workout session:', error);
     throw error;
   }
 };
@@ -61,7 +78,7 @@ export const startWorkoutSession = async (workoutId: string) => {
 //   }
 // };
 
-export const getWorkoutSessionById = async (sessionId: string) => {
+export const getWorkoutSessionById = async (sessionId: number) => {
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,
@@ -78,7 +95,7 @@ export const getWorkoutSessionById = async (sessionId: string) => {
 };
 
 export const updateWorkoutSession = async (
-  sessionId: string,
+  sessionId: number,
   sessionData: WorkoutSession,
 ) => {
   try {
@@ -101,24 +118,24 @@ export const updateWorkoutSession = async (
 };
 
 export const finishWorkoutSession = async (
-  sessionId: string,
+  sessionId: number,
   payload: FinishSessionPayload,
 ) => {
   const response = await fetchWrapper(
-    `${apiUrl}/workoutsessions/${sessionId}/finish`,
+    `${apiUrl}/workoutSessions/${sessionId}/complete`,
     {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     },
   );
   if (!response.ok) {
     throw new Error('Failed to finish workout session');
-
   }
   return await response.json();
 };
 
-export const deleteWorkoutSession = async (sessionId: string) => {
+export const deleteWorkoutSession = async (sessionId: number) => {
   try {
     const response = await fetchWrapper(
       `${apiUrl}/workoutsessions/${sessionId}`,

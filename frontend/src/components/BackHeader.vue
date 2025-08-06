@@ -53,7 +53,6 @@ const emit = defineEmits<{
 
 const routeTo = () => {
   if (props.routeTo) {
-    console.log("Navigating to:", props.routeTo);
     router.push(props.routeTo);
   }
 };

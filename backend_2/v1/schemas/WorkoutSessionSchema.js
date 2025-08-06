@@ -7,7 +7,7 @@ const SetSchema = new Schema(
     weight: { type: Number, required: true },
     reps: { type: Number, required: true },
   },
-  { _id: false }
+  { id: false }
 );
 
 const WorkoutSessionExerciseSchema = new Schema(
@@ -27,7 +27,7 @@ const WorkoutSessionExerciseSchema = new Schema(
     notes: { type: String, trim: true },
     rpe: { type: Number, min: 1, max: 10 },
   },
-  { _id: false }
+  { id: false }
 );
 
 const WorkoutSessionSchema = new Schema(

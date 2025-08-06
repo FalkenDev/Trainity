@@ -57,8 +57,8 @@
               <v-divider />
               <v-list-item
                 v-for="muscleGroup in muscleGroups"
-                :key="muscleGroup._id"
-                :value="muscleGroup._id"
+                :key="muscleGroup.id"
+                :value="muscleGroup.id"
               >
                 <template #prepend="{ isActive }">
                   <v-list-item-action start>
@@ -77,7 +77,7 @@
     <v-list>
       <v-list-item
         v-for="exercise in exercises"
-        :key="exercise._id"
+        :key="exercise.id"
         class="border-t-sm border-b-sm py-2"
         two-line
         @click.stop="openViewExercise(exercise)"
@@ -139,6 +139,7 @@
 </template>
 <script lang="ts" setup>
 import type { Exercise } from "@/interfaces/Exercise.interface";
+import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import { useExerciseStore } from "@/stores/exercise.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 
@@ -157,14 +158,13 @@ const emit = defineEmits<{
 const muscleGroups = computed(() => {
   return muscleGroupStore.muscleGroups.map((group) => ({
     name: group.name,
-    _id: group._id,
+    id: group.id,
   }));
 });
 
-const selectedMuscleGroups = ref<string[]>([]);
+const selectedMuscleGroups = ref<number[]>([]);
 
 const openViewExercise = (exercise: Exercise) => {
-  console.log("Opening view exercise:", exercise);
   viewExercise.value = exercise;
   isViewExerciseOpen.value = true;
 };
@@ -179,8 +179,8 @@ const exercises = computed<Exercise[]>(() =>
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
-      exercise.muscleGroups?.some((mg: string) =>
-        selectedMuscleGroups.value.includes(mg)
+      exercise.muscleGroups?.some((mg: MuscleGroup) =>
+        selectedMuscleGroups.value.includes(mg.id)
       );
 
     return matchesSearch && matchesMuscleGroup;

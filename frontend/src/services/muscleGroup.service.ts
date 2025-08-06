@@ -36,7 +36,7 @@ export const createMuscleGroup = async (muscleGroup: {
   }
 };
 
-export const getMuscleGroupById = async (id: string) => {
+export const getMuscleGroupById = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/muscleGroups/${id}`);
     if (!response.ok) {
@@ -51,7 +51,7 @@ export const getMuscleGroupById = async (id: string) => {
 };
 
 export const updateMuscleGroup = async (
-  id: string,
+  id: number,
   muscleGroup: { name: string; description?: string }
 ) => {
   try {
@@ -70,7 +70,7 @@ export const updateMuscleGroup = async (
   }
 };
 
-export const deleteMuscleGroup = async (id: string) => {
+export const deleteMuscleGroup = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/muscleGroups/${id}`, {
       method: "DELETE",

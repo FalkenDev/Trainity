@@ -44,7 +44,6 @@ export class WorkoutSessionController {
   @ApiOperation({ summary: 'Get all workout sessions for the user' })
   @ApiOkResponse({ type: [WorkoutSession] })
   getAll(@Req() req: RequestWithUser): Promise<WorkoutSession[]> {
-    console.log('Fetching all workout sessions for user:', this.getUserId(req));
     return this.sessionService.getAllSessions(this.getUserId(req));
   }
 
@@ -116,7 +115,36 @@ export class WorkoutSessionController {
   complete(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: RequestWithUser,
+    @Body()
+    payload: {
+      completedExercises?: {
+        exerciseId: number;
+        notes?: string;
+        sets: {
+          setNumber: number;
+          weight: number;
+          reps: number;
+          rpe?: number;
+          notes?: string;
+        }[];
+      }[];
+      notes?: string;
+    },
   ): Promise<WorkoutSession> {
-    return this.sessionService.completeSession(id, this.getUserId(req));
+    return this.sessionService.completeSession(
+      id,
+      this.getUserId(req),
+      payload,
+    );
+  }
+
+  @Post(':id/abandon')
+  @ApiOperation({ summary: 'Mark session as abandoned' })
+  @ApiOkResponse({ type: WorkoutSession })
+  abandon(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: RequestWithUser,
+  ): Promise<WorkoutSession> {
+    return this.sessionService.abandonSession(id, this.getUserId(req));
   }
 }
