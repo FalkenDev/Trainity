@@ -1,5 +1,5 @@
 export interface Workout {
-  _id: string;
+  id: number;
   title: string;
   time: number;
   description?: string;
@@ -10,25 +10,25 @@ export interface Workout {
 }
 
 export interface Exercise {
+  id: number;
   order: number;
   sets: number;
   reps: number;
   weight: number;
   pauseSeconds: number;
-  exerciseId: string;
+  exerciseId: number;
   exercise: {
-    _id: string;
+    id: number;
     name: string;
     description: string;
     img: string;
-    muscleGroups: string[];
+    muscleGroups: MuscleGroup[];
     defaultSets: number;
     defaultReps: number;
     defaultPauseSeconds: number;
     createdBy: string;
     createdAt: string;
     updatedAt: string;
-    __v: number;
   };
 }
 
@@ -47,7 +47,7 @@ type FinishedSetPayload = {
 };
 
 export interface WorkoutExercisePayload {
-  exerciseId: string;
+  exerciseId: number;
   sets: [FinishedSetPayload, ...FinishedSetPayload[]];
 }
 
@@ -57,7 +57,7 @@ export interface CreateWorkout {
   description?: string;
   exercises: [
     {
-      exerciseId: string;
+      exerciseId: number;
       order: number;
       sets: number;
       reps: number;
@@ -75,10 +75,25 @@ export interface UpdateWorkout {
 }
 
 export interface AddExerciseToWorkout {
-  exerciseId: string;
+  exerciseId: number;
   order: number;
   sets: number;
   reps: number;
   weight: number;
   pauseSeconds: number;
+}
+
+export interface UpdateWorkoutExercise {
+  sets?: number;
+  reps?: number;
+  weight?: number;
+  pauseSeconds?: number;
+}
+
+export interface MuscleGroup {
+  id: number;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }

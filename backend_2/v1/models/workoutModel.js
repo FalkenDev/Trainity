@@ -12,7 +12,7 @@ const workoutModel = {
       const result = workouts.map((workout) => ({
         ...workout.toObject(),
         exercises: workout.exercises.map((e) => ({
-          _id: e._id,
+          id: e.id,
           order: e.order,
           sets: e.sets,
           reps: e.reps,
@@ -40,17 +40,10 @@ const workoutModel = {
 
   addExerciseToWorkout: async function (req, res) {
     const { exerciseId, order, sets, reps, weight, pauseSeconds } = req.body;
-    console.log("Adding exercise to workout:", {
-      exerciseId,
-      order,
-      sets,
-      reps,
-      weight,
-      pauseSeconds,
-    });
+
     try {
       const workout = await Workout.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         createdBy: req.user.id,
       });
 
@@ -91,7 +84,7 @@ const workoutModel = {
       }
 
       const workout = await Workout.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         createdBy: req.user.id,
       });
 
@@ -104,7 +97,7 @@ const workoutModel = {
         const exercise = await Exercise.findById(exerciseId);
         if (exercise) {
           newExercises.push({
-            exerciseId: exercise._id,
+            exerciseId: exercise.id,
             order: workout.exercises.length + newExercises.length + 1,
             sets: exercise.defaultSets || 3,
             reps: exercise.defaultReps || 10,
@@ -119,7 +112,7 @@ const workoutModel = {
       }
       
       await Workout.updateOne(
-        { _id: workout._id },
+        { id: workout.id },
         {
           $push: {
             exercises: { $each: newExercises }
@@ -127,7 +120,7 @@ const workoutModel = {
         }
       );
       
-      const updatedWorkout = await Workout.findById(workout._id);
+      const updatedWorkout = await Workout.findById(workout.id);
 
       res.status(201).json(updatedWorkout);
     } catch (error) {
@@ -140,7 +133,7 @@ const workoutModel = {
 
     try {
       const workout = await Workout.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         createdBy: req.user.id,
       });
 
@@ -194,7 +187,7 @@ const workoutModel = {
   removeExerciseFromWorkout: async function (req, res) {
     try {
       const workout = await Workout.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         createdBy: req.user.id,
       });
 
@@ -230,7 +223,7 @@ const workoutModel = {
       }
 
       const result = await Workout.updateOne(
-        { _id: workoutId, createdBy: req.user.id },
+        { id: workoutId, createdBy: req.user.id },
         {
           $pull: {
             exercises: {
@@ -257,7 +250,7 @@ const workoutModel = {
   getWorkout: async function (req, res) {
     try {
       const workout = await Workout.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         createdBy: req.user.id,
       });
       if (!workout) {
@@ -285,7 +278,7 @@ const workoutModel = {
       });
 
       const updatedWorkout = await Workout.findOneAndUpdate(
-        { _id: req.params.id, createdBy: req.user.id },
+        { id: req.params.id, createdBy: req.user.id },
         updates,
         { new: true, runValidators: true }
       );
@@ -304,7 +297,7 @@ const workoutModel = {
       const workoutId = req.params.id;
 
       const deletedWorkout = await Workout.findOneAndDelete({
-        _id: workoutId,
+        id: workoutId,
         createdBy: req.user.id,
       });
       if (!deletedWorkout) {
@@ -327,7 +320,7 @@ const workoutModel = {
   duplicateWorkout: async function (req, res) {
     try {
       const originalWorkout = await Workout.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         createdBy: req.user.id,
       });
 
@@ -351,7 +344,7 @@ const workoutModel = {
         copyNumber = Math.max(...numbers) + 1;
       }
 
-      const { _id, ...workoutData } = originalWorkout.toObject();
+      const { id, ...workoutData } = originalWorkout.toObject();
 
       const newWorkout = new Workout({
         ...workoutData,

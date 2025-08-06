@@ -52,9 +52,9 @@ const authStore = useAuthStore();
 const routeToSelectedWorkoutSession = () => {
   if (
     workoutSessionStore.selectedWorkoutSession &&
-    workoutSessionStore.selectedWorkoutSession._id
+    workoutSessionStore.selectedWorkoutSession.id
   ) {
-    router.push("/session/" + workoutSessionStore.selectedWorkoutSession._id);
+    router.push("/session/" + workoutSessionStore.selectedWorkoutSession.id);
   }
 };
 

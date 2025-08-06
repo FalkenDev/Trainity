@@ -1,5 +1,3 @@
-// workoutExercise.entity.ts
-
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Workout } from './workout.entity';
 import { Exercise } from '../exercise/exercise.entity';

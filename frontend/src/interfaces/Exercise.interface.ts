@@ -1,16 +1,15 @@
 export interface Exercise {
-  _id: string;
+  id: number;
   name: string;
   description: string;
-  img: string;
-  muscleGroups: string[];
+  image: string;
+  muscleGroups: MuscleGroup[];
   defaultSets: number;
   defaultReps: number;
   defaultPauseSeconds: number;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  __v: number;
 }
 
 export interface CreateExercise {
@@ -24,11 +23,20 @@ export interface CreateExercise {
 }
 
 export interface UpdateExercise {
+  id: number;
   name: string;
   description: string;
   image?: string | null;
-  muscleGroups: string[];
+  muscleGroups: number[];
   defaultSets: number;
   defaultReps: number;
   defaultPauseSeconds: number;
+}
+
+export interface MuscleGroup {
+  id: number;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }

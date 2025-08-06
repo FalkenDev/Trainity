@@ -1,13 +1,36 @@
 import 'reflect-metadata';
 import * as bcrypt from 'bcrypt';
+import { DataSource } from 'typeorm';
 
 import { User } from '../user/user.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { Workout } from '../workout/workout.entity';
-import { WorkoutExercise } from '../workout/workoutExercise.entity'; // If using join table
-
+import { WorkoutExercise } from '../workout/workoutExercise.entity';
+import { WorkoutSession } from '../workoutSession/workoutSession.entity';
+import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
+import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { MuscleGroup } from '../muscleGroup/muscleGroup.entity';
-import { AppDataSource } from '../dataSource';
+
+const AppDataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.DATABASE_HOST || 'postgres',
+  port: +(process.env.DATABASE_PORT || 5432),
+  username: process.env.DATABASE_USER || 'user',
+  password: process.env.DATABASE_PASSWORD || 'password',
+  database: process.env.DATABASE_NAME || 'trainitydb',
+  entities: [
+    User,
+    Exercise,
+    Workout,
+    WorkoutExercise,
+    WorkoutSession,
+    WorkoutSessionExercise,
+    WorkoutSessionSet,
+    MuscleGroup,
+  ],
+  synchronize: false,
+  logging: ['error', 'warn', 'query'],
+});
 
 const usersToSeed = [
   {
@@ -139,77 +162,84 @@ const workoutsToSeed = [
 ];
 
 async function seed() {
-  try {
-    await AppDataSource.initialize();
-    console.log('✅ Database connected');
+  await AppDataSource.initialize();
+  console.log(
+    '✅ Database connected:',
+    AppDataSource.options.type,
+    AppDataSource.options.database,
+  );
 
-    // Clear tables
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.startTransaction();
+
+  try {
+    // Clear tables respecting FKs
+    await AppDataSource.query(
+      `
+      TRUNCATE TABLE
+        "workout_session_set",
+        "workout_session_exercise",
+        "workout_session",
+        "workout_exercise",
+        "workout",
+        "exercise_muscle_groups_muscle_group" RESTART IDENTITY CASCADE;
+    `,
+    ).catch(() => {});
+
     await AppDataSource.query(`
-  TRUNCATE TABLE
-    "workout_session_set",
-    "workout_session_exercise",
-    "workout_session",
-    "workout_exercise",
-    "workout",
-    "exercise",
-    "muscle_group",
-    "user"
-  RESTART IDENTITY CASCADE
-`);
+      TRUNCATE TABLE
+        "exercise",
+        "muscle_group",
+        "user" RESTART IDENTITY CASCADE;
+    `);
 
     console.log('🧹 Cleared existing data');
 
-    // Seed users
     const userRepo = AppDataSource.getRepository(User);
-    const createdUsers = [];
+    const mgRepo = AppDataSource.getRepository(MuscleGroup);
+    const exRepo = AppDataSource.getRepository(Exercise);
+    const workoutRepo = AppDataSource.getRepository(Workout);
+    const workoutExerciseRepo = AppDataSource.getRepository(WorkoutExercise);
 
+    // Users
+    const createdUsers: User[] = [];
     for (const u of usersToSeed) {
       const password = await bcrypt.hash(u.password, 10);
       const user = userRepo.create({ ...u, password });
       await userRepo.save(user);
       createdUsers.push(user);
     }
-
     const mainUser = createdUsers[0];
     console.log(`👤 Seeded user: ${mainUser.email}`);
 
-    // Seed muscle groups
-    const mgRepo = AppDataSource.getRepository(MuscleGroup);
+    // Muscle groups
     const savedMGs = await mgRepo.save(muscleGroupsToSeed);
-
     const mgMap = new Map<string, MuscleGroup>();
-    savedMGs.forEach((mg: MuscleGroup) => mgMap.set(mg.name, mg));
-
+    savedMGs.forEach((mg) => mgMap.set(mg.name, mg));
     console.log('💪 Seeded muscle groups');
 
-    // Seed exercises
-    const exRepo = AppDataSource.getRepository(Exercise);
-    const createdExercises = [];
-
+    // Exercises
+    const createdExercises: Exercise[] = [];
     for (const ex of exercisesToSeed) {
       const exercise = exRepo.create({
         name: ex.name,
         description: ex.description,
         muscleGroups: ex.muscleGroups
           .map((name) => mgMap.get(name))
-          .filter((mg): mg is MuscleGroup => Boolean(mg)),
+          .filter((mg): mg is MuscleGroup => !!mg),
         defaultSets: ex.defaultSets,
         defaultReps: ex.defaultReps,
         defaultPauseSeconds: ex.defaultPauseSeconds,
         createdBy: mainUser,
       });
-
       await exRepo.save(exercise);
       createdExercises.push(exercise);
     }
-
     const exerciseMap = new Map<string, Exercise>();
     createdExercises.forEach((e) => exerciseMap.set(e.name, e));
-
     console.log('🏋️ Seeded exercises');
 
-    // Seed workouts
-    const workoutRepo = AppDataSource.getRepository(Workout);
+    // Workouts and WorkoutExercises
     for (const w of workoutsToSeed) {
       const workout = workoutRepo.create({
         title: w.title,
@@ -217,38 +247,40 @@ async function seed() {
         time: w.time,
         createdBy: mainUser,
       });
-
       await workoutRepo.save(workout);
 
       for (const e of w.exercises) {
-        const workoutExercise = new WorkoutExercise();
-        workoutExercise.workout = workout;
         const exercise = exerciseMap.get(e.exerciseName);
-        if (!exercise) {
-          throw new Error(
-            `Exercise "${e.exerciseName}" not found in exerciseMap`,
-          );
-        }
-        workoutExercise.exercise = exercise;
-        workoutExercise.order = e.order;
-        workoutExercise.sets = e.sets;
-        workoutExercise.reps = e.reps;
-        workoutExercise.weight = e.weight;
-        workoutExercise.pauseSeconds = e.pauseSeconds;
-        await AppDataSource.getRepository(WorkoutExercise).save(
-          workoutExercise,
-        );
+        if (!exercise)
+          throw new Error(`Exercise "${e.exerciseName}" not found`);
+        const we = workoutExerciseRepo.create({
+          workout,
+          exercise,
+          order: e.order,
+          sets: e.sets,
+          reps: e.reps,
+          weight: e.weight,
+          pauseSeconds: e.pauseSeconds,
+        });
+        await workoutExerciseRepo.save(we);
       }
     }
-
     console.log('📅 Seeded workouts');
 
-    console.log('\n✅ Database successfully seeded!');
+    await queryRunner.commitTransaction();
+    console.log('✅ Database successfully seeded!');
     process.exit(0);
   } catch (err) {
+    await queryRunner.rollbackTransaction();
     console.error('❌ Error during seeding:', err);
     process.exit(1);
+  } finally {
+    await queryRunner.release();
+    await AppDataSource.destroy();
   }
 }
 
-seed();
+seed().catch((e) => {
+  console.error('❌ Unhandled seeding error:', e);
+  process.exit(1);
+});
