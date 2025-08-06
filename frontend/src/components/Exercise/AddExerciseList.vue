@@ -171,8 +171,10 @@ const exercises = computed<Exercise[]>(() =>
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
-      exercise.muscleGroups?.some((mg: number) =>
-        selectedMuscleGroups.value.includes(mg)
+      (Array.isArray(exercise.muscleGroups) &&
+        exercise.muscleGroups
+          .map((mg: number | { id: number }) => typeof mg === "object" ? mg.id : mg)
+          .some((mgId: number) => selectedMuscleGroups.value.includes(mgId))
       );
 
     return matchesSearch && matchesMuscleGroup;
