@@ -70,6 +70,10 @@ const options = [
 
 const editWeightAndReps = async (value: "default" | "latest" | "exercise") => {
   try {
+    if (!props.workoutId) {
+      console.error("Workout ID is not defined");
+      return;
+    }
     const response = await updateWorkout(props.workoutId, {
       defaultWeightAndReps: value,
     });
@@ -82,7 +86,7 @@ const editWeightAndReps = async (value: "default" | "latest" | "exercise") => {
 };
 
 const props = defineProps<{
-  workoutId: string;
+  workoutId: number | undefined;
   defaultWeightAndReps: string;
 }>();
 </script>

@@ -1,110 +1,353 @@
 <template>
-  <div class="d-flex justify-space-between align-center">
-    <h1 class="text-h5 font-weight-bold">
-      My Workouts
-    </h1>
-  </div>
-  <div v-if="!workouts.length">
-    <v-skeleton-loader
-      v-for="n in 3"
-      :key="n"
-      type="list-item-two-line"
-      class="mb-4"
-    />
-  </div>
-  <div v-else>
-    <v-card
-      v-for="workout in workouts"
-      :key="workout._id"
-      class="mb-4 pa-4"
-      variant="flat"
-      style="
-        border-radius: 16px;
-        background: linear-gradient(135deg, #1a1a1a 50%, #0f0f0f 100%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      "
-      @click="routeTo(workout._id)"
-    >
-      <div class="d-flex justify-space-between align-center">
-        <div class="d-flex flex-column ga-2">
-          <h2 class="text-h6 font-weight-bold">
-            {{ workout.title }}
-          </h2>
-          <div class="d-flex flex-wrap align-center ga-2">
-            <v-chip
-              v-for="group in getMuscleGroupsForWorkout(workout)"
-              :key="group"
-              size="small"
-              color="orange-darken-2"
-              variant="flat"
-              class="font-weight-bold"
-            >
-              {{ group }}
-            </v-chip>
+  <div
+    fluid
+    class="pa-0"
+  >
+    <div class="header pt-4 pb-2">
+      <div class="d-flex align-center justify-space-between">
+        <div>
+          <div class="text-overline text-secondary">
+            Workouts
           </div>
-          <div class="text-body-2 d-flex align-center ga-2 text-grey-lighten-1">
-            <span>{{ workout.exercises.length }} exercises</span>
-            <v-icon size="4">
-              mdi-circle
-            </v-icon>
-            <span>{{ workout.time }} min</span>
+          <h1 class="text-h6 font-weight-bold mb-0">
+            My Workouts
+          </h1>
+          <div class="text-caption text-medium-emphasis mt-1">
+            {{ workouts.length }} total
           </div>
         </div>
-        <v-icon
-          color="grey-darken-1"
-          size="32"
+        <v-btn
+          :loading="loading"
+          size="small"
+          color="primary"
+          variant="tonal"
+          prepend-icon="mdi-refresh"
+          @click="refresh"
         >
-          mdi-chevron-right
-        </v-icon>
+          Refresh
+        </v-btn>
       </div>
-    </v-card>
+    </div>
+
+    <!-- Skeletons -->
+    <div
+      v-if="!workouts.length && loading"
+      class="px-4"
+    >
+      <v-skeleton-loader
+        v-for="n in 4"
+        :key="n"
+        type="image, list-item-two-line, list-item"
+        class="mb-4 rounded-xl"
+      />
+    </div>
+
+    <!-- Empty state -->
+    <div
+      v-else-if="!workouts.length"
+      class="px-4 mt-6"
+    >
+      <v-card
+        class="empty rounded-xl pa-6"
+        variant="outlined"
+      >
+        <div class="d-flex flex-column align-center text-center">
+          <v-icon
+            color="primary"
+            size="48"
+          >
+            mdi-dumbbell
+          </v-icon>
+          <div class="text-subtitle-1 font-weight-medium mt-2">
+            No workouts yet
+          </div>
+          <div class="text-body-2 text-medium-emphasis mt-1">
+            Create your first workout and start training.
+          </div>
+          <v-btn
+            class="mt-4"
+            color="primary"
+            @click="$router.push('/workouts/new')"
+          >
+            Create Workout
+          </v-btn>
+        </div>
+      </v-card>
+    </div>
+
+    <!-- List -->
+    <div
+      v-else
+      class="pb-6"
+    >
+      <v-row dense>
+        <v-col
+          v-for="workout in workouts"
+          :key="workout.id"
+          cols="12"
+        >
+          <v-card
+            class="workout-card"
+            variant="flat"
+            rounded="xl"
+            @click="routeTo(workout.id)"
+          >
+            <div class="card-gradient" />
+
+            <div class="d-flex align-center">
+              <div class="icon-wrap mr-3">
+                <v-icon
+                  color="primary"
+                  size="28"
+                >
+                  mdi-dumbbell
+                </v-icon>
+              </div>
+
+              <div class="flex-1">
+                <div class="d-flex align-center justify-space-between">
+                  <div class="text-subtitle-1 font-weight-bold ellipsis">
+                    {{ workout.title }}
+                  </div>
+                  <v-icon
+                    class="ml-2"
+                    color="grey"
+                    size="22"
+                  >
+                    mdi-chevron-right
+                  </v-icon>
+                </div>
+
+                <div class="text-caption text-medium-emphasis mt-1 d-flex align-center ga-3">
+                  <span>{{ workout.exercises.length }} exercises</span>
+                  <span class="dot" />
+                  <span>{{ workout.time }} min</span>
+                </div>
+
+                <!-- Muscle groups -->
+                <div class="d-flex align-center flex-wrap mt-2 chips-wrap">
+                  <template
+                    v-for="(group, idx) in getMuscleGroupsForWorkout(workout).slice(0, 3)"
+                    :key="group"
+                  >
+                    <v-chip
+                      :color="chipColorAt(idx)"
+                      variant="flat"
+                      size="x-small"
+                      class="mr-2 mb-2 font-weight-medium"
+                    >
+                      {{ group }}
+                    </v-chip>
+                  </template>
+                  <v-chip
+                    v-if="getMuscleGroupsForWorkout(workout).length > 3"
+                    size="x-small"
+                    variant="text"
+                    class="mr-2 mb-2"
+                  >
+                    +{{ getMuscleGroupsForWorkout(workout).length - 3 }}
+                  </v-chip>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer row -->
+            <div class="d-flex align-center justify-space-between mt-3">
+              <div class="text-caption text-medium-emphasis">
+                Updated
+                {{
+                  new Date(workout.updatedAt as any).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                  })
+                }}
+              </div>
+              <div class="d-flex ga-2">
+                <v-btn
+                  size="small"
+                  variant="text"
+                  color="primary"
+                  prepend-icon="mdi-play"
+                >
+                  Start
+                </v-btn>
+                <v-btn
+                  size="small"
+                  variant="text"
+                  color="secondary"
+                  prepend-icon="mdi-content-duplicate"
+                  @click.stop="$router.push(`/workouts/${workout.id}/duplicate`)"
+                >
+                  Duplicate
+                </v-btn>
+              </div>
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </div>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { computed } from "vue";
-import type { Workout } from "@/interfaces/Workout.interface";
-import router from "@/router";
-import { useWorkoutStore } from "@/stores/workout.store";
-import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
-import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useWorkoutStore } from '@/stores/workout.store';
+import type { Workout } from '@/interfaces/Workout.interface';
 
-const muscleGroupStore = useMuscleGroupStore();
+const router = useRouter();
 const workoutStore = useWorkoutStore();
 
-const workouts = computed<Workout[]>(() => workoutStore.workouts);
+const loading = ref(false);
 
-const getMuscleGroupsForWorkout = (workout: Workout): string[] => {
-  if (!workout.exercises || workout.exercises.length === 0) {
-    return [];
-  }
+const workouts = computed<Workout[]>(() => {
+  const list = workoutStore.workouts || [];
+  return [...list].sort(
+    (a, b) => new Date(String(b.createdAt)).getTime() - new Date(String(a.createdAt)).getTime(),
+  );
+});
 
-  const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
+function getMuscleGroupsForWorkout(workout: Workout): string[] {
+  if (!workout.exercises?.length) return [];
+  const names = workout.exercises
+    .flatMap((x) => x.exercise?.muscleGroups || [])
+    .map((mg: { name: string } | string) => (typeof mg === 'object' && mg?.name ? mg.name : null))
+    .filter((x: string | null): x is string => !!x);
+  return Array.from(new Set(names));
+}
 
-  return workout.exercises
-    .flatMap((exercise) => exercise.exercise.muscleGroups || [])
-    .map((muscleGroupId) => {
-      const group = muscleGroup.find((group) => group._id === muscleGroupId);
-      return group ? group.name : "Unknown";
-    })
-    .filter((value, index, self) => self.indexOf(value) === index);
-};
-
-const routeTo = (id: string) => {
+function routeTo(id: number) {
   workoutStore.setCurrentWorkout(id);
   router.push(`/workout/${id}`);
-};
+}
+
+async function refresh() {
+  try {
+    loading.value = true;
+    await workoutStore.setWorkouts(true);
+  } finally {
+    loading.value = false;
+  }
+}
+
+const chipColors = ['orange-lighten-2', 'deep-purple-lighten-2', 'cyan-lighten-2', 'green-lighten-2'];
+function chipColorAt(i: number) {
+  return chipColors[i % chipColors.length];
+}
 </script>
 
 <style scoped>
-.v-card {
-  transition:
-    transform 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out;
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(18, 18, 18, 0.9), rgba(18, 18, 18, 0.6));
 }
 
-.v-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+.workout-card {
+  position: relative;
+  padding: 14px 16px;
+  background: #1e1e1e; /* slightly lighter than page */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  transition:
+    transform 0.15s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.workout-card:active {
+  transform: translateY(1px) scale(0.998);
+}
+
+.workout-card:hover {
+  border-color: rgba(124, 77, 255, 0.35); /* primary accent glow */
+  box-shadow: 0 8px 28px rgba(124, 77, 255, 0.08);
+}
+
+.workout-card .card-gradient {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      120px 60px at 90% 0%,
+      rgba(124, 77, 255, 0.12),
+      transparent 70%
+    ),
+    radial-gradient(
+      120px 60px at 0% 100%,
+      rgba(38, 166, 154, 0.08),
+      transparent 70%
+    );
+  pointer-events: none;
+}
+
+.icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Text tones for dark background */
+:deep(.text-secondary),
+.text-secondary {
+  color: rgba(255, 255, 255, 0.64) !important;
+}
+
+:deep(.text-medium-emphasis),
+.text-medium-emphasis {
+  color: rgba(255, 255, 255, 0.64) !important;
+}
+
+:deep(.text-high-emphasis),
+.text-high-emphasis {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.ellipsis {
+  max-width: 70vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.chips-wrap {
+  margin-left: -4px;
+}
+
+/* Buttons on dark */
+:deep(.v-btn--variant-text) {
+  color: rgba(255, 255, 255, 0.85);
+}
+:deep(.v-btn--variant-text:hover) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Optional: adjust skeleton to blend with dark */
+:deep(.v-skeleton-loader) {
+  --v-theme-surface: #222;
+  --v-theme-on-surface: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+}
+
+/* Empty card surface */
+.empty {
+  background: #1e1e1e;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
 }
 </style>

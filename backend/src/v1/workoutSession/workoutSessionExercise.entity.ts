@@ -35,4 +35,7 @@ export class WorkoutSessionExercise {
     eager: true,
   })
   sets: WorkoutSessionSet[];
+
+  @Column({ nullable: true })
+  notes?: string;
 }

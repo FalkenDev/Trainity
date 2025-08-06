@@ -1,7 +1,7 @@
 import type {
-  AddExerciseToWorkout,
   CreateWorkout,
   UpdateWorkout,
+  UpdateWorkoutExercise,
 } from "@/interfaces/Workout.interface";
 import { fetchWrapper } from "@/utils/fetchWrapper";
 
@@ -38,7 +38,7 @@ export const createWorkout = async (workout: CreateWorkout) => {
   }
 };
 
-export const getWorkoutById = async (id: string) => {
+export const getWorkoutById = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`);
     if (!response.ok) {
@@ -52,7 +52,7 @@ export const getWorkoutById = async (id: string) => {
   }
 };
 
-export const updateWorkout = async (id: string, workout: UpdateWorkout) => {
+export const updateWorkout = async (id: number, workout: UpdateWorkout) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
       method: "PATCH",
@@ -69,7 +69,7 @@ export const updateWorkout = async (id: string, workout: UpdateWorkout) => {
   }
 };
 
-export const deleteWorkout = async (id: string) => {
+export const deleteWorkout = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
       method: "DELETE",
@@ -84,32 +84,9 @@ export const deleteWorkout = async (id: string) => {
   }
 };
 
-export const addExerciseToWorkout = async (
-  workoutId: string,
-  exerciseId: string,
-) => {
-  try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercise`,
-      {
-        method: "POST",
-        body: JSON.stringify({ exerciseId }),
-      },
-    );
-    if (!response.ok) {
-      throw new Error("Failed to add exercise to workout");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error adding exercise to workout:", error);
-    throw error;
-  }
-};
-
 export const addExercisesToWorkout = async (
-  workoutId: string,
-  exerciseIds: string[],
+  workoutId: number,
+  exerciseIds: number[],
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
@@ -134,30 +111,9 @@ export const addExercisesToWorkout = async (
   }
 };
 
-export const removeExerciseFromWorkout = async (
-  workoutId: string,
-  exerciseId: string,
-) => {
-  try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
-      {
-        method: "DELETE",
-      },
-    );
-    if (!response.ok) {
-      throw new Error("Failed to remove exercise from workout");
-    }
-    return true;
-  } catch (error) {
-    console.error("Error removing exercise from workout:", error);
-    throw error;
-  }
-};
-
 export const removeExercisesFromWorkout = async (
-  workoutId: string,
-  exerciseIds: string[],
+  workoutId: number,
+  exerciseIds: number[],
 ) => {
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
@@ -183,16 +139,15 @@ export const removeExercisesFromWorkout = async (
 };
 
 export const updateExerciseInWorkout = async (
-  workoutId: string,
-  exerciseId: string,
-  exerciseData: AddExerciseToWorkout,
+  workoutId: number,
+  exerciseId: number,
+  exerciseData: UpdateWorkoutExercise,
 ) => {
   try {
-    console.log("Updating exercise in workout:", exerciseData);
     const response = await fetchWrapper(
       `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
       {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify(exerciseData),
       },
     );
@@ -207,7 +162,7 @@ export const updateExerciseInWorkout = async (
   }
 };
 
-export const dublicateWorkout = async (id: string) => {
+export const dublicateWorkout = async (id: number) => {
   try {
     const response = await fetchWrapper(`${apiUrl}/workouts/${id}/duplicate`, {
       method: "POST",
