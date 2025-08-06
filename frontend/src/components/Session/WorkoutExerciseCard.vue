@@ -73,7 +73,7 @@
           hide-default-footer
           @click:row="handleRowClick"
         >
-          <!-- @es-ignore-->
+          <!-- eslint-disable-next-line -->
           <template #['item.done']="{ item }"> 
             <v-checkbox
               :model-value="item.done"
