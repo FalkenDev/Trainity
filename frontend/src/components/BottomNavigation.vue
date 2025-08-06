@@ -6,15 +6,19 @@
     >
       <v-icon>mdi-home</v-icon>
     </v-btn>
+    <!-- Disabled for now: Eanble when implemented -->
     <v-btn
       icon
       to="/statistics"
+      :disabled="true"
     >
       <v-icon>mdi-chart-bar</v-icon>
     </v-btn>
+    <!-- Disabled for now: Eanble when implemented -->
     <v-btn
       icon
       to="/add-workout"
+      :disabled="true"
     >
       <v-icon
         color="orange-darken-1"
@@ -23,9 +27,11 @@
         mdi-plus-circle
       </v-icon>
     </v-btn>
+    <!-- Disabled for now: Eanble when implemented -->
     <v-btn
       icon
       to="/calendar"
+      :disabled="true"
     >
       <v-icon>mdi-calendar</v-icon>
     </v-btn>

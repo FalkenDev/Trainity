@@ -11,18 +11,17 @@ import { MuscleGroup } from './muscleGroup/muscleGroup.entity';
 import { WorkoutSessionExercise } from './workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from './workoutSession/workoutSessionSet.entity';
 
-// Load .env
 dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'user',
-  password: 'password',
-  database: 'trainitydb',
+  host: process.env.DATABASE_HOST || 'postgres',
+  port: +(process.env.DATABASE_PORT || 5432),
+  username: process.env.DATABASE_USER || 'user',
+  password: process.env.DATABASE_PASSWORD || 'password',
+  database: process.env.DATABASE_NAME || 'trainitydb',
   synchronize: true,
-  logging: false,
+  logging: ['error', 'warn'],
   entities: [
     User,
     MuscleGroup,

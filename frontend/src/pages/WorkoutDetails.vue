@@ -3,6 +3,7 @@
     <BackHeader
       :show-menu="true"
       title="Workout"
+      :route-to="`/`"
     >
       <template #menuAppend>
         <v-list>
@@ -105,9 +106,9 @@
     v-model="isEditExerciseOpen"
     fullscreen
   >
-    <EditExercise
-      :selected-exercise="selectedExercise"
-      :workout-id="workout?._id || ''"
+    <EditWorkoutExercise
+      :selected-exercise="selectedExercise!"
+      :workout-id="workout?.id ? Number(workout.id) : undefined"
       :is-view-exercise="false"
       :is-view-workout-exercise="true"
       @close="isEditExerciseOpen = false"
@@ -128,7 +129,7 @@
     fullscreen
   >
     <WeightAndRepsSettings
-      :workout-id="workout?._id || ''"
+      :workout-id="workout?.id || undefined"
       :default-weight-and-reps="workout?.defaultWeightAndReps ?? ''"
       @close="isWeightAndRepsOpen = false"
     />
@@ -152,6 +153,7 @@ import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { Workout, Exercise } from "@/interfaces/Workout.interface";
 import { deleteWorkout, dublicateWorkout, removeExercisesFromWorkout, addExercisesToWorkout } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
+import EditWorkoutExercise from "@/components/Workout/EditWorkoutExercise.vue";
 
 const isAddExerciseOpen = ref<boolean>(false);
 const isEditExerciseOpen = ref<boolean>(false);
@@ -168,13 +170,13 @@ const selectedExercise = ref<Exercise | null>(null);
 
 // TODO: If a workout is already started, give a dialog to end the current session and start a new one
 
-const selectedExerciseIds = computed<string[]>(() => {
+const selectedExerciseIds = computed<number[]>(() => {
   return workout.value?.exercises
-    .map((item) => item.exercise?._id)
-    .filter((id): id is string => !!id) ?? [];
+    .map((item) => item.exercise?.id)
+    .filter((id): id is number => !!id) ?? [];
 });
 
-const updateWorkoutExercises = async (newExerciseIds: string[]) => {
+const updateWorkoutExercises = async (newExerciseIds: number[]) => {
   if (!workout.value) return;
 
   isUpdatingWorkout.value = true;
@@ -182,7 +184,6 @@ const updateWorkoutExercises = async (newExerciseIds: string[]) => {
     await workoutStore.setWorkouts(true);
 
     const existingExerciseIds = selectedExerciseIds.value;
-    console.log("Existing exercise IDs:", existingExerciseIds);
 
     const exercisesToAdd = newExerciseIds.filter(
       (id) => !existingExerciseIds.includes(id),
@@ -193,11 +194,11 @@ const updateWorkoutExercises = async (newExerciseIds: string[]) => {
     );
 
     if (exercisesToRemove.length > 0) {
-      await removeExercisesFromWorkout(workout.value._id, exercisesToRemove);
+      await removeExercisesFromWorkout(+workout.value.id, exercisesToRemove);
     }
 
     if (exercisesToAdd.length > 0) {
-      await addExercisesToWorkout(workout.value!._id, exercisesToAdd);
+      await addExercisesToWorkout(+workout.value!.id, exercisesToAdd);
     }
     
     const hasBeenUpdated = exercisesToAdd.length > 0 || exercisesToRemove.length > 0;
@@ -216,13 +217,12 @@ const updateWorkoutExercises = async (newExerciseIds: string[]) => {
 
 const dublicate = async () => {
   if (workout.value) {
-    const response = await dublicateWorkout(workout.value._id);
-    console.log("Duplicating workout:", response);
-    if (response && response._id) {
+    const response = await dublicateWorkout(workout.value.id);
+    if (response && response.id) {
       await workoutStore.setWorkouts(true);
-      workoutStore.setCurrentWorkout(response._id);
+      workoutStore.setCurrentWorkout(response.id);
       toast.success("Workout duplicated successfully", { progressBar: true });
-      router.push(`/workout/${response._id}`);
+      router.push(`/workout/${response.id}`);
     } else {
       console.error("Failed to duplicate workout");
     }
@@ -232,7 +232,7 @@ const dublicate = async () => {
 const deleteExercise = async () => {
   try {
     if (workout.value) {
-      const response = await deleteWorkout(workout.value._id);
+      const response = await deleteWorkout(workout.value.id);
       if (response) {
         workoutStore.setWorkouts(true);
         workoutStore.currentWorkout = null;
@@ -263,9 +263,13 @@ const getMuscleGroupsForWorkout = (): string[] => {
   const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
 
   return workout.value?.exercises
-    .flatMap((exercise) => exercise.exercise.muscleGroups || [])
+    .flatMap((exercise) =>
+      (exercise.exercise.muscleGroups || []).map((mg) =>
+        typeof mg === "object" && mg !== null ? mg.id : mg
+      )
+    )
     .map((muscleGroupId) => {
-      const group = muscleGroup.find((group) => group._id === muscleGroupId);
+      const group = muscleGroup.find((group) => group.id === muscleGroupId);
       return group ? group.name : "Unknown";
     })
     .filter((value, index, self) => self.indexOf(value) === index);
@@ -273,10 +277,10 @@ const getMuscleGroupsForWorkout = (): string[] => {
 
 const startSession = async () => {
   if (workout.value) {
-    const response = await startWorkoutSession(workout.value._id);
-    if (response && response._id) {
-      await workoutSessionStore.fetchSelectedWorkoutSession(response._id);
-      router.push(`/session/${response._id}`);
+    const response = await startWorkoutSession(workout.value.id);
+    if (response && response.id) {
+      await workoutSessionStore.fetchSelectedWorkoutSession(response.id);
+      router.push(`/session/${response.id}`);
     } else {
       console.error("Failed to start session:", response);
     }

@@ -98,7 +98,7 @@ const muscleGroupItems = computed(() =>
   muscleGroupStore.muscleGroups.map((group: MuscleGroup) => ({
     ...group,
     name: group.name,
-    _id: group._id,
+    id: group.id,
   }))
 );
 

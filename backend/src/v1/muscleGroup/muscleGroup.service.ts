@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { MuscleGroup } from './muscleGroup.entity';
 import { CreateMuscleGroupDto } from './dto/createMuscleGroup.dto';
 import { UpdateMuscleGroupDto } from './dto/updateMuscleGroup.dto';
@@ -28,6 +28,20 @@ export class MuscleGroupService {
     }
 
     return muscleGroup;
+  }
+
+  /**
+   * Finds multiple MuscleGroup entities by their IDs.
+   * @param ids - An array of muscle group IDs.
+   * @returns A promise that resolves to an array of MuscleGroup entities.
+   */
+  async findByIds(ids: number[]): Promise<MuscleGroup[]> {
+    if (!ids || ids.length === 0) {
+      return [];
+    }
+    return this.muscleGroupRepo.findBy({
+      id: In(ids),
+    });
   }
 
   async create(dto: CreateMuscleGroupDto): Promise<MuscleGroup> {

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Like, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { Workout } from './workout.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
@@ -7,21 +7,135 @@ import { WorkoutResponseDto } from './dto/workoutResponse.dto';
 import { CreateWorkoutDto } from './dto/createWorkout.dto';
 import { UpdateWorkoutDto } from './dto/updateWorkout.dto';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
+import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
+import { WorkoutExercise } from './workoutExercise.entity';
+import { Exercise } from '../exercise/exercise.entity';
+import { UpdateWorkoutExerciseDto } from './dto/updateWorkoutExercise.dto';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class WorkoutService {
   constructor(
     @InjectRepository(Workout)
     private workoutRepo: Repository<Workout>,
-
+    @InjectRepository(WorkoutExercise)
+    private workoutExerciseRepo: Repository<WorkoutExercise>,
     @InjectRepository(WorkoutSession)
     private readonly workoutSessionRepository: Repository<WorkoutSession>,
+    private readonly dataSource: DataSource,
   ) {}
 
+  private async findWorkoutForUser(
+    workoutId: number,
+    userId: number,
+  ): Promise<Workout> {
+    const workout = await this.workoutRepo.findOne({
+      where: { id: workoutId, createdBy: { id: userId } },
+      relations: ['exercises'],
+    });
+    if (!workout) {
+      throw new NotFoundException('Workout not found');
+    }
+    return workout;
+  }
+
+  async addExercisesToWorkout(
+    workoutId: number,
+    dto: AddRemoveExercisesDto,
+    userId: number,
+  ): Promise<WorkoutResponseDto> {
+    const workout = await this.findWorkoutForUser(workoutId, userId);
+    const newExercises = (dto.exerciseIds ?? []).map((exerciseId, index) =>
+      this.workoutExerciseRepo.create({
+        workout,
+        exercise: { id: exerciseId } as Exercise,
+        order: workout.exercises.length + index + 1,
+        sets: 3,
+        reps: 10,
+        weight: 10,
+        pauseSeconds: 60,
+      }),
+    );
+    await this.workoutExerciseRepo.save(newExercises);
+    // Reload the workout to get the full updated entity
+    const updatedWorkout = await this.getWorkout(workoutId, userId);
+    return updatedWorkout;
+  }
+
+  async removeExercisesFromWorkout(
+    workoutId: number,
+    dto: AddRemoveExercisesDto,
+    userId: number,
+  ): Promise<{ message: string }> {
+    const workout = await this.findWorkoutForUser(workoutId, userId);
+
+    const workoutExercisesToRemove = await this.workoutExerciseRepo.find({
+      where: {
+        workout: { id: workout.id },
+        exercise: { id: In(dto.exerciseIds ?? []) },
+      },
+    });
+
+    if (workoutExercisesToRemove.length === 0) {
+      throw new NotFoundException(
+        'None of the specified exercises were found in this workout.',
+      );
+    }
+
+    await this.workoutExerciseRepo.remove(workoutExercisesToRemove);
+    return { message: 'Exercises removed successfully' };
+  }
+
+  async updateExerciseInWorkout(
+    workoutId: number,
+    workoutExerciseId: number,
+    dto: UpdateWorkoutExerciseDto,
+    userId: number,
+  ): Promise<WorkoutResponseDto> {
+    await this.findWorkoutForUser(workoutId, userId);
+
+    const workoutExercise = await this.workoutExerciseRepo.findOne({
+      where: {
+        id: workoutExerciseId,
+        workout: { id: workoutId },
+      },
+    });
+
+    if (!workoutExercise) {
+      throw new NotFoundException('Exercise not found in this workout');
+    }
+
+    Object.assign(workoutExercise, dto);
+
+    await this.workoutExerciseRepo.save(workoutExercise);
+
+    return this.getWorkout(workoutId, userId);
+  }
+
+  async getWorkout(id: number, userId: number): Promise<WorkoutResponseDto> {
+    const workout = await this.workoutRepo.findOne({
+      where: { id, createdBy: { id: userId } },
+      relations: [
+        'exercises',
+        'exercises.exercise',
+        'exercises.exercise.muscleGroups',
+        'createdBy',
+      ],
+    });
+
+    if (!workout) throw new NotFoundException('Workout not found');
+    return this.toResponseDto(workout);
+  }
+  // ... rest of the service code
   async getWorkoutList(userId: number): Promise<WorkoutResponseDto[]> {
     const workouts = await this.workoutRepo.find({
       where: { createdBy: { id: userId } },
-      relations: ['exercises', 'exercises.exercise', 'createdBy'],
+      relations: [
+        'exercises',
+        'exercises.exercise',
+        'exercises.exercise.muscleGroups',
+        'createdBy',
+      ],
     });
 
     return workouts.map((w) => this.toResponseDto(w));
@@ -39,17 +153,6 @@ export class WorkoutService {
     const saved = await this.workoutRepo.save(workout);
     return this.toResponseDto(saved);
   }
-
-  async getWorkout(id: number, userId: number): Promise<WorkoutResponseDto> {
-    const workout = await this.workoutRepo.findOne({
-      where: { id, createdBy: { id: userId } },
-      relations: ['exercises', 'exercises.exercise'],
-    });
-
-    if (!workout) throw new NotFoundException('Workout not found');
-    return this.toResponseDto(workout);
-  }
-
   async updateWorkout(
     id: number,
     dto: UpdateWorkoutDto,
@@ -74,10 +177,13 @@ export class WorkoutService {
     });
     if (!workout) throw new NotFoundException('Workout not found');
 
-    await this.workoutSessionRepository.update(
-      { workout: { id } },
-      { workout: undefined },
-    );
+    await this.workoutSessionRepository
+      .createQueryBuilder()
+      .update()
+      .set({ workout: null as any })
+      .where('"workoutId" = :id', { id })
+      .execute();
+
     await this.workoutRepo.remove(workout);
 
     return { message: 'Workout deleted and references removed' };
@@ -89,7 +195,7 @@ export class WorkoutService {
   ): Promise<WorkoutResponseDto> {
     const original = await this.workoutRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['exercises', 'createdBy'],
+      relations: ['exercises', 'exercises.exercise', 'createdBy'],
     });
 
     if (!original) throw new NotFoundException('Workout not found');
@@ -106,15 +212,47 @@ export class WorkoutService {
       copyNumber = Math.max(copyNumber, number + 1);
     });
 
-    const duplicate = this.workoutRepo.create({
-      ...original,
-      title: `${baseTitle} (${copyNumber})`,
-      createdBy: original.createdBy,
-      id: undefined,
-    });
+    return await this.dataSource.transaction(async (manager) => {
+      const newWorkout = manager.create(Workout, {
+        title: `${baseTitle} (${copyNumber})`,
+        description: original.description,
+        time: original.time,
+        defaultWeightAndReps: original.defaultWeightAndReps,
+        createdBy: original.createdBy,
+      });
 
-    const saved = await this.workoutRepo.save(duplicate);
-    return this.toResponseDto(saved);
+      const savedWorkout = await manager.save(Workout, newWorkout);
+
+      const newWorkoutExercises = (original.exercises ?? [])
+        .sort((a, b) => a.order - b.order)
+        .map((we, idx) =>
+          manager.create(WorkoutExercise, {
+            workout: savedWorkout,
+            exercise: we.exercise,
+            order: we.order ?? idx + 1,
+            sets: we.sets,
+            reps: we.reps,
+            weight: we.weight,
+            pauseSeconds: we.pauseSeconds,
+          }),
+        );
+
+      if (newWorkoutExercises.length) {
+        await manager.save(WorkoutExercise, newWorkoutExercises);
+      }
+
+      const reloaded = await manager.findOneOrFail(Workout, {
+        where: { id: savedWorkout.id },
+        relations: [
+          'exercises',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+          'createdBy',
+        ],
+      });
+
+      return this.toResponseDto(reloaded);
+    });
   }
 
   private toResponseDto(workout: Workout): WorkoutResponseDto {
@@ -125,18 +263,28 @@ export class WorkoutService {
       time: workout.time,
       defaultWeightAndReps: workout.defaultWeightAndReps,
       exercises:
-        workout.exercises?.map((e) => ({
-          order: e.order,
-          sets: e.sets,
-          reps: e.reps,
-          weight: e.weight,
-          pauseSeconds: e.pauseSeconds,
-          exercise: {
-            id: e.exercise.id,
-            name: e.exercise.name,
-            description: e.exercise.description,
-          },
-        })) || [],
+        workout.exercises
+          ?.map((e) => ({
+            id: e.id,
+            order: e.order,
+            sets: e.sets,
+            reps: e.reps,
+            weight: e.weight,
+            pauseSeconds: e.pauseSeconds,
+            exercise: {
+              id: e.exercise.id,
+              name: e.exercise.name,
+              description: e.exercise.description,
+              muscleGroups:
+                e.exercise.muscleGroups?.map((mg) => ({
+                  id: mg.id,
+                  name: mg.name,
+                  createdAt: mg.createdAt,
+                  updatedAt: mg.updatedAt,
+                })) ?? [],
+            },
+          }))
+          .sort((a, b) => a.order - b.order) || [],
       createdAt: workout.createdAt,
     };
   }

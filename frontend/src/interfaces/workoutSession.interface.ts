@@ -6,7 +6,7 @@ export interface PerformedSet {
 }
 
 export interface FinishedExercisePayload {
-  exerciseId: string;
+  exerciseId: number;
   rpe?: number;
   notes?: string;
   sets: PerformedSet[];
@@ -18,8 +18,8 @@ export interface FinishSessionPayload {
 }
 
 export interface WorkoutSession {
-  _id: string;
-  userId: string;
+  id: number;
+  userId: number;
   startedAt: string;
   endedAt?: string;
   status: 'in_progress' | 'finished' | 'abandoned';
@@ -29,18 +29,71 @@ export interface WorkoutSession {
     exerciseSnapshot: {
       name: string;
       description: string;
-      muscleGroups: string[];
+      muscleGroups: number[];
     };
-    exerciseId: string;
+    exerciseId: number;
     sets: PerformedSet[];
   }[];
   totalWeight: number;
   exerciseStats: {
-    exerciseId: string;
+    exerciseId: number;
     totalWeight: number;
-    _id: string;
+    id: number;
   }[];
   createdAt: string;
   updatedAt: string;
-  __v: number;
+  workoutSnapshot: {
+    title: string;
+    description: string;
+    time: number;
+    exercises: {
+      exerciseId: number;
+      order: number;
+      sets: number;
+      reps: number;
+      weight: number;
+      pauseSeconds?: number;
+    }[];
+  };
 }
+
+export interface tempWorkoutSession {
+  id?: number;
+  userId?: number;
+  startedAt?: string;
+  endedAt?: string;
+  status?: 'in_progress' | 'finished' | 'abandoned';
+  notes?: string;
+  workout?: Workout;
+  exercises?: {
+    exerciseSnapshot?: {
+      name?: string;
+      description?: string;
+      muscleGroups?: number[];
+    };
+    exerciseId?: number;
+    sets?: PerformedSet[];
+  }[];
+  totalWeight?: number;
+  exerciseStats?: {
+    exerciseId?: number;
+    totalWeight?: number;
+    id?: number;
+  }[];
+  createdAt?: string;
+  updatedAt?: string;
+  workoutSnapshot?: {
+    title?: string;
+    description?: string;
+    time?: number;
+    exercises?: {
+      exerciseId?: number;
+      order?: number;
+      sets?: number;
+      reps?: number;
+      weight?: number;
+      pauseSeconds?: number;
+    }[];
+  };
+}
+  

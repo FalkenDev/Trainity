@@ -74,7 +74,7 @@ const workoutSessionModel = {
 
       // Push the new exercise to the exercises array
       const updatedSession = await WorkoutSession.findOneAndUpdate(
-        { _id: sessionId, userId: req.user.id },
+        { id: sessionId, userId: req.user.id },
         { $push: { exercises: exerciseObj } },
         { new: true, runValidators: true }
       );
@@ -95,7 +95,7 @@ const workoutSessionModel = {
       const sessionId = req.params.id;
 
       const session = await WorkoutSession.findOne({
-        _id: sessionId,
+        id: sessionId,
         userId: req.user.id,
       });
 
@@ -110,10 +110,10 @@ const workoutSessionModel = {
 
       const exerciseIds = completedExercises.map((ex) => ex.exerciseId);
       const exerciseDetails = await Exercise.find({
-        _id: { $in: exerciseIds },
+        id: { $in: exerciseIds },
       });
       const exerciseMap = new Map(
-        exerciseDetails.map((ex) => [ex._id.toString(), ex])
+        exerciseDetails.map((ex) => [ex.id.toString(), ex])
       );
 
       const sessionExercises = completedExercises.map((completedEx) => {
@@ -183,7 +183,7 @@ const workoutSessionModel = {
     try {
       const sessionId = req.params.id;
       const session = await WorkoutSession.findOne({
-        _id: sessionId,
+        id: sessionId,
         userId: req.user.id,
       });
       if (!session) {
@@ -206,7 +206,7 @@ const workoutSessionModel = {
   getWorkoutSession: async function (req, res) {
     try {
       const session = await WorkoutSession.findOne({
-        _id: req.params.id,
+        id: req.params.id,
         userId: req.user.id,
       })
         .populate("workoutId")
@@ -250,7 +250,7 @@ const workoutSessionModel = {
   updateWorkoutSession: async function (req, res) {
     try {
       const updatedSession = await WorkoutSession.findOneAndUpdate(
-        { _id: req.params.id, userId: req.user.id },
+        { id: req.params.id, userId: req.user.id },
         req.body,
         { new: true, runValidators: true }
       );
@@ -266,7 +266,7 @@ const workoutSessionModel = {
   deleteWorkoutSession: async function (req, res) {
     try {
       const deletedSession = await WorkoutSession.findOneAndDelete({
-        _id: req.params.id,
+        id: req.params.id,
         userId: req.user.id,
       });
       if (!deletedSession) {
