@@ -194,7 +194,14 @@ import type { WorkoutSession } from '@/interfaces/workoutSession.interface';
 
 const store = useWorkoutSessionStore();
 const sessions = computed<WorkoutSession[]>(
-  () => (store.workoutSessions as WorkoutSession[]) || [],
+  () =>
+    ((store.workoutSessions as WorkoutSession[]) || [])
+      .slice()
+      .sort((a, b) => {
+        const dateA = new Date(a.startedAt).getTime();
+        const dateB = new Date(b.startedAt).getTime();
+        return dateB - dateA;
+      }),
 );
 
 const emit = defineEmits<{
