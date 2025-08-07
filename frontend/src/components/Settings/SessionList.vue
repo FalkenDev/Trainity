@@ -207,7 +207,6 @@ import type { WorkoutSession } from '@/interfaces/workoutSession.interface';
 const searchQuery = ref('');
 const store = useWorkoutSessionStore();
 const sessions = computed<WorkoutSession[]>(() => {
-  
   return ((store.workoutSessions as WorkoutSession[]) || [])
     .filter(session => {
       if (!searchQuery.value) return true; // Show all if no search query
