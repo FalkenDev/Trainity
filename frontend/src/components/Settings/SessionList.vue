@@ -4,7 +4,7 @@
     class="pa-0 bg-grey-darken-4"
   >
     <BackHeader
-      title="Sessions"
+      title="Workout Sessions"
       show-menu
       @close="emit('close')"
     />
@@ -13,9 +13,18 @@
       <v-row>
         <v-col cols="12">
           <v-card elevation="1">
-            <v-card-title class="d-flex justify-space-between align-center">
-              <div class="text-h6">
-                Workout Sessions
+            <v-card-title class="d-flex ga-10 justify-space-between align-center">
+              <div class="text-h6 w-100">
+                <v-text-field
+                  v-model="searchQuery"
+                  variant="outlined"
+                  prepend-inner-icon="mdi-magnify"
+                  label="Search exercises"
+                  clearable
+                  hide-details
+                  density="compact"
+                  width="100%"
+                />
               </div>
               <div class="text-caption text-medium-emphasis">
                 {{ sessions.length }} total
@@ -174,11 +183,14 @@
                   </v-expansion-panel-text>
                 </v-expansion-panel>
 
-                <v-expansion-panel v-if="sessions.length === 0">
-                  <v-expansion-panel-title>
-                    No sessions yet
-                  </v-expansion-panel-title>
-                </v-expansion-panel>
+                <div
+                  v-if="sessions.length === 0"
+                  class="py-10"
+                >
+                  <p class="text-center text-subtitle text-medium-emphasis">
+                    No sessions found
+                  </p>
+                </div>
               </v-expansion-panels>
             </v-card-text>
           </v-card>
@@ -192,17 +204,33 @@
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface';
 
+const searchQuery = ref('');
 const store = useWorkoutSessionStore();
-const sessions = computed<WorkoutSession[]>(
-  () =>
-    ((store.workoutSessions as WorkoutSession[]) || [])
-      .slice()
-      .sort((a, b) => {
-        const dateA = new Date(a.startedAt).getTime();
-        const dateB = new Date(b.startedAt).getTime();
-        return dateB - dateA;
-      }),
-);
+const sessions = computed<WorkoutSession[]>(() => {
+  
+  return ((store.workoutSessions as WorkoutSession[]) || [])
+    .filter(session => {
+      if (!searchQuery.value) return true; // Show all if no search query
+
+      const query = searchQuery.value.toLowerCase().trim();
+      
+      if (session.workoutSnapshot?.title?.toLowerCase().includes(query)) return true;
+      
+      if (session.notes?.toLowerCase().includes(query)) return true;
+      
+      if (session.exercises?.some(ex => 
+        ex.exerciseSnapshot?.name?.toLowerCase().includes(query) ||
+        ex.exerciseSnapshot?.description?.toLowerCase().includes(query)
+      )) return true;
+      
+      return false;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.startedAt).getTime();
+      const dateB = new Date(b.startedAt).getTime();
+      return dateB - dateA;
+    });
+});
 
 const emit = defineEmits<{
   (e: 'close'): void;
