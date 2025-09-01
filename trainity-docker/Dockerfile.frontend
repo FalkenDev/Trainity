@@ -1,7 +1,8 @@
-FROM node:20.12-alpine
+FROM node:lts-alpine
 
-# Install optional dependencies (like fs tools that help file watching work better)
-RUN apk add --no-cache bash curl git
+RUN npm install -g npm@latest
+
+RUN apk update && apk upgrade && apk add --no-cache bash curl git
 
 WORKDIR /app
 
