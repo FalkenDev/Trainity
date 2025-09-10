@@ -29,6 +29,11 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
       return Promise.reject('403 Forbidden');
     }
 
+    if (response.status === 404) {
+      handleForbidden();
+      return Promise.reject('404 Not Found');
+    }
+
     if (response.status === 405) {
       console.error('405 Method Not Allowed');
       return Promise.reject('405 Method Not Allowed');
