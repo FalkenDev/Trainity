@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100 w-100 bg-grey-darken-4">
+  <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
       title="Add Exercises"
       show-menu
@@ -74,7 +74,10 @@
         </v-btn>
       </v-badge>
     </div>
-    <v-list>
+    <v-list
+      v-if="exercises && exercises.length > 0"
+      class="flex-grow-1 overflow-y-auto pa-0 pb-5"
+    >
       <v-list-item
         v-for="exercise in exercises"
         :key="exercise.id"
@@ -105,6 +108,30 @@
         </div>
       </v-list-item>
     </v-list>
+    <div
+      v-else
+      class="flex-grow-1 d-flex flex-column align-center mt-10 text-center px-6"
+    >
+      <v-icon
+        size="48"
+        color="grey-lighten-1"
+      >
+        mdi-dumbbell
+      </v-icon>
+      <h2 class="text-h6 mt-3 mb-1">
+        No exercises found
+      </h2>
+      <p class="text-body-2 text-grey-lighten-1">
+        Try adjusting your search or filter to find what you're looking for.
+      </p> 
+      <v-btn
+        class="mt-4"
+        color="primary"
+        @click="isCreateExerciseOpen = true"
+      >
+        Create Exercise
+      </v-btn>
+    </div>
   </div>
   <v-dialog
     v-model="isViewExerciseOpen"
