@@ -41,7 +41,7 @@
             ref="form"
             @submit.prevent="handleCreateAccount"
           >
-            <v-text-fieldcd
+            <v-text-field
               v-model="fullName"
               autocomplete="name"
               class="mb-4"
