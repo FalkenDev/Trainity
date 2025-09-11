@@ -17,7 +17,10 @@
         <v-icon>mdi-arrow-left</v-icon>
       </template>
     </v-btn>
-    <h1 class="text-h6">
+    <h1
+      class="text-h6"
+      :class="showMenu ? '' : 'w-100 text-center'"
+    >
       {{ title }}
     </h1>
     <v-btn
