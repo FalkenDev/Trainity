@@ -158,10 +158,10 @@
     <!-- Empty state -->
     <div
       v-else
-      class="px-4 mt-6"
+      class="mt-6 mb-5"
     >
       <v-card
-        class="empty rounded-xl pa-6"
+        class="empty pa-6"
         variant="outlined"
       >
         <div class="d-flex flex-column align-center text-center">
@@ -180,7 +180,7 @@
           <v-btn
             class="mt-4"
             color="primary"
-            @click="$router.push('/workouts/new')"
+            @click="isCreateWorkoutOpen = true"
           >
             Create Workout
           </v-btn>
@@ -202,6 +202,12 @@
     >
       <WorkoutList @close="isWorkoutListOpen = false" />
     </v-dialog>
+    <v-dialog
+      v-model="isCreateWorkoutOpen"
+      fullscreen
+    >
+      <CreateWorkout @close="isCreateWorkoutOpen = false" />
+    </v-dialog>
   </div>
 </template>
 
@@ -216,6 +222,7 @@ const workoutStore = useWorkoutStore();
 
 const loading = ref(false);
 const isWorkoutListOpen = ref(false);
+const isCreateWorkoutOpen = ref(false);
 
 const workouts = computed<Workout[]>(() => {
   const list = workoutStore.workouts || [];
