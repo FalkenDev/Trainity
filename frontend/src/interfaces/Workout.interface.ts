@@ -51,20 +51,19 @@ export interface WorkoutExercisePayload {
   sets: [FinishedSetPayload, ...FinishedSetPayload[]];
 }
 
+export interface CreateWorkoutExercise {
+  exerciseId: number;
+  order: number;
+  sets: number;
+  reps: number;
+  weight: number;
+  pauseSeconds: number;
+}
+
 export interface CreateWorkout {
   title: string;
   time: number;
   description?: string;
-  exercises: [
-    {
-      exerciseId: number;
-      order: number;
-      sets: number;
-      reps: number;
-      weight: number;
-      pauseSeconds: number;
-    },
-  ];
 }
 
 export interface UpdateWorkout {
