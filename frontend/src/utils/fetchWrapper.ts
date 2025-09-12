@@ -20,17 +20,17 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
     const response = await fetch(url, options);
 
     if (response.status === 401) {
-      handleForbidden();
+      // handleForbidden();
       return Promise.reject('401 Unauthorized');
     }
 
     if (response.status === 403) {
-      handleForbidden();
+      // handleForbidden();
       return Promise.reject('403 Forbidden');
     }
 
     if (response.status === 404) {
-      handleForbidden();
+      // handleForbidden();
       return Promise.reject('404 Not Found');
     }
 
@@ -46,7 +46,7 @@ export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
       try {
         errorData = JSON.parse(responseText);
       } catch (_e) {
-        console.error("Failed to parse JSON from 409 response:", _e);
+        console.error('Failed to parse JSON from 409 response:', _e);
         errorData = {
           type: 'unknown',
           message: responseText || 'Conflict detected',

@@ -28,7 +28,7 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.5",
-    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/swagger": "^11.0.0-next.2",
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
@@ -89,5 +89,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "overrides": {
+    "@nestjs/mapped-types": "2.0.6"
   }
 }
