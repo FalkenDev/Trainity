@@ -34,7 +34,14 @@ export const useExerciseStore = defineStore(
 
     setExercises();
 
-    return { exercises, isLoading, setExercises };
+    const resetStore = async () => {
+      exercises.value = [];
+      isLoading.value = false;
+      lastFetched.value = null;
+      await setExercises(true);
+    };
+
+    return { exercises, isLoading, setExercises, resetStore };
   },
   {
     persist: true,

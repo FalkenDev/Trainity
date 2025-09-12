@@ -271,6 +271,23 @@ export const useWorkoutSessionStore = defineStore(
       delete liveSessions.value[sessionId];
     }
 
+    const resetStore = async () => {
+      workoutSessions.value = [];
+      isLoading.value = false;
+      lastFetched.value = null;
+      selectedWorkoutSession.value = null;
+      secondsElapsed.value = 0;
+      isRunning.value = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      liveSessions.value = {};
+      if (authStore.isAuthenticated) {
+        await setWorkoutSessions(true);
+      }
+    };
+
     return {
       workoutSessions,
       isLoading,
@@ -293,6 +310,7 @@ export const useWorkoutSessionStore = defineStore(
       deleteSet,
       updateExerciseMeta,
       clearLiveSession,
+      resetStore,
     };
   },
   {
