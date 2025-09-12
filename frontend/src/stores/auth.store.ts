@@ -2,6 +2,10 @@
 import { useRouter } from 'vue-router';
 import { defineStore } from 'pinia';
 import { toast } from 'vuetify-sonner';
+import { useWorkoutStore } from './workout.store';
+import { useExerciseStore } from './exercise.store';
+import { useMuscleGroupStore } from './muscleGroup.store';
+import { useWorkoutSessionStore } from './workoutSession.store';
 
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
 
@@ -34,6 +38,13 @@ export const useAuthStore = defineStore(
           isAuthenticated.value = true;
           user.value = data.user;
           token.value = data.token;
+          
+          // Reset other stores on login to avoid stale data
+          await useWorkoutStore().resetStore();
+          await useExerciseStore().resetStore();
+          await useMuscleGroupStore().resetStore();
+          await useWorkoutSessionStore().resetStore();
+
           router.push('/');
           return data;
         } else {
@@ -51,9 +62,7 @@ export const useAuthStore = defineStore(
     };
 
     const logout = (): void => {
-      isAuthenticated.value = false;
-      user.value = null;
-      token.value = '';
+      resetStore();
       router.push('/login');
     };
 
@@ -92,6 +101,13 @@ export const useAuthStore = defineStore(
       return null;
     };
 
+    const resetStore = () => {
+      isAuthenticated.value = false;
+      user.value = null;
+      token.value = '';
+      loading.value = false;
+    };
+
     return {
       isAuthenticated,
       user,
@@ -100,6 +116,7 @@ export const useAuthStore = defineStore(
       login,
       logout,
       createAccount,
+      resetStore,
     };
   },
   {
