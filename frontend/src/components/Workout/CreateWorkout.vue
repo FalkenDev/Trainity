@@ -66,8 +66,8 @@ const saveWorkout = async () => {
     if (response) {
       workoutStore.setWorkouts(true);
       toast.success("Workout updated successfully!", { progressBar: true });
-      // Route to the workout
-      workoutStore.setCurrentWorkout(response);
+      await workoutStore.setCurrentWorkout(response.id);
+
       router.push(`/workout/${response.id}`);
 
       emit("close");
