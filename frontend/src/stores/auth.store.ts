@@ -6,8 +6,9 @@ import { useWorkoutStore } from './workout.store';
 import { useExerciseStore } from './exercise.store';
 import { useMuscleGroupStore } from './muscleGroup.store';
 import { useWorkoutSessionStore } from './workoutSession.store';
+import { fetchWrapper } from '@/utils/fetchWrapper';
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 export const useAuthStore = defineStore(
   'authStore',
@@ -21,7 +22,7 @@ export const useAuthStore = defineStore(
     const login = async (email: string, password: string) => {
       loading.value = true;
       try {
-        const response = await fetch(`${apiUrl}/auth/login`, {
+        const response = await fetchWrapper(`${apiUrl}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -38,7 +39,7 @@ export const useAuthStore = defineStore(
           isAuthenticated.value = true;
           user.value = data.user;
           token.value = data.token;
-          
+
           // Reset other stores on login to avoid stale data
           await useWorkoutStore().resetStore();
           await useExerciseStore().resetStore();
@@ -76,7 +77,7 @@ export const useAuthStore = defineStore(
         const firstName = registerData.fullName.split(' ')[0];
         const lastName = registerData.fullName.split(' ')[1] || '';
 
-        const response = await fetch(`${apiUrl}/auth/register`, {
+        const response = await fetchWrapper(`${apiUrl}/auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -123,5 +124,5 @@ export const useAuthStore = defineStore(
     persist: {
       pick: ['isAuthenticated', 'user', 'token'],
     },
-  }
+  },
 );
