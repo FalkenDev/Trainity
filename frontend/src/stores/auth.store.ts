@@ -22,44 +22,33 @@ export const useAuthStore = defineStore(
     const login = async (email: string, password: string) => {
       loading.value = true;
       try {
-        const response = await fetchWrapper(`${apiUrl}/auth/login`, {
+        const data = await fetchWrapper<{ user: any }>(`${apiUrl}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          credentials: 'include',
-          body: JSON.stringify({
-            email,
-            password,
-          }),
+          body: JSON.stringify({ email, password }),
         });
 
-        if (response instanceof Response && response.ok) {
-          const data = await response.json();
-          isAuthenticated.value = true;
-          user.value = data.user;
-          token.value = data.token;
+        isAuthenticated.value = true;
+        user.value = data.user;
+        token.value = '';
 
-          // Reset other stores on login to avoid stale data
-          await useWorkoutStore().resetStore();
-          await useExerciseStore().resetStore();
-          await useMuscleGroupStore().resetStore();
-          await useWorkoutSessionStore().resetStore();
+        await useWorkoutStore().resetStore();
+        await useExerciseStore().resetStore();
+        await useMuscleGroupStore().resetStore();
+        await useWorkoutSessionStore().resetStore();
 
-          router.push('/');
-          return data;
-        } else {
-          throw new Error('Invalid credentials');
-        }
+        router.push('/');
+        return data;
       } catch (error) {
         console.error('Login failed:', error);
         toast.error('Login failed. Please check your credentials.');
         isAuthenticated.value = false;
-        throw new Error('Login failed');
+        throw error;
       } finally {
         loading.value = false;
       }
-      return null;
     };
 
     const logout = (): void => {
