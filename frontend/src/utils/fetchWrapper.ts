@@ -6,19 +6,22 @@ export const fetchWrapper = async <T = any>(
   options: RequestInit = {},
 ): Promise<T> => {
   try {
-    options.credentials = 'include';
+    const mergedOptions: RequestInit = {
+      ...options,
+      credentials: 'include',
+    };
 
-    const headers = new Headers(options.headers || {});
+    const headers = new Headers(mergedOptions.headers || {});
     if (
-      options.body &&
-      typeof options.body === 'string' &&
+      mergedOptions.body &&
+      typeof mergedOptions.body === 'string' &&
       !headers.has('Content-Type')
     ) {
       headers.set('Content-Type', 'application/json');
     }
-    options.headers = headers;
+    mergedOptions.headers = headers;
 
-    const response = await fetch(url, options);
+    const response = await fetch(url, mergedOptions);
 
     if (response.status === 401) {
       await handleUnauthorized();
