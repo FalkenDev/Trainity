@@ -372,8 +372,26 @@ watchEffect(async () => {
   });
 });
 
+watchEffect(() => {
+  const s = workoutSession.value;
+  if (!s) return;
+
+  const raw = (s as WorkoutSession).startedAt as string | undefined;
+  if (raw) {
+    const isoGuess =
+      raw.includes('T') ? raw : raw.replace(' ', 'T') + 'Z';
+    const ms = Date.parse(isoGuess);
+    if (!Number.isNaN(ms)) {
+      workoutSessionStore.startedAt = ms;
+    }
+  }
+  if (workoutSessionStore.startedAt != null) {
+    workoutSessionStore.startClock();
+  }
+});
+
 onMounted(() => {
-  if (workoutSessionStore.formattedClock === '00:00') {
+  if (!workoutSessionStore.isRunning && workoutSessionStore.startedAt == null) {
     workoutSessionStore.startClock();
   }
 });
