@@ -160,10 +160,8 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
           details.defaultPauseSeconds ??
           60;
 
-        // 1) Upsert in live store
         workoutSessionStore.upsertExercise(sessionId.value, id);
 
-        // 2) Seed sets in live store if empty
         const live = workoutSessionStore.getLiveSession(sessionId.value);
         const exLive = live?.exercises[id];
         if (exLive && exLive.sets.length === 0) {
@@ -179,7 +177,6 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
           }
         }
 
-        // 3) Push to rendered list with real details
         processedExercises.value.push({
           exerciseId: id,
           id,
