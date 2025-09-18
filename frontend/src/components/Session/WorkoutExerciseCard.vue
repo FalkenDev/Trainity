@@ -205,6 +205,16 @@ function addSet() {
 function onDoneChanged(set: WorkoutSet, isDone: boolean) {
   emit('update:set', { ...set, done: isDone });
 }
+
+watch(
+  allSetsDone,
+  (isCompleted) => {
+    if (isCompleted) {
+      showDetails.value = false;
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
