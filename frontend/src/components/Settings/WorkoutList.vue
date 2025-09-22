@@ -84,10 +84,10 @@
       </v-chip>
     </div>
 
-    <div class="content-scroll">
-      <v-row class="px-2">
+    <div class="content-scroll px-2">
+      <v-row>
         <v-col cols="12">
-          <v-card elevation="1">
+          <v-card elevation="0">
             <v-card-title class="d-flex justify-space-between align-center">
               <div class="text-subtitle-1">
                 Workout Plans
@@ -111,7 +111,7 @@
                           {{ w.title }}
                         </div>
                         <div
-                          class="text-caption text-medium-emphasis one-line"
+                          class="text-caption text-medium-emphasis"
                         >
                           {{ w.description }}
                         </div>
@@ -121,13 +121,22 @@
                         </div>
                         <div class="mt-2 d-flex flex-wrap ga-1">
                           <v-chip
-                            v-for="mg in distinctMGs(w)"
+                            v-for="mg in topMuscleGroups(w).list"
                             :key="mg"
                             size="x-small"
                             variant="outlined"
                             class="text-caption"
                           >
                             {{ mg }}
+                          </v-chip>
+
+                          <v-chip
+                            v-if="topMuscleGroups(w).extra > 0"
+                            size="x-small"
+                            variant="text"
+                            class="text-caption"
+                          >
+                            +{{ topMuscleGroups(w).extra }}
                           </v-chip>
                         </div>
                       </div>
@@ -481,12 +490,23 @@ function totalSets(w: Workout) {
   return w.exercises.reduce((sum, it) => sum + (it.sets || 0), 0);
 }
 
-function distinctMGs(w: Workout) {
-  const s = new Set<string>();
-  w.exercises.forEach((it) =>
-    it.exercise.muscleGroups.forEach((m) => s.add(m.name)),
-  );
-  return Array.from(s).sort();
+function topMuscleGroups(w: Workout, limit = 3) {
+  const counts = new Map<string, number>();
+
+  w.exercises.forEach((it) => {
+    it.exercise.muscleGroups.forEach((m) => {
+      counts.set(m.name, (counts.get(m.name) ?? 0) + 1);
+    });
+  });
+
+  const sorted = Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1]) // descending by frequency
+    .map(([name]) => name);
+
+  return {
+    list: sorted.slice(0, limit),
+    extra: sorted.length > limit ? sorted.length - limit : 0,
+  };
 }
 
 function toggleMG(id: number) {
@@ -511,13 +531,8 @@ function clearAllFilters() {
 .content-scroll {
   height: calc(100vh - 100px);
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 16px;
-}
-
-.one-line {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 </style>
