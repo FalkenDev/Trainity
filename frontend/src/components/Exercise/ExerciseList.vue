@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100 w-100 bg-grey-darken-4">
+  <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
       title="Exercises"
       show-menu
@@ -30,25 +30,16 @@
         offset-x="0"
         offset-y="0"
       >
-        <v-btn
-          height="40"
-          variant="outlined"
-        >
+        <v-btn height="40" variant="outlined">
           Filter
-          <v-menu
-            activator="parent"
-            :close-on-content-click="false"
-          >
+          <v-menu activator="parent" :close-on-content-click="false">
             <v-list
               v-model:selected="selectedMuscleGroups"
               select-strategy="classic"
             >
               <v-list-item @click="selectedMuscleGroups = []">
                 <v-list-item-title>
-                  <v-icon
-                    class="mr-2"
-                    color="grey-lighten-1"
-                  >
+                  <v-icon class="mr-2" color="grey-lighten-1">
                     mdi-close
                   </v-icon>
                   Reset
@@ -74,7 +65,7 @@
         </v-btn>
       </v-badge>
     </div>
-    <v-list>
+    <v-list class="flex-grow-1 overflow-y-auto pa-0 pb-5">
       <v-list-item
         v-for="exercise in exercises"
         :key="exercise.id"
@@ -89,11 +80,7 @@
             </v-list-item-title>
           </div>
           <div>
-            <v-icon
-              color="grey-lighten-1"
-            >
-              mdi-chevron-right
-            </v-icon>
+            <v-icon color="grey-lighten-1"> mdi-chevron-right </v-icon>
           </div>
         </div>
       </v-list-item>
@@ -104,31 +91,23 @@
       >
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-3">
-            <v-list-item-title class="text-body-1 font-weight-bold text-grey-lighten-1">
+            <v-list-item-title
+              class="text-body-1 font-weight-bold text-grey-lighten-1"
+            >
               Create new exercise
             </v-list-item-title>
           </div>
           <div>
-            <v-icon
-              color="grey-lighten-1"
-            >
-              mdi-plus
-            </v-icon>
+            <v-icon color="grey-lighten-1"> mdi-plus </v-icon>
           </div>
         </div>
       </v-list-item>
     </v-list>
   </div>
-  <v-dialog
-    v-model="isCreateExerciseOpen"
-    fullscreen
-  >
+  <v-dialog v-model="isCreateExerciseOpen" fullscreen>
     <CreateExercise @close="isCreateExerciseOpen = false" />
   </v-dialog>
-  <v-dialog
-    v-model="isViewExerciseOpen"
-    fullscreen
-  >
+  <v-dialog v-model="isViewExerciseOpen" fullscreen>
     <EditExercise
       :selected-exercise="viewExercise"
       :is-view-exercise="true"
@@ -138,13 +117,13 @@
   </v-dialog>
 </template>
 <script lang="ts" setup>
-import type { Exercise } from "@/interfaces/Exercise.interface";
-import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
-import { useExerciseStore } from "@/stores/exercise.store";
-import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
+import type { Exercise } from '@/interfaces/Exercise.interface';
+import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface';
+import { useExerciseStore } from '@/stores/exercise.store';
+import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
 
 const muscleGroupStore = useMuscleGroupStore();
-const searchQuery = ref<string>("");
+const searchQuery = ref<string>('');
 const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
 const viewExercise = ref<Exercise | null>(null);
@@ -152,7 +131,7 @@ const isViewExerciseOpen = ref<boolean>(false);
 const isCreateExerciseOpen = ref<boolean>(false);
 
 const emit = defineEmits<{
-  (e: "close"): void;
+  (e: 'close'): void;
 }>();
 
 const muscleGroups = computed(() => {
@@ -173,14 +152,14 @@ const exercises = computed<Exercise[]>(() =>
   exerciseStore.exercises.filter((exercise: Exercise) => {
     const matchesSearch =
       exercise.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      (exercise.description ?? "")
+      (exercise.description ?? '')
         .toLowerCase()
         .includes(searchQuery.value.toLowerCase());
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
       exercise.muscleGroups?.some((mg: MuscleGroup) =>
-        selectedMuscleGroups.value.includes(mg.id)
+        selectedMuscleGroups.value.includes(mg.id),
       );
 
     return matchesSearch && matchesMuscleGroup;

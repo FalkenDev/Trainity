@@ -1,77 +1,63 @@
 import router from '@/router';
 import { useAuthStore } from '@/stores/auth.store';
 
-export const fetchWrapper = async (url: string, options: RequestInit = {}) => {
+export const fetchWrapper = async <T = any>(
+  url: string,
+  options: RequestInit = {},
+): Promise<T> => {
   try {
-    options.credentials = 'include';
+    const mergedOptions: RequestInit = {
+      ...options,
+      credentials: 'include',
+    };
 
-    const headers = new Headers(options.headers || {});
-
+    const headers = new Headers(mergedOptions.headers || {});
     if (
-      options.body &&
-      typeof options.body === 'string' &&
+      mergedOptions.body &&
+      typeof mergedOptions.body === 'string' &&
       !headers.has('Content-Type')
     ) {
       headers.set('Content-Type', 'application/json');
     }
+    mergedOptions.headers = headers;
 
-    options.headers = headers;
-
-    const response = await fetch(url, options);
+    const response = await fetch(url, mergedOptions);
 
     if (response.status === 401) {
-      handleForbidden();
+      await handleUnauthorized();
       return Promise.reject('401 Unauthorized');
     }
 
     if (response.status === 403) {
-      handleForbidden();
+      await handleForbidden();
       return Promise.reject('403 Forbidden');
     }
 
-    if (response.status === 405) {
-      console.error('405 Method Not Allowed');
-      return Promise.reject('405 Method Not Allowed');
-    }
-
-    if (response.status === 409) {
-      let errorData;
-      const responseText = await response.text();
-
-      try {
-        errorData = JSON.parse(responseText);
-      } catch (_e) {
-        console.error("Failed to parse JSON from 409 response:", _e);
-        errorData = {
-          type: 'unknown',
-          message: responseText || 'Conflict detected',
-        };
-      }
-
-      return Promise.reject({
-        status: 409,
-        ...errorData,
-      });
-    }
-
-    if (response.status === 500) {
-      console.error('500 Internal Server Error');
-      return Promise.reject('500 Internal Server Error');
-    }
-
-    // Check if response is not OK (but not 403)
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(
+        `HTTP error! Status: ${response.status}. Body: ${errorText}`,
+      );
     }
 
-    return response;
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return (await response.json()) as T;
+    }
+    return (await response.text()) as unknown as T;
   } catch (error) {
     console.error('Fetch error:', error);
     throw error;
   }
 };
 
-// Function to handle 403 Forbidden responses
+const handleUnauthorized = async () => {
+  const authStore = useAuthStore();
+  await authStore.logout();
+  console.warn('401 Unauthorized: Redirecting to login...');
+  router.push('/login');
+};
+
 const handleForbidden = async () => {
   const authStore = useAuthStore();
   await authStore.logout();

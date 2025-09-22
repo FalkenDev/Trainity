@@ -11,7 +11,7 @@
             : '',
       }"
     >
-      <router-view />
+      <router-view :key="$route.name" />
     </v-main>
     <v-card
       v-if="

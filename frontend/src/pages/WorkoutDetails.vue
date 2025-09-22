@@ -25,13 +25,16 @@
         </v-list>
       </template>
     </BackHeader>
+
     <v-card height="300" />
+
     <div class="px-5">
       <div class="py-4">
         <h1 class="text-h5 font-weight-bold">
           {{ workout?.title }}
         </h1>
         <p>{{ workout?.description }}</p>
+
         <div class="d-flex ga-2 align-center mt-2 flex-wrap">
           <v-chip
             label
@@ -39,34 +42,68 @@
           >
             {{ workout?.time }} min
           </v-chip>
+
           <v-chip
-            v-for="group in getMuscleGroupsForWorkout()"
+            v-for="group in visibleGroups"
             :key="group"
             color="green-lighten-1"
             label
+            size="small"
           >
             {{ group }}
           </v-chip>
+
+          <v-chip
+            v-if="hiddenCount > 0"
+            label
+            variant="tonal"
+            color="green-lighten-1"
+            size="small"
+            :aria-label="`Show ${hiddenCount} more muscle groups`"
+            @click="isAllGroupsOpen = true"
+          >
+            +{{ hiddenCount }} more
+          </v-chip>
         </div>
       </div>
+
       <v-divider />
+
       <v-btn
+        v-if="workout?.exercises && workout.exercises.length > 0"
         class="w-100"
         color="primary"
         @click="startSession"
       >
         Start Session
       </v-btn>
+
+      <div
+        v-else
+        class="text-center my-5"
+      >
+        <p class="text-subtitle-1 mb-4">
+          No exercises added yet.
+        </p>
+        <v-btn
+          color="primary"
+          @click="isAddExerciseOpen = true"
+        >
+          Add Exercise
+        </v-btn>
+      </div>
+
       <div class="mt-4">
         <v-card
           v-for="(exercise, index) in workout?.exercises"
           :key="index"
-          class="mb-4 d-flex pa-2 align-center justify-space-between"
+          class="mb-4 d-flex pa-2 px-4 align-center justify-space-between"
           style="border-radius: 5px"
           @click="selectExercise(exercise)"
         >
           <div class="d-flex ga-5 align-center">
             <img
+              v-if="false /*TODO: Remove when image upload is added */"
               class="bg-grey"
               style="width: 65px; height: 65px"
             >
@@ -91,6 +128,27 @@
       </div>
     </div>
   </div>
+
+  <v-bottom-sheet v-model="isAllGroupsOpen">
+    <v-card>
+      <v-card-title class="text-subtitle-1 font-weight-bold">
+        Muscle groups ({{ groups.length }})
+      </v-card-title>
+      <v-divider />
+      <div class="pa-4 d-flex flex-wrap ga-2">
+        <v-chip
+          v-for="group in groups"
+          :key="group"
+          label
+          size="small"
+          color="green-lighten-1"
+        >
+          {{ group }}
+        </v-chip>
+      </div>
+    </v-card>
+  </v-bottom-sheet>
+
   <v-dialog
     v-model="isAddExerciseOpen"
     fullscreen
@@ -102,6 +160,7 @@
       @save="updateWorkoutExercises"
     />
   </v-dialog>
+
   <v-dialog
     v-model="isEditExerciseOpen"
     fullscreen
@@ -114,6 +173,7 @@
       @close="isEditExerciseOpen = false"
     />
   </v-dialog>
+
   <v-dialog
     v-model="isEditWorkoutOpen"
     fullscreen
@@ -124,6 +184,7 @@
       @save="workoutStore.setWorkouts(true)"
     />
   </v-dialog>
+
   <v-dialog
     v-model="isWeightAndRepsOpen"
     fullscreen
@@ -134,6 +195,7 @@
       @close="isWeightAndRepsOpen = false"
     />
   </v-dialog>
+
   <AcceptDialog
     v-model="isDeleteDialogOpen"
     title="Delete Exercise"
@@ -142,6 +204,7 @@
     @cancel="isDeleteDialogOpen = false"
   />
 </template>
+
 <script lang="ts" setup>
 import BackHeader from "@/components/BackHeader.vue";
 import router from "@/router";
@@ -151,7 +214,12 @@ import { useWorkoutSessionStore } from "@/stores/workoutSession.store";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import type { Workout, Exercise } from "@/interfaces/Workout.interface";
-import { deleteWorkout, dublicateWorkout, removeExercisesFromWorkout, addExercisesToWorkout } from "@/services/workout.service";
+import {
+  deleteWorkout,
+  dublicateWorkout,
+  removeExercisesFromWorkout,
+  addExercisesToWorkout,
+} from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
 import EditWorkoutExercise from "@/components/Workout/EditWorkoutExercise.vue";
 
@@ -168,12 +236,49 @@ const workoutSessionStore = useWorkoutSessionStore();
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
 
-// TODO: If a workout is already started, give a dialog to end the current session and start a new one
+type GroupStat = { name: string; count: number };
+
+const groupStats = computed<GroupStat[]>(() => {
+  if (!workout.value?.exercises || workout.value.exercises.length === 0) {
+    return [];
+  }
+
+  const muscleGroups = muscleGroupStore.muscleGroups as MuscleGroup[];
+  const names: string[] = workout.value.exercises.flatMap((ex) => {
+    const ids =
+      (ex.exercise.muscleGroups || []).map((mg) =>
+        typeof mg === "object" && mg !== null ? mg.id : mg
+      ) ?? [];
+    return ids
+      .map((id) => muscleGroups.find((g) => g.id === id)?.name || "Unknown")
+      .filter(Boolean);
+  });
+
+  const freq = new Map<string, number>();
+  for (const n of names) freq.set(n, (freq.get(n) ?? 0) + 1);
+
+  return Array.from(freq.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => (b.count - a.count) || a.name.localeCompare(b.name));
+});
+
+const groups = computed<string[]>(() => groupStats.value.map((g) => g.name));
+
+const MAX_VISIBLE = 3;
+const visibleGroups = computed<string[]>(() =>
+  groups.value.slice(0, MAX_VISIBLE)
+);
+const hiddenCount = computed<number>(() =>
+  Math.max(groups.value.length - MAX_VISIBLE, 0)
+);
+const isAllGroupsOpen = ref(false);
 
 const selectedExerciseIds = computed<number[]>(() => {
-  return workout.value?.exercises
-    .map((item) => item.exercise?.id)
-    .filter((id): id is number => !!id) ?? [];
+  return (
+    workout.value?.exercises
+      .map((item) => item.exercise?.id)
+      .filter((id): id is number => !!id) ?? []
+  );
 });
 
 const updateWorkoutExercises = async (newExerciseIds: number[]) => {
@@ -186,11 +291,11 @@ const updateWorkoutExercises = async (newExerciseIds: number[]) => {
     const existingExerciseIds = selectedExerciseIds.value;
 
     const exercisesToAdd = newExerciseIds.filter(
-      (id) => !existingExerciseIds.includes(id),
+      (id) => !existingExerciseIds.includes(id)
     );
 
     const exercisesToRemove = existingExerciseIds.filter(
-      (id) => !newExerciseIds.includes(id),
+      (id) => !newExerciseIds.includes(id)
     );
 
     if (exercisesToRemove.length > 0) {
@@ -200,8 +305,9 @@ const updateWorkoutExercises = async (newExerciseIds: number[]) => {
     if (exercisesToAdd.length > 0) {
       await addExercisesToWorkout(+workout.value!.id, exercisesToAdd);
     }
-    
-    const hasBeenUpdated = exercisesToAdd.length > 0 || exercisesToRemove.length > 0;
+
+    const hasBeenUpdated =
+      exercisesToAdd.length > 0 || exercisesToRemove.length > 0;
 
     if (hasBeenUpdated) {
       toast.success("Workout updated successfully");
@@ -253,26 +359,6 @@ const deleteExercise = async () => {
 const selectExercise = (exercise: Exercise) => {
   selectedExercise.value = exercise;
   isEditExerciseOpen.value = true;
-};
-
-const getMuscleGroupsForWorkout = (): string[] => {
-  if (!workout.value?.exercises || workout.value.exercises.length === 0) {
-    return [];
-  }
-
-  const muscleGroup = muscleGroupStore.muscleGroups as MuscleGroup[];
-
-  return workout.value?.exercises
-    .flatMap((exercise) =>
-      (exercise.exercise.muscleGroups || []).map((mg) =>
-        typeof mg === "object" && mg !== null ? mg.id : mg
-      )
-    )
-    .map((muscleGroupId) => {
-      const group = muscleGroup.find((group) => group.id === muscleGroupId);
-      return group ? group.name : "Unknown";
-    })
-    .filter((value, index, self) => self.indexOf(value) === index);
 };
 
 const startSession = async () => {

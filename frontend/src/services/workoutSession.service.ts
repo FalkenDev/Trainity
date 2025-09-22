@@ -1,154 +1,122 @@
+// services/workoutSession.service.ts
 import { fetchWrapper } from '@/utils/fetchWrapper';
 import type {
   FinishSessionPayload,
   WorkoutSession,
 } from '@/interfaces/workoutSession.interface';
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
-export const fetchAllWorkoutSessions = async () => {
+export const fetchAllWorkoutSessions = async (): Promise<WorkoutSession[]> => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workoutSessions`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch workout sessions');
-    }
-    const data = await response.json();
-    return data || [];
+    const data = await fetchWrapper<WorkoutSession[]>(
+      `${apiUrl}/workoutSessions`,
+    );
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching workout sessions:', error);
-    throw error;
+    throw new Error('Failed to fetch workout sessions');
   }
 };
 
-export const startWorkoutSession = async (workoutId: number) => {
+export const startWorkoutSession = async (
+  workoutId: number,
+): Promise<WorkoutSession> => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workoutsessions`, {
-      method: 'POST',
-      body: JSON.stringify({ workoutId: workoutId }),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to start workout session');
-    }
-    const data = await response.json();
+    const data = await fetchWrapper<WorkoutSession>(
+      `${apiUrl}/workoutSessions`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workoutId }),
+      },
+    );
     return data;
   } catch (error) {
     console.error('Error starting workout session:', error);
-    throw error;
+    throw new Error('Failed to start workout session');
   }
 };
 
-export const abandonWorkoutSession = async (sessionId: number) => {
+export const abandonWorkoutSession = async (
+  sessionId: number,
+): Promise<WorkoutSession> => {
   try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workoutsessions/${sessionId}/abandon`,
-      {
-        method: 'POST',
-      },
+    const data = await fetchWrapper<WorkoutSession>(
+      `${apiUrl}/workoutSessions/${sessionId}/abandon`,
+      { method: 'POST' },
     );
-    if (!response.ok) {
-      throw new Error('Failed to abandon workout session');
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error abandoning workout session:', error);
-    throw error;
+    throw new Error('Failed to abandon workout session');
   }
 };
 
-// export const addFinnishedExerciseToSession = async (
-//   sessionId: string,
-//   workoutExercise: WorkoutExercise
-// ) => {
-//   try {
-//     const response = await fetchWrapper(
-//       `${apiUrl}/workoutsessions/${sessionId}/abandon`,
-//       {
-//         method: 'POST',
-//       },
-//     );
-//     if (!response.ok) {
-//       throw new Error('Failed to abandon workout session');
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     console.error('Error abandoning workout session:', error);
-//     throw error;
-//   }
-// };
-
-export const getWorkoutSessionById = async (sessionId: number) => {
+export const getWorkoutSessionById = async (
+  sessionId: number,
+): Promise<WorkoutSession> => {
   try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workoutsessions/${sessionId}`,
+    const data = await fetchWrapper<WorkoutSession>(
+      `${apiUrl}/workoutSessions/${sessionId}`,
     );
-    if (!response.ok) {
-      throw new Error('Failed to fetch workout session');
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error fetching workout session:', error);
-    throw error;
+    throw new Error('Failed to fetch workout session');
   }
 };
 
 export const updateWorkoutSession = async (
   sessionId: number,
   sessionData: WorkoutSession,
-) => {
+): Promise<WorkoutSession> => {
   try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workoutsessions/${sessionId}`,
+    const data = await fetchWrapper<WorkoutSession>(
+      `${apiUrl}/workoutSessions/${sessionId}`,
       {
         method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sessionData),
       },
     );
-    if (!response.ok) {
-      throw new Error('Failed to update workout session');
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error('Error updating workout session:', error);
-    throw error;
+    throw new Error('Failed to update workout session');
   }
 };
 
 export const finishWorkoutSession = async (
   sessionId: number,
   payload: FinishSessionPayload,
-) => {
-  const response = await fetchWrapper(
-    `${apiUrl}/workoutSessions/${sessionId}/complete`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    },
-  );
-  if (!response.ok) {
-    throw new Error('Failed to finish workout session');
-  }
-  return await response.json();
-};
-
-export const deleteWorkoutSession = async (sessionId: number) => {
+): Promise<WorkoutSession> => {
   try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workoutsessions/${sessionId}`,
+    const data = await fetchWrapper<WorkoutSession>(
+      `${apiUrl}/workoutSessions/${sessionId}/complete`,
       {
-        method: 'DELETE',
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       },
     );
-    if (!response.ok) {
-      throw new Error('Failed to delete workout session');
-    }
-    return true; // Assuming deletion is successful if no error is thrown
+    return data;
+  } catch (error) {
+    console.error('Error finishing workout session:', error);
+    throw new Error('Failed to finish workout session');
+  }
+};
+
+export const deleteWorkoutSession = async (
+  sessionId: number,
+): Promise<boolean> => {
+  try {
+    await fetchWrapper<void>(`${apiUrl}/workoutSessions/${sessionId}`, {
+      method: 'DELETE',
+    });
+    return true;
   } catch (error) {
     console.error('Error deleting workout session:', error);
-    throw error;
+    throw new Error('Failed to delete workout session');
   }
 };

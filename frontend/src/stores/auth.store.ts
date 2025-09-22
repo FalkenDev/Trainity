@@ -2,8 +2,13 @@
 import { useRouter } from 'vue-router';
 import { defineStore } from 'pinia';
 import { toast } from 'vuetify-sonner';
+import { useWorkoutStore } from './workout.store';
+import { useExerciseStore } from './exercise.store';
+import { useMuscleGroupStore } from './muscleGroup.store';
+import { useWorkoutSessionStore } from './workoutSession.store';
+import { fetchWrapper } from '@/utils/fetchWrapper';
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 export const useAuthStore = defineStore(
   'authStore',
@@ -17,43 +22,37 @@ export const useAuthStore = defineStore(
     const login = async (email: string, password: string) => {
       loading.value = true;
       try {
-        const response = await fetch(`${apiUrl}/auth/login`, {
+        const data = await fetchWrapper<{ user: any }>(`${apiUrl}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          credentials: 'include',
-          body: JSON.stringify({
-            email,
-            password,
-          }),
+          body: JSON.stringify({ email, password }),
         });
 
-        if (response instanceof Response && response.ok) {
-          const data = await response.json();
-          isAuthenticated.value = true;
-          user.value = data.user;
-          token.value = data.token;
-          router.push('/');
-          return data;
-        } else {
-          throw new Error('Invalid credentials');
-        }
+        isAuthenticated.value = true;
+        user.value = data.user;
+        token.value = '';
+
+        await useWorkoutStore().resetStore();
+        await useExerciseStore().resetStore();
+        await useMuscleGroupStore().resetStore();
+        await useWorkoutSessionStore().resetStore();
+
+        router.push('/');
+        return data;
       } catch (error) {
         console.error('Login failed:', error);
         toast.error('Login failed. Please check your credentials.');
         isAuthenticated.value = false;
-        throw new Error('Login failed');
+        throw error;
       } finally {
         loading.value = false;
       }
-      return null;
     };
 
     const logout = (): void => {
-      isAuthenticated.value = false;
-      user.value = null;
-      token.value = '';
+      resetStore();
       router.push('/login');
     };
 
@@ -67,7 +66,7 @@ export const useAuthStore = defineStore(
         const firstName = registerData.fullName.split(' ')[0];
         const lastName = registerData.fullName.split(' ')[1] || '';
 
-        const response = await fetch(`${apiUrl}/auth/register`, {
+        const response = await fetchWrapper(`${apiUrl}/auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -92,6 +91,13 @@ export const useAuthStore = defineStore(
       return null;
     };
 
+    const resetStore = () => {
+      isAuthenticated.value = false;
+      user.value = null;
+      token.value = '';
+      loading.value = false;
+    };
+
     return {
       isAuthenticated,
       user,
@@ -100,11 +106,12 @@ export const useAuthStore = defineStore(
       login,
       logout,
       createAccount,
+      resetStore,
     };
   },
   {
     persist: {
       pick: ['isAuthenticated', 'user', 'token'],
     },
-  }
+  },
 );

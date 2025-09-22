@@ -9,6 +9,7 @@
       <v-list-item
         v-for="option in options"
         :key="option.value"
+        :disabled="defaultWeightAndReps !== option.value /* TODO: DISABLE until use latest and exercise functions is added*/"
         class="border-t-sm border-b-sm py-2"
         two-line
         @click="
