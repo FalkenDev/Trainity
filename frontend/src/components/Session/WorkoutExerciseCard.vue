@@ -92,7 +92,7 @@
           <v-chip-group
             :model-value="props.rpe ?? 8"
             mandatory
-            class="d-flex flex-wrap justify-space-between"
+            class="d-flex flex-wrap justify-space-between "
             @update:model-value="$emit('update:rpe', $event)"
           >
             <v-chip
@@ -102,7 +102,7 @@
               size="large"
               filter
               label
-              class="flex-grow-1 text-center justify-center"
+              class="flex-grow-1 text-center justify-center ma-0 mx-1"
               :color="(props.rpe ?? 8) === value ? 'primary' : 'grey-darken-2'"
               variant="tonal"
             >
