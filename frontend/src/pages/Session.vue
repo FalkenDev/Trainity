@@ -3,6 +3,7 @@
     <BackHeader
       :show-menu="true"
       title="Workout Session"
+      :route-to="'/'"
     >
       <template #menuAppend>
         <v-list>
