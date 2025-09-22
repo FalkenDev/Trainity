@@ -61,7 +61,6 @@ const handleClick = () => {
     console.log("Routing to:", props.routeTo);
     routeTo();
   } else {
-    console.log("Emitting close event");
     emit("close");
   }
 };
