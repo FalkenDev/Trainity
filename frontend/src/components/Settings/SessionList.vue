@@ -278,6 +278,7 @@ onMounted(() => {
 .content-scroll {
   height: calc(100vh - 56px);
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 </style>
