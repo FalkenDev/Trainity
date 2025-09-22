@@ -86,24 +86,38 @@
           </template>
         </v-data-table>
         <div class="pa-4 pt-2 d-flex flex-column ga-3 bg-grey-darken-4">
-          <v-slider
-            label="RPE (Rate of Perceived Exertion)"
-            :model-value="props.rpe"
-            thumb-label
-            step="1"
-            min="1"
-            max="10"
-            hide-details
+          <!-- TODO: Have in account settings if want to show RPE And notes in a workout session or not -->
+          <span class="text-body-2 text-grey">RPE (Rate of Perceived Exertion)</span>
+
+          <v-chip-group
+            :model-value="props.rpe ?? 8"
+            mandatory
+            class="d-flex flex-wrap justify-space-between"
             @update:model-value="$emit('update:rpe', $event)"
-          />
-          <v-text-field
+          >
+            <v-chip
+              v-for="value in [0, 4, 6, 8, 9, 10]"
+              :key="value"
+              :value="value"
+              size="large"
+              filter
+              label
+              class="flex-grow-1 text-center justify-center"
+              :color="(props.rpe ?? 8) === value ? 'primary' : 'grey-darken-2'"
+              variant="tonal"
+            >
+              {{ value }}
+            </v-chip>
+          </v-chip-group>
+          <!-- TODO: Disable for now (Not working yet, and still don't know how i want it)-->
+          <!-- <v-text-field
             label="Exercise Notes"
             :model-value="props.notes"
             variant="outlined"
             density="compact"
             hide-details
             @update:model-value="$emit('update:notes', $event)"
-          />
+          /> -->
         </div>
       </div>
     </v-expand-transition>
