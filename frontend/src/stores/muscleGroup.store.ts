@@ -35,7 +35,14 @@ export const useMuscleGroupStore = defineStore(
 
     setMuscleGroups();
 
-    return { muscleGroups, isLoading, setMuscleGroups };
+    const resetStore =  async() => {
+      muscleGroups.value = [];
+      isLoading.value = false;
+      lastFetched.value = null;
+      await setMuscleGroups(true);
+    };
+
+    return { muscleGroups, isLoading, setMuscleGroups, resetStore };
   },
   {
     persist: true,

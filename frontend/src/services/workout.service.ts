@@ -1,86 +1,71 @@
+// services/workout.service.ts
 import type {
   CreateWorkout,
   UpdateWorkout,
   UpdateWorkoutExercise,
-} from "@/interfaces/Workout.interface";
-import { fetchWrapper } from "@/utils/fetchWrapper";
+} from '@/interfaces/Workout.interface';
+import { fetchWrapper } from '@/utils/fetchWrapper';
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 export const fetchAllWorkouts = async () => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workouts`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch workouts");
-    }
-    const data = await response.json();
-    return data || [];
+    const data = await fetchWrapper<any[]>(`${apiUrl}/workouts`);
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error("Error fetching workouts:", error);
-    throw error;
+    console.error('Error fetching workouts:', error);
+    throw new Error('Failed to fetch workouts');
   }
 };
 
 export const createWorkout = async (workout: CreateWorkout) => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workouts`, {
-      method: "POST",
+    const data = await fetchWrapper<any>(`${apiUrl}/workouts`, {
+      method: 'POST',
       body: JSON.stringify(workout),
+      headers: { 'Content-Type': 'application/json' },
     });
-    if (!response.ok) {
-      throw new Error("Failed to create workout");
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error creating workout:", error);
-    throw error;
+    console.error('Error creating workout:', error);
+    throw new Error('Failed to create workout');
   }
 };
 
 export const getWorkoutById = async (id: number) => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workouts/${id}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch workout by ID");
-    }
-    const data = await response.json();
+    const data = await fetchWrapper<any>(`${apiUrl}/workouts/${id}`);
     return data;
   } catch (error) {
-    console.error("Error fetching workout by ID:", error);
-    throw error;
+    console.error('Error fetching workout by ID:', error);
+    throw new Error('Failed to fetch workout by ID');
   }
 };
 
 export const updateWorkout = async (id: number, workout: UpdateWorkout) => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
-      method: "PATCH",
+    const data = await fetchWrapper<any>(`${apiUrl}/workouts/${id}`, {
+      method: 'PATCH',
       body: JSON.stringify(workout),
+      headers: { 'Content-Type': 'application/json' },
     });
-    if (!response.ok) {
-      throw new Error("Failed to update workout");
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error updating workout:", error);
-    throw error;
+    console.error('Error updating workout:', error);
+    throw new Error('Failed to update workout');
   }
 };
 
 export const deleteWorkout = async (id: number) => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workouts/${id}`, {
-      method: "DELETE",
+    // If your API returns 204 No Content, fetchWrapper will still resolve (no body).
+    await fetchWrapper<void>(`${apiUrl}/workouts/${id}`, {
+      method: 'DELETE',
     });
-    if (!response.ok) {
-      throw new Error("Failed to delete workout");
-    }
     return true;
   } catch (error) {
-    console.error("Error deleting workout:", error);
-    throw error;
+    console.error('Error deleting workout:', error);
+    throw new Error('Failed to delete workout');
   }
 };
 
@@ -88,26 +73,19 @@ export const addExercisesToWorkout = async (
   workoutId: number,
   exerciseIds: number[],
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
-    const response = await fetchWrapper(
+    const data = await fetchWrapper<any>(
       `${apiUrl}/workouts/${workoutId}/exercises`,
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ exerciseIds }),
       },
     );
-    if (!response.ok) {
-      throw new Error("Failed to add exercises to workout");
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error adding exercises to workout:", error);
-    throw error;
+    console.error('Error adding exercises to workout:', error);
+    throw new Error('Failed to add exercises to workout');
   }
 };
 
@@ -115,26 +93,18 @@ export const removeExercisesFromWorkout = async (
   workoutId: number,
   exerciseIds: number[],
 ) => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8393/v1";
   try {
-    const response = await fetchWrapper(
-      `${apiUrl}/workouts/${workoutId}/exercises`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ exerciseIds }),
-      },
-    );
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to remove exercises from workout");
-    }
+    await fetchWrapper<void>(`${apiUrl}/workouts/${workoutId}/exercises`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ exerciseIds }),
+    });
     return true;
-  } catch (error) {
-    console.error("Error removing exercises from workout:", error);
-    throw error;
+  } catch (error: any) {
+    console.error('Error removing exercises from workout:', error);
+    throw new Error(
+      error?.message || 'Failed to remove exercises from workout',
+    );
   }
 };
 
@@ -144,36 +114,29 @@ export const updateExerciseInWorkout = async (
   exerciseData: UpdateWorkoutExercise,
 ) => {
   try {
-    const response = await fetchWrapper(
+    const data = await fetchWrapper<any>(
       `${apiUrl}/workouts/${workoutId}/exercise/${exerciseId}`,
       {
-        method: "PATCH",
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(exerciseData),
       },
     );
-    if (!response.ok) {
-      throw new Error("Failed to update exercise in workout");
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error updating exercise in workout:", error);
-    throw error;
+    console.error('Error updating exercise in workout:', error);
+    throw new Error('Failed to update exercise in workout');
   }
 };
 
 export const dublicateWorkout = async (id: number) => {
   try {
-    const response = await fetchWrapper(`${apiUrl}/workouts/${id}/duplicate`, {
-      method: "POST",
+    const data = await fetchWrapper<any>(`${apiUrl}/workouts/${id}/duplicate`, {
+      method: 'POST',
     });
-    if (!response.ok) {
-      throw new Error("Failed to duplicate workout");
-    }
-    const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error duplicating workout:", error);
-    throw error;
+    console.error('Error duplicating workout:', error);
+    throw new Error('Failed to duplicate workout');
   }
 };

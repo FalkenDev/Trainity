@@ -47,7 +47,8 @@ export const useWorkoutStore = defineStore(
 
     setWorkouts();
 
-    const setCurrentWorkout = (workoutId: number) => {
+    const setCurrentWorkout = async(workoutId: number) => {
+      await setWorkouts(true);
       const workout = workouts.value.find((w) => w.id === workoutId);
       if (workout) {
         currentWorkout.value = workout;
@@ -56,12 +57,21 @@ export const useWorkoutStore = defineStore(
       }
     };
 
+    const resetStore = async () => {
+      workouts.value = [];
+      isLoading.value = false;
+      currentWorkout.value = null;
+      lastFetched.value = null;
+      await setWorkouts(true);
+    };
+
     return {
       workouts,
       isLoading,
       currentWorkout,
       setCurrentWorkout,
       setWorkouts,
+      resetStore,
     };
   },
   {
