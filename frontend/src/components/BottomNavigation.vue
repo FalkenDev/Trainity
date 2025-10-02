@@ -17,8 +17,8 @@
     <!-- Disabled for now: Eanble when implemented -->
     <v-btn
       icon
-      to="/add-workout"
-      :disabled="true"
+      to="/workout"
+      :disabled="false"
     >
       <v-icon
         color="orange-darken-1"

@@ -76,6 +76,14 @@
     >
       <SessionList @close="isSessionListOpen = false" />
     </v-dialog>
+    <v-dialog
+      v-model="isWorkoutListOpen"
+      fullscreen
+      transition="slide-y-transition"
+      persistent
+    >
+      <WorkoutList @close="isWorkoutListOpen = false" />
+    </v-dialog>
   </div>
 </template>
 <script lang="ts" setup>
@@ -83,11 +91,15 @@ import SessionList from '@/components/Settings/SessionList.vue';
 
 const isExerciseListOpen = ref(false);
 const isSessionListOpen = ref(false);
+const isWorkoutListOpen = ref(false);
 
 const setDialogToOpen = (type: string) => {
   switch (type) {
     case 'exercises':
       isExerciseListOpen.value = true;
+      break;
+    case 'workouts':
+      isWorkoutListOpen.value = true;
       break;
     case 'sessions':
       isSessionListOpen.value = true;
@@ -102,7 +114,7 @@ const setDialogToOpen = (type: string) => {
 
 const contentList = [
   { title: 'Exercises', showArrow: true, type: 'exercises', disabled: false },
-  { title: 'Workouts', showArrow: true, type: 'workouts', disabled: true },
+  { title: 'Workouts', showArrow: true, type: 'workouts', disabled: false },
   { title: 'Sessions', showArrow: true, type: 'sessions', disabled: false },
 ];
 const preferencesList  = [

@@ -12,7 +12,7 @@
     <div class="content-scroll">
       <v-row>
         <v-col cols="12">
-          <v-card elevation="1">
+          <v-card elevation="0">
             <v-card-title class="d-flex ga-10 justify-space-between align-center">
               <div class="text-h6 w-100">
                 <v-text-field
@@ -33,7 +33,10 @@
 
             <v-divider />
 
-            <v-card-text class="pa-0">
+            <v-card-text
+              v-if="sessions.length > 0"
+              class="pa-0"
+            >
               <v-expansion-panels multiple>
                 <v-expansion-panel
                   v-for="session in sessions"
@@ -182,17 +185,16 @@
                     </div>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
-
-                <div
-                  v-if="sessions.length === 0"
-                  class="py-10"
-                >
-                  <p class="text-center text-subtitle text-medium-emphasis">
-                    No sessions found
-                  </p>
-                </div>
               </v-expansion-panels>
             </v-card-text>
+            <div
+              v-else
+              class="py-10"
+            >
+              <p class="text-center text-subtitle text-medium-emphasis">
+                No sessions found
+              </p>
+            </div>
           </v-card>
         </v-col>
       </v-row>
@@ -266,12 +268,17 @@ function title(session: WorkoutSession) {
   return session.workoutSnapshot?.title || `Session #${session.id}`;
 }
 
+onMounted(() => {
+  store.setWorkoutSessions(true);
+});
+
 </script>
 
 <style scoped>
 .content-scroll {
   height: calc(100vh - 56px);
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 </style>

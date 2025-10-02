@@ -1,7 +1,6 @@
 <template>
   <div
     class="d-flex justify-space-between align-center px-5 py-3"
-    @click="routeTo"
   >
     <v-btn
       color="grey-darken-4"
@@ -9,7 +8,7 @@
       icon
       size="40"
       variant="flat"
-      @click="emit('close')"
+      @click="handleClick"
     >
       <v-icon>mdi-arrow-left</v-icon>
     </v-btn>
@@ -54,6 +53,15 @@ const emit = defineEmits<{
 const routeTo = () => {
   if (props.routeTo) {
     router.push(props.routeTo);
+  }
+};
+
+const handleClick = () => {
+  if (props.routeTo) {
+    console.log("Routing to:", props.routeTo);
+    routeTo();
+  } else {
+    emit("close");
   }
 };
 </script>

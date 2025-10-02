@@ -3,6 +3,7 @@
     <BackHeader
       :show-menu="true"
       title="Workout Session"
+      :route-to="'/'"
     >
       <template #menuAppend>
         <v-list>
@@ -160,10 +161,8 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
           details.defaultPauseSeconds ??
           60;
 
-        // 1) Upsert in live store
         workoutSessionStore.upsertExercise(sessionId.value, id);
 
-        // 2) Seed sets in live store if empty
         const live = workoutSessionStore.getLiveSession(sessionId.value);
         const exLive = live?.exercises[id];
         if (exLive && exLive.sets.length === 0) {
@@ -179,7 +178,6 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
           }
         }
 
-        // 3) Push to rendered list with real details
         processedExercises.value.push({
           exerciseId: id,
           id,
@@ -372,8 +370,26 @@ watchEffect(async () => {
   });
 });
 
+watchEffect(() => {
+  const s = workoutSession.value;
+  if (!s) return;
+
+  const raw = (s as WorkoutSession).startedAt as string | undefined;
+  if (raw) {
+    const isoGuess =
+      raw.includes('T') ? raw : raw.replace(' ', 'T') + 'Z';
+    const ms = Date.parse(isoGuess);
+    if (!Number.isNaN(ms)) {
+      workoutSessionStore.startedAt = ms;
+    }
+  }
+  if (workoutSessionStore.startedAt != null) {
+    workoutSessionStore.startClock();
+  }
+});
+
 onMounted(() => {
-  if (workoutSessionStore.formattedClock === '00:00') {
+  if (!workoutSessionStore.isRunning && workoutSessionStore.startedAt == null) {
     workoutSessionStore.startClock();
   }
 });

@@ -1,14 +1,11 @@
 <template>
-  <div class="w-100 h-100 bg-grey-darken-4">
+  <div class="d-flex flex-column fill-height bg-grey-darken-4 content-scroll">
     <BackHeader
-      title="Add Exercises"
+      title="Create Exercises"
       :show-menu="false"
       @close="emit('close')"
     />
     <v-form class="mx-5">
-      <h1 class="text-h4 mb-4">
-        Create Exercise
-      </h1>
       <v-text-field
         v-model="newExercise.name"
         label="Exercise Name"
@@ -62,7 +59,7 @@
       />
       <v-btn
         color="primary"
-        class="mt-4"
+        class="w-100"
         @click="createNewExercise"
       >
         Create Exercise
@@ -126,3 +123,12 @@ const createNewExercise = async () => {
   }
 };
 </script>
+<style>
+.content-scroll {
+  height: calc(100vh - 100px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 16px;
+}
+</style>

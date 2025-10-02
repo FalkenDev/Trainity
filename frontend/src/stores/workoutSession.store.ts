@@ -32,7 +32,7 @@ export const useWorkoutSessionStore = defineStore(
     const lastFetched = ref<number | null>(null);
     const cacheDuration = 10 * 1000;
     const authStore = useAuthStore();
-
+    const startedAt = ref<number | null>(null);
     const secondsElapsed = ref(0);
     let intervalId: ReturnType<typeof setInterval> | null = null;
     const isRunning = ref(false);
@@ -44,6 +44,12 @@ export const useWorkoutSessionStore = defineStore(
       const formattedSeconds = String(seconds).padStart(2, '0');
       return `${formattedMinutes}:${formattedSeconds}`;
     });
+
+    function tickNow() {
+      if (startedAt.value != null) {
+        secondsElapsed.value = Math.floor((Date.now() - startedAt.value) / 1000);
+      }
+    }
 
     const liveSessions = ref<Record<number, LiveSessionState>>({});
 
@@ -90,10 +96,10 @@ export const useWorkoutSessionStore = defineStore(
     }
 
     function startClock() {
-      if (intervalId) return;
-      intervalId = setInterval(() => {
-        secondsElapsed.value++;
-      }, 1000);
+      if (intervalId == null) {
+        tickNow();
+        intervalId = setInterval(tickNow, 1000);
+      }
       isRunning.value = true;
     }
 
@@ -103,6 +109,7 @@ export const useWorkoutSessionStore = defineStore(
         intervalId = null;
       }
       isRunning.value = false;
+      tickNow();
     }
 
     function resetClock() {
@@ -271,6 +278,38 @@ export const useWorkoutSessionStore = defineStore(
       delete liveSessions.value[sessionId];
     }
 
+    const resetStore = async () => {
+      workoutSessions.value = [];
+      isLoading.value = false;
+      lastFetched.value = null;
+      selectedWorkoutSession.value = null;
+      secondsElapsed.value = 0;
+      isRunning.value = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      liveSessions.value = {};
+      if (authStore.isAuthenticated) {
+        await setWorkoutSessions(true);
+      }
+    };
+
+    if (isRunning.value && startedAt.value != null) {
+      tickNow();
+      if (intervalId == null) {
+        intervalId = setInterval(tickNow, 1000);
+      }
+    } else {
+      tickNow();
+    }
+
+    if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+      const onVisibility = () => tickNow();
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('focus', onVisibility);
+    }
+
     return {
       workoutSessions,
       isLoading,
@@ -293,6 +332,8 @@ export const useWorkoutSessionStore = defineStore(
       deleteSet,
       updateExerciseMeta,
       clearLiveSession,
+      resetStore,
+      startedAt,
     };
   },
   {
@@ -305,6 +346,7 @@ export const useWorkoutSessionStore = defineStore(
         'selectedWorkoutSession',
         'lastFetched',
         'liveSessions',
+        'startedAt',
       ],
     },
   },

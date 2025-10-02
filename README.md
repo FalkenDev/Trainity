@@ -59,6 +59,8 @@ Perfect for fitness enthusiasts who want professional-grade workout tracking wit
 
 ### Installation
 
+#### Local
+
 1. **Clone the repository**
 
    ```bash
@@ -83,13 +85,44 @@ Perfect for fitness enthusiasts who want professional-grade workout tracking wit
    npm run dev
    ```
 
+3. **Seed**
+   ```bash
+   cd /backend
+   npm run seed
+   ```
+
 4. **Access the application**
    - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:8393`
+   - Backend API: `http://localhost:1337`
+
+
+#### Docker
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/FalkenDev/Trainity.git
+   cd Trainity
+   ```
+
+2. **Docker**
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+3. **Seed**
+   ```bash
+   docker exec -it trainity_backend npm run seed
+   ```
+
+4. **Access the application**
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:1337`
 
 ### 🐳 Docker Support
 
-Docker configuration is planned for easier deployment. Stay tuned!
+We are now supporting docker setup
 
 ## 📸 Preview
 

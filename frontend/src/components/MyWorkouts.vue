@@ -42,59 +42,27 @@
       />
     </div>
 
-    <!-- Empty state -->
-    <div
-      v-else-if="!workouts.length"
-      class="px-4 mt-6"
-    >
-      <v-card
-        class="empty rounded-xl pa-6"
-        variant="outlined"
-      >
-        <div class="d-flex flex-column align-center text-center">
-          <v-icon
-            color="primary"
-            size="48"
-          >
-            mdi-dumbbell
-          </v-icon>
-          <div class="text-subtitle-1 font-weight-medium mt-2">
-            No workouts yet
-          </div>
-          <div class="text-body-2 text-medium-emphasis mt-1">
-            Create your first workout and start training.
-          </div>
-          <v-btn
-            class="mt-4"
-            color="primary"
-            @click="$router.push('/workouts/new')"
-          >
-            Create Workout
-          </v-btn>
-        </div>
-      </v-card>
-    </div>
-
     <!-- List -->
+    <!-- TODO: FEAT: Show latest 3 workouts done -->
     <div
-      v-else
+      v-else-if="workouts.length"
       class="pb-6"
     >
       <v-row dense>
         <v-col
-          v-for="workout in workouts"
+          v-for="workout in workouts.slice(0, 3)"
           :key="workout.id"
           cols="12"
         >
           <v-card
-            class="workout-card"
+            class="workout-card my-2"
             variant="flat"
-            rounded="xl"
+            rounded="sm"
             @click="routeTo(workout.id)"
           >
             <div class="card-gradient" />
 
-            <div class="d-flex align-center">
+            <div class="d-flex align-center w-100">
               <div class="icon-wrap mr-3">
                 <v-icon
                   color="primary"
@@ -104,7 +72,7 @@
                 </v-icon>
               </div>
 
-              <div class="flex-1">
+              <div class="w-100">
                 <div class="d-flex align-center justify-space-between">
                   <div class="text-subtitle-1 font-weight-bold ellipsis">
                     {{ workout.title }}
@@ -154,9 +122,10 @@
             <!-- Footer row -->
             <div class="d-flex align-center justify-space-between mt-3">
               <div class="text-caption text-medium-emphasis">
-                Updated
+                <!-- TODO: FEAT: Maybe have Latest Update instead -->
+                Created
                 {{
-                  new Date(workout.updatedAt as any).toLocaleDateString(undefined, {
+                  new Date(workout.createdAt as any).toLocaleDateString(undefined, {
                     month: 'short',
                     day: 'numeric',
                   })
@@ -186,6 +155,59 @@
         </v-col>
       </v-row>
     </div>
+    <!-- Empty state -->
+    <div
+      v-else
+      class="mt-6 mb-5"
+    >
+      <v-card
+        class="empty pa-6"
+        variant="outlined"
+      >
+        <div class="d-flex flex-column align-center text-center">
+          <v-icon
+            color="primary"
+            size="48"
+          >
+            mdi-dumbbell
+          </v-icon>
+          <div class="text-subtitle-1 font-weight-medium mt-2">
+            No workouts yet
+          </div>
+          <div class="text-body-2 text-medium-emphasis mt-1">
+            Create your first workout and start training.
+          </div>
+          <v-btn
+            class="mt-4"
+            color="primary"
+            @click="isCreateWorkoutOpen = true"
+          >
+            Create Workout
+          </v-btn>
+        </div>
+      </v-card>
+    </div>
+    <v-btn
+      class="w-100"
+      size="large"
+      @click="isWorkoutListOpen = true"
+    >
+      Show all workouts
+    </v-btn>
+    <v-dialog
+      v-model="isWorkoutListOpen"
+      fullscreen
+      transition="slide-y-transition"
+      persistent
+    >
+      <WorkoutList @close="isWorkoutListOpen = false" />
+    </v-dialog>
+    <v-dialog
+      v-model="isCreateWorkoutOpen"
+      fullscreen
+    >
+      <CreateWorkout @close="isCreateWorkoutOpen = false" />
+    </v-dialog>
   </div>
 </template>
 
@@ -199,6 +221,8 @@ const router = useRouter();
 const workoutStore = useWorkoutStore();
 
 const loading = ref(false);
+const isWorkoutListOpen = ref(false);
+const isCreateWorkoutOpen = ref(false);
 
 const workouts = computed<Workout[]>(() => {
   const list = workoutStore.workouts || [];
