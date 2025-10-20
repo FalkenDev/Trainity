@@ -7,6 +7,7 @@ import { UserWithoutPasswordDto } from '../auth/dto/UserWithoutPassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,8 @@ export class UserService {
 
     @InjectRepository(WorkoutSession)
     private readonly sessionRepo: Repository<WorkoutSession>,
+
+    private readonly uploadService: UploadService,
   ) {}
 
   async findOneById(userId: number): Promise<UserWithoutPasswordDto> {
@@ -67,5 +70,26 @@ export class UserService {
     await this.userRepo.remove(user);
 
     return { message: 'User and all related data deleted' };
+  }
+
+  async updateAvatar(
+    userId: number,
+    avatarUrl: string,
+  ): Promise<UserWithoutPasswordDto> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Delete old avatar if exists
+    if (user.avatar) {
+      await this.uploadService.deleteImage(user.avatar);
+    }
+
+    user.avatar = avatarUrl;
+    const updated = await this.userRepo.save(user);
+
+    return new UserWithoutPasswordDto(updated);
   }
 }

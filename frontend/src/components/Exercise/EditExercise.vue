@@ -27,7 +27,18 @@
     <div
       v-if="selectedExercise"
     >
+      <div
+        v-if="selectedExercise.image"
+        class="exercise-image-container"
+      >
+        <v-img
+          :src="getImageUrl(selectedExercise.image)"
+          height="200"
+          cover
+        />
+      </div>
       <v-card
+        v-else
         height="200"
         class="bg-white"
       />
@@ -133,6 +144,13 @@
             v-if="editExercise"
             class="py-4 d-flex ga-5 flex-column"
           >
+            <ImageUpload
+              v-model="imageFile"
+              :existing-image-url="selectedExercise.image ? getImageUrl(selectedExercise.image) : null"
+              placeholder="Change exercise image"
+              helper-text="Upload a new image to replace the current one"
+            />
+            
             <v-text-field
               v-model="editExercise.name"
               label="Name"
@@ -219,9 +237,11 @@ import { useExerciseStore } from '@/stores/exercise.store';
 import {
   updateExercise as updateExerciseInExercise,
   deleteExercise,
+  uploadExerciseImage,
 } from '@/services/exercise.service';
 import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
 import { toast } from 'vuetify-sonner';
+import ImageUpload from '@/components/basicUI/ImageUpload.vue';
 
 const props = defineProps<{
   workoutId?: number;
@@ -234,6 +254,18 @@ const muscleGroupStore = useMuscleGroupStore();
 const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
 const isDeleteExerciseOpen = ref<boolean>(false);
+const imageFile = ref<File | null>(null);
+
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
+
+const getImageUrl = (imagePath: string) => {
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+  // Remove /v1 from API URL for static assets
+  const baseUrl = apiUrl.replace('/v1', '');
+  return `${baseUrl}${imagePath}`;
+};
 
 const editExercise = ref<UpdateExercise | null>({
   id:  Number(props.selectedExercise?.id || 0),
@@ -300,6 +332,17 @@ const updateExercise = async () => {
         getSanitizedExerciseData() || {},
       );
       if (response) {
+        // If there's a new image, upload it
+        if (imageFile.value) {
+          try {
+            await uploadExerciseImage(props.selectedExercise.id, imageFile.value);
+            imageFile.value = null;
+          } catch (imageError) {
+            console.error('Error uploading image:', imageError);
+            toast.warning('Exercise updated but image upload failed');
+          }
+        }
+        
         toast.success('Exercise updated successfully!', { progressBar: true });
         await exerciseStore.setExercises(true);
         isViewExercise.value = true;
@@ -314,3 +357,11 @@ const updateExercise = async () => {
     }
   }
 </script>
+
+<style scoped>
+.exercise-image-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+</style>

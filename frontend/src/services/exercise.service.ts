@@ -65,3 +65,19 @@ export const deleteExercise = async (exerciseId: number) => {
     throw new Error('Failed to delete exercise');
   }
 };
+
+export const uploadExerciseImage = async (exerciseId: number, file: File) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const data = await fetchWrapper<any>(`${apiUrl}/exercises/${exerciseId}/image`, {
+      method: 'POST',
+      body: formData,
+    });
+    return data;
+  } catch (error) {
+    console.error('Error uploading exercise image:', error);
+    throw new Error('Failed to upload exercise image');
+  }
+};

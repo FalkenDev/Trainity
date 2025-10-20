@@ -6,6 +6,13 @@
       @close="emit('close')"
     />
     <v-form class="mx-5">
+      <ImageUpload
+        v-model="imageFile"
+        placeholder="Add exercise image (optional)"
+        helper-text="Add a reference image for this exercise"
+        class="mb-4"
+      />
+      
       <v-text-field
         v-model="newExercise.name"
         label="Exercise Name"
@@ -60,6 +67,7 @@
       <v-btn
         color="primary"
         class="w-100"
+        :loading="isCreating"
         @click="createNewExercise"
       >
         Create Exercise
@@ -68,12 +76,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { createExercise } from "@/services/exercise.service";
+import { createExercise, uploadExerciseImage } from "@/services/exercise.service";
 import type { CreateExercise } from "@/interfaces/Exercise.interface";
 import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
 import { useExerciseStore } from "@/stores/exercise.store";
 import { toast } from "vuetify-sonner";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
+import ImageUpload from "@/components/basicUI/ImageUpload.vue";
 
 const emit = defineEmits<{
   (e: "close"): void;
@@ -81,6 +90,9 @@ const emit = defineEmits<{
 
 const exerciseStore = useExerciseStore();
 const muscleGroupStore = useMuscleGroupStore();
+const isCreating = ref(false);
+const imageFile = ref<File | null>(null);
+
 const newExercise = ref<CreateExercise>({
   name: "",
   description: "",
@@ -100,10 +112,25 @@ const muscleGroupItems = computed(() =>
 );
 
 const createNewExercise = async () => {
+  isCreating.value = true;
   try {
+    // First create the exercise
     const response = await createExercise(newExercise.value);
+    
     if (response) {
+      // If there's an image, upload it
+      if (imageFile.value) {
+        try {
+          await uploadExerciseImage(response.id, imageFile.value);
+        } catch (imageError) {
+          console.error("Error uploading image:", imageError);
+          toast.warning("Exercise created but image upload failed");
+        }
+      }
+      
       toast.success("Exercise created successfully!");
+      
+      // Reset form
       newExercise.value = {
         name: "",
         description: "",
@@ -112,6 +139,8 @@ const createNewExercise = async () => {
         defaultReps: 1,
         defaultPauseSeconds: 0,
       };
+      imageFile.value = null;
+      
       exerciseStore.setExercises(true);
       emit("close");
     } else {
@@ -120,6 +149,8 @@ const createNewExercise = async () => {
   } catch (error) {
     console.error("Error creating exercise:", error);
     toast.error("An error occurred while creating the exercise.");
+  } finally {
+    isCreating.value = false;
   }
 };
 </script>
