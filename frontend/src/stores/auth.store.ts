@@ -98,6 +98,17 @@ export const useAuthStore = defineStore(
       loading.value = false;
     };
 
+    const refreshUser = async () => {
+      try {
+        const data = await fetchWrapper<any>(`${apiUrl}/users`);
+        user.value = data;
+        return data;
+      } catch (error) {
+        console.error('Failed to refresh user data:', error);
+        throw error;
+      }
+    };
+
     return {
       isAuthenticated,
       user,
@@ -107,6 +118,7 @@ export const useAuthStore = defineStore(
       logout,
       createAccount,
       resetStore,
+      refreshUser,
     };
   },
   {
