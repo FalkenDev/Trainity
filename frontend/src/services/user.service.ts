@@ -1,11 +1,11 @@
-import type { CreateUser } from '@/interfaces/User.interface';
+import type { CreateUser, User } from '@/interfaces/User.interface';
 import { fetchWrapper } from '@/utils/fetchWrapper';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 export const createUser = async (user: CreateUser) => {
   try {
-    const data = await fetchWrapper<any>(`${apiUrl}/users`, {
+    const data = await fetchWrapper<User>(`${apiUrl}/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user),
@@ -17,19 +17,9 @@ export const createUser = async (user: CreateUser) => {
   }
 };
 
-export const getUser = async () => {
-  try {
-    const data = await fetchWrapper<any>(`${apiUrl}/users/me`);
-    return data;
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    throw new Error('Failed to fetch user');
-  }
-};
-
 export const updateUser = async (userData: CreateUser) => {
   try {
-    const data = await fetchWrapper<any>(`${apiUrl}/users/me`, {
+    const data = await fetchWrapper<User>(`${apiUrl}/users`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
@@ -43,7 +33,7 @@ export const updateUser = async (userData: CreateUser) => {
 
 export const deleteUser = async () => {
   try {
-    await fetchWrapper<void>(`${apiUrl}/users/me`, {
+    await fetchWrapper<void>(`${apiUrl}/users`, {
       method: 'DELETE',
     });
     return true; // deletion succeeded (204/200)
@@ -58,7 +48,7 @@ export const uploadAvatar = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const data = await fetchWrapper<any>(`${apiUrl}/users/avatar`, {
+    const data = await fetchWrapper(`${apiUrl}/users/avatar`, {
       method: 'POST',
       body: formData,
     });
@@ -71,7 +61,7 @@ export const uploadAvatar = async (file: File) => {
 
 export const getCurrentUser = async () => {
   try {
-    const data = await fetchWrapper<any>(`${apiUrl}/users`);
+    const data = await fetchWrapper<User>(`${apiUrl}/users`);
     return data;
   } catch (error) {
     console.error('Error fetching current user:', error);

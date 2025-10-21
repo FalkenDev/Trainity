@@ -204,7 +204,7 @@ const uploadAvatarImage = async () => {
 
   isUploadingAvatar.value = true;
   try {
-    const updatedUser = await uploadAvatar(avatarFile.value);
+    const updatedUser = await uploadAvatar(avatarFile.value) as User;
     currentUser.value = updatedUser;
     // Also update the auth store so the avatar shows in HomeHeader
     await authStore.refreshUser();

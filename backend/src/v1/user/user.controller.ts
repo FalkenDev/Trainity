@@ -101,16 +101,13 @@ export class UserController {
       throw new BadRequestException('No file uploaded');
     }
 
-    // Validate the uploaded file
     const validation = this.uploadService.validateImageFile(file);
     if (!validation.valid) {
       throw new BadRequestException(validation.error);
     }
 
-    // Process and save the avatar
     const avatarUrl = await this.uploadService.processAvatarImage(file);
 
-    // Update the user with the new avatar URL
     return this.userService.updateAvatar(+req.user.id, avatarUrl);
   }
 }

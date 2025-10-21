@@ -79,7 +79,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watchEffect } from 'vue';
 import router from '@/router';
 import { toast } from 'vuetify-sonner';
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
