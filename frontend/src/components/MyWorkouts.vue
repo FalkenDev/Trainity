@@ -212,7 +212,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useWorkoutStore } from '@/stores/workout.store';
 import type { Workout } from '@/interfaces/Workout.interface';

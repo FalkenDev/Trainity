@@ -52,7 +52,7 @@ const authStore = useAuthStore();
 const routeToSelectedWorkoutSession = () => {
   if (
     workoutSessionStore.selectedWorkoutSession &&
-    workoutSessionStore.selectedWorkoutSession.id
+    'id' in workoutSessionStore.selectedWorkoutSession
   ) {
     router.push("/session/" + workoutSessionStore.selectedWorkoutSession.id);
   }

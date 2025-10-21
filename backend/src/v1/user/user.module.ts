@@ -6,10 +6,12 @@ import { User } from './user.entity';
 import { UserController } from './user.controller';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
+import { UploadModule } from '../upload/upload.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Exercise, Workout, WorkoutSession]),
+    UploadModule,
   ],
   controllers: [UserController],
   providers: [UserService],

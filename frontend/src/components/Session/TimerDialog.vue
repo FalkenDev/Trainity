@@ -63,8 +63,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
-
 const props = defineProps({
   modelValue: { type: Boolean, required: true },
   duration: { type: Number, required: true },

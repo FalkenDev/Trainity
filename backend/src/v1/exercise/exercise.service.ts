@@ -6,6 +6,7 @@ import { CreateExerciseDto } from './dto/createExercise.dto';
 import { UpdateExerciseDto } from './dto/updateExercise.dto';
 import { ExerciseResponseDto } from './dto/exerciseResponse.dto';
 import { MuscleGroupService } from '../muscleGroup/muscleGroup.service';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class ExerciseService {
@@ -13,6 +14,7 @@ export class ExerciseService {
     @InjectRepository(Exercise)
     private readonly exerciseRepo: Repository<Exercise>,
     private readonly muscleGroupService: MuscleGroupService,
+    private readonly uploadService: UploadService,
   ) {}
 
   private toResponseDto(exercise: Exercise): ExerciseResponseDto {
@@ -20,6 +22,7 @@ export class ExerciseService {
       id: exercise.id,
       name: exercise.name,
       description: exercise.description,
+      image: exercise.image,
       createdAt: exercise.createdAt,
       defaultPauseSeconds: exercise.defaultPauseSeconds,
       defaultReps: exercise.defaultReps,
@@ -115,5 +118,31 @@ export class ExerciseService {
 
     await this.exerciseRepo.remove(exercise);
     return { message: 'Exercise deleted' };
+  }
+
+  async updateImage(
+    id: number,
+    imageUrl: string,
+    userId: number,
+  ): Promise<ExerciseResponseDto> {
+    const exercise = await this.exerciseRepo.findOne({
+      where: { id, createdBy: { id: userId } },
+      relations: ['muscleGroups'],
+    });
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise not found');
+    }
+
+    // Delete old image if exists
+    if (exercise.image) {
+      await this.uploadService.deleteImage(exercise.image);
+    }
+
+    // Update image URL
+    exercise.image = imageUrl;
+    const updated = await this.exerciseRepo.save(exercise);
+
+    return this.toResponseDto(updated);
   }
 }

@@ -1,11 +1,13 @@
 // stores/authStore.ts
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import type { Exercise } from '@/interfaces/Exercise.interface';
 import * as exerciseService from '@/services/exercise.service';
 
 export const useExerciseStore = defineStore(
   'exerciseStore',
   () => {
-    const exercises = ref([]);
+    const exercises = ref<Exercise[]>([]);
     const isLoading = ref<boolean>(false);
     const lastFetched = ref<number | null>(null);
     const cacheDuration = 10 * 1000;
