@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, type PropType } from 'vue';
+import { type PropType } from 'vue';
 
 // Define the structure for a workout set
 interface WorkoutSet {

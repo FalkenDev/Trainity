@@ -114,11 +114,9 @@ const muscleGroupItems = computed(() =>
 const createNewExercise = async () => {
   isCreating.value = true;
   try {
-    // First create the exercise
     const response = await createExercise(newExercise.value);
     
     if (response) {
-      // If there's an image, upload it
       if (imageFile.value) {
         try {
           await uploadExerciseImage(response.id, imageFile.value);
@@ -130,7 +128,6 @@ const createNewExercise = async () => {
       
       toast.success("Exercise created successfully!");
       
-      // Reset form
       newExercise.value = {
         name: "",
         description: "",

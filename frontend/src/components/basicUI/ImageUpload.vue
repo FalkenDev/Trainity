@@ -59,8 +59,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-
 interface Props {
   modelValue?: File | null;
   existingImageUrl?: string | null;
@@ -88,7 +86,6 @@ const emit = defineEmits<{
 const fileInput = ref<HTMLInputElement | null>(null);
 const previewUrl = ref<string | null>(props.existingImageUrl || null);
 
-// Watch for changes to existingImageUrl
 watch(() => props.existingImageUrl, (newUrl) => {
   if (newUrl) {
     previewUrl.value = newUrl;
@@ -105,24 +102,20 @@ const handleFileSelect = async (event: Event) => {
 
   if (!file) return;
 
-  // Validate file type
   const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
     alert('Please select a valid image file (JPEG, PNG, or WebP)');
     return;
   }
 
-  // Validate file size
   const maxSize = props.maxSizeMB * 1024 * 1024;
   if (file.size > maxSize) {
     alert(`File size must be less than ${props.maxSizeMB}MB`);
     return;
   }
 
-  // Compress and preview image
   const compressedFile = await compressImage(file);
   
-  // Create preview
   const reader = new FileReader();
   reader.onload = (e) => {
     previewUrl.value = e.target?.result as string;
@@ -141,7 +134,6 @@ const compressImage = async (file: File): Promise<File> => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Calculate new dimensions (max 1200px)
         let width = img.width;
         let height = img.height;
         const maxDimension = 1200;

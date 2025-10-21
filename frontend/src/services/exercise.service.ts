@@ -1,11 +1,11 @@
 import { fetchWrapper } from '@/utils/fetchWrapper';
-import type { CreateExercise } from '@/interfaces/Exercise.interface';
+import type { CreateExercise, Exercise } from '@/interfaces/Exercise.interface';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 export const fetchAllExercises = async () => {
   try {
-    const data = await fetchWrapper<any[]>(`${apiUrl}/exercises`);
+    const data = await fetchWrapper<Exercise[]>(`${apiUrl}/exercises`);
     return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching exercises:', error);
@@ -15,7 +15,7 @@ export const fetchAllExercises = async () => {
 
 export const fetchExerciseById = async (exerciseId: number) => {
   try {
-    const data = await fetchWrapper<any>(`${apiUrl}/exercises/${exerciseId}`);
+    const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises/${exerciseId}`);
     return data;
   } catch (error) {
     console.error('Error fetching exercise:', error);
@@ -25,7 +25,7 @@ export const fetchExerciseById = async (exerciseId: number) => {
 
 export const createExercise = async (exercise: CreateExercise) => {
   try {
-    const data = await fetchWrapper<any>(`${apiUrl}/exercises`, {
+    const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(exercise),
@@ -42,7 +42,7 @@ export const updateExercise = async (
   exercise: CreateExercise,
 ) => {
   try {
-    const data = await fetchWrapper<any>(`${apiUrl}/exercises/${exerciseId}`, {
+    const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises/${exerciseId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(exercise),
@@ -59,7 +59,7 @@ export const deleteExercise = async (exerciseId: number) => {
     await fetchWrapper<void>(`${apiUrl}/exercises/${exerciseId}`, {
       method: 'DELETE',
     });
-    return true; // success
+    return true;
   } catch (error) {
     console.error('Error deleting exercise:', error);
     throw new Error('Failed to delete exercise');
@@ -71,7 +71,7 @@ export const uploadExerciseImage = async (exerciseId: number, file: File) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const data = await fetchWrapper<any>(`${apiUrl}/exercises/${exerciseId}/image`, {
+    const data = await fetchWrapper(`${apiUrl}/exercises/${exerciseId}/image`, {
       method: 'POST',
       body: formData,
     });
