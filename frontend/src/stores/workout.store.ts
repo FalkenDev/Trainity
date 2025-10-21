@@ -34,7 +34,7 @@ export const useWorkoutStore = defineStore(
           if (foundWorkout) {
             currentWorkout.value = foundWorkout;
           } else {
-            currentWorkout.value = null; // Reset if not found
+            currentWorkout.value = null;
           }
         }
         lastFetched.value = now;

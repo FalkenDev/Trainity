@@ -1,7 +1,7 @@
 import router from '@/router';
 import { useAuthStore } from '@/stores/auth.store';
 
-export const fetchWrapper = async <T = any>(
+export const fetchWrapper = async <T = unknown>(
   url: string,
   options: RequestInit = {},
 ): Promise<T> => {

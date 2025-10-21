@@ -10,7 +10,11 @@ import {
   UseGuards,
   UnauthorizedException,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/createExercise.dto';
 import { UpdateExerciseDto } from './dto/updateExercise.dto';
@@ -20,17 +24,23 @@ import {
   ApiOperation,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { ExerciseResponseDto } from './dto/exerciseResponse.dto';
 import { RequestWithUser } from '../types/requestWithUser.type';
+import { UploadService } from '../upload/upload.service';
 
 @ApiTags('exercises')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('exercises')
 export class ExerciseController {
-  constructor(private readonly exerciseService: ExerciseService) {}
+  constructor(
+    private readonly exerciseService: ExerciseService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all exercises for the logged-in user' })
@@ -93,5 +103,47 @@ export class ExerciseController {
       throw new UnauthorizedException('User not authenticated');
     }
     return this.exerciseService.remove(id, +req.user.id);
+  }
+
+  @Post(':id/image')
+  @ApiOperation({ summary: 'Upload an image for an exercise' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({ type: ExerciseResponseDto })
+  @UseInterceptors(FileInterceptor('file', { storage: undefined }))
+  async uploadExerciseImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithUser,
+  ): Promise<ExerciseResponseDto> {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    // Validate the uploaded file
+    const validation = this.uploadService.validateImageFile(file);
+    if (!validation.valid) {
+      throw new BadRequestException(validation.error);
+    }
+
+    // Process and save the image
+    const imageUrl = await this.uploadService.processExerciseImage(file);
+
+    // Update the exercise with the new image URL
+    return this.exerciseService.updateImage(id, imageUrl, +req.user.id);
   }
 }

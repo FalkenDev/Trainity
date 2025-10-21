@@ -7,6 +7,7 @@ import { useExerciseStore } from './exercise.store';
 import { useMuscleGroupStore } from './muscleGroup.store';
 import { useWorkoutSessionStore } from './workoutSession.store';
 import { fetchWrapper } from '@/utils/fetchWrapper';
+import type { User } from '@/interfaces/User.interface';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
@@ -22,7 +23,7 @@ export const useAuthStore = defineStore(
     const login = async (email: string, password: string) => {
       loading.value = true;
       try {
-        const data = await fetchWrapper<{ user: any }>(`${apiUrl}/auth/login`, {
+        const data = await fetchWrapper<{ user: User }>(`${apiUrl}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -98,6 +99,17 @@ export const useAuthStore = defineStore(
       loading.value = false;
     };
 
+    const refreshUser = async () => {
+      try {
+        const data = await fetchWrapper<User>(`${apiUrl}/users`);
+        user.value = data;
+        return data;
+      } catch (error) {
+        console.error('Failed to refresh user data:', error);
+        throw error;
+      }
+    };
+
     return {
       isAuthenticated,
       user,
@@ -107,6 +119,7 @@ export const useAuthStore = defineStore(
       logout,
       createAccount,
       resetStore,
+      refreshUser,
     };
   },
   {
