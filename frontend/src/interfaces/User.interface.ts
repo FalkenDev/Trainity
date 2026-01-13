@@ -4,6 +4,7 @@ export interface User {
   firstName: string;
   lastName: string;
   avatar?: string;
+  showRpe?: boolean;
   createdAt: string;
   updatedAt: string;
 }

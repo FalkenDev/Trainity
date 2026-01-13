@@ -2,11 +2,14 @@
   <v-sheet>
     <v-calendar
       ref="calendar"
-      v-model="mockCalendarData"
+      v-model="selectedDate"
+      :events="mockCalendarData"
     />
   </v-sheet>
 </template>
 <script lang="ts" setup>
+const selectedDate = ref<Date | string | number | undefined>(new Date());
+
 const mockCalendarData = [
     {
         name: 'Workout 1',

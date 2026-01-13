@@ -29,6 +29,9 @@ export class User {
   @Column({ nullable: true })
   avatar: string;
 
+  @Column({ default: true })
+  showRpe: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
