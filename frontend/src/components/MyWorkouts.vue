@@ -16,16 +16,28 @@
             {{ workouts.length }} total
           </div>
         </div>
-        <v-btn
-          :loading="loading"
-          size="small"
-          color="primary"
-          variant="tonal"
-          prepend-icon="mdi-refresh"
-          @click="refresh"
-        >
-          Refresh
-        </v-btn>
+        <div class="d-flex ga-2">
+          <v-btn
+            :loading="isStartingEmptySession"
+            size="small"
+            color="secondary"
+            variant="tonal"
+            prepend-icon="mdi-play"
+            @click="startEmptySession"
+          >
+            Start empty
+          </v-btn>
+          <v-btn
+            :loading="loading"
+            size="small"
+            color="primary"
+            variant="tonal"
+            prepend-icon="mdi-refresh"
+            @click="refresh"
+          >
+            Refresh
+          </v-btn>
+        </div>
       </div>
     </div>
 
@@ -214,12 +226,16 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { useWorkoutStore } from '@/stores/workout.store';
+import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
+import { startEmptyWorkoutSession } from '@/services/workoutSession.service';
 import type { Workout } from '@/interfaces/Workout.interface';
 
 const router = useRouter();
 const workoutStore = useWorkoutStore();
+const workoutSessionStore = useWorkoutSessionStore();
 
 const loading = ref(false);
+const isStartingEmptySession = ref(false);
 const isWorkoutListOpen = ref(false);
 const isCreateWorkoutOpen = ref(false);
 
@@ -250,6 +266,20 @@ async function refresh() {
     await workoutStore.setWorkouts(true);
   } finally {
     loading.value = false;
+  }
+}
+
+async function startEmptySession() {
+  if (isStartingEmptySession.value) return;
+  try {
+    isStartingEmptySession.value = true;
+    const session = await startEmptyWorkoutSession();
+    if (session?.id) {
+      await workoutSessionStore.fetchSelectedWorkoutSession(session.id);
+      router.push(`/session/${session.id}`);
+    }
+  } finally {
+    isStartingEmptySession.value = false;
   }
 }
 

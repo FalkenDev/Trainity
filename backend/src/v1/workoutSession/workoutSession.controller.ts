@@ -60,6 +60,13 @@ export class WorkoutSessionController {
     );
   }
 
+  @Post('empty')
+  @ApiOperation({ summary: 'Create an empty workout session' })
+  @ApiCreatedResponse({ type: WorkoutSession })
+  createEmpty(@Req() req: RequestWithUser): Promise<WorkoutSession> {
+    return this.sessionService.createEmptySession(this.getUserId(req));
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get one workout session by ID' })
   @ApiOkResponse({ type: WorkoutSession })

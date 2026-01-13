@@ -35,7 +35,7 @@
         v-for="exercise in processedExercises"
         :key="exercise.exerciseId"
         :exercise="exercise"
-        :default-weight-and-reps="workoutSession?.workout.defaultWeightAndReps"
+        :default-weight-and-reps="workoutSession?.workout?.defaultWeightAndReps"
         :workout-sets="liveSets(exercise.exerciseId)"
         :show-rpe="showRpe"
         :rpe="liveEx(exercise.exerciseId)?.rpe"
@@ -144,7 +144,7 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
         number,
         { sets: number; reps: number; weight: number; pauseSeconds?: number }
       >();
-      for (const base of workoutSession.value.workoutSnapshot.exercises || []) {
+      for (const base of workoutSession.value.workoutSnapshot?.exercises || []) {
         snapshotById.set(base.exerciseId, {
           sets: base.sets ?? 0,
           reps: base.reps ?? 0,
@@ -313,7 +313,7 @@ watchEffect(async () => {
   if (idsFromLive.length) {
     exerciseIds = idsFromLive;
   } else {
-    exerciseIds = (s.workoutSnapshot.exercises || []).map((b) => b.exerciseId);
+    exerciseIds = (s.workoutSnapshot?.exercises || []).map((b) => b.exerciseId);
   }
 
   const detailsList = await Promise.all(
@@ -324,7 +324,7 @@ watchEffect(async () => {
   );
 
   processedExercises.value = detailsList.map(({ id, d }) => {
-    const baseSnap = s.workoutSnapshot.exercises?.find((b) => b.exerciseId === id);
+    const baseSnap = s.workoutSnapshot?.exercises?.find((b) => b.exerciseId === id);
     const liveEx = live?.exercises[id];
 
     const plannedSets =

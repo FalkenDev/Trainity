@@ -38,6 +38,21 @@ export const startWorkoutSession = async (
   }
 };
 
+export const startEmptyWorkoutSession = async (): Promise<WorkoutSession> => {
+  try {
+    const data = await fetchWrapper<WorkoutSession>(
+      `${apiUrl}/workoutSessions/empty`,
+      {
+        method: 'POST',
+      },
+    );
+    return data;
+  } catch (error) {
+    console.error('Error starting empty workout session:', error);
+    throw new Error('Failed to start empty workout session');
+  }
+};
+
 export const abandonWorkoutSession = async (
   sessionId: number,
 ): Promise<WorkoutSession> => {

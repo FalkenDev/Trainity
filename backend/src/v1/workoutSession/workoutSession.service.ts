@@ -83,6 +83,23 @@ export class WorkoutSessionService {
     return this.sessionRepo.save(session);
   }
 
+  async createEmptySession(userId: number): Promise<WorkoutSession> {
+    const session = this.sessionRepo.create({
+      user: { id: userId },
+      workout: null,
+      workoutSnapshot: {
+        title: 'Empty Session',
+        description: '',
+        time: 0,
+        exercises: [],
+      },
+      exercises: [],
+      startedAt: new Date(),
+    });
+
+    return this.sessionRepo.save(session);
+  }
+
   async addExerciseToSession(
     sessionId: number,
     exerciseId: number,

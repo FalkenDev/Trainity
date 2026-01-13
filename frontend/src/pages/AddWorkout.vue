@@ -7,6 +7,16 @@
     <!-- TODO: When click on start new workout a list of workouts show and you can choose one, see details ect -->
     <div class="px-5 d-flex flex-column ga-6 mt-4">
       <v-btn
+        :loading="isStartingEmptySession"
+        size="large"
+        color="secondary"
+        variant="tonal"
+        prepend-icon="mdi-play"
+        @click="startEmptySession"
+      >
+        Start empty workout
+      </v-btn>
+      <v-btn
         size="large"
         disabled
       >
@@ -37,5 +47,27 @@
   </div>
 </template>
 <script lang="ts" setup>
+import { useRouter } from 'vue-router';
+import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
+import { startEmptyWorkoutSession } from '@/services/workoutSession.service';
+
+const router = useRouter();
+const workoutSessionStore = useWorkoutSessionStore();
+
 const isCreateWorkoutOpen = ref<boolean>(false);
+const isStartingEmptySession = ref(false);
+
+async function startEmptySession() {
+  if (isStartingEmptySession.value) return;
+  try {
+    isStartingEmptySession.value = true;
+    const session = await startEmptyWorkoutSession();
+    if (session?.id) {
+      await workoutSessionStore.fetchSelectedWorkoutSession(session.id);
+      router.push(`/session/${session.id}`);
+    }
+  } finally {
+    isStartingEmptySession.value = false;
+  }
+}
 </script>
