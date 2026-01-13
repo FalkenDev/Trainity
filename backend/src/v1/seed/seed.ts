@@ -10,6 +10,7 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { MuscleGroup } from '../muscleGroup/muscleGroup.entity';
+import { GlobalExercise } from '../globalExercise/globalExercise.entity';
 
 const AppDataSource = new DataSource({
   type: 'postgres',
@@ -21,6 +22,7 @@ const AppDataSource = new DataSource({
   entities: [
     User,
     Exercise,
+    GlobalExercise,
     Workout,
     WorkoutExercise,
     WorkoutSession,
@@ -28,7 +30,9 @@ const AppDataSource = new DataSource({
     WorkoutSessionSet,
     MuscleGroup,
   ],
-  synchronize: false,
+  // Keep in sync with app.module.ts (synchronize: true). This makes the seed script
+  // resilient when we add new entities (like GlobalExercise).
+  synchronize: true,
   logging: ['error', 'warn', 'query'],
 });
 
@@ -572,6 +576,7 @@ async function seed() {
         "workout_session",
         "workout_exercise",
         "workout",
+        "global_exercise_muscle_groups_muscle_group",
         "exercise_muscle_groups_muscle_group" RESTART IDENTITY CASCADE;
     `,
     ).catch(() => {});
@@ -579,6 +584,7 @@ async function seed() {
     await AppDataSource.query(`
       TRUNCATE TABLE
         "exercise",
+        "global_exercise",
         "muscle_group",
         "user" RESTART IDENTITY CASCADE;
     `);
@@ -588,6 +594,7 @@ async function seed() {
     const userRepo = AppDataSource.getRepository(User);
     const mgRepo = AppDataSource.getRepository(MuscleGroup);
     const exRepo = AppDataSource.getRepository(Exercise);
+    const globalExRepo = AppDataSource.getRepository(GlobalExercise);
     const workoutRepo = AppDataSource.getRepository(Workout);
     const workoutExerciseRepo = AppDataSource.getRepository(WorkoutExercise);
 
@@ -608,54 +615,32 @@ async function seed() {
     savedMGs.forEach((mg) => mgMap.set(mg.name, mg));
     console.log('💪 Seeded muscle groups');
 
-    // Exercises
-    const createdExercises: Exercise[] = [];
+    // Global exercises (predefined catalog)
+    const slugify = (value: string) =>
+      value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+        .replace(/_+/g, '_');
+
     for (const ex of exercisesToSeed) {
-      const exercise = exRepo.create({
-        name: ex.name,
-        description: ex.description,
-        muscleGroups: ex.muscleGroups
-          .map((name) => mgMap.get(name))
-          .filter((mg): mg is MuscleGroup => !!mg),
+      const globalExercise = globalExRepo.create({
+        i18nKey: `exercise.${slugify(ex.name)}`,
+        defaultName: ex.name,
+        defaultDescription: ex.description,
         defaultSets: ex.defaultSets,
         defaultReps: ex.defaultReps,
         defaultPauseSeconds: ex.defaultPauseSeconds,
-        createdBy: mainUser,
+        muscleGroups: ex.muscleGroups
+          .map((name) => mgMap.get(name))
+          .filter((mg): mg is MuscleGroup => !!mg),
       });
-      await exRepo.save(exercise);
-      createdExercises.push(exercise);
+      await globalExRepo.save(globalExercise);
     }
-    const exerciseMap = new Map<string, Exercise>();
-    createdExercises.forEach((e) => exerciseMap.set(e.name, e));
-    console.log('🏋️ Seeded exercises');
+    console.log('🌍 Seeded global exercises');
 
-    // Workouts and WorkoutExercises
-    for (const w of workoutsToSeed) {
-      const workout = workoutRepo.create({
-        title: w.title,
-        description: w.description,
-        time: w.time,
-        createdBy: mainUser,
-      });
-      await workoutRepo.save(workout);
-
-      for (const e of w.exercises) {
-        const exercise = exerciseMap.get(e.exerciseName);
-        if (!exercise)
-          throw new Error(`Exercise "${e.exerciseName}" not found`);
-        const we = workoutExerciseRepo.create({
-          workout,
-          exercise,
-          order: e.order,
-          sets: e.sets,
-          reps: e.reps,
-          weight: e.weight,
-          pauseSeconds: e.pauseSeconds,
-        });
-        await workoutExerciseRepo.save(we);
-      }
-    }
-    console.log('📅 Seeded workouts');
+    // NOTE: We intentionally do NOT seed user-owned exercises anymore.
+    // Users should import from the global exercise catalog via the API.
 
     await queryRunner.commitTransaction();
     console.log('✅ Database successfully seeded!');
