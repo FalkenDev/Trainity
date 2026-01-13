@@ -29,7 +29,18 @@ export class AuthService {
     if (existing) throw new BadRequestException('User already exists');
 
     const hashed = await bcrypt.hash(dto.password, 10);
-    const user = this.userRepo.create({ ...dto, password: hashed });
+    const defaultShowRpeRaw =
+      this.configService.get<string>('DEFAULT_SHOW_RPE');
+    const defaultShowRpe =
+      defaultShowRpeRaw == null
+        ? true
+        : ['1', 'true', 'yes', 'on'].includes(defaultShowRpeRaw.toLowerCase());
+
+    const user = this.userRepo.create({
+      ...dto,
+      password: hashed,
+      showRpe: defaultShowRpe,
+    });
     const savedUser = await this.userRepo.save(user);
 
     return new UserWithoutPasswordDto(savedUser);
@@ -38,7 +49,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.userRepo.findOne({
       where: { email: dto.email },
-      select: ['id', 'email', 'firstName', 'lastName', 'password'],
+      select: ['id', 'email', 'firstName', 'lastName', 'password', 'showRpe'],
     });
 
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {

@@ -74,6 +74,7 @@
             :key="item.title"
             class="px-0"
             :disabled="item.disabled"
+            @click="setPreferenceDialogToOpen(item.type)"
           >
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
               <p>{{ item.title }}</p>
@@ -150,12 +151,47 @@
     >
       <WorkoutList @close="isWorkoutListOpen = false" />
     </v-dialog>
+
+    <v-dialog
+      v-model="isAppearanceOpen"
+      fullscreen
+      transition="slide-y-transition"
+      persistent
+    >
+      <v-card class="d-flex flex-column">
+        <v-toolbar color="primary">
+          <v-btn
+            icon
+            variant="text"
+            @click="isAppearanceOpen = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Appearance</v-toolbar-title>
+          <v-spacer />
+        </v-toolbar>
+
+        <v-card-text class="pa-5">
+          <v-switch
+            v-model="useRpe"
+            color="primary"
+            inset
+            label="Use RPE in workout sessions"
+            :loading="isSavingPreferences"
+            @update:model-value="saveAppearancePreferences"
+          />
+          <p class="text-body-2 text-grey-lighten-1 mt-2">
+            When disabled, RPE will be hidden in active sessions.
+          </p>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script lang="ts" setup>
 import SessionList from '@/components/Settings/SessionList.vue';
 import ImageUpload from '@/components/basicUI/ImageUpload.vue';
-import { getCurrentUser, uploadAvatar } from '@/services/user.service';
+import { getCurrentUser, updateUser, uploadAvatar } from '@/services/user.service';
 import type { User } from '@/interfaces/User.interface';
 import { toast } from 'vuetify-sonner';
 import { onMounted } from 'vue';
@@ -167,8 +203,12 @@ const isSessionListOpen = ref(false);
 const isWorkoutListOpen = ref(false);
 const isAvatarDialogOpen = ref(false);
 const isUploadingAvatar = ref(false);
+const isAppearanceOpen = ref(false);
+const isSavingPreferences = ref(false);
 const avatarFile = ref<File | null>(null);
 const currentUser = ref<User | null>(null);
+
+const useRpe = ref(true);
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
@@ -185,6 +225,7 @@ const loadUserData = async () => {
   try {
     const user = await getCurrentUser();
     currentUser.value = user;
+    useRpe.value = user.showRpe ?? true;
   } catch (error) {
     console.error('Error loading user data:', error);
   }
@@ -234,6 +275,34 @@ const setDialogToOpen = (type: string) => {
   }
 };
 
+const setPreferenceDialogToOpen = (type?: string) => {
+  switch (type) {
+    case 'appearance':
+      isAppearanceOpen.value = true;
+      break;
+    default:
+      return;
+  }
+};
+
+const saveAppearancePreferences = async () => {
+  if (isSavingPreferences.value) return;
+  isSavingPreferences.value = true;
+  try {
+    const updated = await updateUser({ showRpe: useRpe.value });
+    currentUser.value = updated;
+    await authStore.refreshUser();
+    toast.success('Preferences saved');
+  } catch (error) {
+    console.error('Failed saving preferences:', error);
+    toast.error('Failed to save preferences');
+    // rollback UI to last known good value
+    useRpe.value = currentUser.value?.showRpe ?? true;
+  } finally {
+    isSavingPreferences.value = false;
+  }
+};
+
 const contentList = [
   { title: 'Exercises', showArrow: true, type: 'exercises', disabled: false },
   { title: 'Workouts', showArrow: true, type: 'workouts', disabled: false },
@@ -242,7 +311,7 @@ const contentList = [
 const preferencesList  = [
   { title: 'Settings', showArrow: true, disabled: true },
   { title: 'Account', showArrow: true, disabled: true  },
-  { title: 'Appearance', showArrow: true, disabled: true   },
+  { title: 'Appearance', showArrow: true, disabled: false, type: 'appearance' },
   { title: 'Units', showArrow: true, disabled: true   },
   { title: 'Language', showArrow: true, disabled: true   },
   { title: 'Help', showArrow: true, disabled: true   }

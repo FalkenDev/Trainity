@@ -85,8 +85,10 @@
             />
           </template>
         </v-data-table>
-        <div class="pa-4 pt-2 d-flex flex-column ga-3 bg-grey-darken-4">
-          <!-- TODO: Have in account settings if want to show RPE And notes in a workout session or not -->
+        <div
+          v-if="props.showRpe"
+          class="pa-4 pt-2 d-flex flex-column ga-3 bg-grey-darken-4"
+        >
           <span class="text-body-2 text-grey">RPE (Rate of Perceived Exertion)</span>
 
           <v-chip-group
@@ -129,6 +131,37 @@
       @save="saveSet"
       @delete="selectedSet && deleteSet(selectedSet)"
     />
+
+    <v-dialog
+      v-model="showPropagateDialog"
+      max-width="500"
+      persistent
+    >
+      <v-card>
+        <v-card-title>Update subsequent sets?</v-card-title>
+        <v-card-text>
+          Do you want to update sets {{ propagateSetsIndices }} with {{ propagateWeight }}kg and {{ propagateReps }} reps?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="confirmPropagate(false)"
+          >
+            No, just this one
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="text"
+            @click="confirmPropagate(true)"
+          >
+            Yes, update all
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <TimerDialog
       v-model="isTimerVisible"
       :duration="props.exercise.pauseSeconds"
@@ -162,6 +195,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  showRpe: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits<{
@@ -179,6 +216,24 @@ const showDetails = ref(true);
 const isEditDialogVisible = ref(false);
 const isTimerVisible = ref(false);
 const selectedSet = ref<WorkoutSet | null>(null);
+
+const showPropagateDialog = ref(false);
+const pendingEditedSet = ref<WorkoutSet | null>(null);
+
+const propagateWeight = computed(() => pendingEditedSet.value?.weight);
+const propagateReps = computed(() => pendingEditedSet.value?.reps);
+
+const propagateSetsIndices = computed(() => {
+  if (!pendingEditedSet.value) return '';
+  const indices = props.workoutSets
+    .filter((s) => s.set > pendingEditedSet.value!.set && !s.done)
+    .map((s) => s.set);
+
+  if (indices.length === 0) return '';
+  if (indices.length === 1) return indices[0].toString();
+  const last = indices.pop();
+  return indices.join(', ') + ' and ' + last;
+});
 
 const headers = [
   { title: 'Set', key: 'set', sortable: false, width: '20%' },
@@ -205,7 +260,46 @@ function handleRowClick(event: Event, { item }: { item: WorkoutSet }) {
 }
 
 function saveSet(editedSet: WorkoutSet) {
-  emit('update:set', editedSet);
+  const originalSet = props.workoutSets.find((s) => s.set === editedSet.set);
+  const changed =
+    originalSet &&
+    (originalSet.weight !== editedSet.weight ||
+      originalSet.reps !== editedSet.reps);
+
+  const subsequentSets = props.workoutSets.filter(
+    (s) => s.set > editedSet.set && !s.done
+  );
+
+  if (changed && subsequentSets.length > 0) {
+    pendingEditedSet.value = editedSet;
+    showPropagateDialog.value = true;
+  } else {
+    emit('update:set', editedSet);
+  }
+}
+
+function confirmPropagate(shouldPropagate: boolean) {
+  if (pendingEditedSet.value) {
+    emit('update:set', pendingEditedSet.value);
+
+    if (shouldPropagate) {
+      const { weight, reps, set: currentSetNum } = pendingEditedSet.value;
+      const subsequentSets = props.workoutSets.filter(
+        (s) => s.set > currentSetNum && !s.done
+      );
+
+      subsequentSets.forEach((s) => {
+        emit('update:set', {
+          ...s,
+          weight,
+          reps,
+        });
+      });
+    }
+  }
+
+  showPropagateDialog.value = false;
+  pendingEditedSet.value = null;
 }
 
 function deleteSet(setToDelete: WorkoutSet) {

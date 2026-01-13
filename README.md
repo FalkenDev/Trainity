@@ -51,6 +51,13 @@ Perfect for fitness enthusiasts who want professional-grade workout tracking wit
 
 ## 🚀 Getting Started
 
+## ⚙️ Configuration
+
+Trainity is configured via the root `.env` file (used by `docker compose` and the backend `ConfigModule`).
+
+- Copy `.env.example` to `.env` and edit values as needed.
+- `DEFAULT_SHOW_RPE` controls the default for **newly registered users** (existing users keep their saved preference).
+
 ### Prerequisites
 
 - Node.js (v16 or higher)

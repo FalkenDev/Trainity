@@ -37,13 +37,14 @@
         :exercise="exercise"
         :default-weight-and-reps="workoutSession?.workout.defaultWeightAndReps"
         :workout-sets="liveSets(exercise.exerciseId)"
+        :show-rpe="showRpe"
         :rpe="liveEx(exercise.exerciseId)?.rpe"
         :notes="liveEx(exercise.exerciseId)?.notes"
         @update:set="onUpdateSet(exercise.exerciseId, $event)"
         @delete:set="onDeleteSet(exercise.exerciseId, $event)"
         @delete:exercise="onDeleteExercise(exercise.exerciseId)"
         @add:set="onAddSet(exercise.exerciseId)"
-        @update:rpe="onUpdateMeta(exercise.exerciseId, { rpe: $event })"
+        @update:rpe="showRpe && onUpdateMeta(exercise.exerciseId, { rpe: $event })"
         @update:notes="onUpdateMeta(exercise.exerciseId, { notes: $event })"
       />
     </div>
@@ -81,6 +82,7 @@
 <script lang="ts" setup>
 import router from '@/router';
 import { toast } from 'vuetify-sonner';
+import { useAuthStore } from '@/stores/auth.store';
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 import type {
   FinishedExercisePayload,
@@ -96,6 +98,7 @@ import {
 
 const isAddExerciseOpen = ref(false);
 const workoutSessionStore = useWorkoutSessionStore();
+const authStore = useAuthStore();
 const processedExercises = ref<Exercise[]>([]);
 const isLoading = ref(false);
 
@@ -104,6 +107,8 @@ const workoutSession = computed<WorkoutSession | null>(
 );
 const clock = computed(() => workoutSessionStore.formattedClock);
 const sessionId = computed(() => workoutSession.value?.id || 0);
+
+const showRpe = computed(() => authStore.user?.showRpe ?? true);
 
 function liveEx(exerciseId: number) {
   return workoutSessionStore.getLiveSession(sessionId.value)?.exercises[exerciseId];

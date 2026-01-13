@@ -17,7 +17,7 @@ export const createUser = async (user: CreateUser) => {
   }
 };
 
-export const updateUser = async (userData: CreateUser) => {
+export const updateUser = async (userData: Partial<User>) => {
   try {
     const data = await fetchWrapper<User>(`${apiUrl}/users`, {
       method: 'PUT',
