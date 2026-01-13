@@ -278,6 +278,26 @@ export const useWorkoutSessionStore = defineStore(
       delete liveSessions.value[sessionId];
     }
 
+    async function deleteSession(sessionId: number) {
+      if (!sessionId) return;
+      try {
+        isLoading.value = true;
+        await workoutSessionService.deleteWorkoutSession(sessionId);
+        workoutSessions.value = workoutSessions.value.filter(
+          (s: any) => s.id !== sessionId,
+        );
+        delete liveSessions.value[sessionId];
+        if (
+          selectedWorkoutSession.value &&
+          (selectedWorkoutSession.value as any).id === sessionId
+        ) {
+          selectedWorkoutSession.value = null;
+        }
+      } finally {
+        isLoading.value = false;
+      }
+    }
+
     const resetStore = async () => {
       workoutSessions.value = [];
       isLoading.value = false;
@@ -332,6 +352,7 @@ export const useWorkoutSessionStore = defineStore(
       deleteSet,
       updateExerciseMeta,
       clearLiveSession,
+      deleteSession,
       resetStore,
       startedAt,
     };
