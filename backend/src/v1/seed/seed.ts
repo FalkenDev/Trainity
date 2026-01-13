@@ -40,518 +40,303 @@ const usersToSeed = [
   {
     email: 'test@test.se',
     password: 'test1234',
-    firstName: 'Seed',
-    lastName: 'User',
+    firstName: 'Test',
+    lastName: 'Användare',
     avatar: 'https://i.pravatar.cc/150?u=seeduser',
   },
 ];
 
 const muscleGroupsToSeed = [
-  { name: 'Chest' },
-  { name: 'Back' },
-  { name: 'Shoulders' },
+  { name: 'Bröst' },
+  { name: 'Rygg' },
+  { name: 'Axlar' },
   { name: 'Biceps' },
   { name: 'Triceps' },
-  { name: 'Legs' },
-  { name: 'Abs' },
-  { name: 'Forearms' },
-  { name: 'Glutes' },
-  { name: 'Hamstrings' },
-  { name: 'Quads' },
-  { name: 'Calves' },
-  { name: 'Rear Delts' },
-  { name: 'Core' },
-  { name: 'Traps' },
-  { name: 'Lower Back' },
+  { name: 'Ben' },
+  { name: 'Mage' },
+  { name: 'Underarmar' },
+  { name: 'Säte' },
+  { name: 'Baksida lår' },
+  { name: 'Framsida lår' },
+  { name: 'Vader' },
+  { name: 'Bakre axlar' },
+  { name: 'Bål' },
+  { name: 'Trapezius' },
+  { name: 'Ländrygg' },
+  { name: 'Övre bröst' },
+  { name: 'Höftböjare' },
 ];
 
 const exercisesToSeed = [
   {
-    name: 'Bench Press',
-    description:
-      'Barbell press on a flat bench. Retract scapula, slight arch, feet planted. Lower to mid-chest and press up with elbows ~45°.',
-    muscleGroups: ['Chest', 'Shoulders', 'Triceps'],
+    i18nKey: 'exercise.bench_press',
+    defaultName: 'Bänkpress',
+    defaultDescription:
+      'Skivstångspress på plan bänk. Dra ihop skulderbladen, lätt brygga, fötter i golvet. Sänk till mitten av bröstet och pressa upp med armbågar ~45°.',
+    muscleGroups: ['Bröst', 'Axlar', 'Triceps'],
     defaultSets: 4,
     defaultReps: 6,
     defaultPauseSeconds: 150,
   },
   {
-    name: 'Incline Dumbbell Press',
-    description:
-      'Press dumbbells on a 30–45° bench. Lower with control to chest line, press up and slightly inward.',
-    muscleGroups: ['Chest', 'Shoulders', 'Triceps'],
+    i18nKey: 'exercise.incline_dumbbell_press',
+    defaultName: 'Hantelpress lutande',
+    defaultDescription:
+      'Pressa hantlar på en bänk med 30–45° lutning. Sänk kontrollerat till bröstlinjen, pressa upp och lätt inåt.',
+    muscleGroups: ['Bröst', 'Axlar', 'Triceps'],
     defaultSets: 3,
     defaultReps: 9,
     defaultPauseSeconds: 90,
   },
   {
-    name: 'Seated Dumbbell Shoulder Press',
-    description:
-      'Seated vertical press. Keep ribs down, forearms vertical. Lower to about ear level, press without shrugging.',
-    muscleGroups: ['Shoulders', 'Triceps', 'Core'],
+    i18nKey: 'exercise.seated_dumbbell_shoulder_press',
+    defaultName: 'Sittande hantelpress (axlar)',
+    defaultDescription:
+      'Sittande vertikal press. Håll revbenen nere och underarmarna vertikala. Sänk till ungefär öronhöjd och pressa utan att rycka axlarna.',
+    muscleGroups: ['Axlar', 'Triceps', 'Bål'],
     defaultSets: 4,
     defaultReps: 9,
     defaultPauseSeconds: 120,
   },
   {
-    name: 'Dumbbell Lateral Raise',
-    description:
-      'Raise dumbbells slightly forward and out to shoulder height. Soft elbows, strict control, slow eccentric.',
-    muscleGroups: ['Shoulders', 'Rear Delts'],
+    i18nKey: 'exercise.dumbbell_lateral_raise',
+    defaultName: 'Hantellyft åt sidan',
+    defaultDescription:
+      'Lyft hantlar lätt framåt och ut till axelhöjd. Mjuka armbågar, strikt kontroll och långsam excentrisk fas.',
+    muscleGroups: ['Axlar', 'Bakre axlar'],
     defaultSets: 3,
     defaultReps: 14,
     defaultPauseSeconds: 60,
   },
   {
-    name: 'Cable Triceps Pushdown',
-    description:
-      'With rope or bar, elbows pinned. Extend elbows fully and control back to ~90°.',
+    i18nKey: 'exercise.cable_triceps_pushdown',
+    defaultName: 'Triceps pushdown (kabel)',
+    defaultDescription:
+      'Med rep eller stång, håll armbågarna stilla. Sträck ut helt och kontrollera tillbaka till ~90°.',
     muscleGroups: ['Triceps'],
     defaultSets: 3,
     defaultReps: 11,
     defaultPauseSeconds: 60,
   },
   {
-    name: 'Cable Chest Fly',
-    description:
-      'From high/mid pulleys. Slight forward lean, hugging motion with soft elbows. Squeeze chest, slow return.',
-    muscleGroups: ['Chest'],
+    i18nKey: 'exercise.cable_chest_fly',
+    defaultName: 'Kabel-flyes (bröst)',
+    defaultDescription:
+      'Från höga/mitten-trissor. Lätt framåtlutning, kramrörelse med mjuka armbågar. Spänn bröstet och återgå långsamt.',
+    muscleGroups: ['Bröst'],
     defaultSets: 3,
     defaultReps: 13,
     defaultPauseSeconds: 60,
   },
 
   {
-    name: 'Back Squat',
-    description:
-      'Bar on upper back, brace core, knees track over toes. Squat to the deepest range you control, then drive up.',
-    muscleGroups: ['Quads', 'Glutes', 'Hamstrings', 'Core'],
+    i18nKey: 'exercise.back_squat',
+    defaultName: 'Knäböj (skivstång)',
+    defaultDescription:
+      'Stång på övre ryggen, spänn bålen, knän följer tårna. Gå ned så djupt du kontrollerar och driv upp igen.',
+    muscleGroups: ['Framsida lår', 'Säte', 'Baksida lår', 'Bål'],
     defaultSets: 4,
     defaultReps: 8,
     defaultPauseSeconds: 150,
   },
   {
-    name: 'Barbell Hip Thrust',
-    description:
-      'Upper back on bench, bar over hips. Posterior pelvic tilt, drive through heels, lock out with glutes.',
-    muscleGroups: ['Glutes', 'Hamstrings'],
+    i18nKey: 'exercise.barbell_hip_thrust',
+    defaultName: 'Hip thrust (skivstång)',
+    defaultDescription:
+      'Övre rygg på bänk, stång över höften. Tippa bäckenet bakåt, driv genom hälarna och lås ut med sätet.',
+    muscleGroups: ['Säte', 'Baksida lår'],
     defaultSets: 3,
     defaultReps: 9,
     defaultPauseSeconds: 120,
   },
   {
-    name: 'Leg Press',
-    description:
-      'Feet shoulder-width on sled. Lower deep with control without pelvis tilt; press through midfoot.',
-    muscleGroups: ['Quads', 'Glutes', 'Hamstrings'],
+    i18nKey: 'exercise.leg_press',
+    defaultName: 'Benpress',
+    defaultDescription:
+      'Fötter axelbrett på släden. Sänk djupt med kontroll utan att bäckenet tippar; pressa genom mellanfoten.',
+    muscleGroups: ['Framsida lår', 'Säte', 'Baksida lår'],
     defaultSets: 3,
     defaultReps: 11,
     defaultPauseSeconds: 120,
   },
   {
-    name: 'Seated Leg Curl',
-    description:
-      'Adjust pad above heels. Curl to full knee flexion with hips pinned; control the eccentric.',
-    muscleGroups: ['Hamstrings'],
+    i18nKey: 'exercise.seated_leg_curl',
+    defaultName: 'Sittande lårcurl',
+    defaultDescription:
+      'Justera dynan ovanför hälarna. Curl till full knäflexion med höfterna stilla; kontrollera den excentriska fasen.',
+    muscleGroups: ['Baksida lår'],
     defaultSets: 3,
     defaultReps: 11,
     defaultPauseSeconds: 75,
   },
   {
-    name: 'Leg Extension',
-    description:
-      'Pad above ankles. Extend to near lockout under control; 2–3 s eccentric for knee-friendly tension.',
-    muscleGroups: ['Quads'],
+    i18nKey: 'exercise.leg_extension',
+    defaultName: 'Benextension',
+    defaultDescription:
+      'Dyna ovanför anklarna. Sträck ut nästan till låsning med kontroll; 2–3 s excentriskt för knävänlig belastning.',
+    muscleGroups: ['Framsida lår'],
     defaultSets: 3,
     defaultReps: 13,
     defaultPauseSeconds: 60,
   },
   {
-    name: 'Calf Raise (Machine or Leg Press)',
-    description:
-      'Full ankle ROM. Pause at deep stretch; strong plantarflexion at top. No bouncing.',
-    muscleGroups: ['Calves'],
+    i18nKey: 'exercise.calf_raise_machine_or_leg_press',
+    defaultName: 'Vadpress (maskin/benpress)',
+    defaultDescription:
+      'Full rörelse i fotleden. Pausa i bottenläget; kraftig tåhävning i toppen. Ingen studs.',
+    muscleGroups: ['Vader'],
     defaultSets: 3,
     defaultReps: 14,
     defaultPauseSeconds: 60,
   },
 
   {
-    name: 'Standing Barbell Overhead Press',
-    description:
-      'Stand tall, brace glutes and core. Press bar overhead in a straight path; head moves through at the top.',
-    muscleGroups: ['Shoulders', 'Triceps', 'Upper Chest', 'Core'],
+    i18nKey: 'exercise.standing_barbell_overhead_press',
+    defaultName: 'Militärpress (stående)',
+    defaultDescription:
+      'Stå stabilt, spänn säte och bål. Pressa stången rakt upp; för huvudet fram genom armarna i toppläget.',
+    muscleGroups: ['Axlar', 'Triceps', 'Övre bröst', 'Bål'],
     defaultSets: 4,
     defaultReps: 7,
     defaultPauseSeconds: 150,
   },
   {
-    name: 'Seated Cable Row',
-    description:
-      'Neutral spine, chest up. Pull to lower ribs with elbows close; squeeze lats/mid-back, slow return.',
-    muscleGroups: ['Back', 'Rear Delts', 'Biceps'],
+    i18nKey: 'exercise.seated_cable_row',
+    defaultName: 'Sittande rodd (kabel)',
+    defaultDescription:
+      'Neutral rygg, bröstet upp. Dra mot nedre revben med armbågar nära kroppen; spänn lats/mellanrygg, återgå långsamt.',
+    muscleGroups: ['Rygg', 'Bakre axlar', 'Biceps'],
     defaultSets: 4,
     defaultReps: 8,
     defaultPauseSeconds: 120,
   },
   {
-    name: 'Incline Bench Press',
-    description:
-      'Barbell press on a 30–45° incline. Lower to upper chest; press with elbows ~45–60°.',
-    muscleGroups: ['Chest', 'Shoulders', 'Triceps'],
+    i18nKey: 'exercise.incline_bench_press',
+    defaultName: 'Bänkpress lutande (skivstång)',
+    defaultDescription:
+      'Skivstångspress på 30–45° lutning. Sänk till övre bröstet; pressa med armbågar ~45–60°.',
+    muscleGroups: ['Bröst', 'Axlar', 'Triceps'],
     defaultSets: 3,
     defaultReps: 9,
     defaultPauseSeconds: 120,
   },
   {
-    name: 'Walking Lunge',
-    description:
-      'Step forward and descend under control. Front knee tracks over toes; push through front heel and switch.',
-    muscleGroups: ['Quads', 'Glutes', 'Hamstrings', 'Core'],
+    i18nKey: 'exercise.walking_lunge',
+    defaultName: 'Gående utfall',
+    defaultDescription:
+      'Ta ett steg fram och gå ned kontrollerat. Främre knät följer tårna; pressa upp genom främre hälen och växla.',
+    muscleGroups: ['Framsida lår', 'Säte', 'Baksida lår', 'Bål'],
     defaultSets: 3,
     defaultReps: 10,
     defaultPauseSeconds: 90,
   },
   {
-    name: 'Overhead Triceps Extension (Rope or DB)',
-    description:
-      'Arms overhead, elbows tucked. Lower behind head for stretch; extend fully without flaring.',
+    i18nKey: 'exercise.overhead_triceps_extension_rope_or_db',
+    defaultName: 'Triceps extension över huvudet (rep/hantel)',
+    defaultDescription:
+      'Armar över huvudet, armbågar nära. Sänk bakom huvudet för stretch; sträck ut helt utan att flara armbågarna.',
     muscleGroups: ['Triceps'],
     defaultSets: 3,
     defaultReps: 10,
     defaultPauseSeconds: 75,
   },
   {
-    name: 'Hammer Curl',
-    description:
-      'Neutral-grip dumbbell curl. Elbows by sides; control the 2 s eccentric.',
-    muscleGroups: ['Biceps', 'Forearms'],
+    i18nKey: 'exercise.hammer_curl',
+    defaultName: 'Hammercurl',
+    defaultDescription:
+      'Hantelcurl med neutralt grepp. Armbågarna vid sidan; kontrollera den excentriska fasen i ~2 sek.',
+    muscleGroups: ['Biceps', 'Underarmar'],
     defaultSets: 3,
     defaultReps: 12,
     defaultPauseSeconds: 60,
   },
 
   {
-    name: 'Deadlift',
-    description:
-      'Hinge at hips with neutral spine, bar close to shins. Push the floor, stand tall. Reset or control each rep.',
+    i18nKey: 'exercise.deadlift',
+    defaultName: 'Marklyft',
+    defaultDescription:
+      'Höftfällning med neutral rygg, stången nära smalbenen. Tryck golvet, res dig starkt. Återställ eller kontrollera varje repetition.',
     muscleGroups: [
-      'Glutes',
-      'Hamstrings',
-      'Back',
-      'Traps',
-      'Core',
-      'Lower Back',
+      'Säte',
+      'Baksida lår',
+      'Rygg',
+      'Trapezius',
+      'Bål',
+      'Ländrygg',
     ],
     defaultSets: 4,
     defaultReps: 6,
     defaultPauseSeconds: 180,
   },
   {
-    name: 'Lat Pulldown',
-    description:
-      'Grip slightly wider than shoulders. Pull bar to upper chest; elbows down and back; slow eccentric.',
-    muscleGroups: ['Back', 'Biceps', 'Rear Delts'],
+    i18nKey: 'exercise.lat_pulldown',
+    defaultName: 'Latsdrag',
+    defaultDescription:
+      'Greppa något bredare än axlarna. Dra stången mot övre bröstet; armbågar ned och bak; långsam excentrisk fas.',
+    muscleGroups: ['Rygg', 'Biceps', 'Bakre axlar'],
     defaultSets: 4,
     defaultReps: 10,
     defaultPauseSeconds: 90,
   },
   {
-    name: 'Seated Row (Cable)',
-    description:
-      'Neutral spine; pull to belly button/lower ribs. Squeeze scapulae; control return.',
-    muscleGroups: ['Back', 'Rear Delts', 'Biceps'],
+    i18nKey: 'exercise.seated_row_cable',
+    defaultName: 'Sittande rodd (kabel) – mage',
+    defaultDescription:
+      'Neutral rygg; dra till navel/nedre revben. Nyp ihop skulderbladen; kontrollera återgången.',
+    muscleGroups: ['Rygg', 'Bakre axlar', 'Biceps'],
     defaultSets: 4,
     defaultReps: 10,
     defaultPauseSeconds: 90,
   },
   {
-    name: 'Face Pull',
-    description:
-      'Rope at face height. Pull toward nose/forehead with external rotation (thumbs back); squeeze rear delts.',
-    muscleGroups: ['Rear Delts', 'Back', 'Traps'],
+    i18nKey: 'exercise.face_pull',
+    defaultName: 'Face pull',
+    defaultDescription:
+      'Rep i ansiktshöjd. Dra mot näsa/panna med utåtrotation (tummar bak); spänn bakre axlar.',
+    muscleGroups: ['Bakre axlar', 'Rygg', 'Trapezius'],
     defaultSets: 3,
     defaultReps: 14,
     defaultPauseSeconds: 60,
   },
   {
-    name: 'Biceps Curl (Barbell or Dumbbell)',
-    description:
-      'Supinated curl with elbows by sides, shoulders down. Full ROM; controlled negative.',
-    muscleGroups: ['Biceps', 'Forearms'],
+    i18nKey: 'exercise.biceps_curl_barbell_or_dumbbell',
+    defaultName: 'Bicepscurl (stång/hantel)',
+    defaultDescription:
+      'Curl med supinerat grepp, armbågar vid sidan, axlarna nere. Fullt rörelseomfång; kontrollerad negativ fas.',
+    muscleGroups: ['Biceps', 'Underarmar'],
     defaultSets: 3,
     defaultReps: 11,
     defaultPauseSeconds: 60,
   },
   {
-    name: 'Sit-up',
-    description:
-      'Posterior pelvic tilt; curl spine segment by segment. Avoid pulling the neck; control down.',
-    muscleGroups: ['Abs', 'Hip Flexors', 'Core'],
+    i18nKey: 'exercise.sit_up',
+    defaultName: 'Situps',
+    defaultDescription:
+      'Tippa bäckenet bakåt; rulla upp kotsegment för segment. Undvik att dra i nacken; kontrollera nedvägen.',
+    muscleGroups: ['Mage', 'Höftböjare', 'Bål'],
     defaultSets: 1,
     defaultReps: 20,
     defaultPauseSeconds: 45,
   },
   {
-    name: 'Lying Leg Raise',
-    description:
-      'Posteriorly tilt pelvis; raise straight legs without arching lower back; stop before lumbar extension.',
-    muscleGroups: ['Abs', 'Hip Flexors', 'Core'],
+    i18nKey: 'exercise.lying_leg_raise',
+    defaultName: 'Benlyft liggande',
+    defaultDescription:
+      'Tippa bäckenet bakåt; lyft raka ben utan att svanka; stoppa innan ländryggen börjar extendera.',
+    muscleGroups: ['Mage', 'Höftböjare', 'Bål'],
     defaultSets: 1,
     defaultReps: 10,
     defaultPauseSeconds: 45,
   },
   {
-    name: 'Side-Lying Leg Raise (Obliques)',
-    description:
-      'Side-lying; lift with obliques, keep hips stacked and tempo controlled.',
-    muscleGroups: ['Abs', 'Core'],
+    i18nKey: 'exercise.side_lying_leg_raise_obliques',
+    defaultName: 'Sidoliggande benlyft (sneda magmuskler)',
+    defaultDescription:
+      'Sidoliggande; lyft med sneda magmuskler, håll höfterna staplade och kontrollera tempot.',
+    muscleGroups: ['Mage', 'Bål'],
     defaultSets: 1,
     defaultReps: 20,
     defaultPauseSeconds: 45,
-  },
-];
-
-const workoutsToSeed = [
-  {
-    title: 'Push – Chest/Shoulders/Triceps',
-    description:
-      'Hypertrophy-focused push session with compound pressing and targeted accessories.',
-    time: 70,
-    exercises: [
-      {
-        exerciseName: 'Bench Press',
-        order: 1,
-        sets: 4,
-        reps: 6,
-        weight: 0,
-        pauseSeconds: 150,
-      },
-      {
-        exerciseName: 'Incline Dumbbell Press',
-        order: 2,
-        sets: 3,
-        reps: 9,
-        weight: 0,
-        pauseSeconds: 90,
-      },
-      {
-        exerciseName: 'Seated Dumbbell Shoulder Press',
-        order: 3,
-        sets: 4,
-        reps: 9,
-        weight: 0,
-        pauseSeconds: 120,
-      },
-      {
-        exerciseName: 'Dumbbell Lateral Raise',
-        order: 4,
-        sets: 3,
-        reps: 14,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-      {
-        exerciseName: 'Cable Triceps Pushdown',
-        order: 5,
-        sets: 3,
-        reps: 11,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-      {
-        exerciseName: 'Cable Chest Fly',
-        order: 6,
-        sets: 3,
-        reps: 13,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-    ],
-  },
-  {
-    title: 'Legs – Quads/Glutes/Hamstrings',
-    description:
-      'Lower-body session prioritizing big lifts, then machine volume and calves.',
-    time: 70,
-    exercises: [
-      {
-        exerciseName: 'Back Squat',
-        order: 1,
-        sets: 4,
-        reps: 8,
-        weight: 0,
-        pauseSeconds: 150,
-      },
-      {
-        exerciseName: 'Barbell Hip Thrust',
-        order: 2,
-        sets: 3,
-        reps: 9,
-        weight: 0,
-        pauseSeconds: 120,
-      },
-      {
-        exerciseName: 'Leg Press',
-        order: 3,
-        sets: 3,
-        reps: 11,
-        weight: 0,
-        pauseSeconds: 120,
-      },
-      {
-        exerciseName: 'Seated Leg Curl',
-        order: 4,
-        sets: 3,
-        reps: 11,
-        weight: 0,
-        pauseSeconds: 75,
-      },
-      {
-        exerciseName: 'Leg Extension',
-        order: 5,
-        sets: 3,
-        reps: 13,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-      {
-        exerciseName: 'Calf Raise (Machine or Leg Press)',
-        order: 6,
-        sets: 3,
-        reps: 14,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-    ],
-  },
-  {
-    title: 'Full Body – Weak Point Emphasis',
-    description:
-      'Mixed compound focus with arm accessories; adjust to current weak points.',
-    time: 65,
-    exercises: [
-      {
-        exerciseName: 'Standing Barbell Overhead Press',
-        order: 1,
-        sets: 4,
-        reps: 7,
-        weight: 0,
-        pauseSeconds: 150,
-      },
-      {
-        exerciseName: 'Seated Cable Row',
-        order: 2,
-        sets: 4,
-        reps: 8,
-        weight: 0,
-        pauseSeconds: 120,
-      },
-      {
-        exerciseName: 'Incline Bench Press',
-        order: 3,
-        sets: 3,
-        reps: 9,
-        weight: 0,
-        pauseSeconds: 120,
-      },
-      {
-        exerciseName: 'Walking Lunge',
-        order: 4,
-        sets: 3,
-        reps: 10,
-        weight: 0,
-        pauseSeconds: 90,
-      },
-      {
-        exerciseName: 'Overhead Triceps Extension (Rope or DB)',
-        order: 5,
-        sets: 3,
-        reps: 10,
-        weight: 0,
-        pauseSeconds: 75,
-      },
-      {
-        exerciseName: 'Hammer Curl',
-        order: 6,
-        sets: 3,
-        reps: 12,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-    ],
-  },
-  {
-    title: 'Pull – Back/Biceps/Core',
-    description:
-      'Posterior-chain and lat emphasis with arm work; add core finishers.',
-    time: 70,
-    exercises: [
-      {
-        exerciseName: 'Deadlift',
-        order: 1,
-        sets: 4,
-        reps: 6,
-        weight: 0,
-        pauseSeconds: 180,
-      },
-      {
-        exerciseName: 'Lat Pulldown',
-        order: 2,
-        sets: 4,
-        reps: 10,
-        weight: 0,
-        pauseSeconds: 90,
-      },
-      {
-        exerciseName: 'Seated Row (Cable)',
-        order: 3,
-        sets: 4,
-        reps: 10,
-        weight: 0,
-        pauseSeconds: 90,
-      },
-      {
-        exerciseName: 'Face Pull',
-        order: 4,
-        sets: 3,
-        reps: 14,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-      {
-        exerciseName: 'Biceps Curl (Barbell or Dumbbell)',
-        order: 5,
-        sets: 3,
-        reps: 11,
-        weight: 0,
-        pauseSeconds: 60,
-      },
-      {
-        exerciseName: 'Sit-up',
-        order: 6,
-        sets: 1,
-        reps: 20,
-        weight: 0,
-        pauseSeconds: 45,
-      },
-      {
-        exerciseName: 'Lying Leg Raise',
-        order: 7,
-        sets: 1,
-        reps: 10,
-        weight: 0,
-        pauseSeconds: 45,
-      },
-      {
-        exerciseName: 'Side-Lying Leg Raise (Obliques)',
-        order: 8,
-        sets: 1,
-        reps: 20,
-        weight: 0,
-        pauseSeconds: 45,
-      },
-    ],
   },
 ];
 
@@ -593,10 +378,7 @@ async function seed() {
 
     const userRepo = AppDataSource.getRepository(User);
     const mgRepo = AppDataSource.getRepository(MuscleGroup);
-    const exRepo = AppDataSource.getRepository(Exercise);
     const globalExRepo = AppDataSource.getRepository(GlobalExercise);
-    const workoutRepo = AppDataSource.getRepository(Workout);
-    const workoutExerciseRepo = AppDataSource.getRepository(WorkoutExercise);
 
     // Users
     const createdUsers: User[] = [];
@@ -616,18 +398,11 @@ async function seed() {
     console.log('💪 Seeded muscle groups');
 
     // Global exercises (predefined catalog)
-    const slugify = (value: string) =>
-      value
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_+|_+$/g, '')
-        .replace(/_+/g, '_');
-
     for (const ex of exercisesToSeed) {
       const globalExercise = globalExRepo.create({
-        i18nKey: `exercise.${slugify(ex.name)}`,
-        defaultName: ex.name,
-        defaultDescription: ex.description,
+        i18nKey: ex.i18nKey,
+        defaultName: ex.defaultName,
+        defaultDescription: ex.defaultDescription,
         defaultSets: ex.defaultSets,
         defaultReps: ex.defaultReps,
         defaultPauseSeconds: ex.defaultPauseSeconds,
