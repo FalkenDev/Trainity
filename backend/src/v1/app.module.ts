@@ -9,6 +9,7 @@ import { JwtStrategy } from './strategies/Jwt.strategy';
 import { WorkoutModule } from './workout/workout.module';
 import { WorkoutSessionModule } from './workoutSession/workoutSession.module';
 import { MuscleGroupModule } from './muscleGroup/muscleGroup.module';
+import { GlobalExerciseModule } from './globalExercise/globalExercise.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MuscleGroupModule } from './muscleGroup/muscleGroup.module';
     }),
     AuthModule,
     ExerciseModule,
+    GlobalExerciseModule,
     MuscleGroupModule,
     UserModule,
     WorkoutModule,

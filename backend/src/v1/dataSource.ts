@@ -10,6 +10,7 @@ import { WorkoutSession } from './workoutSession/workoutSession.entity';
 import { MuscleGroup } from './muscleGroup/muscleGroup.entity';
 import { WorkoutSessionExercise } from './workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from './workoutSession/workoutSessionSet.entity';
+import { GlobalExercise } from './globalExercise/globalExercise.entity';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ export const AppDataSource = new DataSource({
     User,
     MuscleGroup,
     Exercise,
+    GlobalExercise,
     Workout,
     WorkoutExercise,
     WorkoutSession,

@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Exercise } from './exercise.entity';
 import { MuscleGroupModule } from '../muscleGroup/muscleGroup.module';
 import { UploadModule } from '../upload/upload.module';
+import { GlobalExercise } from '../globalExercise/globalExercise.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Exercise]),
+    TypeOrmModule.forFeature([Exercise, GlobalExercise]),
     MuscleGroupModule,
     UploadModule,
   ],

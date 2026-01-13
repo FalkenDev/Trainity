@@ -8,6 +8,25 @@ export class ExerciseResponseDto {
   @ApiProperty()
   name: string;
 
+  @ApiProperty({
+    required: false,
+    description: 'Optional i18n key for the exercise name',
+  })
+  i18nKey?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'If true, the user has overridden the default translated name',
+  })
+  isNameCustom?: boolean;
+
+  @ApiProperty({
+    required: false,
+    description:
+      'If created from a global exercise, this is the source globalExercise id',
+  })
+  globalExerciseId?: number;
+
   @ApiProperty({ required: false })
   description?: string;
 
