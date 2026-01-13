@@ -1,15 +1,12 @@
 <template>
   <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
-      title="Add Exercises"
+      title="Add From Global Exercises"
       show-menu
       @close="saveAndClose"
     >
       <template #menuAppend>
         <v-list>
-          <v-list-item @click="isAddGlobalExercisesOpen = true">
-            <v-list-item-title>Add from global list</v-list-item-title>
-          </v-list-item>
           <v-list-item @click="isCreateExerciseOpen = true">
             <v-list-item-title>Create exercise</v-list-item-title>
           </v-list-item>
@@ -68,42 +65,41 @@
                     <v-checkbox-btn :model-value="isActive" />
                   </v-list-item-action>
                 </template>
-                <v-list-item-title>
-                  {{ muscleGroup.name }}
-                </v-list-item-title>
+                <v-list-item-title>{{ muscleGroup.name }}</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
         </v-btn>
       </v-badge>
     </div>
+
     <v-list
-      v-if="exercises && exercises.length > 0"
+      v-if="filteredGlobalExercises.length > 0"
       class="flex-grow-1 overflow-y-auto pa-0 pb-5"
     >
       <v-list-item
-        v-for="exercise in exercises"
-        :key="exercise.id"
+        v-for="ex in filteredGlobalExercises"
+        :key="ex.id"
         class="border-t-sm border-b-sm py-2"
         two-line
       >
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-3">
             <v-checkbox
-              v-model="selectedIds"
-              :value="exercise.id"
+              v-model="selectedGlobalIds"
+              :value="ex.id"
               color="primary"
               hide-details
               density="compact"
             />
             <v-list-item-title class="text-body-1 font-weight-bold">
-              {{ exercise.name }}
+              {{ ex.defaultName }}
             </v-list-item-title>
           </div>
           <div>
             <v-icon
               color="grey-lighten-1"
-              @click.stop="openViewExercise(exercise)"
+              @click.stop="openInfo(ex)"
             >
               mdi-information-outline
             </v-icon>
@@ -111,6 +107,7 @@
         </div>
       </v-list-item>
     </v-list>
+
     <div
       v-else
       class="flex-grow-1 d-flex flex-column align-center mt-10 text-center px-6"
@@ -126,7 +123,7 @@
       </h2>
       <p class="text-body-2 text-grey-lighten-1">
         Try adjusting your search or filter to find what you're looking for.
-      </p> 
+      </p>
       <v-btn
         class="mt-4"
         color="primary"
@@ -136,64 +133,76 @@
       </v-btn>
     </div>
   </div>
+
   <v-dialog
-    v-model="isViewExerciseOpen"
-    fullscreen
+    v-model="isInfoOpen"
+    max-width="600"
   >
-    <EditExercise
-      :selected-exercise="viewExercise"
-      :is-view-exercise="true"
-      :is-view-workout-exercise="false"
-      @close="isViewExerciseOpen = false"
-    />
+    <v-card class="bg-grey-darken-4">
+      <v-card-title class="text-body-1 font-weight-bold">
+        {{ infoExercise?.defaultName }}
+      </v-card-title>
+      <v-card-text class="text-body-2 text-grey-lighten-1">
+        {{ infoExercise?.defaultDescription || 'No description' }}
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn
+          variant="text"
+          @click="isInfoOpen = false"
+        >
+          Close
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
+
   <v-dialog
     v-model="isCreateExerciseOpen"
     fullscreen
   >
     <CreateExercise @close="isCreateExerciseOpen = false" />
   </v-dialog>
-
-  <v-dialog
-    v-model="isAddGlobalExercisesOpen"
-    fullscreen
-  >
-    <AddGlobalExerciseList
-      @close="isAddGlobalExercisesOpen = false"
-      @save="onGlobalExercisesImported"
-    />
-  </v-dialog>
 </template>
 
 <script lang="ts" setup>
-import type { Exercise } from "@/interfaces/Exercise.interface";
-import { useExerciseStore } from "@/stores/exercise.store";
-import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
-
-const props = defineProps<{
-  initialSelectedIds: number[];
-}>();
+import type { GlobalExercise } from '@/interfaces/GlobalExercise.interface';
+import { fetchAllGlobalExercises, importGlobalExercises } from '@/services/globalExercise.service';
+import { useExerciseStore } from '@/stores/exercise.store';
+import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
+import { toast } from 'vuetify-sonner';
 
 const emit = defineEmits<{
-  (e: "close"): void;
-  (e: "save", selectedIds: number[]): void;
+  (e: 'close'): void;
+  (e: 'save', createdExerciseIds: number[]): void;
 }>();
 
 const muscleGroupStore = useMuscleGroupStore();
 const exerciseStore = useExerciseStore();
 
-const searchQuery = ref<string>("");
-const selectedIds = ref<number[]>([...props.initialSelectedIds]);
-const viewExercise = ref<Exercise | null>(null);
-const isViewExerciseOpen = ref<boolean>(false);
-const isCreateExerciseOpen = ref<boolean>(false);
-const isAddGlobalExercisesOpen = ref<boolean>(false);
+const searchQuery = ref<string>('');
+const selectedGlobalIds = ref<number[]>([]);
 const selectedMuscleGroups = ref<number[]>([]);
 
-const openViewExercise = (exercise: Exercise) => {
-  viewExercise.value = exercise;
-  isViewExerciseOpen.value = true;
+const globalExercises = ref<GlobalExercise[]>([]);
+const isCreateExerciseOpen = ref<boolean>(false);
+
+const isInfoOpen = ref<boolean>(false);
+const infoExercise = ref<GlobalExercise | null>(null);
+
+const openInfo = (ex: GlobalExercise) => {
+  infoExercise.value = ex;
+  isInfoOpen.value = true;
 };
+
+onMounted(async () => {
+  try {
+    globalExercises.value = await fetchAllGlobalExercises();
+  } catch (e) {
+    toast.error('Failed to load global exercises');
+    console.error(e);
+  }
+});
 
 const muscleGroups = computed(() => {
   return muscleGroupStore.muscleGroups.map((group) => ({
@@ -202,37 +211,44 @@ const muscleGroups = computed(() => {
   }));
 });
 
-const exercises = computed<Exercise[]>(() =>
-  exerciseStore.exercises.filter((exercise: Exercise) => {
+const filteredGlobalExercises = computed<GlobalExercise[]>(() =>
+  globalExercises.value.filter((ex) => {
+    const q = searchQuery.value.toLowerCase();
     const matchesSearch =
-      exercise.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      (exercise.description ?? "")
-        .toLowerCase()
-        .includes(searchQuery.value.toLowerCase());
+      ex.defaultName.toLowerCase().includes(q) ||
+      (ex.defaultDescription ?? '').toLowerCase().includes(q);
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
-      (Array.isArray(exercise.muscleGroups) &&
-        exercise.muscleGroups
-          .map((mg: number | { id: number }) => typeof mg === "object" ? mg.id : mg)
-          .some((mgId: number) => selectedMuscleGroups.value.includes(mgId))
-      );
+      ex.muscleGroups?.some((mg) => selectedMuscleGroups.value.includes(mg.id));
 
     return matchesSearch && matchesMuscleGroup;
   }),
 );
 
-const saveAndClose = () => {
-  emit("save", selectedIds.value);
-  emit("close");
-};
+const saveAndClose = async () => {
+  try {
+    if (selectedGlobalIds.value.length) {
+      const created = await importGlobalExercises(selectedGlobalIds.value);
+      await exerciseStore.setExercises(true);
+      toast.success(
+        created.length
+          ? `${created.length} exercise(s) added to your account`
+          : 'Nothing to add',
+      );
 
-const onGlobalExercisesImported = (createdExerciseIds: number[]) => {
-  for (const id of createdExerciseIds) {
-    if (!selectedIds.value.includes(id)) {
-      selectedIds.value.push(id);
+      emit(
+        'save',
+        created
+          .map((e) => e.id)
+          .filter((id): id is number => typeof id === 'number'),
+      );
     }
+  } catch (e) {
+    toast.error('Failed to add exercises');
+    console.error(e);
+  } finally {
+    emit('close');
   }
 };
-
 </script>
