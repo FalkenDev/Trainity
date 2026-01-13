@@ -24,7 +24,7 @@ export interface WorkoutSession {
   endedAt?: string;
   status: 'in_progress' | 'finished' | 'abandoned';
   notes?: string;
-  workout: Workout;
+  workout?: Workout | null;
   exercises: {
     exerciseSnapshot: {
       name: string;
@@ -64,7 +64,7 @@ export interface tempWorkoutSession {
   endedAt?: string;
   status?: 'in_progress' | 'finished' | 'abandoned';
   notes?: string;
-  workout?: Workout;
+  workout?: Workout | null;
   exercises?: {
     exerciseSnapshot?: {
       name?: string;

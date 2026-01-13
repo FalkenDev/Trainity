@@ -19,8 +19,8 @@ export class WorkoutSession {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Workout, { onDelete: 'CASCADE' })
-  workout: Workout;
+  @ManyToOne(() => Workout, { onDelete: 'SET NULL', nullable: true })
+  workout: Workout | null;
 
   @Column({ type: 'jsonb', nullable: true })
   workoutSnapshot: any;
