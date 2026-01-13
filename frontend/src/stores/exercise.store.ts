@@ -3,10 +3,12 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Exercise } from '@/interfaces/Exercise.interface';
 import * as exerciseService from '@/services/exercise.service';
+import { useAuthStore } from './auth.store';
 
 export const useExerciseStore = defineStore(
   'exerciseStore',
   () => {
+    const authStore = useAuthStore();
     const exercises = ref<Exercise[]>([]);
     const isLoading = ref<boolean>(false);
     const lastFetched = ref<number | null>(null);
@@ -34,13 +36,24 @@ export const useExerciseStore = defineStore(
       }
     };
 
-    setExercises();
+    // Only fetch exercises when authenticated; otherwise avoid 401 loops on app boot.
+    watch(
+      () => authStore.isAuthenticated,
+      (authed) => {
+        if (authed) {
+          void setExercises(true);
+        }
+      },
+      { immediate: true },
+    );
 
     const resetStore = async () => {
       exercises.value = [];
       isLoading.value = false;
       lastFetched.value = null;
-      await setExercises(true);
+      if (authStore.isAuthenticated) {
+        await setExercises(true);
+      }
     };
 
     return { exercises, isLoading, setExercises, resetStore };

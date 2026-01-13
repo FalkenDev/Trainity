@@ -9,7 +9,7 @@ import { useWorkoutSessionStore } from './workoutSession.store';
 import { fetchWrapper } from '@/utils/fetchWrapper';
 import type { User } from '@/interfaces/User.interface';
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:1337/v1';
 
 export const useAuthStore = defineStore(
   'authStore',
@@ -34,6 +34,9 @@ export const useAuthStore = defineStore(
         isAuthenticated.value = true;
         user.value = data.user;
         token.value = '';
+
+        // Give the browser a tick to persist Set-Cookie before fetching protected resources.
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         await useWorkoutStore().resetStore();
         await useExerciseStore().resetStore();

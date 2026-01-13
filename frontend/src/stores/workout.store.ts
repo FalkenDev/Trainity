@@ -2,10 +2,12 @@
 import { defineStore } from "pinia";
 import * as workoutService from "@/services/workout.service";
 import type { Workout } from "@/interfaces/Workout.interface";
+import { useAuthStore } from './auth.store';
 
 export const useWorkoutStore = defineStore(
   "workoutStore",
   () => {
+    const authStore = useAuthStore();
     const workouts = ref<Workout[]>([]);
     const currentWorkout = ref<Workout | null>(null);
     const isLoading = ref<boolean>(false);
@@ -45,7 +47,16 @@ export const useWorkoutStore = defineStore(
       }
     };
 
-    setWorkouts();
+    // Only fetch workouts when authenticated; otherwise avoid 401 loops on app boot.
+    watch(
+      () => authStore.isAuthenticated,
+      (authed) => {
+        if (authed) {
+          void setWorkouts(true);
+        }
+      },
+      { immediate: true },
+    );
 
     const setCurrentWorkout = async(workoutId: number) => {
       await setWorkouts(true);
@@ -62,7 +73,9 @@ export const useWorkoutStore = defineStore(
       isLoading.value = false;
       currentWorkout.value = null;
       lastFetched.value = null;
-      await setWorkouts(true);
+      if (authStore.isAuthenticated) {
+        await setWorkouts(true);
+      }
     };
 
     return {
