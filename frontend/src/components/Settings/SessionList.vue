@@ -180,8 +180,19 @@
 
                     <v-divider class="my-2" />
 
-                    <div class="text-caption">
-                      Session notes: {{ session.notes || '—' }}
+                    <div class="d-flex align-center justify-space-between mt-4">
+                      <div class="text-caption">
+                        Session notes: {{ session.notes || '—' }}
+                      </div>
+                      <v-btn
+                        color="error"
+                        variant="text"
+                        size="small"
+                        prepend-icon="mdi-delete"
+                        @click="handleDelete(session.id)"
+                      >
+                        Delete
+                      </v-btn>
                     </div>
                   </v-expansion-panel-text>
                 </v-expansion-panel>
@@ -266,6 +277,16 @@ function statusColor(status: WorkoutSession['status']) {
 
 function title(session: WorkoutSession) {
   return session.workoutSnapshot?.title || `Session #${session.id}`;
+}
+
+async function handleDelete(sessionId: number) {
+  if (
+    confirm(
+      'Are you sure you want to delete this session? This action cannot be undone.',
+    )
+  ) {
+    await store.deleteSession(sessionId);
+  }
 }
 
 onMounted(() => {

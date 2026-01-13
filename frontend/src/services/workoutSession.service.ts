@@ -109,12 +109,13 @@ export const finishWorkoutSession = async (
 
 export const deleteWorkoutSession = async (
   sessionId: number,
-): Promise<boolean> => {
+): Promise<{ message: string }> => {
   try {
-    await fetchWrapper<void>(`${apiUrl}/workoutSessions/${sessionId}`, {
-      method: 'DELETE',
-    });
-    return true;
+    const data = await fetchWrapper<{ message: string }>(
+      `${apiUrl}/workoutSessions/${sessionId}`,
+      { method: 'DELETE' },
+    );
+    return data;
   } catch (error) {
     console.error('Error deleting workout session:', error);
     throw new Error('Failed to delete workout session');
