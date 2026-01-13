@@ -8,6 +8,9 @@
     >
       <template #menuAppend>
         <v-list>
+          <v-list-item @click="isAddGlobalExercisesOpen = true">
+            <v-list-item-title>Add from global list</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="isCreateExerciseOpen = true">
             <v-list-item-title>Create exercise</v-list-item-title>
           </v-list-item>
@@ -30,16 +33,25 @@
         offset-x="0"
         offset-y="0"
       >
-        <v-btn height="40" variant="outlined">
+        <v-btn
+          height="40"
+          variant="outlined"
+        >
           Filter
-          <v-menu activator="parent" :close-on-content-click="false">
+          <v-menu
+            activator="parent"
+            :close-on-content-click="false"
+          >
             <v-list
               v-model:selected="selectedMuscleGroups"
               select-strategy="classic"
             >
               <v-list-item @click="selectedMuscleGroups = []">
                 <v-list-item-title>
-                  <v-icon class="mr-2" color="grey-lighten-1">
+                  <v-icon
+                    class="mr-2"
+                    color="grey-lighten-1"
+                  >
                     mdi-close
                   </v-icon>
                   Reset
@@ -80,7 +92,9 @@
             </v-list-item-title>
           </div>
           <div>
-            <v-icon color="grey-lighten-1"> mdi-chevron-right </v-icon>
+            <v-icon color="grey-lighten-1">
+              mdi-chevron-right
+            </v-icon>
           </div>
         </div>
       </v-list-item>
@@ -98,16 +112,30 @@
             </v-list-item-title>
           </div>
           <div>
-            <v-icon color="grey-lighten-1"> mdi-plus </v-icon>
+            <v-icon color="grey-lighten-1">
+              mdi-plus
+            </v-icon>
           </div>
         </div>
       </v-list-item>
     </v-list>
   </div>
-  <v-dialog v-model="isCreateExerciseOpen" fullscreen>
+  <v-dialog
+    v-model="isCreateExerciseOpen"
+    fullscreen
+  >
     <CreateExercise @close="isCreateExerciseOpen = false" />
   </v-dialog>
-  <v-dialog v-model="isViewExerciseOpen" fullscreen>
+  <v-dialog
+    v-model="isAddGlobalExercisesOpen"
+    fullscreen
+  >
+    <AddGlobalExerciseList @close="isAddGlobalExercisesOpen = false" />
+  </v-dialog>
+  <v-dialog
+    v-model="isViewExerciseOpen"
+    fullscreen
+  >
     <EditExercise
       :selected-exercise="viewExercise"
       :is-view-exercise="true"
@@ -129,6 +157,7 @@ const isLoading = ref<boolean>(false);
 const viewExercise = ref<Exercise | null>(null);
 const isViewExerciseOpen = ref<boolean>(false);
 const isCreateExerciseOpen = ref<boolean>(false);
+const isAddGlobalExercisesOpen = ref<boolean>(false);
 
 const emit = defineEmits<{
   (e: 'close'): void;
