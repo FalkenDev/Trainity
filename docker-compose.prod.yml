@@ -1,14 +1,17 @@
+# docker-compose.prod.yml
+version: "3.9"
+
 services:
   postgres:
-    image: postgres:17
+    image: postgres:15-alpine
     container_name: trainity_postgres
+    restart: unless-stopped
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      PGDATA: /var/lib/postgresql/data/17/main
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -25,41 +28,33 @@ services:
       context: .
       dockerfile: Dockerfile.api
     container_name: trainity_backend
-    ports:
-      - "${BACKEND_PORT:-1337}:1337"
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-1337}:1337"
     env_file:
       - .env
-    develop:
-      watch:
-        - action: sync
-          path: ../backend
-          target: /app
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
     container_name: trainity_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
+    env_file:
+      - .env
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    depends_on:
-      - backend
-    env_file:
-      - .env
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend
-          target: /app
 
 volumes:
-  postgres_data:
+  postgres_data

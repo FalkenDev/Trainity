@@ -2,10 +2,12 @@
 import { defineStore } from 'pinia';
 import * as muscleGroupsService from '@/services/muscleGroup.service';
 import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface';
+import { useAuthStore } from './auth.store';
 
 export const useMuscleGroupStore = defineStore(
   'muscleGroupStore',
   () => {
+    const authStore = useAuthStore();
     const muscleGroups = ref<MuscleGroup[]>([]);
     const isLoading = ref<boolean>(false);
     const lastFetched = ref<number | null>(null);
@@ -33,13 +35,24 @@ export const useMuscleGroupStore = defineStore(
       }
     };
 
-    setMuscleGroups();
+    // Only fetch muscle groups when authenticated; otherwise avoid 401 loops on app boot.
+    watch(
+      () => authStore.isAuthenticated,
+      (authed) => {
+        if (authed) {
+          void setMuscleGroups(true);
+        }
+      },
+      { immediate: true },
+    );
 
     const resetStore =  async() => {
       muscleGroups.value = [];
       isLoading.value = false;
       lastFetched.value = null;
-      await setMuscleGroups(true);
+      if (authStore.isAuthenticated) {
+        await setMuscleGroups(true);
+      }
     };
 
     return { muscleGroups, isLoading, setMuscleGroups, resetStore };
