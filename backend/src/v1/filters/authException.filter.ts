@@ -12,10 +12,19 @@ export class AuthExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
+
+    // Read cookie options from environment variables, with sensible defaults
+    const cookieDomain = process.env.AUTH_COOKIE_DOMAIN || undefined;
+    const cookieSecure = process.env.AUTH_COOKIE_SECURE === 'true';
+    const cookieSameSite = process.env.AUTH_COOKIE_SAMESITE || 'lax';
+    const cookiePath = process.env.AUTH_COOKIE_PATH || undefined;
+
     response.clearCookie('auth_token', {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: cookieSecure,
+      sameSite: cookieSameSite,
+      ...(cookieDomain ? { domain: cookieDomain } : {}),
+      ...(cookiePath ? { path: cookiePath } : {}),
     });
 
     response.status(401).json({

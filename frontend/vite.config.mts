@@ -83,6 +83,10 @@ export default defineConfig({
     ],
   },
   server: {
+    host: true, // bind to 0.0.0.0 so external devices can connect
+    allowedHosts: process.env.VITE_ALLOWED_HOSTS
+      ? process.env.VITE_ALLOWED_HOSTS.split(',').map((h) => h.trim())
+      : undefined,
     port: 3000,
   },
   css: {

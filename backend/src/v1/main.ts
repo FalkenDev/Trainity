@@ -7,10 +7,15 @@ import * as basicAuth from 'express-basic-auth';
 import { AuthExceptionsFilter } from './filters/authException.filter';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Read allowed origins from env (comma-separated)
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+    : ['http://localhost:3000'];
   app.use(cookieParser());
 
   app.useGlobalFilters(new AuthExceptionsFilter());
@@ -30,8 +35,18 @@ async function bootstrap() {
     }),
   );
 
+
+  // Cache-control and no-store headers
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.removeHeader?.('ETag');
+    next();
+  });
+
   app.enableCors({
-    origin: true,
+    origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
