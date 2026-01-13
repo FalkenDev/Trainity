@@ -57,4 +57,4 @@ services:
       - /app/node_modules
 
 volumes:
-  postgres_data
+  postgres_data:
