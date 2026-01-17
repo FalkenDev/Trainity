@@ -284,12 +284,12 @@ export const useWorkoutSessionStore = defineStore(
         isLoading.value = true;
         await workoutSessionService.deleteWorkoutSession(sessionId);
         workoutSessions.value = workoutSessions.value.filter(
-          (s: any) => s.id !== sessionId,
+          (s: { id?: number }) => s.id !== sessionId,
         );
         delete liveSessions.value[sessionId];
         if (
           selectedWorkoutSession.value &&
-          (selectedWorkoutSession.value as any).id === sessionId
+          (selectedWorkoutSession.value as { id?: number }).id === sessionId
         ) {
           selectedWorkoutSession.value = null;
         }

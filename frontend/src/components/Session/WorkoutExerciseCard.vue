@@ -2,7 +2,7 @@
   <div>
     <div class="d-flex flex-row justify-space-between align-center pa-3">
       <h1 class="text-h5">
-        {{ resolvedExercise?.name || 'Loading...' }}
+        {{ resolvedExercise ? displayName(resolvedExercise) : $t('common.loading') }}
       </h1>
       <div class="d-flex flex-row ga-5 align-center">
         <v-chip
@@ -12,7 +12,7 @@
           size="small"
           variant="tonal"
         >
-          Done
+          {{ $t('table.done') }}
         </v-chip>
         <v-icon
           v-if="allSetsDone"
@@ -37,13 +37,13 @@
           </template>
           <v-list>
             <v-list-item disabled>
-              <v-list-item-title>Exercise details</v-list-item-title>
+              <v-list-item-title>{{ $t('session.exerciseDetails') }}</v-list-item-title>
             </v-list-item>
             <v-list-item @click="addSet">
-              <v-list-item-title>Add Set</v-list-item-title>
+              <v-list-item-title>{{ $t('session.addSet') }}</v-list-item-title>
             </v-list-item>
             <v-list-item @click="$emit('delete:exercise', resolvedExercise)">
-              <v-list-item-title>Delete Exercise</v-list-item-title>
+              <v-list-item-title>{{ $t('session.deleteExercise') }}</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -62,7 +62,7 @@
             mdi-lightbulb-outline
           </v-icon>
           <p class="text-subtitle-2 text-grey">
-            {{ resolvedExercise?.description || 'No description available.' }}
+            {{ resolvedExercise ? displayDescription(resolvedExercise) : '' }}
           </p>
         </div>
 
@@ -89,7 +89,7 @@
           v-if="props.showRpe"
           class="pa-4 pt-2 d-flex flex-column ga-3 bg-grey-darken-4"
         >
-          <span class="text-body-2 text-grey">RPE (Rate of Perceived Exertion)</span>
+          <span class="text-body-2 text-grey">{{ $t('session.rpeLabel') }}</span>
 
           <v-chip-group
             :model-value="props.rpe ?? 8"
@@ -138,9 +138,9 @@
       persistent
     >
       <v-card>
-        <v-card-title>Update subsequent sets?</v-card-title>
+        <v-card-title>{{ $t('session.updateSubsequentSets') }}</v-card-title>
         <v-card-text>
-          Do you want to update sets {{ propagateSetsIndices }} with {{ propagateWeight }}kg and {{ propagateReps }} reps?
+          {{ $t('session.updateSetsPrompt', { sets: propagateSetsIndices, weight: propagateWeight, reps: propagateReps }) }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -149,14 +149,14 @@
             variant="text"
             @click="confirmPropagate(false)"
           >
-            No, just this one
+            {{ $t('session.noJustThisOne') }}
           </v-btn>
           <v-btn
             color="primary"
             variant="text"
             @click="confirmPropagate(true)"
           >
-            Yes, update all
+            {{ $t('session.yesUpdateAll') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -173,10 +173,15 @@
 // TODO: Add functionality to view exercise details
 // TODO: Maybe have a info icon that shows exercise details in a dialog instead of a dropdown
 
+import { useI18n } from 'vue-i18n';
+import { displayExerciseDescription, displayExerciseName } from '@/utils/exerciseDisplay';
+
 import type {
   Exercise as ExerciseProp,
   WorkoutSet,
 } from '@/interfaces/Workout.interface';
+
+const { t } = useI18n({ useScope: 'global' });
 
 const props = defineProps({
   exercise: {
@@ -211,6 +216,12 @@ const emit = defineEmits<{
 }>();
 
 const resolvedExercise = computed(() => props.exercise.exercise);
+
+const displayName = (exercise: NonNullable<typeof resolvedExercise.value>) =>
+  displayExerciseName({ t }, exercise);
+
+const displayDescription = (exercise: NonNullable<typeof resolvedExercise.value>) =>
+  displayExerciseDescription({ t }, exercise, t('exerciseCatalog.noDescription'));
 const showDetails = ref(true);
 
 const isEditDialogVisible = ref(false);
@@ -232,16 +243,16 @@ const propagateSetsIndices = computed(() => {
   if (indices.length === 0) return '';
   if (indices.length === 1) return indices[0].toString();
   const last = indices.pop();
-  return indices.join(', ') + ' and ' + last;
+  return indices.join(', ') + ` ${t('common.and')} ` + last;
 });
 
-const headers = [
-  { title: 'Set', key: 'set', sortable: false, width: '20%' },
-  { title: 'Previous', key: 'previous', sortable: false, width: '30%' },
-  { title: 'Weight (kg)', key: 'weight', sortable: false, width: '25%' },
-  { title: 'Reps', key: 'reps', sortable: false, width: '15%' },
-  { title: 'Done', key: 'done', sortable: false, width: '10%' },
-];
+const headers = computed(() => [
+  { title: t('table.set'), key: 'set', sortable: false, width: '20%' },
+  { title: t('table.previous'), key: 'previous', sortable: false, width: '30%' },
+  { title: t('table.weightKg'), key: 'weight', sortable: false, width: '25%' },
+  { title: t('table.reps'), key: 'reps', sortable: false, width: '15%' },
+  { title: t('table.done'), key: 'done', sortable: false, width: '10%' },
+]);
 
 const allSetsDone = computed(() => {
   if (!props.workoutSets || props.workoutSets.length === 0) return false;

@@ -1,7 +1,7 @@
 <template>
   <div>
     <ExitHeader
-      title="Workout"
+      :title="$t('workout.workoutTitle')"
       :show-menu="false"
     />
     <!-- TODO: When click on start new workout a list of workouts show and you can choose one, see details ect -->
@@ -14,20 +14,20 @@
         prepend-icon="mdi-play"
         @click="startEmptySession"
       >
-        Start empty workout
+        {{ $t('workout.startEmptyWorkout') }}
       </v-btn>
       <v-btn
         size="large"
         disabled
       >
-        Start New Workout
+        {{ $t('workout.startNewWorkout') }}
       </v-btn>
       <!-- TODO: When click on Add previous workout, you choose a workout and all the details to save the workout as done -->
       <v-btn
         disabled
         size="large"
       >
-        Add previous workout
+        {{ $t('workout.addPreviousWorkout') }}
       </v-btn>
       <v-divider />
       <!-- TODO: FEAT: FUTURE: Maybe have like you can Browse workouts -->
@@ -35,7 +35,7 @@
         size="large"
         @click="isCreateWorkoutOpen = true"
       >
-        Create new workout
+        {{ $t('workout.createNewWorkout') }}
       </v-btn>
     </div>
     <v-dialog

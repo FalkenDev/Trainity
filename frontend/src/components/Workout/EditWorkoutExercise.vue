@@ -4,15 +4,15 @@
       :show-menu="true"
       :title="
         isViewExercise
-          ? 'Exercise'
-          : 'Edit Exercise in workout'
+          ? $t('exerciseForm.viewTitle')
+          : $t('workoutExerciseForm.editInWorkoutTitle')
       "
       @close="emit('close')"
     >
       <template #menuAppend>
         <v-list>
           <v-list-item @click="removeExercise">
-            <v-list-item-title>Delete</v-list-item-title>
+            <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
@@ -27,12 +27,12 @@
         <div class="py-4">
           <h1 class="text-h5 font-weight-bold">
             {{
-              selectedExercise.exercise.name
+              displayName
             }}
           </h1>
           <p>
             {{
-              selectedExercise.exercise.description
+              displayDescription
             }}
           </p>
           <div class="d-flex ga-2 align-center mt-2 flex-wrap">
@@ -56,7 +56,7 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Default Sets:</span>
+                <span class="font-weight-medium">{{ $t('exerciseForm.defaultSets') }}:</span>
                 <span class="ml-2">
                   {{
                     selectedExercise.sets
@@ -71,7 +71,7 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Default Reps:</span>
+                <span class="font-weight-medium">{{ $t('exerciseForm.defaultReps') }}:</span>
                 <span class="ml-2">
                   {{
                     selectedExercise.reps
@@ -86,12 +86,12 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Default Pause:</span>
+                <span class="font-weight-medium">{{ $t('exerciseForm.defaultPause') }}:</span>
                 <span class="ml-2">
                   {{
                     selectedExercise.pauseSeconds
                   }}
-                  seconds
+                  {{ $t('units.sec') }}
                 </span>
               </v-list-item-title>
             </v-list-item>
@@ -103,7 +103,7 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Created at:</span>
+                <span class="font-weight-medium">{{ $t('common.createdAt') }}:</span>
                 <span class="ml-2">
                   {{
                     new Date(
@@ -120,7 +120,7 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Updated at:</span>
+                <span class="font-weight-medium">{{ $t('common.updatedAt') }}:</span>
                 <span class="ml-2">
                   {{
                     new Date(
@@ -139,7 +139,7 @@
             :loading="isLoading"
             @click="updateExercise"
           >
-            Save Changes
+            {{ $t('common.saveChanges') }}
           </v-btn>
           <v-form
             v-if="editExercise"
@@ -147,14 +147,14 @@
           >
             <v-text-field
               v-model="editExercise.sets"
-              label="Sets"
+              :label="$t('exerciseForm.setsLabel')"
               type="number"
               variant="outlined"
               hide-details
             />
             <v-text-field
               v-model="editExercise.reps"
-              label="Reps"
+              :label="$t('exerciseForm.repsLabel')"
               type="number"
               variant="outlined"
               hide-details
@@ -162,14 +162,14 @@
             <v-text-field
               v-if="isViewWorkoutExercise"
               v-model="editExercise.weight"
-              label="Weight (kg)"
+              :label="$t('workoutList.weightKg')"
               type="number"
               variant="outlined"
               hide-details
             />
             <v-text-field
               v-model="editExercise.pauseSeconds"
-              label="Pause (seconds)"
+              :label="$t('workoutList.pauseSeconds')"
               type="number"
               variant="outlined"
               hide-details
@@ -190,6 +190,8 @@ import {
 } from '@/services/workout.service';
 import { useWorkoutStore } from '@/stores/workout.store';
 import { toast } from 'vuetify-sonner';
+import { useI18n } from 'vue-i18n';
+import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay';
 
 const props = defineProps<{
   workoutId?: number;
@@ -199,6 +201,27 @@ const props = defineProps<{
 }>();
 
 const isViewExercise = ref(props.isViewExercise);
+
+const { t } = useI18n({ useScope: 'global' });
+
+const displayName = computed(() =>
+  displayExerciseName({ t }, {
+    name: props.selectedExercise.exercise.name,
+    i18nKey: props.selectedExercise.exercise.i18nKey,
+    isNameCustom: props.selectedExercise.exercise.isNameCustom,
+  }),
+);
+
+const displayDescription = computed(() =>
+  displayExerciseDescription(
+    { t },
+    {
+      description: props.selectedExercise.exercise.description,
+      i18nKey: props.selectedExercise.exercise.i18nKey,
+    },
+    t('common.noDescription'),
+  ),
+);
 
 const exerciseStore = useExerciseStore();
 const workoutStore = useWorkoutStore();
@@ -236,7 +259,7 @@ const removeExercise = async () => {
     );
 
     if (response) {
-      toast.success('Exercise removed successfully!', { progressBar: true, duration: 1000 });
+      toast.success(t('exercise.removed'), { progressBar: true, duration: 1000 });
       if (props.isViewWorkoutExercise) {
         await workoutStore.setWorkouts(true);
       } else {
@@ -247,7 +270,7 @@ const removeExercise = async () => {
       console.error('Failed to remove exercise.');
     }
   } catch (error) {
-    toast.error('Error in removeExerciseFromWorkout.', { progressBar: true, duration: 1000 });
+    toast.error(t('exercise.removeError'), { progressBar: true, duration: 1000 });
     console.error('Error in removeExerciseFromWorkout:', error);
   }
 };
@@ -284,11 +307,11 @@ const updateExercise = async () => {
   try {
     isLoading.value = true;
     if (!editExercise.value) {
-      toast.error('No exercise data to update.', { progressBar: true, duration: 1000 });
+      toast.error(t('exercise.updateNoData'), { progressBar: true, duration: 1000 });
       return;
     }
     if (!props.workoutId) {
-      toast.error('No workout ID provided.', { progressBar: true, duration: 1000 });
+      toast.error(t('exercise.updateNoWorkoutId'), { progressBar: true, duration: 1000 });
       return;
     }
 
@@ -297,7 +320,7 @@ const updateExercise = async () => {
     );
 
     if (!workoutExercise) {
-      toast.error('Could not find the exercise in the workout.', { progressBar: true, duration: 1000 });
+      toast.error(t('exercise.updateNotFoundInWorkout'), { progressBar: true, duration: 1000 });
       return;
     }
 
@@ -307,14 +330,14 @@ const updateExercise = async () => {
       getSanitizedExerciseDataForWorkout() || {},
     );
     if (response) {
-      toast.success('Exercise updated successfully!', { progressBar: true, duration: 1000 });
+      toast.success(t('exercise.updated'), { progressBar: true, duration: 1000 });
       await workoutStore.setWorkouts(true);
       emit('close');
     } else {
-      toast.error('Failed to update exercise.', { progressBar: true, duration: 1000 });
+      toast.error(t('exercise.failedToUpdate'), { progressBar: true, duration: 1000 });
     }
   } catch (error) {
-    toast.error('Error in updateExercise.', { progressBar: true, duration: 1000 });
+    toast.error(t('exercise.updateError'), { progressBar: true, duration: 1000 });
     console.error('Error in updateExercise:', error);
   } finally {
     isLoading.value = false;

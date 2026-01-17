@@ -18,13 +18,13 @@
           color="primary"
           @click="handleAccept"
         >
-          Accept
+          {{ $t('common.accept') }}
         </v-btn>
         <v-btn
           color="secondary"
           @click="handleCancel"
         >
-          Cancel
+          {{ $t('common.cancel') }}
         </v-btn>
       </v-card-actions>
     </v-card>
