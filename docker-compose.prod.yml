@@ -1,4 +1,3 @@
-# docker-compose.prod.yml
 version: "3.9"
 
 services:
@@ -36,9 +35,6 @@ services:
       - "${BACKEND_PORT:-1337}:1337"
     env_file:
       - .env
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
 
   frontend:
     build:
@@ -52,9 +48,6 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     env_file:
       - .env
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
 
 volumes:
-  postgres_data:
+  postgres_data
