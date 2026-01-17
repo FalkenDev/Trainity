@@ -1,11 +1,6 @@
 <template>
   <div class="mx-5">
-    <div class="d-flex justify-end py-3">
-      <v-btn variant="text">
-        {{ $t('settings.logout') }}
-      </v-btn>
-    </div>
-    <div class="d-flex flex-column align-center justify-center pb-5">
+    <div class="d-flex flex-column align-center justify-center pb-5 pt-10">
       <div class="avatar-wrapper">
         <v-avatar
           class="mb-4"
@@ -313,13 +308,16 @@ const setDialogToOpen = (type: string) => {
   }
 };
 
-const setPreferenceDialogToOpen = (type?: string) => {
+const setPreferenceDialogToOpen = async (type?: string) => {
   switch (type) {
     case 'appearance':
       isAppearanceOpen.value = true;
       break;
     case 'language':
       isLanguageDialogOpen.value = true;
+      break;
+    case 'logout':
+      await authStore.logout();
       break;
     default:
       return;
@@ -361,7 +359,8 @@ const preferencesList  = [
   { titleKey: 'settings.appearance', showArrow: true, disabled: false, type: 'appearance' },
   { titleKey: 'settings.units', showArrow: true, disabled: true   },
   { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language'   },
-  { titleKey: 'settings.help', showArrow: true, disabled: true   }
+  { titleKey: 'settings.help', showArrow: true, disabled: true },
+  { titleKey: 'settings.logout', showArrow: false, disabled: false, type: 'logout' },
 ];
 
 onMounted(() => {
