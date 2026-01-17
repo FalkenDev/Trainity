@@ -151,6 +151,7 @@
               type="number"
               variant="outlined"
               hide-details
+              density="compact"
             />
             <v-text-field
               v-model="editExercise.reps"
@@ -158,6 +159,7 @@
               type="number"
               variant="outlined"
               hide-details
+              density="compact"
             />
             <v-text-field
               v-if="isViewWorkoutExercise"
@@ -166,6 +168,7 @@
               type="number"
               variant="outlined"
               hide-details
+              density="compact"
             />
             <v-text-field
               v-model="editExercise.pauseSeconds"
@@ -173,6 +176,7 @@
               type="number"
               variant="outlined"
               hide-details
+              density="compact"
             />
           </v-form>
         </div>
