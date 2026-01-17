@@ -2,7 +2,7 @@
   <div class="mx-5">
     <div class="d-flex justify-end py-3">
       <v-btn variant="text">
-        Logout
+        {{ $t('settings.logout') }}
       </v-btn>
     </div>
     <div class="d-flex flex-column align-center justify-center pb-5">
@@ -45,18 +45,18 @@
     <div class="d-flex flex-column ga-5">
       <div>
         <h1 class="text-h6">
-          Content
+          {{ $t('settings.content') }}
         </h1>
         <v-list class="bg-transparent">
           <v-list-item
             v-for="item in contentList"
-            :key="item.title"
+            :key="item.titleKey"
             class="px-0"
             :disabled="item.disabled"
             @click="setDialogToOpen(item.type)"
           >
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
-              <p>{{ item.title }}</p>
+              <p>{{ $t(item.titleKey) }}</p>
               <v-icon v-if="item.showArrow">
                 mdi-chevron-right
               </v-icon>
@@ -66,18 +66,18 @@
       </div>
       <div>
         <h1 class="text-h6">
-          Preferences
+          {{ $t('settings.preferences') }}
         </h1>
         <v-list class="bg-transparent">
           <v-list-item
             v-for="item in preferencesList"
-            :key="item.title"
+            :key="item.titleKey"
             class="px-0"
             :disabled="item.disabled"
             @click="setPreferenceDialogToOpen(item.type)"
           >
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
-              <p>{{ item.title }}</p>
+              <p>{{ $t(item.titleKey) }}</p>
               <v-icon v-if="item.showArrow">
                 mdi-chevron-right
               </v-icon>
@@ -94,14 +94,14 @@
     >
       <v-card>
         <v-card-title>
-          <span class="text-h6">Update Avatar</span>
+          <span class="text-h6">{{ $t('settings.updateAvatar') }}</span>
         </v-card-title>
         <v-card-text>
           <ImageUpload
             v-model="avatarFile"
             :existing-image-url="currentUser?.avatar ? getImageUrl(currentUser.avatar) : null"
-            placeholder="Click to upload avatar"
-            helper-text="JPEG, PNG, or WebP. Recommended: 400x400px"
+            :placeholder="$t('settings.avatarPlaceholder')"
+            :helper-text="$t('settings.avatarHelper')"
             circular
           />
         </v-card-text>
@@ -111,7 +111,7 @@
             variant="text"
             @click="closeAvatarDialog"
           >
-            Cancel
+            {{ $t('common.cancel') }}
           </v-btn>
           <v-btn
             color="primary"
@@ -119,7 +119,7 @@
             :disabled="!avatarFile"
             @click="uploadAvatarImage"
           >
-            Upload
+            {{ $t('common.upload') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -159,30 +159,62 @@
       persistent
     >
       <v-card class="d-flex flex-column">
-        <v-toolbar color="primary">
-          <v-btn
-            icon
-            variant="text"
-            @click="isAppearanceOpen = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title>Appearance</v-toolbar-title>
-          <v-spacer />
-        </v-toolbar>
+        <BackHeader
+          :title="$t('settings.appearance')"
+          @close="isAppearanceOpen = false"
+        />
 
         <v-card-text class="pa-5">
           <v-switch
             v-model="useRpe"
             color="primary"
             inset
-            label="Use RPE in workout sessions"
+            :label="$t('settings.useRpe')"
             :loading="isSavingPreferences"
             @update:model-value="saveAppearancePreferences"
           />
           <p class="text-body-2 text-grey-lighten-1 mt-2">
-            When disabled, RPE will be hidden in active sessions.
+            {{ $t('settings.useRpeHint') }}
           </p>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog
+      v-model="isLanguageDialogOpen"
+      max-width="500"
+      fullscreen
+    >
+      <v-card>
+        <BackHeader
+          :title="$t('settings.language')"
+          @close="isLanguageDialogOpen = false"
+        />
+        <v-card-text class="pa-0">
+          <v-list>
+            <v-list-item
+              :active="locale === 'en'"
+              @click="selectLanguage('en')"
+            >
+              <v-list-item-title>{{ $t('settings.english') }}</v-list-item-title>
+              <template #append>
+                <v-icon v-if="locale === 'en'">
+                  mdi-check
+                </v-icon>
+              </template>
+            </v-list-item>
+            <v-list-item
+              :active="locale === 'sv'"
+              @click="selectLanguage('sv')"
+            >
+              <v-list-item-title>{{ $t('settings.swedish') }}</v-list-item-title>
+              <template #append>
+                <v-icon v-if="locale === 'sv'">
+                  mdi-check
+                </v-icon>
+              </template>
+            </v-list-item>
+          </v-list>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -196,14 +228,19 @@ import type { User } from '@/interfaces/User.interface';
 import { toast } from 'vuetify-sonner';
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
+import { useI18n } from 'vue-i18n';
+import { useAppStore } from '@/stores/app';
 
 const authStore = useAuthStore();
+const appStore = useAppStore();
+const { t, locale } = useI18n({ useScope: 'global' });
 const isExerciseListOpen = ref(false);
 const isSessionListOpen = ref(false);
 const isWorkoutListOpen = ref(false);
 const isAvatarDialogOpen = ref(false);
 const isUploadingAvatar = ref(false);
 const isAppearanceOpen = ref(false);
+const isLanguageDialogOpen = ref(false);
 const isSavingPreferences = ref(false);
 const avatarFile = ref<File | null>(null);
 const currentUser = ref<User | null>(null);
@@ -228,7 +265,7 @@ const loadUserData = async () => {
     useRpe.value = user.showRpe ?? true;
   } catch (error) {
     console.error('Error loading user data:', error);
-    toast.error('Error loading user data', { progressBar: true, duration: 1000 });
+    toast.error(t('settings.errorLoadingUserData'), { progressBar: true, duration: 1000 });
   }
 };
 
@@ -250,11 +287,11 @@ const uploadAvatarImage = async () => {
     currentUser.value = updatedUser;
 
     await authStore.refreshUser();
-    toast.success('Avatar updated successfully!', { progressBar: true, duration: 1000 });
+    toast.success(t('settings.avatarUpdated'), { progressBar: true, duration: 1000 });
     closeAvatarDialog();
   } catch (error) {
     console.error('Error uploading avatar:', error);
-    toast.error('Failed to upload avatar', { progressBar: true, duration: 1000 });
+    toast.error(t('settings.failedToUploadAvatar'), { progressBar: true, duration: 1000 });
   } finally {
     isUploadingAvatar.value = false;
   }
@@ -281,9 +318,18 @@ const setPreferenceDialogToOpen = (type?: string) => {
     case 'appearance':
       isAppearanceOpen.value = true;
       break;
+    case 'language':
+      isLanguageDialogOpen.value = true;
+      break;
     default:
       return;
   }
+};
+
+const selectLanguage = (nextLocale: 'en' | 'sv') => {
+  appStore.setLocale(nextLocale);
+  locale.value = nextLocale;
+  isLanguageDialogOpen.value = false;
 };
 
 const saveAppearancePreferences = async () => {
@@ -293,10 +339,10 @@ const saveAppearancePreferences = async () => {
     const updated = await updateUser({ showRpe: useRpe.value });
     currentUser.value = updated;
     await authStore.refreshUser();
-    toast.success('Preferences saved', { progressBar: true, duration: 1000 });
+    toast.success(t('settings.preferencesSaved'), { progressBar: true, duration: 1000 });
   } catch (error) {
     console.error('Failed saving preferences:', error);
-    toast.error('Failed to save preferences', { progressBar: true, duration: 1000 });
+    toast.error(t('settings.failedToSavePreferences'), { progressBar: true, duration: 1000 });
     // rollback UI to last known good value
     useRpe.value = currentUser.value?.showRpe ?? true;
   } finally {
@@ -305,20 +351,21 @@ const saveAppearancePreferences = async () => {
 };
 
 const contentList = [
-  { title: 'Exercises', showArrow: true, type: 'exercises', disabled: false },
-  { title: 'Workouts', showArrow: true, type: 'workouts', disabled: false },
-  { title: 'Sessions', showArrow: true, type: 'sessions', disabled: false },
+  { titleKey: 'settings.exercises', showArrow: true, type: 'exercises', disabled: false },
+  { titleKey: 'settings.workouts', showArrow: true, type: 'workouts', disabled: false },
+  { titleKey: 'settings.sessions', showArrow: true, type: 'sessions', disabled: false },
 ];
 const preferencesList  = [
-  { title: 'Settings', showArrow: true, disabled: true },
-  { title: 'Account', showArrow: true, disabled: true  },
-  { title: 'Appearance', showArrow: true, disabled: false, type: 'appearance' },
-  { title: 'Units', showArrow: true, disabled: true   },
-  { title: 'Language', showArrow: true, disabled: true   },
-  { title: 'Help', showArrow: true, disabled: true   }
+  { titleKey: 'settings.settings', showArrow: true, disabled: true },
+  { titleKey: 'settings.account', showArrow: true, disabled: true  },
+  { titleKey: 'settings.appearance', showArrow: true, disabled: false, type: 'appearance' },
+  { titleKey: 'settings.units', showArrow: true, disabled: true   },
+  { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language'   },
+  { titleKey: 'settings.help', showArrow: true, disabled: true   }
 ];
 
 onMounted(() => {
+  locale.value = appStore.locale;
   loadUserData();
 });
 </script>

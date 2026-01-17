@@ -5,14 +5,14 @@
   >
     <div class="d-flex justify-space-between align-center">
       <h1 class="text-h6">
-        Your Progress
+        {{ $t('progress.title') }}
       </h1>
       <v-btn
         color="grey-darken-3"
         density="compact"
         variant="flat"
       >
-        Days
+        {{ $t('progress.days') }}
         <v-icon>mdi-chevron-down</v-icon>
         <v-menu activator="parent">
           <v-list>
@@ -29,7 +29,7 @@
     </div>
     <div class="d-flex justify-space-between align-center my-5">
       <div
-        v-for="day in ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']"
+        v-for="day in weekdays"
         :key="day"
       >
         <v-avatar
@@ -46,7 +46,7 @@
           4
         </h1>
         <p class="text-grey-lighten-1">
-          Workouts
+          {{ $t('progress.workouts') }}
         </p>
       </div>
       <div class="text-center d-flex flex-column ga-2">
@@ -54,7 +54,7 @@
           2000
         </h1>
         <p class="text-grey-lighten-1">
-          KCAL
+          {{ $t('progress.kcal') }}
         </p>
       </div>
       <div class="text-center d-flex flex-column ga-2">
@@ -62,7 +62,7 @@
           120
         </h1>
         <p class="text-grey-lighten-1">
-          Minutes
+          {{ $t('progress.minutes') }}
         </p>
       </div>
     </div>
@@ -70,10 +70,19 @@
 </template>
 <script lang="ts" setup>
 
-  const sortBy = [
-    { title: 'Days' },
-    { title: 'Weeks' },
-    { title: 'Months' },
-    { title: 'Years' },
-  ];
+import { useI18n } from 'vue-i18n';
+
+const { t, tm } = useI18n({ useScope: 'global' });
+
+const weekdays = computed(() => {
+  const v = tm('progress.weekdaysShort');
+  return Array.isArray(v) ? (v as string[]) : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+});
+
+const sortBy = computed(() => [
+  { title: t('progress.days') },
+  { title: t('progress.weeks') },
+  { title: t('progress.months') },
+  { title: t('progress.years') },
+]);
 </script>

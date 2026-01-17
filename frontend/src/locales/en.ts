@@ -1,0 +1,465 @@
+export default {
+  common: {
+    accept: 'Accept',
+    cancel: 'Cancel',
+    close: 'Close',
+    save: 'Save',
+    upload: 'Upload',
+    delete: 'Delete',
+    edit: 'Edit',
+    back: 'Back',
+    ok: 'OK',
+    filter: 'Filter',
+    reset: 'Reset',
+    loading: 'Loading…',
+    unknown: 'Unknown',
+    na: 'N/A',
+    and: 'and',
+    search: 'Search',
+    total: 'total',
+    sort: 'Sort',
+    clear: 'Clear',
+    clearAll: 'Clear all',
+    done: 'Done',
+    name: 'Name',
+    description: 'Description',
+    noDescription: 'No description',
+    start: 'Start',
+    pause: 'Pause',
+    saveChanges: 'Save changes',
+    createdAt: 'Created',
+    updatedAt: 'Updated',
+  },
+  units: {
+    kg: 'kg',
+    kgShort: 'kg',
+    reps: 'reps',
+    repsShort: 'reps',
+    min: 'minutes',
+    minShort: 'min',
+    sec: 'seconds',
+    secShort: 's',
+  },
+  navigation: {
+    resumeWorkout: 'Resume workout',
+  },
+  home: {
+    guest: 'Guest',
+    ready: "Let's get ready",
+  },
+  settings: {
+    logout: 'Logout',
+    content: 'Content',
+    preferences: 'Preferences',
+    exercises: 'Exercises',
+    workouts: 'Workouts',
+    sessions: 'Sessions',
+    appearance: 'Appearance',
+    settings: 'Settings',
+    account: 'Account',
+    units: 'Units',
+    language: 'Language',
+    help: 'Help',
+    updateAvatar: 'Update avatar',
+    avatarPlaceholder: 'Click to upload avatar',
+    avatarHelper: 'JPEG, PNG, or WebP. Recommended: 400x400px',
+    useRpe: 'Use RPE in workout sessions',
+    useRpeHint: 'When disabled, RPE will be hidden in active sessions.',
+    preferencesSaved: 'Preferences saved',
+    failedToSavePreferences: 'Failed to save preferences',
+    errorLoadingUserData: 'Error loading user data',
+    avatarUpdated: 'Avatar updated successfully!',
+    failedToUploadAvatar: 'Failed to upload avatar',
+    chooseLanguage: 'Choose language',
+    english: 'English',
+    swedish: 'Swedish',
+  },
+  auth: {
+    gymAccess: 'Gym Access',
+    welcomeBackSubtitle: 'Welcome back! Fuel your journey.',
+    emailAddress: 'Email address',
+    password: 'Password',
+    login: 'Login',
+    signUp: 'Sign up',
+    dontHaveAccount: "Don't have an account?",
+
+    joinMovement: 'Join the movement',
+    createAccountSubtitle: 'Create your account to start your fitness journey.',
+    fullName: 'Full name',
+    confirmPassword: 'Confirm password',
+    mustAgreeToContinue: 'You must agree to continue!',
+    agreeToThe: 'I agree to the',
+    termsAndConditions: 'Terms & Conditions',
+    createAccount: 'Create account',
+    alreadyHaveAccount: 'Already have an account?',
+    termsPlaceholder:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua…',
+    termsReadCarefully: 'Please read carefully before agreeing.',
+
+    fullNameRequired: 'Full name is required',
+    emailRequired: 'Email is required',
+    emailValid: 'Email must be valid',
+    passwordRequired: 'Password is required',
+    passwordMinLength: 'Password must be at least 8 characters',
+    confirmPasswordRequired: 'Confirm password is required',
+    passwordsDoNotMatch: 'Passwords do not match',
+    passwordsDoNotMatchAlert: 'Passwords do not match!',
+    accountCreatedSuccess: 'Account created successfully! Please login.',
+
+    loginFailed: 'Login failed. Please check your credentials.',
+    accountCreationFailed: 'Account creation failed',
+  },
+  errors: {
+    generic: 'Something went wrong',
+  },
+  workout: {
+    workoutTitle: 'Workout',
+    weightAndReps: 'Weight and reps',
+    duplicate: 'Duplicate',
+    startSession: 'Start session',
+    noExercisesYet: 'No exercises added yet.',
+    setsTimesReps: '{sets} × {reps} reps',
+    pauseSeconds: '{seconds} sec pauses',
+    moreCount: '+{count} more',
+    showMoreMuscleGroupsAria: 'Show {count} more muscle groups',
+    deleteWorkoutTitle: 'Delete workout',
+    deleteWorkoutConfirm: 'Are you sure you want to delete this workout?',
+    deleted: 'Workout deleted successfully',
+    failedToDelete: 'Failed to delete workout',
+
+    created: 'Workout created successfully!',
+    failedToCreate: 'Failed to create workout',
+    updated: 'Workout updated successfully!',
+    failedToUpdate: 'Failed to update workout',
+    updatedNoBang: 'Workout updated successfully',
+    duplicated: 'Workout duplicated successfully',
+    failedToStartSession: 'Failed to start session',
+  },
+  exercise: {
+    createExercise: 'Create exercise',
+    createNewExercise: 'Create new exercise',
+    searchExercises: 'Search exercises',
+    addExercises: 'Add exercises',
+
+    created: 'Exercise created successfully!',
+    createdImageUploadFailed: 'Exercise created but image upload failed',
+    updatedImageUploadFailed: 'Exercise updated but image upload failed',
+    failedToCreate: 'Failed to create exercise.',
+    createGenericError: 'An error occurred while creating the exercise.',
+    removed: 'Exercise removed successfully!',
+    updateNoData: 'No exercise data to update.',
+    updateNoSelected: 'No selected exercise to update.',
+    updateNoWorkoutId: 'No workout ID provided.',
+    updateNotFoundInWorkout: 'Could not find the exercise in the workout.',
+    updated: 'Exercise updated successfully!',
+    failedToUpdate: 'Failed to update exercise.',
+    updateError: 'Error in updateExercise.',
+    removeError: 'Error in removeExerciseFromWorkout.',
+    deleted: 'Exercise deleted successfully',
+    failedToDelete: 'Failed to delete exercise',
+    failedToLoadGlobal: 'Failed to load global exercises',
+    failedToAdd: 'Failed to add exercises',
+
+    bench_press: {
+      name: 'Bench press',
+      description:
+        'Barbell press on a flat bench. Set your shoulder blades, keep a small arch, feet on the floor. Lower to mid-chest and press up with elbows ~45°.',
+    },
+    incline_dumbbell_press: {
+      name: 'Incline dumbbell press',
+      description:
+        'Press dumbbells on a 30–45° incline bench. Lower under control to chest line, press up and slightly inward.',
+    },
+    seated_dumbbell_shoulder_press: {
+      name: 'Seated dumbbell shoulder press',
+      description:
+        'Seated vertical press. Keep ribs down and forearms vertical. Lower to around ear height and press without shrugging.',
+    },
+    dumbbell_lateral_raise: {
+      name: 'Dumbbell lateral raise',
+      description:
+        'Raise dumbbells slightly forward and out to shoulder height. Soft elbows, strict control, slow eccentric.',
+    },
+    cable_triceps_pushdown: {
+      name: 'Cable triceps pushdown',
+      description:
+        'With rope or bar, keep elbows pinned. Fully extend, then return under control to ~90°.',
+    },
+    cable_chest_fly: {
+      name: 'Cable chest fly',
+      description:
+        'From high/mid pulleys. Slight forward lean, hug motion with soft elbows. Squeeze chest and return slowly.',
+    },
+    back_squat: {
+      name: 'Back squat',
+      description:
+        'Bar on upper back, brace your core, knees track toes. Squat as deep as you can control and drive back up.',
+    },
+    barbell_hip_thrust: {
+      name: 'Barbell hip thrust',
+      description:
+        'Upper back on bench, bar over hips. Posteriorly tilt pelvis, drive through heels, lock out with glutes.',
+    },
+    leg_press: {
+      name: 'Leg press',
+      description:
+        'Feet shoulder-width on the sled. Lower deep with control without pelvic tuck; press through mid-foot.',
+    },
+    seated_leg_curl: {
+      name: 'Seated leg curl',
+      description:
+        'Set the pad above the heels. Curl to full knee flexion with hips still; control the eccentric.',
+    },
+    leg_extension: {
+      name: 'Leg extension',
+      description:
+        'Pad above the ankles. Extend close to lockout with control; 2–3s eccentric for knee-friendly loading.',
+    },
+    calf_raise_machine_or_leg_press: {
+      name: 'Calf raise (machine/leg press)',
+      description:
+        'Full ankle range of motion. Pause at the bottom; strong toe raise at the top. No bouncing.',
+    },
+    standing_barbell_overhead_press: {
+      name: 'Standing barbell overhead press',
+      description:
+        'Stand stable, brace glutes and core. Press straight up; bring head through in the top position.',
+    },
+    seated_cable_row: {
+      name: 'Seated cable row',
+      description:
+        'Neutral spine, chest up. Pull to lower ribs with elbows close; squeeze lats/mid-back, return slowly.',
+    },
+    incline_bench_press: {
+      name: 'Incline bench press (barbell)',
+      description:
+        'Barbell press on a 30–45° incline. Lower to upper chest; press with elbows ~45–60°.',
+    },
+    walking_lunge: {
+      name: 'Walking lunge',
+      description:
+        'Step forward and lower under control. Front knee tracks toes; drive up through the front heel and alternate.',
+    },
+    overhead_triceps_extension_rope_or_db: {
+      name: 'Overhead triceps extension (rope/dumbbell)',
+      description:
+        'Arms overhead, elbows in. Lower behind head for a stretch; extend fully without flaring elbows.',
+    },
+    hammer_curl: {
+      name: 'Hammer curl',
+      description:
+        'Dumbbell curl with neutral grip. Elbows by your sides; control the eccentric for ~2 seconds.',
+    },
+    deadlift: {
+      name: 'Deadlift',
+      description:
+        'Hip hinge with neutral spine, bar close to shins. Push the floor away and stand tall. Reset or control each rep.',
+    },
+    lat_pulldown: {
+      name: 'Lat pulldown',
+      description:
+        'Grip slightly wider than shoulders. Pull bar to upper chest; elbows down and back; slow eccentric.',
+    },
+    seated_row_cable: {
+      name: 'Seated cable row (to navel)',
+      description:
+        'Neutral spine; pull to navel/lower ribs. Squeeze shoulder blades; control the return.',
+    },
+    face_pull: {
+      name: 'Face pull',
+      description:
+        'Rope at face height. Pull to nose/forehead with external rotation (thumbs back); squeeze rear delts.',
+    },
+    biceps_curl_barbell_or_dumbbell: {
+      name: 'Biceps curl (barbell/dumbbell)',
+      description:
+        'Curl with a supinated grip, elbows by your sides, shoulders down. Full range of motion; controlled negative.',
+    },
+    sit_up: {
+      name: 'Sit-up',
+      description:
+        'Posteriorly tilt pelvis; roll up vertebra by vertebra. Don’t pull on your neck; control the descent.',
+    },
+    lying_leg_raise: {
+      name: 'Lying leg raise',
+      description:
+        'Posteriorly tilt pelvis; raise straight legs without arching. Stop before lower back extends.',
+    },
+    side_lying_leg_raise_obliques: {
+      name: 'Side-lying leg raise (obliques)',
+      description:
+        'Lie on your side; lift using obliques, keep hips stacked, control tempo.',
+    },
+  },
+  exerciseForm: {
+    createTitle: 'Create exercise',
+    viewTitle: 'Exercise',
+    editTitle: 'Edit exercise',
+    editInWorkoutTitle: 'Edit exercise in workout',
+    imageOptionalPlaceholder: 'Add exercise image (optional)',
+    imageHelperReference: 'Add a reference image for this exercise',
+    changeImagePlaceholder: 'Change exercise image',
+    changeImageHelper: 'Upload a new image to replace the current one',
+    nameLabel: 'Exercise name',
+    muscleGroupsLabel: 'Muscle groups',
+    setsLabel: 'Sets',
+    repsLabel: 'Reps',
+    pauseSecondsLabel: 'Pause seconds',
+    createButton: 'Create exercise',
+    defaultSets: 'Default sets',
+    defaultReps: 'Default reps',
+    defaultPause: 'Default pause',
+    deleteTitle: 'Delete exercise',
+    deleteConfirm: 'Are you sure you want to delete this exercise?',
+  },
+  workoutExerciseForm: {
+    editInWorkoutTitle: 'Edit exercise in workout',
+  },
+  workoutForm: {
+    createTitle: 'Create workout',
+    editTitle: 'Edit workout',
+    nameLabel: 'Workout name',
+    timeMinutesLabel: 'Time (minutes)',
+    createButton: 'Create workout',
+    saveButton: 'Save workout',
+  },
+  weightAndReps: {
+    title: 'Weight and reps settings',
+    options: {
+      default: {
+        label: 'Default',
+        description: 'Use the default weights and repetitions set from workout',
+      },
+      latest: {
+        label: 'Latest',
+        description: 'Use weights and repetitions from the last time you did this workout',
+      },
+      exercise: {
+        label: 'Exercise',
+        description: 'Use the weights and repetitions set from exercise',
+      },
+    },
+  },
+  session: {
+    editSetTitle: 'Edit set {set}',
+    weightLabel: 'WEIGHT',
+    repetitionsLabel: 'REPETITIONS',
+    deleteSet: 'Delete set',
+    workoutSessionTitle: 'Workout session',
+    addNotes: 'Add notes',
+    addExercise: 'Add exercise',
+    finish: 'Finish',
+    finishSession: 'Finish session',
+    noExercisesCompleted: 'No exercises completed. Session abandoned.',
+    exerciseDetails: 'Exercise details',
+    addSet: 'Add set',
+    deleteExercise: 'Delete exercise',
+    rpeLabel: 'RPE (Rate of Perceived Exertion)',
+    updateSubsequentSets: 'Update subsequent sets?',
+    updateSetsPrompt: 'Do you want to update sets {sets} with {weight}kg and {reps} reps?',
+    noJustThisOne: 'No, just this one',
+    yesUpdateAll: 'Yes, update all',
+
+    status: {
+      finished: 'finished',
+      in_progress: 'in progress',
+      abandoned: 'abandoned',
+    },
+
+    activeNotFound: 'Active session not found.',
+    finished: 'Workout session finished successfully!',
+    finishError: 'An error occurred while finishing the session.',
+  },
+  timer: {
+    start: 'Start',
+    pause: 'Pause',
+    closeTimer: 'Close timer',
+  },
+  sessionList: {
+    title: 'Workout sessions',
+    noSessionsFound: 'No sessions found',
+    started: 'Started',
+    ended: 'Ended',
+    duration: 'Duration',
+    totalWeight: 'Total',
+    exercises: 'Exercises',
+    exerciseFallback: 'Exercise',
+    sets: 'Sets',
+    weightKg: 'Weight (kg)',
+    noSetsRecorded: 'No sets recorded',
+    sessionNotes: 'Session notes',
+    deleteConfirm: 'Are you sure you want to delete this session? This action cannot be undone.',
+  },
+  workoutList: {
+    title: 'Workouts',
+    createWorkout: 'Create workout',
+    plansTitle: 'Workout plans',
+    setsUnit: 'sets',
+    exercisesUnit: 'exercises',
+    exercise: 'Exercise',
+    sets: 'Sets',
+    reps: 'Reps',
+    weightKg: 'Weight (kg)',
+    pauseSeconds: 'Pause (seconds)',
+    muscleGroups: 'Muscle groups',
+    goToWorkout: 'Go to workout',
+    noWorkoutsMatchFilters: 'No workouts match your filters',
+    muscleGroupsTitle: 'Muscle groups',
+    searchMuscleGroups: 'Search muscle groups',
+    sortByTitle: 'Sort by',
+    sort: {
+      mostRecent: 'Most recent',
+      nameAZ: 'Name (A–Z)',
+      timeMin: 'Time (min)',
+      exercisesCount: 'Exercises (count)',
+    },
+  },
+  myWorkouts: {
+    workoutsHeading: 'Workouts',
+    title: 'My workouts',
+    startEmpty: 'Start empty',
+    exercisesUnit: 'exercises',
+    created: 'Created',
+    emptyTitle: 'No workouts yet',
+    emptyDescription: 'Create your first workout and start training.',
+    createWorkout: 'Create workout',
+    showAllWorkouts: 'Show all workouts',
+  },
+  exerciseCatalog: {
+    addFromGlobal: 'Add from global exercises',
+    addFromGlobalShort: 'Add from global list',
+    noExercisesFound: 'No exercises found',
+    adjustSearch: "Try adjusting your search or filter to find what you're looking for.",
+    noDescription: 'No description',
+    addedToAccount: '{count} exercise(s) added to your account',
+    nothingToAdd: 'Nothing to add',
+  },
+  imageUpload: {
+    placeholder: 'Click to upload image',
+    helper: 'JPEG, PNG, or WebP. Max {maxSizeMB}MB',
+    previewAlt: 'Preview',
+    invalidType: 'Please select a valid image file (JPEG, PNG, or WebP)',
+    maxSize: 'File size must be less than {maxSizeMB}MB',
+  },
+  calendar: {
+    workoutNumber: 'Workout {number}',
+  },
+  progress: {
+    title: 'Your progress',
+    workouts: 'Workouts',
+    kcal: 'KCAL',
+    minutes: 'Minutes',
+    weekdaysShort: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+    days: 'Days',
+    weeks: 'Weeks',
+    months: 'Months',
+    years: 'Years',
+  },
+  table: {
+    set: 'Set',
+    previous: 'Previous',
+    weightKg: 'Weight (kg)',
+    reps: 'Reps',
+    done: 'Done',
+  },
+} as const;

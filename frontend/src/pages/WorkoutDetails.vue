@@ -2,25 +2,25 @@
   <div>
     <BackHeader
       :show-menu="true"
-      title="Workout"
+      :title="$t('workout.workoutTitle')"
       :route-to="`/`"
     >
       <template #menuAppend>
         <v-list>
           <v-list-item @click="isWeightAndRepsOpen = true">
-            <v-list-item-title>Weight and reps</v-list-item-title>
+            <v-list-item-title>{{ $t('workout.weightAndReps') }}</v-list-item-title>
           </v-list-item>
           <v-list-item @click="isAddExerciseOpen = true">
-            <v-list-item-title>Add exercise</v-list-item-title>
+            <v-list-item-title>{{ $t('session.addExercise') }}</v-list-item-title>
           </v-list-item>
           <v-list-item @click="isEditWorkoutOpen = true">
-            <v-list-item-title>Edit</v-list-item-title>
+            <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
           </v-list-item>
           <v-list-item @click="dublicate">
-            <v-list-item-title>Duplicate</v-list-item-title>
+            <v-list-item-title>{{ $t('workout.duplicate') }}</v-list-item-title>
           </v-list-item>
           <v-list-item @click="() => (isDeleteDialogOpen = true)">
-            <v-list-item-title>Delete</v-list-item-title>
+            <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
@@ -59,10 +59,10 @@
             variant="tonal"
             color="green-lighten-1"
             size="small"
-            :aria-label="`Show ${hiddenCount} more muscle groups`"
+            :aria-label="$t('workout.showMoreMuscleGroupsAria', { count: hiddenCount })"
             @click="isAllGroupsOpen = true"
           >
-            +{{ hiddenCount }} more
+            {{ $t('workout.moreCount', { count: hiddenCount }) }}
           </v-chip>
         </div>
       </div>
@@ -75,7 +75,7 @@
         color="primary"
         @click="startSession"
       >
-        Start Session
+        {{ $t('workout.startSession') }}
       </v-btn>
 
       <div
@@ -83,13 +83,13 @@
         class="text-center my-5"
       >
         <p class="text-subtitle-1 mb-4">
-          No exercises added yet.
+          {{ $t('workout.noExercisesYet') }}
         </p>
         <v-btn
           color="primary"
           @click="isAddExerciseOpen = true"
         >
-          Add Exercise
+          {{ $t('session.addExercise') }}
         </v-btn>
       </div>
 
@@ -109,14 +109,14 @@
             >
             <div class="d-flex flex-column ga-1">
               <h2 class="text-h6">
-                {{ exercise.exercise?.name }}
+                {{ exercise.exercise ? displayName(exercise.exercise) : '' }}
               </h2>
               <div class="d-flex ga-2">
                 <p class="text-body-2">
-                  {{ exercise.sets }} x {{ exercise.reps }} Reps
+                  {{ $t('workout.setsTimesReps', { sets: exercise.sets, reps: exercise.reps }) }}
                 </p>
                 <p class="text-body-2">
-                  {{ exercise.pauseSeconds }} sec pauses
+                  {{ $t('workout.pauseSeconds', { seconds: exercise.pauseSeconds }) }}
                 </p>
                 <p class="text-body-2">
                   {{ exercise.weight }}kg
@@ -198,8 +198,8 @@
 
   <AcceptDialog
     v-model="isDeleteDialogOpen"
-    title="Delete Exercise"
-    description="Are you sure you want to delete this exercise?"
+    :title="$t('workout.deleteWorkoutTitle')"
+    :description="$t('workout.deleteWorkoutConfirm')"
     @accept="deleteExercise"
     @cancel="isDeleteDialogOpen = false"
   />
@@ -222,6 +222,10 @@ import {
 } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
 import EditWorkoutExercise from "@/components/Workout/EditWorkoutExercise.vue";
+import { useI18n } from 'vue-i18n';
+import { displayExerciseName } from '@/utils/exerciseDisplay';
+
+const { t } = useI18n({ useScope: 'global' });
 
 const isAddExerciseOpen = ref<boolean>(false);
 const isEditExerciseOpen = ref<boolean>(false);
@@ -235,6 +239,8 @@ const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
+
+const displayName = (exercise: NonNullable<Exercise['exercise']>) => displayExerciseName({ t }, exercise);
 
 type GroupStat = { name: string; count: number };
 
@@ -250,7 +256,7 @@ const groupStats = computed<GroupStat[]>(() => {
         typeof mg === "object" && mg !== null ? mg.id : mg
       ) ?? [];
     return ids
-      .map((id) => muscleGroups.find((g) => g.id === id)?.name || "Unknown")
+      .map((id) => muscleGroups.find((g) => g.id === id)?.name || t('common.unknown'))
       .filter(Boolean);
   });
 
@@ -310,12 +316,12 @@ const updateWorkoutExercises = async (newExerciseIds: number[]) => {
       exercisesToAdd.length > 0 || exercisesToRemove.length > 0;
 
     if (hasBeenUpdated) {
-      toast.success("Workout updated successfully", { progressBar: true, duration: 1000 });
+      toast.success(t('workout.updatedNoBang'), { progressBar: true, duration: 1000 });
       await workoutStore.setWorkouts(true);
     }
   } catch (error) {
     console.error("Error updating workout exercises:", error);
-    toast.error("Failed to update workout", { progressBar: true, duration: 1000 });
+    toast.error(t('workout.failedToUpdate'), { progressBar: true, duration: 1000 });
   } finally {
     isUpdatingWorkout.value = false;
   }
@@ -327,7 +333,7 @@ const dublicate = async () => {
     if (response && response.id) {
       await workoutStore.setWorkouts(true);
       workoutStore.setCurrentWorkout(response.id);
-      toast.success("Workout duplicated successfully", { progressBar: true, duration: 1000 });
+      toast.success(t('workout.duplicated'), { progressBar: true, duration: 1000 });
       router.push(`/workout/${response.id}`);
     } else {
       console.error("Failed to duplicate workout");
@@ -343,7 +349,7 @@ const deleteExercise = async () => {
         workoutStore.setWorkouts(true);
         workoutStore.currentWorkout = null;
         isDeleteDialogOpen.value = false;
-        toast.success("Exercise deleted successfully", { progressBar: true, duration: 1000 });
+        toast.success(t('workout.deleted'), { progressBar: true, duration: 1000 });
         router.push("/");
       } else {
         console.error("Failed to delete exercise");
@@ -351,7 +357,7 @@ const deleteExercise = async () => {
     }
   } catch (error) {
     console.error("Error deleting exercise:", error);
-    toast.error("Failed to delete exercise", { progressBar: true, duration: 1000 });
+    toast.error(t('workout.failedToDelete'), { progressBar: true, duration: 1000 });
     isDeleteDialogOpen.value = false;
   }
 };
@@ -369,7 +375,7 @@ const startSession = async () => {
       router.push(`/session/${response.id}`);
     } else {
       console.error("Failed to start session:", response);
-      toast.error("Failed to start session", { progressBar: true, duration: 1000 });
+      toast.error(t('workout.failedToStartSession'), { progressBar: true, duration: 1000 });
     }
   }
 };

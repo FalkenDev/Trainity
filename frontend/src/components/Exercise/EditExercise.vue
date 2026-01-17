@@ -7,18 +7,18 @@
       :show-menu="true"
       :title="
         isViewExercise
-          ? 'Exercise'
-          : 'Edit Exercise'
+          ? $t('exerciseForm.viewTitle')
+          : $t('exerciseForm.editTitle')
       "
       @close="isViewExercise ? emit('close') : isViewExercise = true"
     >
       <template #menuAppend>
         <v-list>
           <v-list-item @click="isViewExercise = false">
-            <v-list-item-title>Edit</v-list-item-title>
+            <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
           </v-list-item>
           <v-list-item @click="isDeleteExerciseOpen = true">
-            <v-list-item-title>Delete</v-list-item-title>
+            <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
@@ -76,7 +76,7 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Default Sets:</span>
+                <span class="font-weight-medium">{{ $t('exerciseForm.defaultSets') }}:</span>
                 <span class="ml-2">
                   {{ selectedExercise.defaultSets || 0 }}
                 </span>
@@ -89,7 +89,7 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Default Reps:</span>
+                <span class="font-weight-medium">{{ $t('exerciseForm.defaultReps') }}:</span>
                 <span class="ml-2">
                   {{ selectedExercise.defaultReps || 0 }}
                 </span>
@@ -102,10 +102,10 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Default Pause:</span>
+                <span class="font-weight-medium">{{ $t('exerciseForm.defaultPause') }}:</span>
                 <span class="ml-2">
                   {{ selectedExercise.defaultPauseSeconds || 0 }}
-                  seconds
+                  {{ $t('units.sec') }}
                 </span>
               </v-list-item-title>
             </v-list-item>
@@ -117,7 +117,7 @@
                 </v-icon>
               </template>
               <v-list-item-title>
-                <span class="font-weight-medium">Created at:</span>
+                <span class="font-weight-medium">{{ $t('common.createdAt') }}:</span>
                 <span class="ml-2">
                   {{
                     new Date(
@@ -138,7 +138,7 @@
             :loading="isLoading"
             @click="updateExercise"
           >
-            Save Changes
+            {{ $t('common.saveChanges') }}
           </v-btn>
           <v-form
             v-if="editExercise"
@@ -147,20 +147,20 @@
             <ImageUpload
               v-model="imageFile"
               :existing-image-url="selectedExercise.image ? getImageUrl(selectedExercise.image) : null"
-              placeholder="Change exercise image"
-              helper-text="Upload a new image to replace the current one"
+              :placeholder="$t('exerciseForm.changeImagePlaceholder')"
+              :helper-text="$t('exerciseForm.changeImageHelper')"
             />
             
             <v-text-field
               v-model="editExercise.name"
-              label="Name"
+              :label="$t('common.name')"
               type="string"
               variant="outlined"
               hide-details
             />
             <v-text-field
               v-model="editExercise.description"
-              label="Description"
+              :label="$t('common.description')"
               type="string"
               variant="outlined"
               hide-details
@@ -168,7 +168,7 @@
             <v-select
               v-model="editExercise.muscleGroups"
               :items="muscleGroupStore.muscleGroups"
-              label="Muscle Groups"
+              :label="$t('exerciseForm.muscleGroupsLabel')"
               multiple
               variant="outlined"
               hide-details
@@ -177,21 +177,21 @@
             />
             <v-text-field
               v-model="editExercise.defaultSets"
-              label="Sets"
+              :label="$t('exerciseForm.setsLabel')"
               type="number"
               variant="outlined"
               hide-details
             />
             <v-text-field
               v-model="editExercise.defaultReps"
-              label="Reps"
+              :label="$t('exerciseForm.repsLabel')"
               type="number"
               variant="outlined"
               hide-details
             />
             <v-text-field
               v-model="editExercise.defaultPauseSeconds"
-              label="Pause (seconds)"
+              :label="$t('exerciseForm.pauseSecondsLabel')"
               type="number"
               variant="outlined"
               hide-details
@@ -207,10 +207,10 @@
     >
       <v-card>
         <v-card-title class="text-h6">
-          Delete Exercise
+          {{ $t('exerciseForm.deleteTitle') }}
         </v-card-title>
         <v-card-text>
-          Are you sure you want to delete this exercise?
+          {{ $t('exerciseForm.deleteConfirm') }}
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -218,13 +218,13 @@
             color="grey"
             @click="isDeleteExerciseOpen = false"
           >
-            Cancel
+            {{ $t('common.cancel') }}
           </v-btn>
           <v-btn
             color="red"
             @click="removeExercise"
           >
-            Delete
+            {{ $t('common.delete') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -242,6 +242,7 @@ import {
 import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
 import { toast } from 'vuetify-sonner';
 import ImageUpload from '@/components/basicUI/ImageUpload.vue';
+import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   workoutId?: number;
@@ -255,6 +256,7 @@ const exerciseStore = useExerciseStore();
 const isLoading = ref<boolean>(false);
 const isDeleteExerciseOpen = ref<boolean>(false);
 const imageFile = ref<File | null>(null);
+const { t } = useI18n({ useScope: 'global' });
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
@@ -294,7 +296,7 @@ const removeExercise = async () => {
     response = await deleteExercise(props.selectedExercise?.id ?? 0);
     
     if (response) {
-      toast.success('Exercise removed successfully!', { progressBar: true, duration: 1000 });
+      toast.success(t('exercise.deleted'), { progressBar: true, duration: 1000 });
         await exerciseStore.setExercises(true);
       emit('close');
     } else {
@@ -302,7 +304,7 @@ const removeExercise = async () => {
     }
   } catch (error) {
     console.error('Error in removeExerciseFromWorkout:', error);
-    toast.error('Error in removeExerciseFromWorkout.', { progressBar: true, duration: 1000 });
+    toast.error(t('exercise.removeError'), { progressBar: true, duration: 1000 });
   }
 };
 
@@ -321,11 +323,11 @@ const updateExercise = async () => {
     try {
       isLoading.value = true;
       if (!editExercise.value) {
-        toast.error('No exercise data to update.');
+        toast.error(t('exercise.updateNoData'));
         return;
       }
       if (!props.selectedExercise) {
-        toast.error('No selected exercise to update.');
+        toast.error(t('exercise.updateNoSelected'));
         return;
       }
       const response = await updateExerciseInExercise(
@@ -340,18 +342,18 @@ const updateExercise = async () => {
             imageFile.value = null;
           } catch (imageError) {
             console.error('Error uploading image:', imageError);
-            toast.warning('Exercise updated but image upload failed', { progressBar: true, duration: 1000 });
+            toast.warning(t('exercise.updatedImageUploadFailed'), { progressBar: true, duration: 1000 });
           }
         }
         
-        toast.success('Exercise updated successfully!', { progressBar: true, duration: 1000 });
+        toast.success(t('exercise.updated'), { progressBar: true, duration: 1000 });
         await exerciseStore.setExercises(true);
         isViewExercise.value = true;
       } else {
-        toast.error('Failed to update exercise.', { progressBar: true, duration: 1000 });
+        toast.error(t('exercise.failedToUpdate'), { progressBar: true, duration: 1000 });
       }
     } catch (error) {
-      toast.error('Error in updateExercise.', { progressBar: true, duration: 1000 });
+      toast.error(t('exercise.updateError'), { progressBar: true, duration: 1000 });
       console.error('Error in updateExercise:', error);
     } finally {
       isLoading.value = false;

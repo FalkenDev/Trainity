@@ -39,7 +39,7 @@
           class="font-weight-bold flex-grow-1"
           @click="toggleTimer"
         >
-          {{ isRunning ? 'Pause' : 'Start' }}
+          {{ isRunning ? $t('timer.pause') : $t('timer.start') }}
         </v-btn>
         <v-btn
           size="large"
@@ -47,7 +47,7 @@
           class="font-weight-bold flex-grow-1"
           @click="resetTimer"
         >
-          Reset
+          {{ $t('common.reset') }}
         </v-btn>
       </div>
       <v-btn
@@ -56,7 +56,7 @@
         class="mb-10 mx-5"
         @click="closeDialog"
       >
-        Close Timer
+        {{ $t('timer.closeTimer') }}
       </v-btn>
     </v-card>
   </v-dialog>

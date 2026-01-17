@@ -11,40 +11,40 @@
       class="d-flex flex-column"
     >
       <v-toolbar color="primary">
-        <v-toolbar-title>Edit Set {{ editableSet.set }}</v-toolbar-title>
+        <v-toolbar-title>{{ $t('session.editSetTitle', { set: editableSet.set }) }}</v-toolbar-title>
         <v-spacer />
         <v-btn
           variant="text"
           @click="onSave"
         >
-          Save
+          {{ $t('common.save') }}
         </v-btn>
       </v-toolbar>
 
       <v-card-text class="pa-5">
         <p class="text-grey-lighten-1 mb-2">
-          WEIGHT
+          {{ $t('session.weightLabel') }}
         </p>
         <v-text-field
           v-model.number="editableSet.weight"
           type="number"
           variant="solo-filled"
           flat
-          suffix="kg"
+          :suffix="$t('units.kgShort')"
           class="mb-4"
           autofocus
           single-line
         />
 
         <p class="text-grey-lighten-1 mb-2">
-          REPETITIONS
+          {{ $t('session.repetitionsLabel') }}
         </p>
         <v-text-field
           v-model.number="editableSet.reps"
           type="number"
           variant="solo-filled"
           flat
-          suffix="reps"
+          :suffix="$t('units.repsShort')"
           single-line
         />
       </v-card-text>
@@ -59,7 +59,7 @@
           variant="outlined"
           @click="onDelete"
         >
-          Delete Set
+          {{ $t('session.deleteSet') }}
         </v-btn>
       </div>
     </v-card>

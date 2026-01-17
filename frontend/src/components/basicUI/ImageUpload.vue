@@ -24,7 +24,7 @@
           mdi-camera-plus
         </v-icon>
         <p class="text-body-2 mt-2 text-grey-lighten-1">
-          {{ placeholder }}
+          {{ placeholderText }}
         </p>
       </div>
 
@@ -34,7 +34,7 @@
       >
         <img 
           :src="previewUrl" 
-          :alt="altText"
+          :alt="altTextComputed"
           :class="{ 'circular': circular }"
         >
         <v-btn
@@ -50,15 +50,17 @@
     </div>
     
     <p
-      v-if="helperText"
+      v-if="helperTextComputed"
       class="text-caption text-grey mt-2"
     >
-      {{ helperText }}
+      {{ helperTextComputed }}
     </p>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+
 interface Props {
   modelValue?: File | null;
   existingImageUrl?: string | null;
@@ -72,12 +74,15 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
   existingImageUrl: null,
-  placeholder: 'Click to upload image',
-  helperText: 'JPEG, PNG, or WebP. Max 10MB',
-  altText: 'Preview',
   circular: false,
   maxSizeMB: 10,
 });
+
+const { t } = useI18n({ useScope: 'global' });
+
+const placeholderText = computed(() => props.placeholder ?? t('imageUpload.placeholder'));
+const helperTextComputed = computed(() => props.helperText ?? t('imageUpload.helper', { maxSizeMB: props.maxSizeMB }));
+const altTextComputed = computed(() => props.altText ?? t('imageUpload.previewAlt'));
 
 const emit = defineEmits<{
   (e: 'update:modelValue', file: File | null): void;
@@ -104,13 +109,13 @@ const handleFileSelect = async (event: Event) => {
 
   const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('Please select a valid image file (JPEG, PNG, or WebP)');
+    alert(t('imageUpload.invalidType'));
     return;
   }
 
   const maxSize = props.maxSizeMB * 1024 * 1024;
   if (file.size > maxSize) {
-    alert(`File size must be less than ${props.maxSizeMB}MB`);
+    alert(t('imageUpload.maxSize', { maxSizeMB: props.maxSizeMB }));
     return;
   }
 

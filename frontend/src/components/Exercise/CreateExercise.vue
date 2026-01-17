@@ -1,33 +1,33 @@
 <template>
   <div class="d-flex flex-column fill-height bg-grey-darken-4 content-scroll">
     <BackHeader
-      title="Create Exercises"
+      :title="$t('exerciseForm.createTitle')"
       :show-menu="false"
       @close="emit('close')"
     />
     <v-form class="mx-5">
       <ImageUpload
         v-model="imageFile"
-        placeholder="Add exercise image (optional)"
-        helper-text="Add a reference image for this exercise"
+        :placeholder="$t('exerciseForm.imageOptionalPlaceholder')"
+        :helper-text="$t('exerciseForm.imageHelperReference')"
         class="mb-4"
       />
       
       <v-text-field
         v-model="newExercise.name"
-        label="Exercise Name"
+        :label="$t('exerciseForm.nameLabel')"
         required
         variant="outlined"
       />
       <v-textarea
         v-model="newExercise.description"
-        label="Description"
+        :label="$t('common.description')"
         rows="2"
         variant="outlined"
       />
       <v-select
         v-model="newExercise.muscleGroupIds"
-        label="Muscle Group"
+        :label="$t('exerciseForm.muscleGroupsLabel')"
         :items="muscleGroupItems"
         required
         class="mt-3"
@@ -39,7 +39,7 @@
       />
       <v-text-field
         v-model="newExercise.defaultSets"
-        label="Sets"
+        :label="$t('exerciseForm.setsLabel')"
         type="number"
         min="1"
         required
@@ -48,7 +48,7 @@
       />
       <v-text-field
         v-model="newExercise.defaultReps"
-        label="Reps"
+        :label="$t('exerciseForm.repsLabel')"
         type="number"
         min="1"
         required
@@ -57,7 +57,7 @@
       />
       <v-text-field
         v-model="newExercise.defaultPauseSeconds"
-        label="Pause Seconds"
+        :label="$t('exerciseForm.pauseSecondsLabel')"
         type="number"
         min="0"
         required
@@ -70,7 +70,7 @@
         :loading="isCreating"
         @click="createNewExercise"
       >
-        Create Exercise
+        {{ $t('exerciseForm.createButton') }}
       </v-btn>
     </v-form>
   </div>
@@ -83,6 +83,7 @@ import { useExerciseStore } from "@/stores/exercise.store";
 import { toast } from "vuetify-sonner";
 import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
 import ImageUpload from "@/components/basicUI/ImageUpload.vue";
+import { useI18n } from 'vue-i18n';
 
 const emit = defineEmits<{
   (e: "close"): void;
@@ -92,6 +93,7 @@ const exerciseStore = useExerciseStore();
 const muscleGroupStore = useMuscleGroupStore();
 const isCreating = ref(false);
 const imageFile = ref<File | null>(null);
+const { t } = useI18n({ useScope: 'global' });
 
 const newExercise = ref<CreateExercise>({
   name: "",
@@ -122,11 +124,11 @@ const createNewExercise = async () => {
           await uploadExerciseImage(response.id, imageFile.value);
         } catch (imageError) {
           console.error("Error uploading image:", imageError);
-          toast.warning("Exercise created but image upload failed", { progressBar: true, duration: 1000 });
+          toast.warning(t('exercise.createdImageUploadFailed'), { progressBar: true, duration: 1000 });
         }
       }
       
-      toast.success("Exercise created successfully!", { progressBar: true, duration: 1000 });
+      toast.success(t('exercise.created'), { progressBar: true, duration: 1000 });
       
       newExercise.value = {
         name: "",
@@ -141,11 +143,11 @@ const createNewExercise = async () => {
       exerciseStore.setExercises(true);
       emit("close");
     } else {
-      toast.error("Failed to create exercise.", { progressBar: true, duration: 1000 });
+      toast.error(t('exercise.failedToCreate'), { progressBar: true, duration: 1000 });
     }
   } catch (error) {
     console.error("Error creating exercise:", error);
-    toast.error("An error occurred while creating the exercise.", { progressBar: true, duration: 1000 });
+    toast.error(t('exercise.createGenericError'), { progressBar: true, duration: 1000 });
   } finally {
     isCreating.value = false;
   }

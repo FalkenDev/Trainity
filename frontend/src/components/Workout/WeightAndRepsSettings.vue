@@ -1,7 +1,7 @@
 <template>
   <div class="bg-grey-darken-4 h-100 w-100">
     <ExitHeader
-      title="Weight and Reps Settings"
+      :title="$t('weightAndReps.title')"
       show-menu
       @close="$emit('close')"
     />
@@ -19,10 +19,10 @@
         <div class="d-flex w-100 align-center ga-4">
           <div class="d-flex flex-column">
             <v-list-item-title class="text-body-1 font-weight-bold">
-              {{ option.label }}
+              {{ $t(option.label) }}
             </v-list-item-title>
             <v-list-item-subtitle class="text-body-2 d-flex flex-wrap">
-              {{ option.description }}
+              {{ $t(option.description) }}
             </v-list-item-subtitle>
           </div>
           <v-icon
@@ -52,19 +52,19 @@ const workoutStore = useWorkoutStore();
 
 const options = [
   {
-    label: "Default",
-    description: "Use the default weights and repetitions set from workout",
+    label: "weightAndReps.options.default.label",
+    description: "weightAndReps.options.default.description",
     value: "default",
   },
   {
-    label: "Latest",
+    label: "weightAndReps.options.latest.label",
     description:
-      "Use weights and repetitions from the last time you did this workout",
+      "weightAndReps.options.latest.description",
     value: "latest",
   },
   {
-    label: "Exercise",
-    description: "Use the weights and repetitions set from exercise",
+    label: "weightAndReps.options.exercise.label",
+    description: "weightAndReps.options.exercise.description",
     value: "exercise",
   },
 ];

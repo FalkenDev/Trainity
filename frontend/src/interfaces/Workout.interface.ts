@@ -20,7 +20,9 @@ export interface Exercise {
   exercise: {
     id: number;
     name: string;
-    description: string;
+    i18nKey?: string;
+    isNameCustom?: boolean;
+    description?: string | null;
     img: string;
     muscleGroups: MuscleGroup[];
     defaultSets: number;

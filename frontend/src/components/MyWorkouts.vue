@@ -7,13 +7,13 @@
       <div class="d-flex align-center justify-space-between">
         <div>
           <div class="text-overline text-secondary">
-            Workouts
+            {{ $t('myWorkouts.workoutsHeading') }}
           </div>
           <h1 class="text-h6 font-weight-bold mb-0">
-            My Workouts
+            {{ $t('myWorkouts.title') }}
           </h1>
           <div class="text-caption text-medium-emphasis mt-1">
-            {{ workouts.length }} total
+            {{ workouts.length }} {{ $t('common.total') }}
           </div>
         </div>
         <div class="d-flex ga-2">
@@ -25,7 +25,7 @@
             prepend-icon="mdi-play"
             @click="startEmptySession"
           >
-            Start empty
+            {{ $t('myWorkouts.startEmpty') }}
           </v-btn>
         </div>
       </div>
@@ -89,9 +89,9 @@
                 </div>
 
                 <div class="text-caption text-medium-emphasis mt-1 d-flex align-center ga-3">
-                  <span>{{ workout.exercises.length }} exercises</span>
+                  <span>{{ workout.exercises.length }} {{ $t('myWorkouts.exercisesUnit') }}</span>
                   <span class="dot" />
-                  <span>{{ workout.time }} min</span>
+                  <span>{{ workout.time }} {{ $t('units.minShort') }}</span>
                 </div>
 
                 <!-- Muscle groups -->
@@ -125,7 +125,7 @@
             <div class="d-flex align-center justify-space-between mt-3">
               <div class="text-caption text-medium-emphasis">
                 <!-- TODO: FEAT: Maybe have Latest Update instead -->
-                Created
+                {{ $t('myWorkouts.created') }}
                 {{
                   new Date(workout.createdAt as any).toLocaleDateString(undefined, {
                     month: 'short',
@@ -140,7 +140,7 @@
                   color="primary"
                   prepend-icon="mdi-play"
                 >
-                  Start
+                  {{ $t('common.start') }}
                 </v-btn>
                 <v-btn
                   size="small"
@@ -149,7 +149,7 @@
                   prepend-icon="mdi-content-duplicate"
                   @click.stop="$router.push(`/workouts/${workout.id}/duplicate`)"
                 >
-                  Duplicate
+                  {{ $t('workout.duplicate') }}
                 </v-btn>
               </div>
             </div>
@@ -174,17 +174,17 @@
             mdi-dumbbell
           </v-icon>
           <div class="text-subtitle-1 font-weight-medium mt-2">
-            No workouts yet
+            {{ $t('myWorkouts.emptyTitle') }}
           </div>
           <div class="text-body-2 text-medium-emphasis mt-1">
-            Create your first workout and start training.
+            {{ $t('myWorkouts.emptyDescription') }}
           </div>
           <v-btn
             class="mt-4"
             color="primary"
             @click="isCreateWorkoutOpen = true"
           >
-            Create Workout
+            {{ $t('myWorkouts.createWorkout') }}
           </v-btn>
         </div>
       </v-card>
@@ -194,7 +194,7 @@
       size="large"
       @click="isWorkoutListOpen = true"
     >
-      Show all workouts
+      {{ $t('myWorkouts.showAllWorkouts') }}
     </v-btn>
     <v-dialog
       v-model="isWorkoutListOpen"

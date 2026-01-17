@@ -1,8 +1,11 @@
 export interface Exercise {
   id: number;
   name: string;
-  description: string;
-  image: string;
+  i18nKey?: string;
+  isNameCustom?: boolean;
+  isCustomized?: boolean;
+  description?: string | null;
+  image?: string | null;
   muscleGroups: MuscleGroup[];
   defaultSets: number;
   defaultReps: number;

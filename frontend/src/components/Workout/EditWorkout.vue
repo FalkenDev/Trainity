@@ -1,7 +1,7 @@
 <template>
   <div class="h-100 w-100 bg-grey-darken-4">
     <BackHeader
-      title="Edit Workout"
+      :title="$t('workoutForm.editTitle')"
       show-menu
       :is-loading="isLoading"
       @close="$emit('close')"
@@ -10,21 +10,21 @@
       <v-text-field
         v-model="editWorkout.name"
         variant="outlined"
-        label="Workout Name"
+        :label="$t('workoutForm.nameLabel')"
         required
         hide-details
       />
       <v-textarea
         v-model="editWorkout.description"
         variant="outlined"
-        label="Description"
+        :label="$t('common.description')"
         rows="3"
         hide-details
       />
       <v-text-field
         v-model.number="editWorkout.time"
         variant="outlined"
-        label="Time (minutes)"
+        :label="$t('workoutForm.timeMinutesLabel')"
         type="number"
         hide-details
       />
@@ -33,7 +33,7 @@
         color="primary"
         @click="saveWorkout"
       >
-        Save Workout
+        {{ $t('workoutForm.saveButton') }}
       </v-btn>
     </v-form>
   </div>
@@ -42,10 +42,12 @@
 import { useWorkoutStore } from "@/stores/workout.store";
 import { updateWorkout } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
+import { useI18n } from 'vue-i18n';
 
 const isLoading = ref<boolean>(false);
 
 const workoutStore = useWorkoutStore();
+const { t } = useI18n({ useScope: 'global' });
 
 const selectedWorkout = computed(() => {
   return workoutStore.currentWorkout;
@@ -74,14 +76,14 @@ const saveWorkout = async () => {
     });
     if (response) {
       workoutStore.setWorkouts(true);
-      toast.success("Workout updated successfully!", { progressBar: true, duration: 1000 });
+      toast.success(t('workout.updated'), { progressBar: true, duration: 1000 });
       emit("close");
     } else {
       throw new Error("Failed to update workout");
     }
   } catch (error) {
     console.error("Error updating workout:", error);
-    toast.error("Failed to update workout", { progressBar: true, duration: 1000 });
+    toast.error(t('workout.failedToUpdate'), { progressBar: true, duration: 1000 });
   } finally {
     isLoading.value = false;
   }

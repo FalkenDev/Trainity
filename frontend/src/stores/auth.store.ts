@@ -8,6 +8,7 @@ import { useMuscleGroupStore } from './muscleGroup.store';
 import { useWorkoutSessionStore } from './workoutSession.store';
 import { fetchWrapper } from '@/utils/fetchWrapper';
 import type { User } from '@/interfaces/User.interface';
+import i18n from '@/plugins/i18n';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:1337/v1';
 
@@ -47,7 +48,7 @@ export const useAuthStore = defineStore(
         return data;
       } catch (error) {
         console.error('Login failed:', error);
-        toast.error('Login failed. Please check your credentials.', { progressBar: true, duration: 1000 });
+        toast.error(i18n.global.t('auth.loginFailed'), { progressBar: true, duration: 1000 });
         isAuthenticated.value = false;
         throw error;
       } finally {
@@ -88,7 +89,7 @@ export const useAuthStore = defineStore(
         }
       } catch (error) {
         console.error('Account creation failed:', error);
-        toast.error('Account creation failed', { progressBar: true, duration: 1000 });
+        toast.error(i18n.global.t('auth.accountCreationFailed'), { progressBar: true, duration: 1000 });
         throw new Error('Account creation failed');
       } finally {
         loading.value = false;
