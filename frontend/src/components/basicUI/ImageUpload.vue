@@ -74,6 +74,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: null,
   existingImageUrl: null,
+  placeholder: undefined,
+  helperText: undefined,
+  altText: undefined,
   circular: false,
   maxSizeMB: 10,
 });
@@ -246,5 +249,10 @@ const removeImage = () => {
   position: absolute;
   top: 8px;
   right: 8px;
+}
+
+:deep(.v-btn) {
+  width: 32px !important;
+  height: 32px !important;
 }
 </style>

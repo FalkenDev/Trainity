@@ -6,7 +6,7 @@
           class="mb-4"
           size="100"
           color="primary"
-          @click="openAvatarDialog"
+          @click="openAccountDialog"
         >
           <v-img
             v-if="currentUser?.avatar"
@@ -26,7 +26,7 @@
           size="small"
           color="primary"
           class="edit-avatar-btn"
-          @click="openAvatarDialog"
+          @click="openAccountDialog"
         >
           <v-icon size="16">
             mdi-camera
@@ -81,40 +81,130 @@
         </v-list>
       </div>
     </div>
-    
-    <!-- Avatar Upload Dialog -->
+
+    <!-- Account Edit Dialog -->
     <v-dialog
-      v-model="isAvatarDialogOpen"
-      max-width="500"
+      v-model="isAccountDialogOpen"
+      fullscreen
+      transition="slide-y-transition"
+      persistent
     >
-      <v-card>
-        <v-card-title>
-          <span class="text-h6">{{ $t('settings.updateAvatar') }}</span>
-        </v-card-title>
-        <v-card-text>
-          <ImageUpload
-            v-model="avatarFile"
-            :existing-image-url="currentUser?.avatar ? getImageUrl(currentUser.avatar) : null"
-            :placeholder="$t('settings.avatarPlaceholder')"
-            :helper-text="$t('settings.avatarHelper')"
-            circular
-          />
+      <v-card class="d-flex flex-column">
+        <BackHeader
+          :title="$t('settings.editAccount')"
+          @close="closeAccountDialog"
+        />
+
+        <v-card-text class="pa-5 flex-grow-1 overflow-y-auto">
+          <v-form
+            ref="accountForm"
+            @submit.prevent="saveAccount"
+          >
+            <div class="mb-6">
+              <p class="text-subtitle-1 mb-3">
+                {{ $t('settings.profilePhoto') }}
+              </p>
+              <ImageUpload
+                v-model="avatarFile"
+                :existing-image-url="currentUser?.avatar ? getImageUrl(currentUser.avatar) : null"
+                :placeholder="$t('settings.avatarPlaceholder')"
+                :helper-text="$t('settings.avatarHelper')"
+                circular
+              />
+            </div>
+
+            <div class="mb-6">
+              <p class="text-subtitle-1 mb-3">
+                {{ $t('settings.profileDetails') }}
+              </p>
+              <v-text-field
+                v-model="fullName"
+                autocomplete="name"
+                class="mb-4"
+                :label="$t('settings.fullName')"
+                prepend-inner-icon="mdi-account-outline"
+                required
+                :rules="nameRules"
+                variant="outlined"
+              />
+
+              <v-text-field
+                v-model="email"
+                autocomplete="email"
+                class="mb-2"
+                :label="$t('settings.email')"
+                prepend-inner-icon="mdi-email-outline"
+                required
+                :rules="emailRules"
+                type="email"
+                variant="outlined"
+              />
+            </div>
+
+            <div>
+              <p class="text-subtitle-1 mb-3">
+                {{ $t('settings.changePassword') }}
+              </p>
+              <p class="text-body-2 text-grey-lighten-1 mt-n2 mb-4">
+                {{ $t('settings.changePasswordHint') }}
+              </p>
+
+              <v-text-field
+                v-model="currentPassword"
+                :append-inner-icon="showCurrentPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                class="mb-4"
+                :label="$t('settings.currentPassword')"
+                autocomplete="current-password"
+                prepend-inner-icon="mdi-lock-outline"
+                :type="showCurrentPassword ? 'text' : 'password'"
+                variant="outlined"
+                @click:append-inner="showCurrentPassword = !showCurrentPassword"
+              />
+
+              <v-text-field
+                v-model="newPassword"
+                :append-inner-icon="showNewPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                class="mb-4"
+                :label="$t('settings.newPassword')"
+                autocomplete="new-password"
+                prepend-inner-icon="mdi-lock-outline"
+                :type="showNewPassword ? 'text' : 'password'"
+                variant="outlined"
+                :rules="newPasswordRules"
+                @click:append-inner="showNewPassword = !showNewPassword"
+              />
+
+              <v-text-field
+                v-model="confirmNewPassword"
+                :append-inner-icon="showConfirmNewPassword ? 'mdi-eye-off' : 'mdi-eye'"
+                class="mb-2"
+                :label="$t('settings.confirmNewPassword')"
+                autocomplete="new-password"
+                prepend-inner-icon="mdi-lock-check-outline"
+                :type="showConfirmNewPassword ? 'text' : 'password'"
+                variant="outlined"
+                :rules="confirmNewPasswordRules"
+                @click:append-inner="showConfirmNewPassword = !showConfirmNewPassword"
+              />
+            </div>
+          </v-form>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
+
+        <v-card-actions class="pa-5">
           <v-btn
             variant="text"
-            @click="closeAvatarDialog"
+            :disabled="isSavingAccount"
+            @click="closeAccountDialog"
           >
             {{ $t('common.cancel') }}
           </v-btn>
+          <v-spacer />
           <v-btn
             color="primary"
-            :loading="isUploadingAvatar"
-            :disabled="!avatarFile"
-            @click="uploadAvatarImage"
+            :loading="isSavingAccount"
+            @click="saveAccount"
           >
-            {{ $t('common.upload') }}
+            {{ $t('common.saveChanges') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -225,6 +315,7 @@ import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
 import { useI18n } from 'vue-i18n';
 import { useAppStore } from '@/stores/app';
+import type { VForm } from 'vuetify/components';
 
 const authStore = useAuthStore();
 const appStore = useAppStore();
@@ -232,13 +323,23 @@ const { t, locale } = useI18n({ useScope: 'global' });
 const isExerciseListOpen = ref(false);
 const isSessionListOpen = ref(false);
 const isWorkoutListOpen = ref(false);
-const isAvatarDialogOpen = ref(false);
-const isUploadingAvatar = ref(false);
+const isAccountDialogOpen = ref(false);
+const isSavingAccount = ref(false);
 const isAppearanceOpen = ref(false);
 const isLanguageDialogOpen = ref(false);
 const isSavingPreferences = ref(false);
 const avatarFile = ref<File | null>(null);
 const currentUser = ref<User | null>(null);
+
+const accountForm = ref<VForm | null>(null);
+const fullName = ref('');
+const email = ref('');
+const currentPassword = ref('');
+const newPassword = ref('');
+const confirmNewPassword = ref('');
+const showCurrentPassword = ref(false);
+const showNewPassword = ref(false);
+const showConfirmNewPassword = ref(false);
 
 const useRpe = ref(true);
 
@@ -264,31 +365,93 @@ const loadUserData = async () => {
   }
 };
 
-const openAvatarDialog = () => {
-  isAvatarDialogOpen.value = true;
-};
+const nameRules = [(v: string) => !!v?.trim() || t('auth.fullNameRequired')];
+const emailRules = [
+  (v: string) => !!v || t('auth.emailRequired'),
+  (v: string) => /.+@.+\..+/.test(v) || t('auth.emailValid'),
+];
+const newPasswordRules = computed(() => [
+  (v: string) => !v || v.length >= 8 || t('auth.passwordMinLength'),
+]);
+const confirmNewPasswordRules = computed(() => [
+  (v: string) => !newPassword.value || (!!v && v === newPassword.value) || t('auth.passwordsDoNotMatch'),
+]);
 
-const closeAvatarDialog = () => {
-  isAvatarDialogOpen.value = false;
+const openAccountDialog = () => {
+  const user = currentUser.value;
+  fullName.value = `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
+  email.value = user?.email || '';
   avatarFile.value = null;
+  currentPassword.value = '';
+  newPassword.value = '';
+  confirmNewPassword.value = '';
+  isAccountDialogOpen.value = true;
 };
 
-const uploadAvatarImage = async () => {
-  if (!avatarFile.value) return;
+const closeAccountDialog = () => {
+  isAccountDialogOpen.value = false;
+  avatarFile.value = null;
+  currentPassword.value = '';
+  newPassword.value = '';
+  confirmNewPassword.value = '';
+};
 
-  isUploadingAvatar.value = true;
+const splitFullName = (value: string) => {
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+  const firstName = parts.shift() || '';
+  const lastName = parts.join(' ');
+  return { firstName, lastName };
+};
+
+const saveAccount = async () => {
+  if (isSavingAccount.value) return;
+  if (!accountForm.value) return;
+
+  const { valid } = await accountForm.value.validate();
+  if (!valid) return;
+
+  if (newPassword.value && newPassword.value !== confirmNewPassword.value) {
+    toast.error(t('auth.passwordsDoNotMatchAlert'), { progressBar: true, duration: 1000 });
+    return;
+  }
+
+  if (newPassword.value && !currentPassword.value) {
+    toast.error(t('settings.currentPasswordRequired'), { progressBar: true, duration: 1000 });
+    return;
+  }
+
+  isSavingAccount.value = true;
   try {
-    const updatedUser = await uploadAvatar(avatarFile.value) as User;
-    currentUser.value = updatedUser;
+    let updatedUser: User | null = null;
 
+    if (avatarFile.value) {
+      updatedUser = (await uploadAvatar(avatarFile.value)) as User;
+      currentUser.value = updatedUser;
+    }
+
+    const { firstName, lastName } = splitFullName(fullName.value);
+    const payload: Record<string, unknown> = {
+      firstName,
+      lastName,
+      email: email.value,
+    };
+
+    if (newPassword.value) {
+      payload.currentPassword = currentPassword.value;
+      payload.newPassword = newPassword.value;
+    }
+
+    updatedUser = (await updateUser(payload as Partial<User>)) as User;
+    currentUser.value = updatedUser;
     await authStore.refreshUser();
-    toast.success(t('settings.avatarUpdated'), { progressBar: true, duration: 1000 });
-    closeAvatarDialog();
+
+    toast.success(t('settings.accountUpdated'), { progressBar: true, duration: 1000 });
+    closeAccountDialog();
   } catch (error) {
-    console.error('Error uploading avatar:', error);
-    toast.error(t('settings.failedToUploadAvatar'), { progressBar: true, duration: 1000 });
+    console.error('Error saving account:', error);
+    toast.error(t('settings.failedToUpdateAccount'), { progressBar: true, duration: 1000 });
   } finally {
-    isUploadingAvatar.value = false;
+    isSavingAccount.value = false;
   }
 };
 
@@ -310,6 +473,9 @@ const setDialogToOpen = (type: string) => {
 
 const setPreferenceDialogToOpen = async (type?: string) => {
   switch (type) {
+    case 'account':
+      openAccountDialog();
+      break;
     case 'appearance':
       isAppearanceOpen.value = true;
       break;
@@ -354,8 +520,7 @@ const contentList = [
   { titleKey: 'settings.sessions', showArrow: true, type: 'sessions', disabled: false },
 ];
 const preferencesList  = [
-  { titleKey: 'settings.settings', showArrow: true, disabled: true },
-  { titleKey: 'settings.account', showArrow: true, disabled: true  },
+  { titleKey: 'settings.account', showArrow: true, disabled: false, type: 'account' },
   { titleKey: 'settings.appearance', showArrow: true, disabled: false, type: 'appearance' },
   { titleKey: 'settings.units', showArrow: true, disabled: true   },
   { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language'   },
@@ -379,5 +544,7 @@ onMounted(() => {
   position: absolute;
   bottom: 12px;
   right: -4px;
+  height: 32px !important;
+  width: 32px !important;
 }
 </style>

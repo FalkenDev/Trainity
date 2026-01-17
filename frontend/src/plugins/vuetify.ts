@@ -105,8 +105,6 @@ export default createVuetify( {
     VAvatar: {
       density: 'compact'
     },
-    VIcon: {
-    },
     VRating: {
       density: 'compact'
     }
