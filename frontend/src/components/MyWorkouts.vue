@@ -139,17 +139,9 @@
                   variant="text"
                   color="primary"
                   prepend-icon="mdi-play"
+                  @click="startSession(workout.id)"
                 >
                   {{ $t('common.start') }}
-                </v-btn>
-                <v-btn
-                  size="small"
-                  variant="text"
-                  color="secondary"
-                  prepend-icon="mdi-content-duplicate"
-                  @click.stop="$router.push(`/workouts/${workout.id}/duplicate`)"
-                >
-                  {{ $t('workout.duplicate') }}
                 </v-btn>
               </div>
             </div>
@@ -217,12 +209,15 @@
 import { useRouter } from 'vue-router';
 import { useWorkoutStore } from '@/stores/workout.store';
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
-import { startEmptyWorkoutSession } from '@/services/workoutSession.service';
+import { startEmptyWorkoutSession, startWorkoutSession } from '@/services/workoutSession.service';
 import type { Workout } from '@/interfaces/Workout.interface';
+import { toast } from "vuetify-sonner";
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
+const { t } = useI18n();
 
 const loading = ref(false);
 const isStartingEmptySession = ref(false);
@@ -249,6 +244,19 @@ function routeTo(id: number) {
   workoutStore.setCurrentWorkout(id);
   router.push(`/workout/${id}`);
 }
+
+async function startSession(workoutId: number) {
+  if (workoutId) {
+    const response = await startWorkoutSession(workoutId);
+    if (response && response.id) {
+      await workoutSessionStore.fetchSelectedWorkoutSession(response.id);
+      router.push(`/session/${response.id}`);
+    } else {
+      console.error("Failed to start session:", response);
+      toast.error(t('workout.failedToStartSession'), { progressBar: true, duration: 1000 });
+    }
+  }
+};
 
 async function startEmptySession() {
   if (isStartingEmptySession.value) return;
