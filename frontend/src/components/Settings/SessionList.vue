@@ -1,8 +1,5 @@
 <template>
-  <v-container
-    fluid
-    class="pa-0 bg-grey-darken-4"
-  >
+  <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
       :title="$t('sessionList.title')"
       show-menu
@@ -210,7 +207,7 @@
         </v-col>
       </v-row>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
