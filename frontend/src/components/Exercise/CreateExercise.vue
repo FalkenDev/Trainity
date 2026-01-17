@@ -122,11 +122,11 @@ const createNewExercise = async () => {
           await uploadExerciseImage(response.id, imageFile.value);
         } catch (imageError) {
           console.error("Error uploading image:", imageError);
-          toast.warning("Exercise created but image upload failed");
+          toast.warning("Exercise created but image upload failed", { progressBar: true, duration: 1000 });
         }
       }
       
-      toast.success("Exercise created successfully!");
+      toast.success("Exercise created successfully!", { progressBar: true, duration: 1000 });
       
       newExercise.value = {
         name: "",
@@ -141,11 +141,11 @@ const createNewExercise = async () => {
       exerciseStore.setExercises(true);
       emit("close");
     } else {
-      toast.error("Failed to create exercise.");
+      toast.error("Failed to create exercise.", { progressBar: true, duration: 1000 });
     }
   } catch (error) {
     console.error("Error creating exercise:", error);
-    toast.error("An error occurred while creating the exercise.");
+    toast.error("An error occurred while creating the exercise.", { progressBar: true, duration: 1000 });
   } finally {
     isCreating.value = false;
   }

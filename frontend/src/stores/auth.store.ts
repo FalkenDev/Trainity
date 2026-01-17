@@ -47,7 +47,7 @@ export const useAuthStore = defineStore(
         return data;
       } catch (error) {
         console.error('Login failed:', error);
-        toast.error('Login failed. Please check your credentials.');
+        toast.error('Login failed. Please check your credentials.', { progressBar: true, duration: 1000 });
         isAuthenticated.value = false;
         throw error;
       } finally {
@@ -88,6 +88,7 @@ export const useAuthStore = defineStore(
         }
       } catch (error) {
         console.error('Account creation failed:', error);
+        toast.error('Account creation failed', { progressBar: true, duration: 1000 });
         throw new Error('Account creation failed');
       } finally {
         loading.value = false;

@@ -246,7 +246,7 @@ function onAddSet(exerciseId: number) {
 const finnishSession = async () => {
   if (isLoading.value) return;
   if (!workoutSession.value?.id) {
-    toast.error('Active session not found.');
+    toast.error('Active session not found.', { progressBar: true, duration: 1000 });
     return;
   }
 
@@ -274,7 +274,7 @@ const finnishSession = async () => {
   try {
     if (completedExercises.length === 0) {
       await abandonWorkoutSession(sessionId.value);
-      toast.info('No exercises completed. Session abandoned.');
+      toast.info('No exercises completed. Session abandoned.', { progressBar: true, duration: 1000 });
       workoutSessionStore.stopClock();
       workoutSessionStore.selectedWorkoutSession = null;
       workoutSessionStore.resetClock();
@@ -283,7 +283,7 @@ const finnishSession = async () => {
     } else {
       const finalPayload = { completedExercises, notes: '' };
       await finishWorkoutSession(sessionId.value, finalPayload);
-      toast.success('Workout session finished successfully!');
+      toast.success('Workout session finished successfully!', { progressBar: true, duration: 1000 });
       workoutSessionStore.stopClock();
       workoutSessionStore.selectedWorkoutSession = null;
       workoutSessionStore.resetClock();
@@ -291,7 +291,7 @@ const finnishSession = async () => {
       router.push('/');
     }
   } catch {
-    toast.error('An error occurred while finishing the session.');
+    toast.error('An error occurred while finishing the session.', { progressBar: true, duration: 1000 });
   } finally {
     isLoading.value = false;
   }

@@ -199,7 +199,7 @@ onMounted(async () => {
   try {
     globalExercises.value = await fetchAllGlobalExercises();
   } catch (e) {
-    toast.error('Failed to load global exercises');
+    toast.error('Failed to load global exercises', { progressBar: true, duration: 1000 });
     console.error(e);
   }
 });
@@ -245,7 +245,7 @@ const saveAndClose = async () => {
       );
     }
   } catch (e) {
-    toast.error('Failed to add exercises');
+    toast.error('Failed to add exercises', { progressBar: true, duration: 1000 });
     console.error(e);
   } finally {
     emit('close');

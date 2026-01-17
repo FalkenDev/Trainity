@@ -294,7 +294,7 @@ const removeExercise = async () => {
     response = await deleteExercise(props.selectedExercise?.id ?? 0);
     
     if (response) {
-      toast.success('Exercise removed successfully!', { progressBar: true });
+      toast.success('Exercise removed successfully!', { progressBar: true, duration: 1000 });
         await exerciseStore.setExercises(true);
       emit('close');
     } else {
@@ -302,6 +302,7 @@ const removeExercise = async () => {
     }
   } catch (error) {
     console.error('Error in removeExerciseFromWorkout:', error);
+    toast.error('Error in removeExerciseFromWorkout.', { progressBar: true, duration: 1000 });
   }
 };
 
@@ -339,18 +340,18 @@ const updateExercise = async () => {
             imageFile.value = null;
           } catch (imageError) {
             console.error('Error uploading image:', imageError);
-            toast.warning('Exercise updated but image upload failed');
+            toast.warning('Exercise updated but image upload failed', { progressBar: true, duration: 1000 });
           }
         }
         
-        toast.success('Exercise updated successfully!', { progressBar: true });
+        toast.success('Exercise updated successfully!', { progressBar: true, duration: 1000 });
         await exerciseStore.setExercises(true);
         isViewExercise.value = true;
       } else {
-        toast.error('Failed to update exercise.');
+        toast.error('Failed to update exercise.', { progressBar: true, duration: 1000 });
       }
     } catch (error) {
-      toast.error('Error in updateExercise.');
+      toast.error('Error in updateExercise.', { progressBar: true, duration: 1000 });
       console.error('Error in updateExercise:', error);
     } finally {
       isLoading.value = false;

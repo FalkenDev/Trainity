@@ -310,12 +310,12 @@ const updateWorkoutExercises = async (newExerciseIds: number[]) => {
       exercisesToAdd.length > 0 || exercisesToRemove.length > 0;
 
     if (hasBeenUpdated) {
-      toast.success("Workout updated successfully");
+      toast.success("Workout updated successfully", { progressBar: true, duration: 1000 });
       await workoutStore.setWorkouts(true);
     }
   } catch (error) {
     console.error("Error updating workout exercises:", error);
-    toast.error("Failed to update workout");
+    toast.error("Failed to update workout", { progressBar: true, duration: 1000 });
   } finally {
     isUpdatingWorkout.value = false;
   }
@@ -327,7 +327,7 @@ const dublicate = async () => {
     if (response && response.id) {
       await workoutStore.setWorkouts(true);
       workoutStore.setCurrentWorkout(response.id);
-      toast.success("Workout duplicated successfully", { progressBar: true });
+      toast.success("Workout duplicated successfully", { progressBar: true, duration: 1000 });
       router.push(`/workout/${response.id}`);
     } else {
       console.error("Failed to duplicate workout");
@@ -343,7 +343,7 @@ const deleteExercise = async () => {
         workoutStore.setWorkouts(true);
         workoutStore.currentWorkout = null;
         isDeleteDialogOpen.value = false;
-        toast.success("Exercise deleted successfully", { progressBar: true });
+        toast.success("Exercise deleted successfully", { progressBar: true, duration: 1000 });
         router.push("/");
       } else {
         console.error("Failed to delete exercise");
@@ -351,7 +351,7 @@ const deleteExercise = async () => {
     }
   } catch (error) {
     console.error("Error deleting exercise:", error);
-    toast.error("Failed to delete exercise", { progressBar: true });
+    toast.error("Failed to delete exercise", { progressBar: true, duration: 1000 });
     isDeleteDialogOpen.value = false;
   }
 };
@@ -369,6 +369,7 @@ const startSession = async () => {
       router.push(`/session/${response.id}`);
     } else {
       console.error("Failed to start session:", response);
+      toast.error("Failed to start session", { progressBar: true, duration: 1000 });
     }
   }
 };
