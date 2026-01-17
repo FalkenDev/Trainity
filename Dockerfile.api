@@ -1,20 +1,25 @@
-FROM node:22-alpine
+FROM node:22-slim
 
-# Install optional dependencies (like fs tools that help file watching work better)
-RUN apk add --no-cache bash curl git
+# Install sharp dependencies for Debian ARM
+RUN apt-get update && apt-get install -y \
+    bash \
+    curl \
+    git \
+    libvips-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 COPY ./backend/package*.json ./
 
-# install devDependencies too (for ts-node-dev)
+# Install devDependencies too (for ts-node-dev)
 RUN npm install
 
-# copy rest of the code
+# Copy rest of the code
 COPY ./backend .
 
-# expose if not already
+# Expose port
 EXPOSE 1337
 
-# run dev script (with hot reload)
+# Run dev script (with hot reload)
 CMD ["npm", "run", "start:dev"]
