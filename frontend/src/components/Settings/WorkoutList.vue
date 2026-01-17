@@ -1,8 +1,5 @@
 <template>
-  <v-container
-    fluid
-    class="pa-0 bg-grey-darken-4"
-  >
+  <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
       :title="$t('workoutList.title')"
       show-menu
@@ -84,7 +81,7 @@
       </v-chip>
     </div>
 
-    <div class="content-scroll px-2">
+    <div class="flex-grow-1 overflow-y-auto px-2 pb-5">
       <v-row>
         <v-col cols="12">
           <v-card elevation="0">
@@ -357,7 +354,7 @@
         </v-list>
       </v-card>
     </v-bottom-sheet>
-  </v-container>
+  </div>
 </template>
 <script setup lang="ts">
 import type { MuscleGroup } from '@/interfaces/Exercise.interface';
@@ -551,11 +548,4 @@ function clearAllFilters() {
 
 </script>
 <style scoped>
-.content-scroll {
-  height: calc(100vh - 100px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 16px;
-}
 </style>
