@@ -15,16 +15,16 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          color="primary"
-          @click="handleAccept"
-        >
-          {{ $t('common.accept') }}
-        </v-btn>
-        <v-btn
           color="secondary"
           @click="handleCancel"
         >
           {{ $t('common.cancel') }}
+        </v-btn>
+        <v-btn
+          color="primary"
+          @click="handleAccept"
+        >
+          {{ $t('common.accept') }}
         </v-btn>
       </v-card-actions>
     </v-card>
