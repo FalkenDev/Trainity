@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -8,6 +8,7 @@ import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { UploadService } from '../upload/upload.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -43,13 +44,62 @@ export class UserService {
     userId: number,
     dto: UpdateUserDto,
   ): Promise<UserWithoutPasswordDto> {
-    const user = await this.userRepo.findOne({ where: { id: userId } });
+    const needsPassword = !!dto.newPassword;
+
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      select: needsPassword
+        ? [
+            'id',
+            'email',
+            'firstName',
+            'lastName',
+            'avatar',
+            'showRpe',
+            'password',
+            'createdAt',
+            'updatedAt',
+          ]
+        : [
+            'id',
+            'email',
+            'firstName',
+            'lastName',
+            'avatar',
+            'showRpe',
+            'createdAt',
+            'updatedAt',
+          ],
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    Object.assign(user, dto);
+    if (dto.email && dto.email !== user.email) {
+      const existing = await this.userRepo.findOne({ where: { email: dto.email } });
+      if (existing && existing.id !== userId) {
+        throw new BadRequestException('Email already in use');
+      }
+      user.email = dto.email;
+    }
+
+    if (dto.newPassword) {
+      if (!dto.currentPassword) {
+        throw new BadRequestException('Current password is required');
+      }
+      if (!user.password) {
+        throw new BadRequestException('Password not available for comparison');
+      }
+      const ok = await bcrypt.compare(dto.currentPassword, user.password);
+      if (!ok) {
+        throw new BadRequestException('Current password is incorrect');
+      }
+      user.password = await bcrypt.hash(dto.newPassword, 10);
+    }
+
+    const { currentPassword, newPassword, email, ...safeDto } = dto;
+    Object.assign(user, safeDto);
     const updated = await this.userRepo.save(user);
 
     return new UserWithoutPasswordDto(updated);

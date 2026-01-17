@@ -10,7 +10,7 @@ import { fetchWrapper } from '@/utils/fetchWrapper';
 import type { User } from '@/interfaces/User.interface';
 import i18n from '@/plugins/i18n';
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:1337/v1';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 export const useAuthStore = defineStore(
   'authStore',

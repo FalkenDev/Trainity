@@ -43,6 +43,10 @@ export default {
   navigation: {
     resumeWorkout: 'Fortsätt passet',
   },
+  home: {
+    guest: 'Gäst',
+    ready: 'Redo att köra',
+  },
   settings: {
     logout: 'Logga ut',
     content: 'Innehåll',
@@ -69,12 +73,27 @@ export default {
     chooseLanguage: 'Välj språk',
     english: 'Engelska',
     swedish: 'Svenska',
+
+    editAccount: 'Redigera konto',
+    profilePhoto: 'Profilbild',
+    profileDetails: 'Profiluppgifter',
+    fullName: 'Fullständigt namn',
+    email: 'E-post',
+    changePassword: 'Byt lösenord',
+    changePasswordHint: 'Lämna tomt om du inte vill ändra.',
+    currentPassword: 'Nuvarande lösenord',
+    currentPasswordRequired: 'Nuvarande lösenord krävs',
+    newPassword: 'Nytt lösenord',
+    confirmNewPassword: 'Bekräfta nytt lösenord',
+    accountUpdated: 'Kontot uppdaterades',
+    failedToUpdateAccount: 'Kunde inte uppdatera konto',
   },
   auth: {
     loginFailed: 'Inloggningen misslyckades. Kontrollera dina uppgifter.',
     accountCreationFailed: 'Kunde inte skapa konto',
     accountAlreadyExists: 'Det finns redan ett konto med den här e-postadressen',
     gymAccess: 'Gym Access',
+    welcomeBack: 'Välkommen tillbaka',
     welcomeBackSubtitle: 'Välkommen tillbaka! Fortsätt din resa.',
     emailAddress: 'E-postadress',
     password: 'Lösenord',
