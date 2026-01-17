@@ -3,9 +3,8 @@
     <div class="d-flex ga-3 align-center">
       <v-avatar
         color="white"
-        height="45"
         style="border-radius: 8px"
-        width="45"
+        size="42"
       >
         <v-img
           v-if="user?.avatar"
