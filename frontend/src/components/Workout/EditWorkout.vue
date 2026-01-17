@@ -74,14 +74,14 @@ const saveWorkout = async () => {
     });
     if (response) {
       workoutStore.setWorkouts(true);
-      toast.success("Workout updated successfully!", { progressBar: true });
+      toast.success("Workout updated successfully!", { progressBar: true, duration: 1000 });
       emit("close");
     } else {
       throw new Error("Failed to update workout");
     }
   } catch (error) {
     console.error("Error updating workout:", error);
-    toast.error("Failed to update workout", { progressBar: true });
+    toast.error("Failed to update workout", { progressBar: true, duration: 1000 });
   } finally {
     isLoading.value = false;
   }

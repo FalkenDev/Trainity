@@ -65,7 +65,7 @@ const saveWorkout = async () => {
     const response = await createWorkout(createWorkoutData.value);
     if (response) {
       workoutStore.setWorkouts(true);
-      toast.success("Workout created successfully!", { progressBar: true });
+      toast.success("Workout created successfully!", { progressBar: true, duration: 1000 });
       await workoutStore.setCurrentWorkout(response.id);
 
       router.push(`/workout/${response.id}`);
@@ -76,7 +76,7 @@ const saveWorkout = async () => {
     }
   } catch (error) {
     console.error("Error creating workout:", error);
-    toast.error("Failed to create workout", { progressBar: true });
+    toast.error("Failed to create workout", { progressBar: true, duration: 1000 });
   } finally {
     isLoading.value = false;
   }

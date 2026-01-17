@@ -228,6 +228,7 @@ const loadUserData = async () => {
     useRpe.value = user.showRpe ?? true;
   } catch (error) {
     console.error('Error loading user data:', error);
+    toast.error('Error loading user data', { progressBar: true, duration: 1000 });
   }
 };
 
@@ -249,11 +250,11 @@ const uploadAvatarImage = async () => {
     currentUser.value = updatedUser;
 
     await authStore.refreshUser();
-    toast.success('Avatar updated successfully!');
+    toast.success('Avatar updated successfully!', { progressBar: true, duration: 1000 });
     closeAvatarDialog();
   } catch (error) {
     console.error('Error uploading avatar:', error);
-    toast.error('Failed to upload avatar');
+    toast.error('Failed to upload avatar', { progressBar: true, duration: 1000 });
   } finally {
     isUploadingAvatar.value = false;
   }
@@ -292,10 +293,10 @@ const saveAppearancePreferences = async () => {
     const updated = await updateUser({ showRpe: useRpe.value });
     currentUser.value = updated;
     await authStore.refreshUser();
-    toast.success('Preferences saved');
+    toast.success('Preferences saved', { progressBar: true, duration: 1000 });
   } catch (error) {
     console.error('Failed saving preferences:', error);
-    toast.error('Failed to save preferences');
+    toast.error('Failed to save preferences', { progressBar: true, duration: 1000 });
     // rollback UI to last known good value
     useRpe.value = currentUser.value?.showRpe ?? true;
   } finally {

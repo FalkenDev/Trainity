@@ -236,7 +236,7 @@ const removeExercise = async () => {
     );
 
     if (response) {
-      toast.success('Exercise removed successfully!', { progressBar: true });
+      toast.success('Exercise removed successfully!', { progressBar: true, duration: 1000 });
       if (props.isViewWorkoutExercise) {
         await workoutStore.setWorkouts(true);
       } else {
@@ -247,6 +247,7 @@ const removeExercise = async () => {
       console.error('Failed to remove exercise.');
     }
   } catch (error) {
+    toast.error('Error in removeExerciseFromWorkout.', { progressBar: true, duration: 1000 });
     console.error('Error in removeExerciseFromWorkout:', error);
   }
 };
@@ -283,11 +284,11 @@ const updateExercise = async () => {
   try {
     isLoading.value = true;
     if (!editExercise.value) {
-      toast.error('No exercise data to update.');
+      toast.error('No exercise data to update.', { progressBar: true, duration: 1000 });
       return;
     }
     if (!props.workoutId) {
-      toast.error('No workout ID provided.');
+      toast.error('No workout ID provided.', { progressBar: true, duration: 1000 });
       return;
     }
 
@@ -296,7 +297,7 @@ const updateExercise = async () => {
     );
 
     if (!workoutExercise) {
-      toast.error('Could not find the exercise in the workout.');
+      toast.error('Could not find the exercise in the workout.', { progressBar: true, duration: 1000 });
       return;
     }
 
@@ -306,14 +307,14 @@ const updateExercise = async () => {
       getSanitizedExerciseDataForWorkout() || {},
     );
     if (response) {
-      toast.success('Exercise updated successfully!', { progressBar: true });
+      toast.success('Exercise updated successfully!', { progressBar: true, duration: 1000 });
       await workoutStore.setWorkouts(true);
       emit('close');
     } else {
-      toast.error('Failed to update exercise.');
+      toast.error('Failed to update exercise.', { progressBar: true, duration: 1000 });
     }
   } catch (error) {
-    toast.error('Error in updateExercise.');
+    toast.error('Error in updateExercise.', { progressBar: true, duration: 1000 });
     console.error('Error in updateExercise:', error);
   } finally {
     isLoading.value = false;
