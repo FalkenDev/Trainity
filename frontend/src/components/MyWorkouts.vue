@@ -27,16 +27,6 @@
           >
             Start empty
           </v-btn>
-          <v-btn
-            :loading="loading"
-            size="small"
-            color="primary"
-            variant="tonal"
-            prepend-icon="mdi-refresh"
-            @click="refresh"
-          >
-            Refresh
-          </v-btn>
         </div>
       </div>
     </div>
@@ -258,15 +248,6 @@ function getMuscleGroupsForWorkout(workout: Workout): string[] {
 function routeTo(id: number) {
   workoutStore.setCurrentWorkout(id);
   router.push(`/workout/${id}`);
-}
-
-async function refresh() {
-  try {
-    loading.value = true;
-    await workoutStore.setWorkouts(true);
-  } finally {
-    loading.value = false;
-  }
 }
 
 async function startEmptySession() {
