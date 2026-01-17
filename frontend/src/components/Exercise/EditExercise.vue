@@ -157,6 +157,7 @@
               type="string"
               variant="outlined"
               hide-details
+              density="compact"
             />
             <v-text-field
               v-model="editExercise.description"
@@ -164,6 +165,7 @@
               type="string"
               variant="outlined"
               hide-details
+              density="compact"
             />
             <v-select
               v-model="editExercise.muscleGroups"
@@ -174,6 +176,7 @@
               hide-details
               item-title="name"
               item-value="id"
+              density="compact"
             />
             <v-text-field
               v-model="editExercise.defaultSets"
@@ -181,6 +184,7 @@
               type="number"
               variant="outlined"
               hide-details
+              density="compact"
             />
             <v-text-field
               v-model="editExercise.defaultReps"
@@ -188,6 +192,7 @@
               type="number"
               variant="outlined"
               hide-details
+              density="compact"
             />
             <v-text-field
               v-model="editExercise.defaultPauseSeconds"
@@ -195,6 +200,7 @@
               type="number"
               variant="outlined"
               hide-details
+              density="compact"
             />
           </v-form>
         </div>

@@ -25,7 +25,7 @@
         :label="$t('common.search')"
         clearable
         hide-details
-        density="comfortable"
+        density="compact"
         class="flex-grow-1"
       />
       <v-btn
