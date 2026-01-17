@@ -2,17 +2,8 @@
   <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
       :title="$t('exerciseCatalog.addFromGlobal')"
-      show-menu
       @close="saveAndClose"
-    >
-      <template #menuAppend>
-        <v-list>
-          <v-list-item @click="isCreateExerciseOpen = true">
-            <v-list-item-title>{{ $t('exercise.createExercise') }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </template>
-    </BackHeader>
+    />
 
     <div class="d-flex flex-row mx-2 ga-5 mb-3">
       <v-text-field
