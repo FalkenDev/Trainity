@@ -65,13 +65,13 @@ export const useAuthStore = defineStore(
       fullName: string;
       email: string;
       password: string;
-    }) => {
+    }): Promise<boolean> => {
       loading.value = true;
       try {
         const firstName = registerData.fullName.split(' ')[0];
         const lastName = registerData.fullName.split(' ')[1] || '';
 
-        const response = await fetchWrapper(`${apiUrl}/auth/register`, {
+        await fetchWrapper(`${apiUrl}/auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -84,17 +84,23 @@ export const useAuthStore = defineStore(
           }),
         });
 
-        if (response instanceof Response && response.ok) {
-          router.push('/login');
-        }
+        // Auto-login after successful registration
+        await login(registerData.email, registerData.password);
+        return true;
       } catch (error) {
         console.error('Account creation failed:', error);
+        const errorMessage = error instanceof Error ? error.message : '';
+
+        if (errorMessage.includes('User already exists')) {
+          toast.error(i18n.global.t('auth.accountAlreadyExists'), { progressBar: true, duration: 1000 });
+          return false;
+        }
+
         toast.error(i18n.global.t('auth.accountCreationFailed'), { progressBar: true, duration: 1000 });
-        throw new Error('Account creation failed');
+        return false;
       } finally {
         loading.value = false;
       }
-      return null;
     };
 
     const resetStore = () => {

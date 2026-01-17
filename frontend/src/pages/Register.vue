@@ -229,9 +229,8 @@
         password: password_new.value,
       });
       if (success) {
-        // Optionally show a success message before navigating
-        alert(t('auth.accountCreatedSuccess')); // Replace with a VSnackbar or VDialog
-        router.push('/login');
+        // Registration auto-logs in via the auth store.
+        router.push('/');
       }
     }
   };

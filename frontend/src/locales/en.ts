@@ -108,6 +108,7 @@ export default {
 
     loginFailed: 'Login failed. Please check your credentials.',
     accountCreationFailed: 'Account creation failed',
+    accountAlreadyExists: 'An account with this email already exists',
   },
   errors: {
     generic: 'Something went wrong',

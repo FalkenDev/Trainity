@@ -73,6 +73,7 @@ export default {
   auth: {
     loginFailed: 'Inloggningen misslyckades. Kontrollera dina uppgifter.',
     accountCreationFailed: 'Kunde inte skapa konto',
+    accountAlreadyExists: 'Det finns redan ett konto med den här e-postadressen',
     gymAccess: 'Gym Access',
     welcomeBackSubtitle: 'Välkommen tillbaka! Fortsätt din resa.',
     emailAddress: 'E-postadress',
