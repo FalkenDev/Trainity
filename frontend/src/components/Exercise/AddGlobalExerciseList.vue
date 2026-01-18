@@ -191,6 +191,8 @@ const openInfo = (ex: GlobalExercise) => {
 
 onMounted(async () => {
   try {
+    // Refresh user exercises to get latest isCustomized state
+    await exerciseStore.setExercises(true);
     globalExercises.value = await fetchAllGlobalExercises();
   } catch (e) {
     toast.error(t('exercise.failedToLoadGlobal'), { progressBar: true, duration: 1000 });
@@ -211,6 +213,13 @@ const muscleGroups = computed(() => {
 
 const filteredGlobalExercises = computed<GlobalExercise[]>(() =>
   globalExercises.value.filter((ex) => {
+    // Hide exercises that already exist for the user (match by i18nKey)
+    // UNLESS the user has customized it - then show it again so they can re-import the original
+    const existingExercise = exerciseStore.exercises.find(
+      (userExercise) => userExercise.i18nKey === ex.i18nKey
+    );
+    if (existingExercise && !existingExercise.isCustomized) return false;
+
     const q = searchQuery.value.toLowerCase();
     const name = displayName(ex).toLowerCase();
     const desc = displayDescription(ex).toLowerCase();
@@ -233,7 +242,7 @@ const saveAndClose = async () => {
         created.length
           ? t('exerciseCatalog.addedToAccount', { count: created.length })
           : t('exerciseCatalog.nothingToAdd'),
-      );
+      { progressBar: true, duration: 1000 });
 
       emit(
         'save',
