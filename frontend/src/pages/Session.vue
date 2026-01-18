@@ -7,9 +7,6 @@
     >
       <template #menuAppend>
         <v-list>
-          <v-list-item>
-            <v-list-item-title>{{ $t('session.addNotes') }}</v-list-item-title>
-          </v-list-item>
           <v-list-item @click="isAddExerciseOpen = true">
             <v-list-item-title>{{ $t('session.addExercise') }}</v-list-item-title>
           </v-list-item>
@@ -281,6 +278,7 @@ const finnishSession = async () => {
       workoutSessionStore.selectedWorkoutSession = null;
       workoutSessionStore.resetClock();
       workoutSessionStore.clearLiveSession(sessionId.value);
+      await workoutSessionStore.setWorkoutSessions(true);
       router.push('/');
     } else {
       const finalPayload = { completedExercises, notes: '' };
@@ -290,6 +288,7 @@ const finnishSession = async () => {
       workoutSessionStore.selectedWorkoutSession = null;
       workoutSessionStore.resetClock();
       workoutSessionStore.clearLiveSession(sessionId.value);
+      await workoutSessionStore.setWorkoutSessions(true);
       router.push('/');
     }
   } catch {
