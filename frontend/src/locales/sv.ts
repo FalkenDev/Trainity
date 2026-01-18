@@ -455,6 +455,7 @@ export default {
   },
   progress: {
     title: 'Din utveckling',
+    week: 'Vecka',
     workouts: 'Träningspass',
     kcal: 'KCAL',
     minutes: 'Minuter',

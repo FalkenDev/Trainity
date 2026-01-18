@@ -462,6 +462,7 @@ export default {
   },
   progress: {
     title: 'Your progress',
+    week: 'Week',
     workouts: 'Workouts',
     kcal: 'KCAL',
     minutes: 'Minutes',
