@@ -303,13 +303,107 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <!-- Goals Dialog -->
+    <v-dialog
+      v-model="isGoalsDialogOpen"
+      fullscreen
+      transition="slide-y-transition"
+      persistent
+    >
+      <v-card class="d-flex flex-column">
+        <BackHeader
+          :title="$t('settings.goals')"
+          @close="isGoalsDialogOpen = false"
+        />
+
+        <v-card-text class="pa-5 flex-grow-1 overflow-y-auto">
+          <h2 class="text-h6 mb-2">
+            {{ $t('settings.weeklyWorkoutGoal') }}
+          </h2>
+          <p class="text-body-2 text-grey-lighten-1 mb-4">
+            {{ $t('settings.weeklyWorkoutGoalDescription') }}
+          </p>
+
+          <div class="mb-6">
+            <v-slider
+              v-model="weeklyGoal"
+              :min="1"
+              :max="7"
+              :step="1"
+              thumb-label
+              color="primary"
+              :disabled="isSavingGoal"
+            >
+              <template #append>
+                <v-text-field
+                  v-model="weeklyGoal"
+                  :disabled="isSavingGoal"
+                  type="number"
+                  :min="1"
+                  :max="7"
+                  style="width: 80px"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                />
+              </template>
+            </v-slider>
+            <p class="text-body-2 text-grey-lighten-1 mt-2">
+              {{ $t('settings.workoutsPerWeek', { count: weeklyGoal }) }}
+            </p>
+          </div>
+
+          <v-btn
+            color="primary"
+            block
+            :loading="isSavingGoal"
+            @click="saveWeeklyGoal"
+          >
+            {{ $t('common.saveChanges') }}
+          </v-btn>
+
+          <v-divider class="my-6" />
+
+          <h2 class="text-h6 mb-2">
+            {{ $t('settings.yourProgress') }}
+          </h2>
+          <p class="text-body-2 text-grey-lighten-1 mb-4">
+            {{ $t('settings.currentStreak') }}: <strong>{{ streakInfo?.currentStreak || 0 }} {{ $t('settings.weeks') }}</strong>
+          </p>
+          <p class="text-body-2 text-grey-lighten-1 mb-4">
+            {{ $t('settings.thisWeekProgress') }}: {{ streakInfo?.currentWeekWorkouts || 0 }} / {{ streakInfo?.weeklyWorkoutGoal || 3 }} {{ $t('settings.workouts') }}
+          </p>
+
+          <v-progress-linear
+            :model-value="streakInfo?.progressPercentage || 0"
+            color="success"
+            height="20"
+            rounded
+          >
+            <template #default="{ value }">
+              <strong>{{ Math.ceil(value) }}%</strong>
+            </template>
+          </v-progress-linear>
+
+          <v-alert
+            v-if="(streakInfo?.currentWeekWorkouts || 0) >= (streakInfo?.weeklyWorkoutGoal || 3)"
+            type="success"
+            variant="tonal"
+            class="mt-4"
+          >
+            {{ $t('settings.goalReachedThisWeek') }}
+          </v-alert>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script lang="ts" setup>
 import SessionList from '@/components/Settings/SessionList.vue';
 import ImageUpload from '@/components/basicUI/ImageUpload.vue';
-import { getCurrentUser, updateUser, uploadAvatar } from '@/services/user.service';
-import type { User } from '@/interfaces/User.interface';
+import { getCurrentUser, updateUser, uploadAvatar, getStreakInfo, updateWeeklyWorkoutGoal } from '@/services/user.service';
+import type { User, StreakInfo } from '@/interfaces/User.interface';
 import { toast } from 'vuetify-sonner';
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth.store';
@@ -327,9 +421,13 @@ const isAccountDialogOpen = ref(false);
 const isSavingAccount = ref(false);
 const isAppearanceOpen = ref(false);
 const isLanguageDialogOpen = ref(false);
+const isGoalsDialogOpen = ref(false);
 const isSavingPreferences = ref(false);
+const isSavingGoal = ref(false);
 const avatarFile = ref<File | null>(null);
 const currentUser = ref<User | null>(null);
+const weeklyGoal = ref(3);
+const streakInfo = ref<StreakInfo | null>(null);
 
 const accountForm = ref<VForm | null>(null);
 const fullName = ref('');
@@ -359,6 +457,11 @@ const loadUserData = async () => {
     const user = await getCurrentUser();
     currentUser.value = user;
     useRpe.value = user.showRpe ?? true;
+    weeklyGoal.value = user.weeklyWorkoutGoal ?? 3;
+    
+    // Load streak info
+    const streak = await getStreakInfo();
+    streakInfo.value = streak;
   } catch (error) {
     console.error('Error loading user data:', error);
     toast.error(t('settings.errorLoadingUserData'), { progressBar: true, duration: 1000 });
@@ -479,6 +582,9 @@ const setPreferenceDialogToOpen = async (type?: string) => {
     case 'appearance':
       isAppearanceOpen.value = true;
       break;
+    case 'goals':
+      isGoalsDialogOpen.value = true;
+      break;
     case 'language':
       isLanguageDialogOpen.value = true;
       break;
@@ -514,6 +620,34 @@ const saveAppearancePreferences = async () => {
   }
 };
 
+const saveWeeklyGoal = async () => {
+  if (isSavingGoal.value) return;
+  if (weeklyGoal.value < 1 || weeklyGoal.value > 7) {
+    toast.error(t('settings.invalidGoalValue'), { progressBar: true, duration: 1000 });
+    return;
+  }
+
+  isSavingGoal.value = true;
+  try {
+    const updated = await updateWeeklyWorkoutGoal(weeklyGoal.value);
+    currentUser.value = updated;
+    await authStore.refreshUser();
+    
+    // Refresh streak info
+    const streak = await getStreakInfo();
+    streakInfo.value = streak;
+    
+    toast.success(t('settings.goalUpdated'), { progressBar: true, duration: 1000 });
+  } catch (error) {
+    console.error('Failed saving weekly goal:', error);
+    toast.error(t('settings.failedToUpdateGoal'), { progressBar: true, duration: 1000 });
+    // rollback UI to last known good value
+    weeklyGoal.value = currentUser.value?.weeklyWorkoutGoal ?? 3;
+  } finally {
+    isSavingGoal.value = false;
+  }
+};
+
 const contentList = [
   { titleKey: 'settings.exercises', showArrow: true, type: 'exercises', disabled: false },
   { titleKey: 'settings.workouts', showArrow: true, type: 'workouts', disabled: false },
@@ -522,6 +656,7 @@ const contentList = [
 const preferencesList  = [
   { titleKey: 'settings.account', showArrow: true, disabled: false, type: 'account' },
   { titleKey: 'settings.appearance', showArrow: true, disabled: false, type: 'appearance' },
+  { titleKey: 'settings.goals', showArrow: true, disabled: false, type: 'goals' },
   { titleKey: 'settings.units', showArrow: true, disabled: true   },
   { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language'   },
   { titleKey: 'settings.help', showArrow: true, disabled: true },
