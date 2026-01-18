@@ -26,8 +26,6 @@
       </template>
     </BackHeader>
 
-    <v-card height="300" />
-
     <div class="px-5">
       <div class="py-4">
         <h1 class="text-h5 font-weight-bold">
