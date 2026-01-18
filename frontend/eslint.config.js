@@ -6,6 +6,7 @@
 
 import pluginVue from 'eslint-plugin-vue'
 import vueTsEslintConfig from '@vue/eslint-config-typescript'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
   {
@@ -21,6 +22,8 @@ export default [
   ...pluginVue.configs['flat/recommended'],
   ...vueTsEslintConfig(),
 
+  eslintConfigPrettier,
+
   {
     rules: {
       '@typescript-eslint/no-unused-expressions': [
@@ -31,6 +34,6 @@ export default [
         },
       ],
       'vue/multi-word-component-names': 'off',
-    }
-  }
+    },
+  },
 ]

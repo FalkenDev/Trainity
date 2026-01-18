@@ -1,4 +1,4 @@
-import type { CreateUser, User } from '@/interfaces/User.interface';
+import type { CreateUser, User, StreakInfo } from '@/interfaces/User.interface';
 import { fetchWrapper } from '@/utils/fetchWrapper';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
@@ -66,5 +66,28 @@ export const getCurrentUser = async () => {
   } catch (error) {
     console.error('Error fetching current user:', error);
     throw new Error('Failed to fetch current user');
+  }
+};
+export const getStreakInfo = async () => {
+  try {
+    const data = await fetchWrapper<StreakInfo>(`${apiUrl}/users/streak`);
+    return data;
+  } catch (error) {
+    console.error('Error fetching streak info:', error);
+    throw new Error('Failed to fetch streak info');
+  }
+};
+
+export const updateWeeklyWorkoutGoal = async (weeklyWorkoutGoal: number) => {
+  try {
+    const data = await fetchWrapper<User>(`${apiUrl}/users/weekly-goal`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weeklyWorkoutGoal }),
+    });
+    return data;
+  } catch (error) {
+    console.error('Error updating weekly workout goal:', error);
+    throw new Error('Failed to update weekly workout goal');
   }
 };

@@ -20,6 +20,15 @@ export class UserWithoutPasswordDto {
   @ApiProperty({ default: true })
   showRpe: boolean;
 
+  @ApiProperty({ default: 3 })
+  weeklyWorkoutGoal: number;
+
+  @ApiProperty({ default: 0 })
+  currentStreak: number;
+
+  @ApiProperty({ default: 0 })
+  currentWeekWorkouts: number;
+
   constructor(user: User) {
     this.id = user.id;
     this.email = user.email;
@@ -27,5 +36,8 @@ export class UserWithoutPasswordDto {
     this.lastName = user.lastName;
     this.avatar = user.avatar;
     this.showRpe = user.showRpe ?? true;
+    this.weeklyWorkoutGoal = user.weeklyWorkoutGoal ?? 3;
+    this.currentStreak = user.currentStreak ?? 0;
+    this.currentWeekWorkouts = user.currentWeekWorkouts ?? 0;
   }
 }

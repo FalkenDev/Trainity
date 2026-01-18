@@ -11,6 +11,7 @@ import { WorkoutSessionExercise } from './workoutSessionExercise.entity';
 import { WorkoutSessionSet } from './workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutStatus } from '../types/WorkoutStatus.type';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class WorkoutSessionService {
@@ -26,6 +27,7 @@ export class WorkoutSessionService {
     @InjectRepository(WorkoutSessionSet)
     private readonly setRepo: Repository<WorkoutSessionSet>,
     private readonly dataSource: DataSource,
+    private readonly userService: UserService,
   ) {}
 
   async getAllSessions(userId: number): Promise<WorkoutSession[]> {
@@ -277,6 +279,9 @@ export class WorkoutSessionService {
       session.exerciseStats = stats;
 
       await manager.save(WorkoutSession, session);
+
+      // Update user's streak after finishing workout
+      await this.userService.updateStreakOnWorkoutCompletion(userId);
 
       return manager.findOneOrFail(WorkoutSession, {
         where: { id: session.id },
