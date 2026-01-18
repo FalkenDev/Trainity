@@ -1,11 +1,12 @@
 FROM node:22-slim
 
-# Install sharp dependencies for Debian ARM
+# Install sharp dependencies and procps for Debian ARM
 RUN apt-get update && apt-get install -y \
     bash \
     curl \
     git \
     libvips-dev \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

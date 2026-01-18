@@ -23,6 +23,7 @@ export class ExerciseService {
       name: exercise.name,
       i18nKey: exercise.i18nKey,
       isNameCustom: exercise.isNameCustom,
+      isCustomized: exercise.isCustomized,
       globalExerciseId: exercise.globalExercise?.id,
       description: exercise.description,
       image: exercise.image,

@@ -2,16 +2,13 @@
   <div>
     <BackHeader
       :show-menu="true"
-      title="Workout Session"
+      :title="$t('session.workoutSessionTitle')"
       :route-to="'/'"
     >
       <template #menuAppend>
         <v-list>
-          <v-list-item>
-            <v-list-item-title>Add Notes</v-list-item-title>
-          </v-list-item>
           <v-list-item @click="isAddExerciseOpen = true">
-            <v-list-item-title>Add Exercise</v-list-item-title>
+            <v-list-item-title>{{ $t('session.addExercise') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
@@ -26,7 +23,7 @@
         :loading="isLoading"
         @click="finnishSession"
       >
-        Finnish
+        {{ $t('session.finish') }}
       </v-btn>
     </div>
 
@@ -54,14 +51,14 @@
         color="secondary"
         @click="isAddExerciseOpen = true"
       >
-        Add Exercise
+        {{ $t('session.addExercise') }}
       </v-btn>
       <v-btn
         color="primary"
         :loading="isLoading"
         @click="finnishSession"
       >
-        Finish Session
+        {{ $t('session.finishSession') }}
       </v-btn>
     </div>
 
@@ -82,6 +79,7 @@
 <script lang="ts" setup>
 import router from '@/router';
 import { toast } from 'vuetify-sonner';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '@/stores/auth.store';
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 import type {
@@ -97,6 +95,7 @@ import {
 } from '@/services/workoutSession.service';
 
 const isAddExerciseOpen = ref(false);
+const { t } = useI18n({ useScope: 'global' });
 const workoutSessionStore = useWorkoutSessionStore();
 const authStore = useAuthStore();
 const processedExercises = ref<Exercise[]>([]);
@@ -121,7 +120,7 @@ function liveSets(exerciseId: number): WorkoutSet[] {
     weight: s.weight,
     reps: s.reps,
     done: s.done,
-    previous: s.previous ?? 'N/A',
+    previous: s.previous ?? t('common.na'),
   })) : [];
 }
 
@@ -246,7 +245,7 @@ function onAddSet(exerciseId: number) {
 const finnishSession = async () => {
   if (isLoading.value) return;
   if (!workoutSession.value?.id) {
-    toast.error('Active session not found.');
+    toast.error(t('session.activeNotFound'), { progressBar: true, duration: 1000 });
     return;
   }
 
@@ -274,24 +273,26 @@ const finnishSession = async () => {
   try {
     if (completedExercises.length === 0) {
       await abandonWorkoutSession(sessionId.value);
-      toast.info('No exercises completed. Session abandoned.');
+      toast.info(t('session.noExercisesCompleted'), { progressBar: true, duration: 1000 });
       workoutSessionStore.stopClock();
       workoutSessionStore.selectedWorkoutSession = null;
       workoutSessionStore.resetClock();
       workoutSessionStore.clearLiveSession(sessionId.value);
+      await workoutSessionStore.setWorkoutSessions(true);
       router.push('/');
     } else {
       const finalPayload = { completedExercises, notes: '' };
       await finishWorkoutSession(sessionId.value, finalPayload);
-      toast.success('Workout session finished successfully!');
+      toast.success(t('session.finished'), { progressBar: true, duration: 1000 });
       workoutSessionStore.stopClock();
       workoutSessionStore.selectedWorkoutSession = null;
       workoutSessionStore.resetClock();
       workoutSessionStore.clearLiveSession(sessionId.value);
+      await workoutSessionStore.setWorkoutSessions(true);
       router.push('/');
     }
   } catch {
-    toast.error('An error occurred while finishing the session.');
+    toast.error(t('session.finishError'), { progressBar: true, duration: 1000 });
   } finally {
     isLoading.value = false;
   }

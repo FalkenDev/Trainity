@@ -31,10 +31,10 @@
             >
               mdi-dumbbell
             </v-icon>
-            Gym Access
+            {{ $t('auth.gymAccess') }}
           </v-card-title>
           <v-card-subtitle class="text-center mb-8">
-            Welcome back! Fuel your journey.
+            {{ $t('auth.welcomeBack') }}
           </v-card-subtitle>
 
           <v-form
@@ -45,7 +45,7 @@
               v-model="email"
               class="mb-4"
               autocomplete="email"
-              label="Email Address"
+              :label="$t('auth.emailAddress')"
               prepend-inner-icon="mdi-email-outline"
               required
               :rules="emailRules"
@@ -57,7 +57,7 @@
               v-model="password"
               :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
               class="mb-4"
-              label="Password"
+              :label="$t('auth.password')"
               autocomplete="current-password"
               prepend-inner-icon="mdi-lock-outline"
               required
@@ -83,12 +83,12 @@
               >
                 mdi-login-variant
               </v-icon>
-              Login
+              {{ $t('auth.login') }}
             </v-btn>
           </v-form>
 
           <div class="text-center">
-            <span class="text-grey-darken-1">Don't have an account?</span>
+            <span class="text-grey-darken-1">{{ $t('auth.dontHaveAccount') }}</span>
             <v-btn
               class="pl-1 text-capitalize"
               color="primary"
@@ -96,7 +96,7 @@
               variant="text"
               @click="navigateToCreateAccount"
             >
-              Sign Up
+              {{ $t('auth.signUp') }}
             </v-btn>
           </div>
         </v-card>
@@ -110,10 +110,12 @@
   import { useAuthStore } from '@/stores/auth.store';
   import type { VForm } from 'vuetify/components';
   import { useDisplay } from 'vuetify';
+  import { useI18n } from 'vue-i18n';
 
   const { smAndUp } = useDisplay();
   const router = useRouter();
   const authStore = useAuthStore();
+  const { t } = useI18n({ useScope: 'global' });
 
   const form = ref<VForm | null>(null);
   const email = ref('');
@@ -121,10 +123,10 @@
   const showPassword = ref(false);
 
   const emailRules = [
-    (v: string) => !!v || 'Email is required',
-    (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+    (v: string) => !!v || t('auth.emailRequired'),
+    (v: string) => /.+@.+\..+/.test(v) || t('auth.emailValid'),
   ];
-  const passwordRules = [(v: string) => !!v || 'Password is required'];
+  const passwordRules = [(v: string) => !!v || t('auth.passwordRequired')];
 
   const handleLogin = async () => {
     if (!form.value) return;

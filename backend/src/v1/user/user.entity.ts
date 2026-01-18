@@ -32,6 +32,18 @@ export class User {
   @Column({ default: true })
   showRpe: boolean;
 
+  @Column({ default: 3 })
+  weeklyWorkoutGoal: number;
+
+  @Column({ default: 0 })
+  currentStreak: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastStreakCheckDate: Date;
+
+  @Column({ default: 0 })
+  currentWeekWorkouts: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

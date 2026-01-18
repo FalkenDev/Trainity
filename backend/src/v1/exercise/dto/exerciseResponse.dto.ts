@@ -22,6 +22,12 @@ export class ExerciseResponseDto {
 
   @ApiProperty({
     required: false,
+    description: 'If true, the user has customized this exercise after importing it',
+  })
+  isCustomized?: boolean;
+
+  @ApiProperty({
+    required: false,
     description:
       'If created from a global exercise, this is the source globalExercise id',
   })

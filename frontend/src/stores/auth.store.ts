@@ -8,8 +8,9 @@ import { useMuscleGroupStore } from './muscleGroup.store';
 import { useWorkoutSessionStore } from './workoutSession.store';
 import { fetchWrapper } from '@/utils/fetchWrapper';
 import type { User } from '@/interfaces/User.interface';
+import i18n from '@/plugins/i18n';
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:1337/v1';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 export const useAuthStore = defineStore(
   'authStore',
@@ -47,7 +48,7 @@ export const useAuthStore = defineStore(
         return data;
       } catch (error) {
         console.error('Login failed:', error);
-        toast.error('Login failed. Please check your credentials.');
+        toast.error(i18n.global.t('auth.loginFailed'), { progressBar: true, duration: 1000 });
         isAuthenticated.value = false;
         throw error;
       } finally {
@@ -64,13 +65,13 @@ export const useAuthStore = defineStore(
       fullName: string;
       email: string;
       password: string;
-    }) => {
+    }): Promise<boolean> => {
       loading.value = true;
       try {
         const firstName = registerData.fullName.split(' ')[0];
         const lastName = registerData.fullName.split(' ')[1] || '';
 
-        const response = await fetchWrapper(`${apiUrl}/auth/register`, {
+        await fetchWrapper(`${apiUrl}/auth/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -83,16 +84,23 @@ export const useAuthStore = defineStore(
           }),
         });
 
-        if (response instanceof Response && response.ok) {
-          router.push('/login');
-        }
+        // Auto-login after successful registration
+        await login(registerData.email, registerData.password);
+        return true;
       } catch (error) {
         console.error('Account creation failed:', error);
-        throw new Error('Account creation failed');
+        const errorMessage = error instanceof Error ? error.message : '';
+
+        if (errorMessage.includes('User already exists')) {
+          toast.error(i18n.global.t('auth.accountAlreadyExists'), { progressBar: true, duration: 1000 });
+          return false;
+        }
+
+        toast.error(i18n.global.t('auth.accountCreationFailed'), { progressBar: true, duration: 1000 });
+        return false;
       } finally {
         loading.value = false;
       }
-      return null;
     };
 
     const resetStore = () => {

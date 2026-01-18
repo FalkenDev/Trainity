@@ -31,10 +31,10 @@
             >
               mdi-account-plus-outline
             </v-icon>
-            Join The Movement
+            {{ $t('auth.joinMovement') }}
           </v-card-title>
           <v-card-subtitle class="text-center mb-8">
-            Create your account to start your fitness journey.
+            {{ $t('auth.createAccountSubtitle') }}
           </v-card-subtitle>
 
           <v-form
@@ -45,7 +45,7 @@
               v-model="fullName"
               autocomplete="name"
               class="mb-4"
-              label="Full Name"
+              :label="$t('auth.fullName')"
               prepend-inner-icon="mdi-account-outline"
               required
               :rules="nameRules"
@@ -56,7 +56,7 @@
               v-model="email"
               class="mb-4"
               autocomplete="email"
-              label="Email Address"
+              :label="$t('auth.emailAddress')"
               prepend-inner-icon="mdi-email-outline"
               required
               :rules="emailRules"
@@ -68,7 +68,7 @@
               v-model="password_new"
               :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
               class="mb-4"
-              label="Password"
+              :label="$t('auth.password')"
               autocomplete="new-password"
               prepend-inner-icon="mdi-lock-outline"
               required
@@ -84,7 +84,7 @@
                 showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'
               "
               class="mb-4"
-              label="Confirm Password"
+              :label="$t('auth.confirmPassword')"
               autocomplete="new-password"
               prepend-inner-icon="mdi-lock-check-outline"
               required
@@ -98,15 +98,15 @@
               v-model="agreeToTerms"
               class="mb-2"
               required
-              :rules="[(v: boolean) => !!v || 'You must agree to continue!']"
+              :rules="[(v: boolean) => !!v || t('auth.mustAgreeToContinue')]"
             >
               <template #label>
                 <div class="text-body-2">
-                  I agree to the
+                  {{ $t('auth.agreeToThe') }}
                   <a
                     href="#"
                     @click.prevent="showTermsDialog = true"
-                  >Terms & Conditions</a>
+                  >{{ $t('auth.termsAndConditions') }}</a>
                 </div>
               </template>
             </v-checkbox>
@@ -127,12 +127,12 @@
               >
                 mdi-check-circle-outline
               </v-icon>
-              Create Account
+              {{ $t('auth.createAccount') }}
             </v-btn>
           </v-form>
 
           <div class="text-center">
-            <span class="text-grey-darken-1">Already have an account?</span>
+            <span class="text-grey-darken-1">{{ $t('auth.alreadyHaveAccount') }}</span>
             <v-btn
               class="pl-1 text-capitalize"
               color="primary"
@@ -140,7 +140,7 @@
               variant="text"
               @click="navigateToLogin"
             >
-              Login
+              {{ $t('auth.login') }}
             </v-btn>
           </div>
         </v-card>
@@ -153,14 +153,13 @@
     >
       <v-card rounded="lg">
         <v-card-title class="text-h5 primary--text">
-          Terms & Conditions
+          {{ $t('auth.termsAndConditions') }}
         </v-card-title>
         <v-card-text>
           <p class="mb-4">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua...
+            {{ $t('auth.termsPlaceholder') }}
           </p>
-          <p>Please read carefully before agreeing.</p>
+          <p>{{ $t('auth.termsReadCarefully') }}</p>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -169,7 +168,7 @@
             text
             @click="showTermsDialog = false"
           >
-            Close
+            {{ $t('common.close') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -182,11 +181,13 @@
   import { useAuthStore } from '@/stores/auth.store';
   import type { VForm } from 'vuetify/components';
   import { useDisplay } from 'vuetify';
+  import { useI18n } from 'vue-i18n';
 
   const { smAndUp } = useDisplay();
 
   const router = useRouter();
   const authStore = useAuthStore();
+  const { t } = useI18n({ useScope: 'global' });
 
   const form = ref<VForm | null>(null);
   const fullName = ref('');
@@ -198,18 +199,18 @@
   const agreeToTerms = ref(false);
   const showTermsDialog = ref(false);
 
-  const nameRules = [(v: string) => !!v || 'Full name is required'];
+  const nameRules = [(v: string) => !!v || t('auth.fullNameRequired')];
   const emailRules = [
-    (v: string) => !!v || 'Email is required',
-    (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+    (v: string) => !!v || t('auth.emailRequired'),
+    (v: string) => /.+@.+\..+/.test(v) || t('auth.emailValid'),
   ];
   const passwordRules = [
-    (v: string) => !!v || 'Password is required',
-    (v: string) => v.length >= 8 || 'Password must be at least 8 characters',
+    (v: string) => !!v || t('auth.passwordRequired'),
+    (v: string) => v.length >= 8 || t('auth.passwordMinLength'),
   ];
   const confirmPasswordRules = computed(() => [
-    (v: string) => !!v || 'Confirm password is required',
-    (v: string) => v === password_new.value || 'Passwords do not match',
+    (v: string) => !!v || t('auth.confirmPasswordRequired'),
+    (v: string) => v === password_new.value || t('auth.passwordsDoNotMatch'),
   ]);
 
   const handleCreateAccount = async () => {
@@ -217,7 +218,7 @@
     const { valid } = await form.value.validate();
 
     if (password_new.value !== confirmPassword_new.value) {
-      alert('Passwords do not match!');
+      alert(t('auth.passwordsDoNotMatchAlert'));
       return;
     }
 
@@ -228,9 +229,8 @@
         password: password_new.value,
       });
       if (success) {
-        // Optionally show a success message before navigating
-        alert('Account created successfully! Please login.'); // Replace with a VSnackbar or VDialog
-        router.push('/login');
+        // Registration auto-logs in via the auth store.
+        router.push('/');
       }
     }
   };

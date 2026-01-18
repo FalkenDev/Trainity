@@ -90,7 +90,7 @@ export class UserController {
   @ApiOkResponse({ type: UserWithoutPasswordDto })
   @UseInterceptors(FileInterceptor('file', { storage: undefined }))
   async uploadAvatar(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Req() req: RequestWithUser,
   ): Promise<UserWithoutPasswordDto> {
     if (!req.user?.id) {
@@ -109,5 +109,41 @@ export class UserController {
     const avatarUrl = await this.uploadService.processAvatarImage(file);
 
     return this.userService.updateAvatar(+req.user.id, avatarUrl);
+  }
+
+  @Get('streak')
+  @ApiOperation({ summary: 'Get user streak information' })
+  @ApiOkResponse({
+    description: 'User streak information',
+    schema: {
+      example: {
+        currentStreak: 5,
+        weeklyWorkoutGoal: 3,
+        currentWeekWorkouts: 2,
+        progressPercentage: 67,
+      },
+    },
+  })
+  getStreak(@Req() req: RequestWithUser) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.userService.getStreakInfo(+req.user.id);
+  }
+
+  @Put('weekly-goal')
+  @ApiOperation({ summary: 'Update weekly workout goal' })
+  @ApiOkResponse({ type: UserWithoutPasswordDto })
+  updateWeeklyGoal(
+    @Req() req: RequestWithUser,
+    @Body() body: { weeklyWorkoutGoal: number },
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.userService.updateWeeklyWorkoutGoal(
+      +req.user.id,
+      body.weeklyWorkoutGoal,
+    );
   }
 }

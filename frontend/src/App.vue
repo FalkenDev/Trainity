@@ -31,7 +31,7 @@
         mdi-chevron-up
       </v-icon>
       <h1 class="text-body-1 text-primary">
-        Resume workout
+        {{ $t('navigation.resumeWorkout') }}
       </h1>
       <div style="width: 40px" />
     </v-card>
