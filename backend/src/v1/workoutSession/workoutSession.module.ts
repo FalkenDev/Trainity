@@ -7,6 +7,7 @@ import { WorkoutSessionController } from './workoutSession.controller';
 import { WorkoutSessionService } from './workoutSession.service';
 import { WorkoutModule } from '../workout/workout.module';
 import { ExerciseModule } from '../exercise/exercise.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ExerciseModule } from '../exercise/exercise.module';
       WorkoutSessionSet,
     ]),
     forwardRef(() => WorkoutModule),
+    forwardRef(() => UserModule),
     ExerciseModule,
   ],
   providers: [WorkoutSessionService],

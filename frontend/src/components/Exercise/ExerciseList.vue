@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
-      title="Exercises"
+      :title="$t('settings.exercises')"
       show-menu
       :loading="isLoading"
       @close="emit('close')"
@@ -9,10 +9,10 @@
       <template #menuAppend>
         <v-list>
           <v-list-item @click="isAddGlobalExercisesOpen = true">
-            <v-list-item-title>Add from global list</v-list-item-title>
+            <v-list-item-title>{{ $t('exerciseCatalog.addFromGlobalShort') }}</v-list-item-title>
           </v-list-item>
           <v-list-item @click="isCreateExerciseOpen = true">
-            <v-list-item-title>Create exercise</v-list-item-title>
+            <v-list-item-title>{{ $t('exercise.createExercise') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </template>
@@ -22,7 +22,7 @@
         v-model="searchQuery"
         variant="outlined"
         prepend-inner-icon="mdi-magnify"
-        label="Search exercises"
+        :label="$t('exercise.searchExercises')"
         clearable
         hide-details
         density="compact"
@@ -37,7 +37,7 @@
           height="40"
           variant="outlined"
         >
-          Filter
+          {{ $t('common.filter') }}
           <v-menu
             activator="parent"
             :close-on-content-click="false"
@@ -54,7 +54,7 @@
                   >
                     mdi-close
                   </v-icon>
-                  Reset
+                  {{ $t('common.reset') }}
                 </v-list-item-title>
               </v-list-item>
               <v-divider />
@@ -88,7 +88,7 @@
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-3">
             <v-list-item-title class="text-body-1 font-weight-bold">
-              {{ exercise.name }}
+              {{ displayName(exercise) }}
             </v-list-item-title>
           </div>
           <div>
@@ -108,7 +108,7 @@
             <v-list-item-title
               class="text-body-1 font-weight-bold text-grey-lighten-1"
             >
-              Create new exercise
+              {{ $t('exercise.createNewExercise') }}
             </v-list-item-title>
           </div>
           <div>
@@ -149,10 +149,13 @@ import type { Exercise } from '@/interfaces/Exercise.interface';
 import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface';
 import { useExerciseStore } from '@/stores/exercise.store';
 import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
+import { useI18n } from 'vue-i18n';
+import { displayExerciseName } from '@/utils/exerciseDisplay';
 
 const muscleGroupStore = useMuscleGroupStore();
 const searchQuery = ref<string>('');
 const exerciseStore = useExerciseStore();
+const { t } = useI18n({ useScope: 'global' });
 const isLoading = ref<boolean>(false);
 const viewExercise = ref<Exercise | null>(null);
 const isViewExerciseOpen = ref<boolean>(false);
@@ -172,6 +175,8 @@ const muscleGroups = computed(() => {
 
 const selectedMuscleGroups = ref<number[]>([]);
 
+const displayName = (exercise: Exercise) => displayExerciseName({ t }, exercise);
+
 const openViewExercise = (exercise: Exercise) => {
   viewExercise.value = exercise;
   isViewExerciseOpen.value = true;
@@ -179,11 +184,11 @@ const openViewExercise = (exercise: Exercise) => {
 
 const exercises = computed<Exercise[]>(() =>
   exerciseStore.exercises.filter((exercise: Exercise) => {
+    const name = displayName(exercise).toLowerCase();
+    const desc = (exercise.description ?? '').toLowerCase();
     const matchesSearch =
-      exercise.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      (exercise.description ?? '')
-        .toLowerCase()
-        .includes(searchQuery.value.toLowerCase());
+      name.includes(searchQuery.value.toLowerCase()) ||
+      desc.includes(searchQuery.value.toLowerCase());
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||

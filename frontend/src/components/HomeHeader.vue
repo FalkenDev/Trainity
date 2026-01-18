@@ -3,9 +3,8 @@
     <div class="d-flex ga-3 align-center">
       <v-avatar
         color="white"
-        height="45"
         style="border-radius: 8px"
-        width="45"
+        size="42"
       >
         <v-img
           v-if="user?.avatar"
@@ -22,10 +21,10 @@
       </v-avatar>
       <div>
         <h1 class="text-h6">
-          {{ user ? user.firstName + " " + user.lastName : "Guest" }}
+          {{ user ? user.firstName + " " + user.lastName : $t('home.guest') }}
         </h1>
         <p class="text-body-2">
-          Lets Get Ready 💪
+          {{ $t('home.ready') }}
         </p>
       </div>
     </div>
@@ -40,7 +39,7 @@
       <v-menu activator="parent">
         <v-list>
           <v-list-item @click="authStore.logout">
-            <v-list-item-title>Logout</v-list-item-title>
+            <v-list-item-title>{{ $t('settings.logout') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>

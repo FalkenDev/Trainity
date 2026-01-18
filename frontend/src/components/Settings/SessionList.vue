@@ -1,10 +1,7 @@
 <template>
-  <v-container
-    fluid
-    class="pa-0 bg-grey-darken-4"
-  >
+  <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
-      title="Workout Sessions"
+      :title="$t('sessionList.title')"
       show-menu
       @close="emit('close')"
     />
@@ -19,7 +16,7 @@
                   v-model="searchQuery"
                   variant="outlined"
                   prepend-inner-icon="mdi-magnify"
-                  label="Search exercises"
+                  :label="$t('common.search')"
                   clearable
                   hide-details
                   density="compact"
@@ -27,7 +24,7 @@
                 />
               </div>
               <div class="text-caption text-medium-emphasis">
-                {{ sessions.length }} total
+                {{ sessions.length }} {{ $t('common.total') }}
               </div>
             </v-card-title>
 
@@ -49,11 +46,11 @@
                           {{ title(session) }}
                         </div>
                         <div class="text-caption text-medium-emphasis">
-                          Started: {{ formatDateTime(session.startedAt) }}
+                          {{ $t('sessionList.started') }}: {{ formatDateTime(session.startedAt) }}
                           <span v-if="session.endedAt">
-                            • Ended: {{ formatDateTime(session.endedAt) }}
+                            • {{ $t('sessionList.ended') }}: {{ formatDateTime(session.endedAt) }}
                           </span>
-                          • Duration:
+                          • {{ $t('sessionList.duration') }}:
                           {{
                             durationMinutes(
                               session.startedAt,
@@ -70,14 +67,14 @@
                           variant="flat"
                           class="text-uppercase"
                         >
-                          {{ session.status.replace('_', ' ') }}
+                          {{ statusLabel(session.status) }}
                         </v-chip>
 
                         <v-chip
                           size="small"
                           variant="outlined"
                         >
-                          Total: {{ session.totalWeight }} kg
+                          {{ $t('sessionList.totalWeight') }}: {{ session.totalWeight }} {{ $t('units.kgShort') }}
                         </v-chip>
                       </div>
                     </div>
@@ -92,7 +89,7 @@
                         <div class="text-body-2">
                           {{
                             session.workoutSnapshot?.description ||
-                              'No description'
+                              $t('common.noDescription')
                           }}
                         </div>
                       </v-col>
@@ -102,8 +99,8 @@
                         class="d-flex justify-end"
                       >
                         <div class="text-caption text-medium-emphasis">
-                          Created: {{ formatDateTime(session.createdAt) }} •
-                          Updated: {{ formatDateTime(session.updatedAt) }}
+                          {{ $t('common.createdAt') }}: {{ formatDateTime(session.createdAt) }} •
+                          {{ $t('common.updatedAt') }}: {{ formatDateTime(session.updatedAt) }}
                         </div>
                       </v-col>
                     </v-row>
@@ -111,7 +108,7 @@
                     <v-divider class="my-2" />
 
                     <div class="text-subtitle-2 mb-2">
-                      Exercises
+                      {{ $t('sessionList.exercises') }}
                     </div>
                     <v-row>
                       <v-col
@@ -126,7 +123,7 @@
                           <div class="d-flex justify-space-between align-start">
                             <div>
                               <div class="text-subtitle-2">
-                                {{ ex.exerciseSnapshot?.name || 'Exercise' }}
+                                {{ ex.exerciseSnapshot?.name || $t('sessionList.exerciseFallback') }}
                               </div>
                               <div class="text-caption text-medium-emphasis">
                                 {{ ex.exerciseSnapshot?.description || '' }}
@@ -134,7 +131,7 @@
                             </div>
 
                             <div class="text-caption text-medium-emphasis">
-                              Sets: {{ ex.sets?.length || 0 }}
+                              {{ $t('sessionList.sets') }}: {{ ex.sets?.length || 0 }}
                             </div>
                           </div>
 
@@ -145,13 +142,13 @@
                             <thead>
                               <tr>
                                 <th class="text-left">
-                                  Set
+                                  {{ $t('table.set') }}
                                 </th>
                                 <th class="text-left">
-                                  Weight (kg)
+                                  {{ $t('sessionList.weightKg') }}
                                 </th>
                                 <th class="text-left">
-                                  Reps
+                                  {{ $t('table.reps') }}
                                 </th>
                               </tr>
                             </thead>
@@ -169,7 +166,7 @@
                                   colspan="5"
                                   class="text-medium-emphasis"
                                 >
-                                  No sets recorded
+                                  {{ $t('sessionList.noSetsRecorded') }}
                                 </td>
                               </tr>
                             </tbody>
@@ -182,7 +179,7 @@
 
                     <div class="d-flex align-center justify-space-between mt-4">
                       <div class="text-caption">
-                        Session notes: {{ session.notes || '—' }}
+                        {{ $t('sessionList.sessionNotes') }}: {{ session.notes || '—' }}
                       </div>
                       <v-btn
                         color="error"
@@ -191,7 +188,7 @@
                         prepend-icon="mdi-delete"
                         @click="handleDelete(session.id)"
                       >
-                        Delete
+                        {{ $t('common.delete') }}
                       </v-btn>
                     </div>
                   </v-expansion-panel-text>
@@ -203,19 +200,22 @@
               class="py-10"
             >
               <p class="text-center text-subtitle text-medium-emphasis">
-                No sessions found
+                {{ $t('sessionList.noSessionsFound') }}
               </p>
             </div>
           </v-card>
         </v-col>
       </v-row>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n({ useScope: 'global' });
 
 const searchQuery = ref('');
 const store = useWorkoutSessionStore();
@@ -259,7 +259,12 @@ function durationMinutes(start?: string, end?: string) {
   const s = new Date(start).getTime();
   const e = end ? new Date(end).getTime() : Date.now();
   const mins = Math.max(0, Math.round((e - s) / 60000));
-  return `${mins} min`;
+  return `${mins} ${t('units.minShort')}`;
+}
+
+function statusLabel(status: WorkoutSession['status']) {
+  const key = `session.status.${status}` as const;
+  return t(key);
 }
 
 function statusColor(status: WorkoutSession['status']) {
@@ -282,7 +287,7 @@ function title(session: WorkoutSession) {
 async function handleDelete(sessionId: number) {
   if (
     confirm(
-      'Are you sure you want to delete this session? This action cannot be undone.',
+      t('sessionList.deleteConfirm'),
     )
   ) {
     await store.deleteSession(sessionId);

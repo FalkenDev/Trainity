@@ -7,13 +7,13 @@
       <div class="d-flex align-center justify-space-between">
         <div>
           <div class="text-overline text-secondary">
-            Workouts
+            {{ $t('myWorkouts.workoutsHeading') }}
           </div>
           <h1 class="text-h6 font-weight-bold mb-0">
-            My Workouts
+            {{ $t('myWorkouts.title') }}
           </h1>
           <div class="text-caption text-medium-emphasis mt-1">
-            {{ workouts.length }} total
+            {{ workouts.length }} {{ $t('common.total') }}
           </div>
         </div>
         <div class="d-flex ga-2">
@@ -25,17 +25,7 @@
             prepend-icon="mdi-play"
             @click="startEmptySession"
           >
-            Start empty
-          </v-btn>
-          <v-btn
-            :loading="loading"
-            size="small"
-            color="primary"
-            variant="tonal"
-            prepend-icon="mdi-refresh"
-            @click="refresh"
-          >
-            Refresh
+            {{ $t('myWorkouts.startEmpty') }}
           </v-btn>
         </div>
       </div>
@@ -99,9 +89,9 @@
                 </div>
 
                 <div class="text-caption text-medium-emphasis mt-1 d-flex align-center ga-3">
-                  <span>{{ workout.exercises.length }} exercises</span>
+                  <span>{{ workout.exercises.length }} {{ $t('myWorkouts.exercisesUnit') }}</span>
                   <span class="dot" />
-                  <span>{{ workout.time }} min</span>
+                  <span>{{ workout.time }} {{ $t('units.minShort') }}</span>
                 </div>
 
                 <!-- Muscle groups -->
@@ -135,7 +125,7 @@
             <div class="d-flex align-center justify-space-between mt-3">
               <div class="text-caption text-medium-emphasis">
                 <!-- TODO: FEAT: Maybe have Latest Update instead -->
-                Created
+                {{ $t('myWorkouts.created') }}
                 {{
                   new Date(workout.createdAt as any).toLocaleDateString(undefined, {
                     month: 'short',
@@ -149,17 +139,9 @@
                   variant="text"
                   color="primary"
                   prepend-icon="mdi-play"
+                  @click="startSession(workout.id)"
                 >
-                  Start
-                </v-btn>
-                <v-btn
-                  size="small"
-                  variant="text"
-                  color="secondary"
-                  prepend-icon="mdi-content-duplicate"
-                  @click.stop="$router.push(`/workouts/${workout.id}/duplicate`)"
-                >
-                  Duplicate
+                  {{ $t('common.start') }}
                 </v-btn>
               </div>
             </div>
@@ -184,17 +166,17 @@
             mdi-dumbbell
           </v-icon>
           <div class="text-subtitle-1 font-weight-medium mt-2">
-            No workouts yet
+            {{ $t('myWorkouts.emptyTitle') }}
           </div>
           <div class="text-body-2 text-medium-emphasis mt-1">
-            Create your first workout and start training.
+            {{ $t('myWorkouts.emptyDescription') }}
           </div>
           <v-btn
             class="mt-4"
             color="primary"
             @click="isCreateWorkoutOpen = true"
           >
-            Create Workout
+            {{ $t('myWorkouts.createWorkout') }}
           </v-btn>
         </div>
       </v-card>
@@ -204,7 +186,7 @@
       size="large"
       @click="isWorkoutListOpen = true"
     >
-      Show all workouts
+      {{ $t('myWorkouts.showAllWorkouts') }}
     </v-btn>
     <v-dialog
       v-model="isWorkoutListOpen"
@@ -227,12 +209,15 @@
 import { useRouter } from 'vue-router';
 import { useWorkoutStore } from '@/stores/workout.store';
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
-import { startEmptyWorkoutSession } from '@/services/workoutSession.service';
+import { startEmptyWorkoutSession, startWorkoutSession } from '@/services/workoutSession.service';
 import type { Workout } from '@/interfaces/Workout.interface';
+import { toast } from "vuetify-sonner";
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
+const { t } = useI18n();
 
 const loading = ref(false);
 const isStartingEmptySession = ref(false);
@@ -260,14 +245,18 @@ function routeTo(id: number) {
   router.push(`/workout/${id}`);
 }
 
-async function refresh() {
-  try {
-    loading.value = true;
-    await workoutStore.setWorkouts(true);
-  } finally {
-    loading.value = false;
+async function startSession(workoutId: number) {
+  if (workoutId) {
+    const response = await startWorkoutSession(workoutId);
+    if (response && response.id) {
+      await workoutSessionStore.fetchSelectedWorkoutSession(response.id);
+      router.push(`/session/${response.id}`);
+    } else {
+      console.error("Failed to start session:", response);
+      toast.error(t('workout.failedToStartSession'), { progressBar: true, duration: 1000 });
+    }
   }
-}
+};
 
 async function startEmptySession() {
   if (isStartingEmptySession.value) return;

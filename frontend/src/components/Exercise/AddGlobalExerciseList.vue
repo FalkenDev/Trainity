@@ -1,25 +1,16 @@
 <template>
   <div class="d-flex flex-column fill-height bg-grey-darken-4">
     <BackHeader
-      title="Add From Global Exercises"
-      show-menu
+      :title="$t('exerciseCatalog.addFromGlobal')"
       @close="saveAndClose"
-    >
-      <template #menuAppend>
-        <v-list>
-          <v-list-item @click="isCreateExerciseOpen = true">
-            <v-list-item-title>Create exercise</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </template>
-    </BackHeader>
+    />
 
     <div class="d-flex flex-row mx-2 ga-5 mb-3">
       <v-text-field
         v-model="searchQuery"
         variant="outlined"
         prepend-inner-icon="mdi-magnify"
-        label="Search exercises"
+        :label="$t('exercise.searchExercises')"
         clearable
         hide-details
         density="compact"
@@ -34,7 +25,7 @@
           height="40"
           variant="outlined"
         >
-          Filter
+          {{ $t('common.filter') }}
           <v-menu
             activator="parent"
             :close-on-content-click="false"
@@ -51,7 +42,7 @@
                   >
                     mdi-close
                   </v-icon>
-                  Reset
+                  {{ $t('common.reset') }}
                 </v-list-item-title>
               </v-list-item>
               <v-divider />
@@ -93,7 +84,7 @@
               density="compact"
             />
             <v-list-item-title class="text-body-1 font-weight-bold">
-              {{ ex.defaultName }}
+              {{ displayName(ex) }}
             </v-list-item-title>
           </div>
           <div>
@@ -119,17 +110,17 @@
         mdi-dumbbell
       </v-icon>
       <h2 class="text-h6 mt-3 mb-1">
-        No exercises found
+        {{ $t('exerciseCatalog.noExercisesFound') }}
       </h2>
       <p class="text-body-2 text-grey-lighten-1">
-        Try adjusting your search or filter to find what you're looking for.
+        {{ $t('exerciseCatalog.adjustSearch') }}
       </p>
       <v-btn
         class="mt-4"
         color="primary"
         @click="isCreateExerciseOpen = true"
       >
-        Create Exercise
+        {{ $t('exercise.createExercise') }}
       </v-btn>
     </div>
   </div>
@@ -140,10 +131,10 @@
   >
     <v-card class="bg-grey-darken-4">
       <v-card-title class="text-body-1 font-weight-bold">
-        {{ infoExercise?.defaultName }}
+        {{ infoExercise ? displayName(infoExercise) : '' }}
       </v-card-title>
       <v-card-text class="text-body-2 text-grey-lighten-1">
-        {{ infoExercise?.defaultDescription || 'No description' }}
+        {{ infoExercise ? displayDescription(infoExercise) : '' }}
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -151,7 +142,7 @@
           variant="text"
           @click="isInfoOpen = false"
         >
-          Close
+          {{ $t('common.close') }}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -171,6 +162,8 @@ import { fetchAllGlobalExercises, importGlobalExercises } from '@/services/globa
 import { useExerciseStore } from '@/stores/exercise.store';
 import { useMuscleGroupStore } from '@/stores/muscleGroup.store';
 import { toast } from 'vuetify-sonner';
+import { useI18n } from 'vue-i18n';
+import { displayGlobalExerciseDescription, displayGlobalExerciseName } from '@/utils/exerciseDisplay';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -179,6 +172,7 @@ const emit = defineEmits<{
 
 const muscleGroupStore = useMuscleGroupStore();
 const exerciseStore = useExerciseStore();
+const { t } = useI18n({ useScope: 'global' });
 
 const searchQuery = ref<string>('');
 const selectedGlobalIds = ref<number[]>([]);
@@ -197,12 +191,18 @@ const openInfo = (ex: GlobalExercise) => {
 
 onMounted(async () => {
   try {
+    // Refresh user exercises to get latest isCustomized state
+    await exerciseStore.setExercises(true);
     globalExercises.value = await fetchAllGlobalExercises();
   } catch (e) {
-    toast.error('Failed to load global exercises');
+    toast.error(t('exercise.failedToLoadGlobal'), { progressBar: true, duration: 1000 });
     console.error(e);
   }
 });
+
+const displayName = (ex: GlobalExercise) => displayGlobalExerciseName({ t }, ex);
+const displayDescription = (ex: GlobalExercise) =>
+  displayGlobalExerciseDescription({ t }, ex, t('exerciseCatalog.noDescription'));
 
 const muscleGroups = computed(() => {
   return muscleGroupStore.muscleGroups.map((group) => ({
@@ -213,10 +213,17 @@ const muscleGroups = computed(() => {
 
 const filteredGlobalExercises = computed<GlobalExercise[]>(() =>
   globalExercises.value.filter((ex) => {
+    // Hide exercises that already exist for the user (match by i18nKey)
+    // UNLESS the user has customized it - then show it again so they can re-import the original
+    const existingExercise = exerciseStore.exercises.find(
+      (userExercise) => userExercise.i18nKey === ex.i18nKey
+    );
+    if (existingExercise && !existingExercise.isCustomized) return false;
+
     const q = searchQuery.value.toLowerCase();
-    const matchesSearch =
-      ex.defaultName.toLowerCase().includes(q) ||
-      (ex.defaultDescription ?? '').toLowerCase().includes(q);
+    const name = displayName(ex).toLowerCase();
+    const desc = displayDescription(ex).toLowerCase();
+    const matchesSearch = name.includes(q) || desc.includes(q);
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
@@ -233,9 +240,9 @@ const saveAndClose = async () => {
       await exerciseStore.setExercises(true);
       toast.success(
         created.length
-          ? `${created.length} exercise(s) added to your account`
-          : 'Nothing to add',
-      );
+          ? t('exerciseCatalog.addedToAccount', { count: created.length })
+          : t('exerciseCatalog.nothingToAdd'),
+      { progressBar: true, duration: 1000 });
 
       emit(
         'save',
@@ -245,7 +252,7 @@ const saveAndClose = async () => {
       );
     }
   } catch (e) {
-    toast.error('Failed to add exercises');
+    toast.error(t('exercise.failedToAdd'), { progressBar: true, duration: 1000 });
     console.error(e);
   } finally {
     emit('close');
