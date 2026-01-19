@@ -45,6 +45,7 @@
         required
         class="mt-3"
         variant="outlined"
+        @update:model-value="val => newExercise.defaultSets = parseInt(val, 10) || 1"
       />
       <v-text-field
         v-model="newExercise.defaultReps"
@@ -54,6 +55,7 @@
         required
         class="mt-3"
         variant="outlined"
+        @update:model-value="val => newExercise.defaultReps = parseInt(val, 10) || 1"
       />
       <v-text-field
         v-model="newExercise.defaultPauseSeconds"
@@ -63,6 +65,7 @@
         required
         class="mt-3"
         variant="outlined"
+        @update:model-value="val => newExercise.defaultPauseSeconds = parseInt(val, 10) || 0"
       />
       <v-btn
         color="primary"
