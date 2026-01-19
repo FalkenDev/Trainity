@@ -8,6 +8,7 @@ import Session from '@/pages/Session.vue';
 import Calendar from '@/pages/Calendar.vue';
 import Settings from '@/pages/Settings.vue';
 import AddWorkout from '@/pages/AddWorkout.vue';
+import LogActivity from '@/pages/LogActivity.vue';
 
 const routes = [
   {
@@ -36,6 +37,12 @@ const routes = [
     path: '/workout',
     name: 'Workout',
     component: AddWorkout,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/log-activity',
+    name: 'LogActivity',
+    component: LogActivity,
     meta: { requiresAuth: true },
   },
   {
