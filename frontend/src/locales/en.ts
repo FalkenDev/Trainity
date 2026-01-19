@@ -162,6 +162,8 @@ export default {
     updatedNoBang: 'Workout updated successfully',
     duplicated: 'Workout duplicated successfully',
     failedToStartSession: 'Failed to start session',
+    exercisesReordered: 'Exercises reordered successfully',
+    failedToReorder: 'Failed to reorder exercises',
   },
   exercise: {
     createExercise: 'Create exercise',
@@ -382,6 +384,7 @@ export default {
     exerciseDetails: 'Exercise details',
     addSet: 'Add set',
     deleteExercise: 'Delete exercise',
+    moveToTop: 'Move to top',
     rpeLabel: 'RPE (Rate of Perceived Exertion)',
     updateSubsequentSets: 'Update subsequent sets?',
     updateSetsPrompt: 'Do you want to update sets {sets} with {weight}kg and {reps} reps?',

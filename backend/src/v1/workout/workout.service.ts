@@ -86,6 +86,27 @@ export class WorkoutService {
     return { message: 'Exercises removed successfully' };
   }
 
+  async reorderExercises(
+    workoutId: number,
+    exercises: Array<{ workoutExerciseId: number; order: number }>,
+    userId: number,
+  ): Promise<WorkoutResponseDto> {
+    const workout = await this.findWorkoutForUser(workoutId, userId);
+
+    // Update each exercise's order
+    for (const exerciseOrder of exercises) {
+      await this.workoutExerciseRepo.update(
+        {
+          id: exerciseOrder.workoutExerciseId,
+          workout: { id: workout.id },
+        },
+        { order: exerciseOrder.order },
+      );
+    }
+
+    return this.getWorkout(workoutId, userId);
+  }
+
   async updateExerciseInWorkout(
     workoutId: number,
     workoutExerciseId: number,
