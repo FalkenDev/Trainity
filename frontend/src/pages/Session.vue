@@ -44,6 +44,7 @@
         @update:rpe="showRpe && onUpdateMeta(exercise.exerciseId, { rpe: $event })"
         @update:notes="onUpdateMeta(exercise.exerciseId, { notes: $event })"
         @move-to-top="onMoveToTop(exercise.exerciseId)"
+        @view-details="onViewExerciseDetails(exercise.exerciseId)"
       />
     </div>
 
@@ -74,6 +75,19 @@
         @save="updateWorkoutSessionExercises"
       />
     </v-dialog>
+
+    <v-dialog
+      v-model="isViewExerciseDetailsOpen"
+      fullscreen
+    >
+      <EditExercise
+        v-if="isViewExerciseDetailsOpen && viewExerciseDetails"
+        :selected-exercise="viewExerciseDetails"
+        :is-view-exercise="true"
+        :hide-menu="true"
+        @close="onCloseExerciseDetails"
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -96,6 +110,8 @@ import {
 } from '@/services/workoutSession.service';
 
 const isAddExerciseOpen = ref(false);
+const isViewExerciseDetailsOpen = ref(false);
+const viewExerciseDetails = ref<Exercise | null>(null);
 const { t } = useI18n({ useScope: 'global' });
 const workoutSessionStore = useWorkoutSessionStore();
 const authStore = useAuthStore();
@@ -252,6 +268,19 @@ const onMoveToTop = (exerciseId: number) => {
     exercises.unshift(exercise);
     processedExercises.value = exercises;
   }
+};
+
+const onViewExerciseDetails = (exerciseId: number) => {
+  const exercise = processedExercises.value.find((e) => e.exerciseId === exerciseId);
+  if (exercise) {
+    viewExerciseDetails.value = exercise;
+    isViewExerciseDetailsOpen.value = true;
+  }
+};
+
+const onCloseExerciseDetails = () => {
+  isViewExerciseDetailsOpen.value = false;
+  viewExerciseDetails.value = null;
 };
 
 const finnishSession = async () => {

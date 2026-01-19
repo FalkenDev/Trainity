@@ -4,7 +4,7 @@
     style="height: 150vh;"
   >
     <BackHeader
-      :show-menu="true"
+      :show-menu="!props.hideMenu"
       :title="
         isViewExercise
           ? $t('exerciseForm.viewTitle')
@@ -254,6 +254,7 @@ const props = defineProps<{
   workoutId?: number;
   selectedExercise: Exercise | null;
   isViewExercise: boolean;
+  hideMenu?: boolean;
 }>();
 
 const isViewExercise = ref(props.isViewExercise);

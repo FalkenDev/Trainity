@@ -39,7 +39,7 @@
             </v-icon>
           </template>
           <v-list>
-            <v-list-item disabled>
+            <v-list-item @click="$emit('view-details')">
               <v-list-item-title>{{ $t('session.exerciseDetails') }}</v-list-item-title>
             </v-list-item>
             <v-list-item @click="$emit('move-to-top')">
@@ -220,6 +220,7 @@ const emit = defineEmits<{
   (e: 'update:notes', value: string): void;
   (e: 'delete:exercise', payload: ExerciseProp['exercise']): void;
   (e: 'move-to-top'): void;
+  (e: 'view-details'): void;
 }>();
 
 const resolvedExercise = computed(() => props.exercise.exercise);
