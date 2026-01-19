@@ -12,6 +12,8 @@ import { ConfigService } from '@nestjs/config';
 import { UserWithoutPasswordDto } from './dto/UserWithoutPassword.dto';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { ActivityService } from '../activity/activity.service';
+import { ActivityIcon } from '../activity/activity.entity';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +22,7 @@ export class AuthService {
     private readonly userRepo: Repository<User>,
     private readonly configService: ConfigService,
     private jwtService: JwtService,
+    private readonly activityService: ActivityService,
   ) {}
 
   async register(dto: RegisterDto): Promise<UserWithoutPasswordDto> {
@@ -43,7 +46,93 @@ export class AuthService {
     });
     const savedUser = await this.userRepo.save(user);
 
+    // Seed default activities for new user
+    await this.seedDefaultActivities(savedUser.id);
+
     return new UserWithoutPasswordDto(savedUser);
+  }
+
+  /**
+   * Seed default activities for a new user
+   */
+  private async seedDefaultActivities(userId: number): Promise<void> {
+    const defaultActivities = [
+      {
+        name: 'Running',
+        description: 'Outdoor running sessions',
+        icon: ActivityIcon.RUNNING,
+        trackDistance: true,
+        trackPace: true,
+        trackElevation: true,
+        trackCalories: true,
+      },
+      {
+        name: 'Walking',
+        description: 'Walking and hiking',
+        icon: ActivityIcon.WALKING,
+        trackDistance: true,
+        trackPace: true,
+        trackElevation: true,
+        trackCalories: true,
+      },
+      {
+        name: 'Cycling',
+        description: 'Road and mountain biking',
+        icon: ActivityIcon.CYCLING,
+        trackDistance: true,
+        trackPace: false,
+        trackElevation: true,
+        trackCalories: true,
+      },
+      {
+        name: 'Floorball',
+        description: 'Floorball training and matches',
+        icon: ActivityIcon.OTHER,
+        trackDistance: false,
+        trackPace: false,
+        trackElevation: false,
+        trackCalories: true,
+      },
+      {
+        name: 'Football',
+        description: 'Football training and matches',
+        icon: ActivityIcon.FOOTBALL,
+        trackDistance: false,
+        trackPace: false,
+        trackElevation: false,
+        trackCalories: true,
+      },
+      {
+        name: 'Swimming',
+        description: 'Swimming sessions',
+        icon: ActivityIcon.SWIMMING,
+        trackDistance: true,
+        trackPace: false,
+        trackElevation: false,
+        trackCalories: true,
+      },
+      {
+        name: 'Kayaking',
+        description: 'Kayaking and canoeing',
+        icon: ActivityIcon.KAYAKING,
+        trackDistance: true,
+        trackPace: false,
+        trackElevation: false,
+        trackCalories: true,
+      },
+    ];
+
+    for (const activity of defaultActivities) {
+      try {
+        await this.activityService.create(activity, userId);
+      } catch (error) {
+        // Ignore errors (e.g., duplicate names) and continue
+        console.error(
+          `Failed to seed activity ${activity.name}:`,
+          error.message,
+        );
+      }
+    }
   }
 
   async login(dto: LoginDto) {

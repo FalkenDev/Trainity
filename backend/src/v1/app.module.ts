@@ -10,6 +10,8 @@ import { WorkoutModule } from './workout/workout.module';
 import { WorkoutSessionModule } from './workoutSession/workoutSession.module';
 import { MuscleGroupModule } from './muscleGroup/muscleGroup.module';
 import { GlobalExerciseModule } from './globalExercise/globalExercise.module';
+import { ActivityModule } from './activity/activity.module';
+import { ActivityLogModule } from './activityLog/activityLog.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { GlobalExerciseModule } from './globalExercise/globalExercise.module';
     UserModule,
     WorkoutModule,
     WorkoutSessionModule,
+    ActivityModule,
+    ActivityLogModule,
   ],
   providers: [AppService, JwtStrategy],
 })
