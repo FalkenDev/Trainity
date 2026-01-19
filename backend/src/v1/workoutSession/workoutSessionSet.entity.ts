@@ -14,10 +14,10 @@ export class WorkoutSessionSet {
   @Column()
   setNumber: number;
 
-  @Column()
+  @Column({ nullable: true })
   weight: number;
 
-  @Column()
+  @Column({ nullable: true })
   reps: number;
 
   @Column({ nullable: true })
@@ -25,4 +25,14 @@ export class WorkoutSessionSet {
 
   @Column({ nullable: true })
   notes: string;
+
+  // Cardio exercise fields
+  @Column({ type: 'decimal', precision: 6, scale: 2, nullable: true })
+  distance?: number;
+
+  @Column({ nullable: true })
+  duration?: number; // in minutes
+
+  @Column({ nullable: true })
+  calories?: number;
 }
