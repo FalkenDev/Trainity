@@ -18,6 +18,15 @@
       </v-btn>
       <v-btn
         size="large"
+        color="primary"
+        variant="tonal"
+        prepend-icon="mdi-run"
+        @click="$router.push('/log-activity')"
+      >
+        {{ $t('activity.logActivity') }}
+      </v-btn>
+      <v-btn
+        size="large"
         disabled
       >
         {{ $t('workout.startNewWorkout') }}

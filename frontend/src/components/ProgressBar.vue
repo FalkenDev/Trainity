@@ -31,12 +31,14 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
+import { useActivityStore } from '@/stores/activity.store'
 import { getStreakInfo } from '@/services/user.service'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
 import type { StreakInfo } from '@/interfaces/User.interface'
 
 const { tm } = useI18n({ useScope: 'global' })
 const workoutSessionStore = useWorkoutSessionStore()
+const activityStore = useActivityStore()
 const streakInfo = ref<StreakInfo | null>(null)
 
 const weekdays = computed(() => {
@@ -69,13 +71,15 @@ const currentWeekRange = computed(() => {
   return { start: monday, end: sunday }
 })
 
-// Get completed sessions for the current week
+// Get completed sessions and activity logs for the current week
 const completedDaysThisWeek = computed(() => {
   const sessions = workoutSessionStore.workoutSessions as WorkoutSession[]
+  const activityLogs = activityStore.activityLogs || []
   const { start, end } = currentWeekRange.value
 
   const completedDays = new Set<number>()
 
+  // Add workout sessions
   sessions.forEach((session: WorkoutSession) => {
     if (session.status === 'finished' && session.endedAt) {
       const sessionDate = new Date(session.endedAt)
@@ -86,6 +90,16 @@ const completedDaysThisWeek = computed(() => {
         dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1
         completedDays.add(dayOfWeek)
       }
+    }
+  })
+
+  // Add activity logs
+  activityLogs.forEach((log) => {
+    const logDate = new Date(log.date)
+    if (logDate >= start && logDate <= end) {
+      let dayOfWeek = logDate.getDay()
+      dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+      completedDays.add(dayOfWeek)
     }
   })
 
@@ -120,14 +134,14 @@ const loadStreakInfo = async () => {
   }
 }
 
-// Load streak info on mount and when sessions change
+// Load streak info on mount and when sessions or activity logs change
 onMounted(() => {
   loadStreakInfo()
 })
 
-// Watch for changes in workout sessions
+// Watch for changes in workout sessions and activity logs
 watch(
-  () => workoutSessionStore.workoutSessions,
+  () => [workoutSessionStore.workoutSessions, activityStore.activityLogs],
   () => {
     loadStreakInfo()
   },

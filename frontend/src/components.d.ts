@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AcceptDialog: typeof import('./components/basicUI/AcceptDialog.vue')['default']
+    ActivityList: typeof import('./components/Settings/ActivityList.vue')['default']
     AddExerciseList: typeof import('./components/Exercise/AddExerciseList.vue')['default']
     AddGlobalExerciseList: typeof import('./components/Exercise/AddGlobalExerciseList.vue')['default']
     BackHeader: typeof import('./components/BackHeader.vue')['default']
