@@ -35,6 +35,20 @@ export const fetchWrapper = async <T = unknown>(
 
     if (!response.ok) {
       const errorText = await response.text();
+      
+      // Check for 404 User not found error
+      if (response.status === 404) {
+        try {
+          const errorBody = JSON.parse(errorText);
+          if (errorBody.message === 'User not found') {
+            await handleUserNotFound();
+            return Promise.reject('User not found - logged out');
+          }
+        } catch (e) {
+          // Not JSON or different error, continue with normal error handling
+        }
+      }
+      
       throw new Error(
         `HTTP error! Status: ${response.status}. Body: ${errorText}`,
       );
@@ -62,5 +76,12 @@ const handleForbidden = async () => {
   const authStore = useAuthStore();
   await authStore.logout();
   console.warn('403 Forbidden: Redirecting to login...');
+  router.push('/login');
+};
+
+const handleUserNotFound = async () => {
+  const authStore = useAuthStore();
+  await authStore.logout();
+  console.warn('User not found: Logging out and redirecting to login...');
   router.push('/login');
 };
