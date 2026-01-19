@@ -221,6 +221,16 @@
       />
     </v-dialog>
     <v-dialog
+      v-model="isActivityListOpen"
+      fullscreen
+      transition="slide-y-transition"
+      persistent
+    >
+      <ActivityList
+        @close="isActivityListOpen = false"
+      />
+    </v-dialog>
+    <v-dialog
       v-model="isSessionListOpen"
       fullscreen
       transition="slide-y-transition"
@@ -415,6 +425,7 @@ const authStore = useAuthStore();
 const appStore = useAppStore();
 const { t, locale } = useI18n({ useScope: 'global' });
 const isExerciseListOpen = ref(false);
+const isActivityListOpen = ref(false);
 const isSessionListOpen = ref(false);
 const isWorkoutListOpen = ref(false);
 const isAccountDialogOpen = ref(false);
@@ -563,6 +574,9 @@ const setDialogToOpen = (type: string) => {
     case 'exercises':
       isExerciseListOpen.value = true;
       break;
+    case 'activities':
+      isActivityListOpen.value = true;
+      break;
     case 'workouts':
       isWorkoutListOpen.value = true;
       break;
@@ -650,6 +664,7 @@ const saveWeeklyGoal = async () => {
 
 const contentList = [
   { titleKey: 'settings.exercises', showArrow: true, type: 'exercises', disabled: false },
+  { titleKey: 'settings.activities', showArrow: true, type: 'activities', disabled: false },
   { titleKey: 'settings.workouts', showArrow: true, type: 'workouts', disabled: false },
   { titleKey: 'settings.sessions', showArrow: true, type: 'sessions', disabled: false },
 ];

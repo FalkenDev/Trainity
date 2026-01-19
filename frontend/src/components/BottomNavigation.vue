@@ -31,7 +31,6 @@
     <v-btn
       icon
       to="/calendar"
-      :disabled="true"
     >
       <v-icon>mdi-calendar</v-icon>
     </v-btn>
