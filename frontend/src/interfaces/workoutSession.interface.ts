@@ -1,8 +1,12 @@
 import type { Workout } from './Workout.interface';
 export interface PerformedSet {
   setNumber: number;
-  weight: number;
-  reps: number;
+  weight?: number;
+  reps?: number;
+  // Cardio fields
+  distance?: number;
+  duration?: number;
+  calories?: number;
 }
 
 export interface FinishedExercisePayload {
