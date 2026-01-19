@@ -13,5 +13,8 @@
 
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-  }
+  },
+  "i18n-ally.localesPaths": [
+    "src/locales"
+  ]
 }
