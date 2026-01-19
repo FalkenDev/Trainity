@@ -37,7 +37,7 @@
               <v-expansion-panels multiple>
                 <v-expansion-panel
                   v-for="session in sessions"
-                  :key="session.id"
+                  :key="`${session.type}-${session.data.id}`"
                 >
                   <v-expansion-panel-title>
                     <div class="d-flex flex-wrap align-center w-100 ga-2">
@@ -46,147 +46,218 @@
                           {{ title(session) }}
                         </div>
                         <div class="text-caption text-medium-emphasis">
-                          {{ $t('sessionList.started') }}: {{ formatDateTime(session.startedAt) }}
-                          <span v-if="session.endedAt">
-                            • {{ $t('sessionList.ended') }}: {{ formatDateTime(session.endedAt) }}
-                          </span>
-                          • {{ $t('sessionList.duration') }}:
-                          {{
-                            durationMinutes(
-                              session.startedAt,
-                              session.endedAt || undefined
-                            )
-                          }}
+                          <!-- Workout Session -->
+                          <template v-if="session.type === 'workout'">
+                            {{ $t('sessionList.started') }}: {{ formatDateTime((session.data as WorkoutSession).startedAt) }}
+                            <span v-if="(session.data as WorkoutSession).endedAt">
+                              • {{ $t('sessionList.ended') }}: {{ formatDateTime((session.data as WorkoutSession).endedAt) }}
+                            </span>
+                            • {{ $t('sessionList.duration') }}:
+                            {{
+                              durationMinutes(
+                                (session.data as WorkoutSession).startedAt,
+                                (session.data as WorkoutSession).endedAt || undefined
+                              )
+                            }}
+                          </template>
+                          <!-- Activity Log -->
+                          <template v-else>
+                            {{ $t('common.date') }}: {{ formatDateTime((session.data as ActivityLog).date) }}
+                            • {{ $t('sessionList.duration') }}: {{ durationMinutes(undefined, undefined, (session.data as ActivityLog).duration) }}
+                            <span v-if="(session.data as ActivityLog).distance">
+                              • {{ $t('activity.distance') }}: {{ (session.data as ActivityLog).distance }} {{ $t('units.km') }}
+                            </span>
+                          </template>
                         </div>
                       </div>
 
                       <div class="d-flex ga-2 flex-wrap">
+                        <!-- Type chip -->
                         <v-chip
-                          :color="statusColor(session.status)"
+                          :color="session.type === 'workout' ? 'primary' : 'secondary'"
+                          size="small"
+                          variant="flat"
+                        >
+                          {{ session.type === 'workout' ? $t('sessionList.workoutSession') : $t('sessionList.activityLog') }}
+                        </v-chip>
+
+                        <!-- Workout Session: Status chip -->
+                        <v-chip
+                          v-if="session.type === 'workout'"
+                          :color="statusColor((session.data as WorkoutSession).status)"
                           size="small"
                           variant="flat"
                           class="text-uppercase"
                         >
-                          {{ statusLabel(session.status) }}
+                          {{ statusLabel((session.data as WorkoutSession).status) }}
                         </v-chip>
 
+                        <!-- Workout Session: Total Weight -->
                         <v-chip
+                          v-if="session.type === 'workout'"
                           size="small"
                           variant="outlined"
                         >
-                          {{ $t('sessionList.totalWeight') }}: {{ session.totalWeight }} {{ $t('units.kgShort') }}
+                          {{ $t('sessionList.totalWeight') }}: {{ (session.data as WorkoutSession).totalWeight }} {{ $t('units.kgShort') }}
+                        </v-chip>
+
+                        <!-- Activity Log: Calories -->
+                        <v-chip
+                          v-if="session.type === 'activity' && (session.data as ActivityLog).calories"
+                          size="small"
+                          variant="outlined"
+                        >
+                          {{ $t('activity.calories') }}: {{ (session.data as ActivityLog).calories }} {{ $t('units.kcal') }}
                         </v-chip>
                       </div>
                     </div>
                   </v-expansion-panel-title>
 
                   <v-expansion-panel-text>
-                    <v-row class="mb-2">
-                      <v-col
-                        cols="12"
-                        md="8"
-                      >
-                        <div class="text-body-2">
-                          {{
-                            session.workoutSnapshot?.description ||
-                              $t('common.noDescription')
-                          }}
-                        </div>
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        md="4"
-                        class="d-flex justify-end"
-                      >
-                        <div class="text-caption text-medium-emphasis">
-                          {{ $t('common.createdAt') }}: {{ formatDateTime(session.createdAt) }} •
-                          {{ $t('common.updatedAt') }}: {{ formatDateTime(session.updatedAt) }}
-                        </div>
-                      </v-col>
-                    </v-row>
-
-                    <v-divider class="my-2" />
-
-                    <div class="text-subtitle-2 mb-2">
-                      {{ $t('sessionList.exercises') }}
-                    </div>
-                    <v-row>
-                      <v-col
-                        v-for="ex in session.exercises"
-                        :key="ex.exerciseId"
-                        cols="12"
-                      >
-                        <v-card
-                          variant="text"
-                          class="pa-2"
+                    <!-- Workout Session Details -->
+                    <template v-if="session.type === 'workout'">
+                      <v-row class="mb-2">
+                        <v-col
+                          cols="12"
+                          md="8"
                         >
-                          <div class="d-flex justify-space-between align-start">
-                            <div>
-                              <div class="text-subtitle-2">
-                                {{ ex.exerciseSnapshot?.name || $t('sessionList.exerciseFallback') }}
-                              </div>
-                              <div class="text-caption text-medium-emphasis">
-                                {{ ex.exerciseSnapshot?.description || '' }}
-                              </div>
-                            </div>
-
-                            <div class="text-caption text-medium-emphasis">
-                              {{ $t('sessionList.sets') }}: {{ ex.sets?.length || 0 }}
-                            </div>
+                          <div class="text-body-2">
+                            {{
+                              (session.data as WorkoutSession).workoutSnapshot?.description ||
+                                $t('common.noDescription')
+                            }}
                           </div>
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          md="4"
+                          class="d-flex justify-end"
+                        >
+                          <div class="text-caption text-medium-emphasis">
+                            {{ $t('common.createdAt') }}: {{ formatDateTime(session.data.createdAt) }} <br />
+                            {{ $t('common.updatedAt') }}: {{ formatDateTime(session.data.updatedAt) }}
+                          </div>
+                        </v-col>
+                      </v-row>
 
-                          <v-table
-                            density="comfortable"
-                            class="mt-2"
+                      <v-divider class="my-2" />
+
+                      <div class="text-subtitle-2 mb-2">
+                        {{ $t('sessionList.exercises') }}
+                      </div>
+                      <v-row>
+                        <v-col
+                          v-for="ex in (session.data as WorkoutSession).exercises"
+                          :key="ex.exerciseId"
+                          cols="12"
+                        >
+                          <v-card
+                            variant="text"
+                            class="pa-2"
                           >
-                            <thead>
-                              <tr>
-                                <th class="text-left">
-                                  {{ $t('table.set') }}
-                                </th>
-                                <th class="text-left">
-                                  {{ $t('sessionList.weightKg') }}
-                                </th>
-                                <th class="text-left">
-                                  {{ $t('table.reps') }}
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr
-                                v-for="s in ex.sets"
-                                :key="s.setNumber"
-                              >
-                                <td>#{{ s.setNumber }}</td>
-                                <td>{{ s.weight }}</td>
-                                <td>{{ s.reps }}</td>
-                              </tr>
-                              <tr v-if="!ex.sets || ex.sets.length === 0">
-                                <td
-                                  colspan="5"
-                                  class="text-medium-emphasis"
+                            <div class="d-flex justify-space-between align-start">
+                              <div>
+                                <div class="text-subtitle-2">
+                                  {{ ex.exerciseSnapshot?.name || $t('sessionList.exerciseFallback') }}
+                                </div>
+                                <div class="text-caption text-medium-emphasis">
+                                  {{ ex.exerciseSnapshot?.description || '' }}
+                                </div>
+                              </div>
+
+                              <div class="text-caption text-medium-emphasis">
+                                {{ $t('sessionList.sets') }}: {{ ex.sets?.length || 0 }}
+                              </div>
+                            </div>
+
+                            <v-table
+                              density="comfortable"
+                              class="mt-2"
+                            >
+                              <thead>
+                                <tr>
+                                  <th class="text-left">
+                                    {{ $t('table.set') }}
+                                  </th>
+                                  <th class="text-left">
+                                    {{ $t('sessionList.weightKg') }}
+                                  </th>
+                                  <th class="text-left">
+                                    {{ $t('table.reps') }}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  v-for="s in ex.sets"
+                                  :key="s.setNumber"
                                 >
-                                  {{ $t('sessionList.noSetsRecorded') }}
-                                </td>
-                              </tr>
-                            </tbody>
-                          </v-table>
-                        </v-card>
-                      </v-col>
-                    </v-row>
+                                  <td>#{{ s.setNumber }}</td>
+                                  <td>{{ s.weight }}</td>
+                                  <td>{{ s.reps }}</td>
+                                </tr>
+                                <tr v-if="!ex.sets || ex.sets.length === 0">
+                                  <td
+                                    colspan="5"
+                                    class="text-medium-emphasis"
+                                  >
+                                    {{ $t('sessionList.noSetsRecorded') }}
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </v-table>
+                          </v-card>
+                        </v-col>
+                      </v-row>
+                    </template>
+
+                    <!-- Activity Log Details -->
+                    <template v-else>
+                      <v-row class="mb-2">
+                        <v-col cols="12">
+                          <v-card variant="text" class="pa-2">
+                            <div class="text-subtitle-2 mb-2">{{ $t('sessionList.activityDetails') }}</div>
+                            <v-row dense>
+                              <v-col v-if="(session.data as ActivityLog).distance" cols="6">
+                                <div class="text-caption text-medium-emphasis">{{ $t('activity.distance') }}</div>
+                                <div class="text-body-1">{{ (session.data as ActivityLog).distance }} {{ $t('units.km') }}</div>
+                              </v-col>
+                              <v-col v-if="(session.data as ActivityLog).pace" cols="6">
+                                <div class="text-caption text-medium-emphasis">{{ $t('activity.pace') }}</div>
+                                <div class="text-body-1">{{ (session.data as ActivityLog).pace }} {{ $t('units.minPerKm') }}</div>
+                              </v-col>
+                              <v-col v-if="(session.data as ActivityLog).calories" cols="6">
+                                <div class="text-caption text-medium-emphasis">{{ $t('activity.calories') }}</div>
+                                <div class="text-body-1">{{ (session.data as ActivityLog).calories }} {{ $t('units.kcal') }}</div>
+                              </v-col>
+                              <v-col cols="6">
+                                <div class="text-caption text-medium-emphasis">{{ $t('sessionList.duration') }}</div>
+                                <div class="text-body-1">{{ durationMinutes(undefined, undefined, (session.data as ActivityLog).duration) }}</div>
+                              </v-col>
+                            </v-row>
+                          </v-card>
+                        </v-col>
+                        <v-col cols="12">
+                          <div class="text-caption text-medium-emphasis">
+                            {{ $t('common.createdAt') }}: {{ formatDateTime(session.data.createdAt) }} <br />
+                            {{ $t('common.updatedAt') }}: {{ formatDateTime(session.data.updatedAt) }}
+                          </div>
+                        </v-col>
+                      </v-row>
+                    </template>
 
                     <v-divider class="my-2" />
 
                     <div class="d-flex align-center justify-space-between mt-4">
                       <div class="text-caption">
-                        {{ $t('sessionList.sessionNotes') }}: {{ session.notes || '—' }}
+                        {{ $t('sessionList.sessionNotes') }}: {{ session.data.notes || '—' }}
                       </div>
                       <v-btn
                         color="error"
                         variant="text"
                         size="small"
                         prepend-icon="mdi-delete"
-                        @click="handleDelete(session.id)"
+                        @click="handleDelete(session.type, session.data.id)"
                       >
                         {{ $t('common.delete') }}
                       </v-btn>
@@ -212,34 +283,59 @@
 
 <script setup lang="ts">
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
+import { useActivityStore } from '@/stores/activity.store';
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface';
+import type { ActivityLog } from '@/interfaces/Activity.interface';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n({ useScope: 'global' });
 
 const searchQuery = ref('');
-const store = useWorkoutSessionStore();
-const sessions = computed<WorkoutSession[]>(() => {
-  return ((store.workoutSessions as WorkoutSession[]) || [])
+const workoutSessionStore = useWorkoutSessionStore();
+const activityStore = useActivityStore();
+
+type UnifiedSession = 
+  | { type: 'workout'; data: WorkoutSession }
+  | { type: 'activity'; data: ActivityLog };
+
+const sessions = computed<UnifiedSession[]>(() => {
+  const workoutSessions: UnifiedSession[] = ((workoutSessionStore.workoutSessions as WorkoutSession[]) || [])
+    .map(session => ({ type: 'workout' as const, data: session }));
+  
+  const activityLogs: UnifiedSession[] = ((activityStore.activityLogs as ActivityLog[]) || [])
+    .map(log => ({ type: 'activity' as const, data: log }));
+  
+  const combined = [...workoutSessions, ...activityLogs];
+  
+  return combined
     .filter(session => {
-      if (!searchQuery.value) return true; // Show all if no search query
+      if (!searchQuery.value) return true;
 
       const query = searchQuery.value.toLowerCase().trim();
       
-      if (session.workoutSnapshot?.title?.toLowerCase().includes(query)) return true;
-      
-      if (session.notes?.toLowerCase().includes(query)) return true;
-      
-      if (session.exercises?.some(ex => 
-        ex.exerciseSnapshot?.name?.toLowerCase().includes(query) ||
-        ex.exerciseSnapshot?.description?.toLowerCase().includes(query)
-      )) return true;
+      if (session.type === 'workout') {
+        const ws = session.data as WorkoutSession;
+        if (ws.workoutSnapshot?.title?.toLowerCase().includes(query)) return true;
+        if (ws.notes?.toLowerCase().includes(query)) return true;
+        if (ws.exercises?.some(ex => 
+          ex.exerciseSnapshot?.name?.toLowerCase().includes(query) ||
+          ex.exerciseSnapshot?.description?.toLowerCase().includes(query)
+        )) return true;
+      } else {
+        const al = session.data as ActivityLog;
+        if (al.activity?.name?.toLowerCase().includes(query)) return true;
+        if (al.notes?.toLowerCase().includes(query)) return true;
+      }
       
       return false;
     })
     .sort((a, b) => {
-      const dateA = new Date(a.startedAt).getTime();
-      const dateB = new Date(b.startedAt).getTime();
+      const dateA = a.type === 'workout' 
+        ? new Date((a.data as WorkoutSession).startedAt).getTime()
+        : new Date((a.data as ActivityLog).date).getTime();
+      const dateB = b.type === 'workout'
+        ? new Date((b.data as WorkoutSession).startedAt).getTime()
+        : new Date((b.data as ActivityLog).date).getTime();
       return dateB - dateA;
     });
 });
@@ -254,7 +350,12 @@ function formatDateTime(iso?: string) {
   return d.toLocaleString();
 }
 
-function durationMinutes(start?: string, end?: string) {
+function durationMinutes(start?: string, end?: string, duration?: number) {
+  // For activity logs with duration field
+  if (duration !== undefined) {
+    return `${duration} ${t('units.minShort')}`;
+  }
+  // For workout sessions with start/end times
   if (!start) return '';
   const s = new Date(start).getTime();
   const e = end ? new Date(end).getTime() : Date.now();
@@ -280,22 +381,31 @@ function statusColor(status: WorkoutSession['status']) {
   }
 }
 
-function title(session: WorkoutSession) {
-  return session.workoutSnapshot?.title || `Session #${session.id}`;
+function title(session: UnifiedSession) {
+  if (session.type === 'workout') {
+    return (session.data as WorkoutSession).workoutSnapshot?.title || `Session #${(session.data as WorkoutSession).id}`;
+  } else {
+    return (session.data as ActivityLog).activity?.name || `Activity #${(session.data as ActivityLog).id}`;
+  }
 }
 
-async function handleDelete(sessionId: number) {
+async function handleDelete(sessionType: 'workout' | 'activity', sessionId: number) {
   if (
     confirm(
       t('sessionList.deleteConfirm'),
     )
   ) {
-    await store.deleteSession(sessionId);
+    if (sessionType === 'workout') {
+      await workoutSessionStore.deleteSession(sessionId);
+    } else {
+      await activityStore.deleteActivityLog(sessionId);
+    }
   }
 }
 
 onMounted(() => {
-  store.setWorkoutSessions(true);
+  workoutSessionStore.setWorkoutSessions(true);
+  activityStore.fetchActivityLogs(true);
 });
 
 </script>
