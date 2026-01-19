@@ -1,9 +1,12 @@
 <template>
   <div>
     <div class="d-flex flex-row justify-space-between align-center pa-3">
-      <h1 class="text-h5">
-        {{ resolvedExercise ? displayName(resolvedExercise) : $t('common.loading') }}
-      </h1>
+      <div class="d-flex align-center ga-2">
+        <slot name="prepend" />
+        <h1 class="text-h5">
+          {{ resolvedExercise ? displayName(resolvedExercise) : $t('common.loading') }}
+        </h1>
+      </div>
       <div class="d-flex flex-row ga-5 align-center">
         <v-chip
           v-if="allSetsDone"
@@ -38,6 +41,9 @@
           <v-list>
             <v-list-item disabled>
               <v-list-item-title>{{ $t('session.exerciseDetails') }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="$emit('move-to-top')">
+              <v-list-item-title>{{ $t('session.moveToTop') }}</v-list-item-title>
             </v-list-item>
             <v-list-item @click="addSet">
               <v-list-item-title>{{ $t('session.addSet') }}</v-list-item-title>
@@ -213,6 +219,7 @@ const emit = defineEmits<{
   (e: 'update:rpe', value: number): void;
   (e: 'update:notes', value: string): void;
   (e: 'delete:exercise', payload: ExerciseProp['exercise']): void;
+  (e: 'move-to-top'): void;
 }>();
 
 const resolvedExercise = computed(() => props.exercise.exercise);

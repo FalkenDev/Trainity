@@ -93,13 +93,19 @@
 
       <div class="mt-4">
         <v-card
-          v-for="(exercise, index) in workout?.exercises"
-          :key="index"
+          v-for="(exercise, index) in sortedExercises"
+          :key="exercise.id"
           class="mb-4 d-flex pa-2 px-4 align-center justify-space-between"
-          style="border-radius: 5px"
+          style="border-radius: 5px; cursor: move"
+          draggable="true"
+          @dragstart="onDragStart(index)"
+          @dragover.prevent="onDragOver(index)"
+          @drop="onDrop(index)"
+          @dragend="onDragEnd"
           @click="selectExercise(exercise)"
         >
-          <div class="d-flex ga-5 align-center">
+          <div class="d-flex ga-5 align-center flex-grow-1">
+            <v-icon>mdi-drag-vertical</v-icon>
             <img
               v-if="false /*TODO: Remove when image upload is added */"
               class="bg-grey"
@@ -168,7 +174,7 @@
       :workout-id="workout?.id ? Number(workout.id) : undefined"
       :is-view-exercise="false"
       :is-view-workout-exercise="true"
-      @close="isEditExerciseOpen = false"
+      @close="onEditExerciseClose"
     />
   </v-dialog>
 
@@ -217,6 +223,7 @@ import {
   dublicateWorkout,
   removeExercisesFromWorkout,
   addExercisesToWorkout,
+  reorderExercises,
 } from "@/services/workout.service";
 import { toast } from "vuetify-sonner";
 import EditWorkoutExercise from "@/components/Workout/EditWorkoutExercise.vue";
@@ -237,6 +244,16 @@ const workoutStore = useWorkoutStore();
 const workoutSessionStore = useWorkoutSessionStore();
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
 const selectedExercise = ref<Exercise | null>(null);
+
+// Drag and drop state
+const draggedIndex = ref<number | null>(null);
+const dragOverIndex = ref<number | null>(null);
+
+// Sorted exercises for display
+const sortedExercises = computed(() => {
+  if (!workout.value?.exercises) return [];
+  return [...workout.value.exercises].sort((a, b) => a.order - b.order);
+});
 
 const displayName = (exercise: NonNullable<Exercise['exercise']>) => displayExerciseName({ t }, exercise);
 
@@ -365,6 +382,12 @@ const selectExercise = (exercise: Exercise) => {
   isEditExerciseOpen.value = true;
 };
 
+const onEditExerciseClose = async () => {
+  isEditExerciseOpen.value = false;
+  // Refresh workout to get updated exercise details
+  await workoutStore.setWorkouts(true);
+};
+
 const startSession = async () => {
   if (workout.value) {
     const response = await startWorkoutSession(workout.value.id);
@@ -376,5 +399,46 @@ const startSession = async () => {
       toast.error(t('workout.failedToStartSession'), { progressBar: true, duration: 1000 });
     }
   }
+};
+
+// Drag and drop handlers
+const onDragStart = (index: number) => {
+  draggedIndex.value = index;
+};
+
+const onDragOver = (index: number) => {
+  if (draggedIndex.value !== null && draggedIndex.value !== index) {
+    dragOverIndex.value = index;
+  }
+};
+
+const onDrop = async (dropIndex: number) => {
+  if (draggedIndex.value === null || draggedIndex.value === dropIndex || !workout.value) {
+    return;
+  }
+
+  const exercises = [...sortedExercises.value];
+  const [draggedExercise] = exercises.splice(draggedIndex.value, 1);
+  exercises.splice(dropIndex, 0, draggedExercise);
+
+  // Update order values for all exercises
+  const reorderedExercises = exercises.map((ex, idx) => ({
+    workoutExerciseId: ex.id,
+    order: idx + 1,
+  }));
+
+  try {
+    await reorderExercises(workout.value.id, reorderedExercises);
+    await workoutStore.setWorkouts(true);
+    toast.success(t('workout.exercisesReordered'), { progressBar: true, duration: 1000 });
+  } catch (error) {
+    console.error('Error reordering exercises:', error);
+    toast.error(t('workout.failedToReorder'), { progressBar: true, duration: 1000 });
+  }
+};
+
+const onDragEnd = () => {
+  draggedIndex.value = null;
+  dragOverIndex.value = null;
 };
 </script>

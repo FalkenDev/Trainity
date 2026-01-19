@@ -43,6 +43,7 @@
         @add:set="onAddSet(exercise.exerciseId)"
         @update:rpe="showRpe && onUpdateMeta(exercise.exerciseId, { rpe: $event })"
         @update:notes="onUpdateMeta(exercise.exerciseId, { notes: $event })"
+        @move-to-top="onMoveToTop(exercise.exerciseId)"
       />
     </div>
 
@@ -241,6 +242,17 @@ function onDeleteSet(exerciseId: number, setToDelete: WorkoutSet) {
 function onAddSet(exerciseId: number) {
   workoutSessionStore.addSet(sessionId.value, exerciseId);
 }
+
+// Move exercise to top (temporary reordering, doesn't save to workout)
+const onMoveToTop = (exerciseId: number) => {
+  const currentIndex = processedExercises.value.findIndex((e) => e.exerciseId === exerciseId);
+  if (currentIndex > 0) {
+    const exercises = [...processedExercises.value];
+    const [exercise] = exercises.splice(currentIndex, 1);
+    exercises.unshift(exercise);
+    processedExercises.value = exercises;
+  }
+};
 
 const finnishSession = async () => {
   if (isLoading.value) return;

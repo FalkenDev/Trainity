@@ -141,3 +141,23 @@ export const dublicateWorkout = async (id: number) => {
     throw new Error('Failed to duplicate workout');
   }
 };
+
+export const reorderExercises = async (
+  workoutId: number,
+  exercises: Array<{ workoutExerciseId: number; order: number }>,
+) => {
+  try {
+    const data = await fetchWrapper<Workout>(
+      `${apiUrl}/workouts/${workoutId}/exercises/reorder`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exercises }),
+      },
+    );
+    return data;
+  } catch (error) {
+    console.error('Error reordering exercises:', error);
+    throw new Error('Failed to reorder exercises');
+  }
+};

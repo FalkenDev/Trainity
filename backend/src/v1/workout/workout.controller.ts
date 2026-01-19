@@ -26,6 +26,7 @@ import { WorkoutResponseDto } from './dto/workoutResponse.dto';
 import { RequestWithUser } from '../types/requestWithUser.type';
 import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
 import { UpdateWorkoutExerciseDto } from './dto/updateWorkoutExercise.dto';
+import { ReorderExercisesDto } from './dto/reorderExercises.dto';
 
 @ApiTags('workouts')
 @ApiBearerAuth()
@@ -133,6 +134,21 @@ export class WorkoutController {
     return this.workoutService.removeExercisesFromWorkout(
       id,
       dto,
+      this.getUserId(req),
+    );
+  }
+
+  @Patch(':id/exercises/reorder')
+  @ApiOperation({ summary: 'Reorder exercises in a workout' })
+  @ApiOkResponse({ type: WorkoutResponseDto })
+  reorderExercises(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ReorderExercisesDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.workoutService.reorderExercises(
+      id,
+      dto.exercises,
       this.getUserId(req),
     );
   }
