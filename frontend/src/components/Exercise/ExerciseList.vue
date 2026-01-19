@@ -124,7 +124,7 @@
     v-model="isCreateExerciseOpen"
     fullscreen
   >
-    <CreateExercise @close="isCreateExerciseOpen = false" />
+    <CreateExercise @close="onCreateExerciseClose" />
   </v-dialog>
   <v-dialog
     v-model="isAddGlobalExercisesOpen"
@@ -140,7 +140,7 @@
       :selected-exercise="viewExercise"
       :is-view-exercise="true"
       :is-view-workout-exercise="false"
-      @close="isViewExerciseOpen = false"
+      @close="onEditExerciseClose"
     />
   </v-dialog>
 </template>
@@ -180,6 +180,18 @@ const displayName = (exercise: Exercise) => displayExerciseName({ t }, exercise)
 const openViewExercise = (exercise: Exercise) => {
   viewExercise.value = exercise;
   isViewExerciseOpen.value = true;
+};
+
+const onEditExerciseClose = async () => {
+  isViewExerciseOpen.value = false;
+  // Refresh exercises to get updated exercise details
+  await exerciseStore.setExercises(true);
+};
+
+const onCreateExerciseClose = async () => {
+  isCreateExerciseOpen.value = false;
+  // Refresh exercises after creating new one
+  await exerciseStore.setExercises(true);
 };
 
 const exercises = computed<Exercise[]>(() =>

@@ -28,7 +28,7 @@
       v-if="selectedExercise"
     >
       <div
-        v-if="selectedExercise.image"
+        v-if="selectedExercise?.image"
         class="exercise-image-container"
       >
         <v-img
@@ -45,17 +45,17 @@
       <div class="mx-5">
         <div class="py-4">
           <h1 class="text-h5 font-weight-bold">
-            {{ selectedExercise.name }}
+            {{ selectedExercise?.name }}
           </h1>
           <p>
-            {{ selectedExercise.description }}
+            {{ selectedExercise?.description }}
           </p>
           <div
-            v-if="props.selectedExercise?.muscleGroups"
+            v-if="selectedExercise?.muscleGroups"
             class="d-flex ga-2 align-center mt-2 flex-wrap"
           >
             <v-chip
-              v-for="group in props.selectedExercise.muscleGroups"
+              v-for="group in selectedExercise.muscleGroups"
               :key="group.id"
               color="green-lighten-1"
               label
@@ -78,7 +78,7 @@
               <v-list-item-title>
                 <span class="font-weight-medium">{{ $t('exerciseForm.defaultSets') }}:</span>
                 <span class="ml-2">
-                  {{ selectedExercise.defaultSets || 0 }}
+                  {{ selectedExercise?.defaultSets || 0 }}
                 </span>
               </v-list-item-title>
             </v-list-item>
@@ -91,7 +91,7 @@
               <v-list-item-title>
                 <span class="font-weight-medium">{{ $t('exerciseForm.defaultReps') }}:</span>
                 <span class="ml-2">
-                  {{ selectedExercise.defaultReps || 0 }}
+                  {{ selectedExercise?.defaultReps || 0 }}
                 </span>
               </v-list-item-title>
             </v-list-item>
@@ -104,7 +104,7 @@
               <v-list-item-title>
                 <span class="font-weight-medium">{{ $t('exerciseForm.defaultPause') }}:</span>
                 <span class="ml-2">
-                  {{ selectedExercise.defaultPauseSeconds || 0 }}
+                  {{ selectedExercise?.defaultPauseSeconds || 0 }}
                   {{ $t('units.sec') }}
                 </span>
               </v-list-item-title>
@@ -120,9 +120,9 @@
                 <span class="font-weight-medium">{{ $t('common.createdAt') }}:</span>
                 <span class="ml-2">
                   {{
-                    new Date(
-                      selectedExercise.createdAt,
-                    ).toLocaleDateString()
+                    selectedExercise?.createdAt
+                      ? new Date(selectedExercise.createdAt).toLocaleDateString()
+                      : ''
                   }}
                 </span>
               </v-list-item-title>
@@ -146,7 +146,7 @@
           >
             <ImageUpload
               v-model="imageFile"
-              :existing-image-url="selectedExercise.image ? getImageUrl(selectedExercise.image) : null"
+              :existing-image-url="selectedExercise?.image ? getImageUrl(selectedExercise.image) : null"
               :placeholder="$t('exerciseForm.changeImagePlaceholder')"
               :helper-text="$t('exerciseForm.changeImageHelper')"
             />
@@ -264,6 +264,15 @@ const isDeleteExerciseOpen = ref<boolean>(false);
 const imageFile = ref<File | null>(null);
 const { t } = useI18n({ useScope: 'global' });
 
+// Use a computed property that updates from the store after changes
+const selectedExercise = computed(() => {
+  // Find the exercise in the store to get the latest data
+  const exerciseInStore = exerciseStore.exercises.find(
+    (ex) => ex.id === props.selectedExercise?.id
+  );
+  return exerciseInStore || props.selectedExercise;
+});
+
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
 
 const getImageUrl = (imagePath: string) => {
@@ -275,16 +284,23 @@ const getImageUrl = (imagePath: string) => {
   return `${baseUrl}${imagePath}`;
 };
 
-const editExercise = ref<UpdateExercise | null>({
-  id:  Number(props.selectedExercise?.id || 0),
-  name: props.selectedExercise?.name || '',
-  description: props.selectedExercise?.description || '',
-  image: props.selectedExercise?.image || null,
-  muscleGroups: props.selectedExercise?.muscleGroups?.map((group) => group.id) || [],
-  defaultSets: props.selectedExercise?.defaultSets || 0,
-  defaultReps:props.selectedExercise?.defaultReps || 0,
-  defaultPauseSeconds:  props.selectedExercise?.defaultPauseSeconds || 0,
-});
+const editExercise = ref<UpdateExercise | null>(null);
+
+// Watch for changes in selectedExercise and update editExercise
+watch(() => selectedExercise.value, (newExercise) => {
+  if (newExercise) {
+    editExercise.value = {
+      id: Number(newExercise.id || 0),
+      name: newExercise.name || '',
+      description: newExercise.description || '',
+      image: newExercise.image || null,
+      muscleGroups: newExercise.muscleGroups?.map((group) => group.id) || [],
+      defaultSets: newExercise.defaultSets || 0,
+      defaultReps: newExercise.defaultReps || 0,
+      defaultPauseSeconds: newExercise.defaultPauseSeconds || 0,
+    };
+  }
+}, { immediate: true });
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -292,14 +308,14 @@ const emit = defineEmits<{
 
 const removeExercise = async () => {
   try {
-    if (!props.selectedExercise && !props.workoutId) {
+    if (!selectedExercise.value && !props.workoutId) {
       console.error('No exercise or workout ID provided.');
       return;
     }
 
     let response = null;
 
-    response = await deleteExercise(props.selectedExercise?.id ?? 0);
+    response = await deleteExercise(selectedExercise.value?.id ?? 0);
     
     if (response) {
       toast.success(t('exercise.deleted'), { progressBar: true, duration: 1000 });
@@ -332,19 +348,19 @@ const updateExercise = async () => {
         toast.error(t('exercise.updateNoData'));
         return;
       }
-      if (!props.selectedExercise) {
+      if (!selectedExercise.value) {
         toast.error(t('exercise.updateNoSelected'));
         return;
       }
       const response = await updateExerciseInExercise(
-        props.selectedExercise?.id,
+        selectedExercise.value?.id,
         getSanitizedExerciseData() || {},
       );
       if (response) {
         // If there's a new image, upload it
         if (imageFile.value) {
           try {
-            await uploadExerciseImage(props.selectedExercise.id, imageFile.value);
+            await uploadExerciseImage(selectedExercise.value.id, imageFile.value);
             imageFile.value = null;
           } catch (imageError) {
             console.error('Error uploading image:', imageError);
