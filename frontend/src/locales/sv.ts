@@ -42,6 +42,7 @@ export default {
     sec: 'sekunder',
     secShort: 's',
     km: 'km',
+    minPerKm: 'min/km',
   },
   navigation: {
     resumeWorkout: 'Fortsätt passet',
