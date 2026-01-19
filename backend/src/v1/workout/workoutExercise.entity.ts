@@ -29,4 +29,7 @@ export class WorkoutExercise {
 
   @Column()
   pauseSeconds: number;
+
+  @Column({ type: 'decimal', precision: 6, scale: 2, nullable: true })
+  distance?: number;
 }
