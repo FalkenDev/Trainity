@@ -224,7 +224,7 @@
                               </v-col>
                               <v-col v-if="(session.data as ActivityLog).pace" cols="6">
                                 <div class="text-caption text-medium-emphasis">{{ $t('activity.pace') }}</div>
-                                <div class="text-body-1">{{ (session.data as ActivityLog).pace }} {{ $t('units.minPerKm') }}</div>
+                                <div class="text-body-1">{{ (session.data as ActivityLog).pace }}</div>
                               </v-col>
                               <v-col v-if="(session.data as ActivityLog).calories" cols="6">
                                 <div class="text-caption text-medium-emphasis">{{ $t('activity.calories') }}</div>
@@ -239,8 +239,7 @@
                         </v-col>
                         <v-col cols="12">
                           <div class="text-caption text-medium-emphasis">
-                            {{ $t('common.createdAt') }}: {{ formatDateTime(session.data.createdAt) }} <br />
-                            {{ $t('common.updatedAt') }}: {{ formatDateTime(session.data.updatedAt) }}
+                            {{ $t('common.createdAt') }}: {{ formatDateTime(session.data.createdAt) }}
                           </div>
                         </v-col>
                       </v-row>
