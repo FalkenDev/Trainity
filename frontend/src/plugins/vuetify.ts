@@ -28,6 +28,8 @@ export default createVuetify({
           cardBg: '#15181E',
           background: '#0C0E12',
           iconBackground: '#304d00ff',
+          borderColor: '#474747',
+          weekDayBg: '#242424',
         },
       },
       light: {

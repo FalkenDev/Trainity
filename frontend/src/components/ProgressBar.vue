@@ -1,25 +1,12 @@
 <template>
-  <v-card class="pa-5" style="border-radius: 10px">
-    <div class="d-flex justify-space-between align-center mb-4">
-      <div>
-        <h1 class="text-h6">{{ $t('progress.week') }} {{ currentWeek }}</h1>
-        <p v-if="streakInfo" class="text-body-2 text-grey-lighten-1">
-          {{
-            $t('progress.weekProgress', {
-              current: streakInfo.currentWeekWorkouts,
-              goal: streakInfo.weeklyWorkoutGoal,
-            })
-          }}
-        </p>
-      </div>
-      <div class="text-center d-flex align-center">
-        <v-icon size="32" color="orange"> mdi-fire </v-icon>
-        <p class="text-h5 pa-0 font-weight-bold mr-1">
-          {{ streakInfo?.currentStreak || 0 }}
-        </p>
-      </div>
+  <v-card
+    class="px-5 py-4 bg-cardBg d-flex ga-2 flex-column rounded-lg"
+    style="border: 1px solid #474747; box-shadow: none"
+  >
+    <div class="d-flex justify-space-between align-center">
+      <h1 class="text-h6">{{ $t('progress.week') }} {{ currentWeek }}</h1>
     </div>
-    <div class="d-flex justify-space-between align-center my-5">
+    <div class="d-flex justify-space-between align-center">
       <div v-for="(day, index) in weekdays" :key="day">
         <v-avatar :color="getDayColor(index)" size="40">
           <span class="text-body-2">{{ day }}</span>
@@ -32,21 +19,17 @@
 import { useI18n } from 'vue-i18n'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { useActivityStore } from '@/stores/activity.store'
-import { getStreakInfo } from '@/services/user.service'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
-import type { StreakInfo } from '@/interfaces/User.interface'
 
 const { tm } = useI18n({ useScope: 'global' })
 const workoutSessionStore = useWorkoutSessionStore()
 const activityStore = useActivityStore()
-const streakInfo = ref<StreakInfo | null>(null)
 
 const weekdays = computed(() => {
   const v = tm('progress.weekdaysShort')
   return Array.isArray(v) ? (v as string[]) : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 })
 
-// Get current week number (ISO week)
 const currentWeek = computed(() => {
   const now = new Date()
   const startOfYear = new Date(now.getFullYear(), 0, 1)
@@ -54,12 +37,10 @@ const currentWeek = computed(() => {
   return Math.ceil((days + startOfYear.getDay() + 1) / 7)
 })
 
-// Get the start and end of the current week (Monday to Sunday)
 const currentWeekRange = computed(() => {
   const now = new Date()
   const dayOfWeek = now.getDay()
   const monday = new Date(now)
-  // Adjust for Monday as start of week (0 = Sunday, 1 = Monday, etc.)
   const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
   monday.setDate(now.getDate() + diff)
   monday.setHours(0, 0, 0, 0)
@@ -71,7 +52,6 @@ const currentWeekRange = computed(() => {
   return { start: monday, end: sunday }
 })
 
-// Get completed sessions and activity logs for the current week
 const completedDaysThisWeek = computed(() => {
   const sessions = workoutSessionStore.workoutSessions as WorkoutSession[]
   const activityLogs = activityStore.activityLogs || []
@@ -79,22 +59,18 @@ const completedDaysThisWeek = computed(() => {
 
   const completedDays = new Set<number>()
 
-  // Add workout sessions
   sessions.forEach((session: WorkoutSession) => {
     if (session.status === 'finished' && session.endedAt) {
       const sessionDate = new Date(session.endedAt)
       if (sessionDate >= start && sessionDate <= end) {
-        // Get day of week (0 = Sunday, 1 = Monday, etc.)
         let dayOfWeek = sessionDate.getDay()
-        // Convert to Monday = 0, Sunday = 6
         dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1
         completedDays.add(dayOfWeek)
       }
     }
   })
 
-  // Add activity logs
-  activityLogs.forEach((log) => {
+  activityLogs.forEach(log => {
     const logDate = new Date(log.date)
     if (logDate >= start && logDate <= end) {
       let dayOfWeek = logDate.getDay()
@@ -106,15 +82,12 @@ const completedDaysThisWeek = computed(() => {
   return completedDays
 })
 
-// Get today's day index (Monday = 0, Sunday = 6)
 const todayIndex = computed(() => {
   const now = new Date()
   const dayOfWeek = now.getDay()
-  // Convert to Monday = 0, Sunday = 6
   return dayOfWeek === 0 ? 6 : dayOfWeek - 1
 })
 
-// Get color for each day based on workout completion
 function getDayColor(dayIndex: number): string {
   if (completedDaysThisWeek.value.has(dayIndex)) {
     return 'success'
@@ -124,27 +97,4 @@ function getDayColor(dayIndex: number): string {
   }
   return 'grey-darken-3'
 }
-
-// Load streak info
-const loadStreakInfo = async () => {
-  try {
-    streakInfo.value = await getStreakInfo()
-  } catch (error) {
-    console.error('Failed to load streak info:', error)
-  }
-}
-
-// Load streak info on mount and when sessions or activity logs change
-onMounted(() => {
-  loadStreakInfo()
-})
-
-// Watch for changes in workout sessions and activity logs
-watch(
-  () => [workoutSessionStore.workoutSessions, activityStore.activityLogs],
-  () => {
-    loadStreakInfo()
-  },
-  { deep: true }
-)
 </script>
