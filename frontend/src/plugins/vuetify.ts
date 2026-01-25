@@ -12,101 +12,105 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
-export default createVuetify( {
+export default createVuetify({
   theme: {
     defaultTheme: 'dark',
     themes: {
       dark: {
         dark: true,
         colors: {
+          primary: '#ABFF1A',
+          secondary: '#424242',
+          accent: '#82B1FF',
+          error: '#FF0000',
+          textPrimary: '#FFFFFF',
+          textSecondary: '#A1A1A1',
+          cardBg: '#15181E',
+          background: '#0C0E12',
         },
       },
       light: {
         dark: false,
-        colors: {
-        },
-      }
+        colors: {},
+      },
     },
   },
   defaults: {
     VBtn: {
       density: 'compact',
-      height: '40px'
+      height: '40px',
     },
     VBtnToggle: {
-      density: 'compact'
+      density: 'compact',
     },
     VAlert: {
-      density: 'compact'
+      density: 'compact',
     },
     VBanner: {
-      density: 'compact'
+      density: 'compact',
     },
-    VTextField: {
-      density: 'compact'
-    },
+    VTextField: {},
     VTextarea: {
-      density: 'compact'
+      density: 'compact',
     },
     VSelect: {
-      density: 'compact'
+      density: 'compact',
     },
     VAutocomplete: {
-      density: 'compact'
+      density: 'compact',
     },
     VCombobox: {
       density: 'compact',
-      delimiters: [',']
+      delimiters: [','],
     },
     VFileInput: {
-      density: 'compact'
+      density: 'compact',
     },
     VCheckbox: {
-      density: 'compact'
+      density: 'compact',
     },
     VRadio: {
-      density: 'compact'
+      density: 'compact',
     },
     VRadioGroup: {
-      density: 'compact'
+      density: 'compact',
     },
     VSwitch: {
-      density: 'compact'
+      density: 'compact',
     },
     VSlider: {
-      density: 'compact'
+      density: 'compact',
     },
     VRangeSlider: {
-      density: 'compact'
+      density: 'compact',
     },
     VToolbar: {
-      density: 'compact'
+      density: 'compact',
     },
     VTabs: {
-      density: 'compact'
+      density: 'compact',
     },
     VBreadcrumbs: {
-      density: 'compact'
+      density: 'compact',
     },
     VPagination: {
-      density: 'compact'
+      density: 'compact',
     },
     VDataTable: {
-      density: 'compact'
+      density: 'compact',
     },
     VDataTableServer: {
-      density: 'compact'
+      density: 'compact',
     },
     VTimeline: {
-      density: 'compact'
+      density: 'compact',
     },
-    VTimelineItem: {
-    },
+    VTimelineItem: {},
     VAvatar: {
-      density: 'compact'
+      density: 'compact',
     },
     VRating: {
-      density: 'compact'
-    }
+      density: 'compact',
+    },
   },
-} )
+})
