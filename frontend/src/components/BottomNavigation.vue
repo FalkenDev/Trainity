@@ -1,44 +1,25 @@
 <template>
-  <v-bottom-navigation class="d-flex justify-space-around">
-    <v-btn
-      icon
-      to="/"
-    >
-      <v-icon>mdi-home</v-icon>
+  <v-bottom-navigation bg-color="cardBg" class="d-flex justify-space-around">
+    <v-btn icon to="/">
+      <v-icon :color="route.path === '/' ? 'primary' : ''">mdi-home</v-icon>
     </v-btn>
-    <!-- Disabled for now: Eanble when implemented -->
-    <v-btn
-      icon
-      to="/statistics"
-      :disabled="true"
-    >
+    <v-btn icon to="/calendar">
+      <v-icon :color="route.path === '/calendar' ? 'primary' : ''">mdi-calendar</v-icon>
+    </v-btn>
+    <v-btn icon to="/workout">
+      <v-icon color="primary" size="40"> mdi-plus-circle </v-icon>
+    </v-btn>
+    <v-btn icon to="/statistics" :disabled="true">
       <v-icon>mdi-chart-bar</v-icon>
     </v-btn>
-    <!-- Disabled for now: Eanble when implemented -->
-    <v-btn
-      icon
-      to="/workout"
-      :disabled="false"
-    >
-      <v-icon
-        color="orange-darken-1"
-        size="40"
-      >
-        mdi-plus-circle
-      </v-icon>
-    </v-btn>
-    <!-- Disabled for now: Eanble when implemented -->
-    <v-btn
-      icon
-      to="/calendar"
-    >
-      <v-icon>mdi-calendar</v-icon>
-    </v-btn>
-    <v-btn
-      icon
-      to="/settings"
-    >
-      <v-icon>mdi-cog</v-icon>
+    <v-btn icon to="/settings">
+      <v-icon :color="route.path === '/settings' ? 'primary' : ''">mdi-account</v-icon>
     </v-btn>
   </v-bottom-navigation>
 </template>
+
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+</script>

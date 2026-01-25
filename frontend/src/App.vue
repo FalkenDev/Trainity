@@ -1,5 +1,5 @@
 <template>
-  <v-app class="background-background">
+  <v-app>
     <VSonner position="top-center" />
     <v-main
       :style="{
