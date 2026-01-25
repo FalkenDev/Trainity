@@ -79,7 +79,8 @@ export default {
     english: 'Engelska',
     swedish: 'Svenska',
     goals: 'Mål',
-    goalsDescription: 'Ställ in och spåra dina träningsmål för att hålla dig motiverad och på rätt spår.',
+    goalsDescription:
+      'Ställ in och spåra dina träningsmål för att hålla dig motiverad och på rätt spår.',
     editAccount: 'Redigera konto',
     profilePhoto: 'Profilbild',
     profileDetails: 'Profiluppgifter',
@@ -94,7 +95,8 @@ export default {
     accountUpdated: 'Kontot uppdaterades',
     failedToUpdateAccount: 'Kunde inte uppdatera konto',
     weeklyWorkoutGoal: 'Veckomål för träning',
-    weeklyWorkoutGoalDescription: 'Ange hur många dagar per vecka du vill träna. Nå ditt mål varje vecka för att bygga din streak!',
+    weeklyWorkoutGoalDescription:
+      'Ange hur många dagar per vecka du vill träna. Nå ditt mål varje vecka för att bygga din streak!',
     workoutsPerWeek: '{count} träningspass per vecka',
     yourProgress: 'Dina Framsteg',
     currentStreak: 'Nuvarande streak',
@@ -138,6 +140,8 @@ export default {
     passwordsDoNotMatch: 'Lösenorden matchar inte',
     passwordsDoNotMatchAlert: 'Lösenorden matchar inte!',
     accountCreatedSuccess: 'Konto skapat! Logga in för att fortsätta.',
+    forgotPassword: 'Glömt lösenord?',
+    orContinueWith: 'eller fortsätt med',
   },
   errors: {
     generic: 'Något gick fel',
@@ -540,4 +544,4 @@ export default {
     reps: 'Reps',
     done: 'Klar',
   },
-} as const;
+} as const

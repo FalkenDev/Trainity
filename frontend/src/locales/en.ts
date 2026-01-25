@@ -86,7 +86,7 @@ export default {
     fullName: 'Full name',
     email: 'Email',
     changePassword: 'Change password',
-    changePasswordHint: 'Leave blank if you don\'t want to change it.',
+    changePasswordHint: "Leave blank if you don't want to change it.",
     currentPassword: 'Current password',
     currentPasswordRequired: 'Current password is required',
     newPassword: 'New password',
@@ -94,13 +94,14 @@ export default {
     accountUpdated: 'Account updated',
     failedToUpdateAccount: 'Failed to update account',
     weeklyWorkoutGoal: 'Weekly Workout Goal',
-    weeklyWorkoutGoalDescription: 'Set how many days per week you want to work out. Meet your goal each week to build your streak!',
+    weeklyWorkoutGoalDescription:
+      'Set how many days per week you want to work out. Meet your goal each week to build your streak!',
     workoutsPerWeek: '{count} workouts per week',
     yourProgress: 'Your Progress',
     currentStreak: 'Current streak',
     weeks: 'weeks',
     thisWeekProgress: 'This week',
-    goalReachedThisWeek: '🎉 Great job! You\'ve reached your weekly goal!',
+    goalReachedThisWeek: "🎉 Great job! You've reached your weekly goal!",
     goalUpdated: 'Weekly goal updated',
     failedToUpdateGoal: 'Failed to update goal',
     invalidGoalValue: 'Goal must be between 1 and 7 days',
@@ -111,7 +112,7 @@ export default {
     welcomeBackSubtitle: 'Welcome back! Fuel your journey.',
     emailAddress: 'Email address',
     password: 'Password',
-    login: 'Login',
+    login: 'Sign in',
     signUp: 'Sign up',
     dontHaveAccount: "Don't have an account?",
 
@@ -141,6 +142,8 @@ export default {
     loginFailed: 'Login failed. Please check your credentials.',
     accountCreationFailed: 'Account creation failed',
     accountAlreadyExists: 'An account with this email already exists',
+    forgotPassword: 'Forgot password?',
+    orContinueWith: 'or continue with',
   },
   errors: {
     generic: 'Something went wrong',
@@ -173,7 +176,6 @@ export default {
     startNewWorkout: 'Start new workout',
     addPreviousWorkout: 'Add previous workout',
     createNewWorkout: 'Create new workout',
-
   },
   activity: {
     logActivity: 'Log Activity',
@@ -362,8 +364,7 @@ export default {
     },
     side_lying_leg_raise_obliques: {
       name: 'Side-lying leg raise (obliques)',
-      description:
-        'Lie on your side; lift using obliques, keep hips stacked, control tempo.',
+      description: 'Lie on your side; lift using obliques, keep hips stacked, control tempo.',
     },
   },
   exerciseForm: {
@@ -548,4 +549,4 @@ export default {
     reps: 'Reps',
     done: 'Done',
   },
-} as const;
+} as const

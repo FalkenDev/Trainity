@@ -1,12 +1,10 @@
 <template>
-  <v-app>
+  <v-app class="background-background">
     <VSonner position="top-center" />
     <v-main
       :style="{
         paddingBottom:
-          authStore.isAuthenticated &&
-          workoutSessionStore.selectedWorkoutSession &&
-          checkPath()
+          authStore.isAuthenticated && workoutSessionStore.selectedWorkoutSession && checkPath()
             ? '101px'
             : '',
       }"
@@ -14,11 +12,7 @@
       <router-view :key="$route.name" />
     </v-main>
     <v-card
-      v-if="
-        authStore.isAuthenticated &&
-          workoutSessionStore.selectedWorkoutSession &&
-          checkPath()
-      "
+      v-if="authStore.isAuthenticated && workoutSessionStore.selectedWorkoutSession && checkPath()"
       class="resume-card d-flex align-center justify-space-between px-5 border-b-md"
       height="45"
       color="#262626"
@@ -27,9 +21,7 @@
       rounded="0"
       @click="routeToSelectedWorkoutSession"
     >
-      <v-icon color="primary">
-        mdi-chevron-up
-      </v-icon>
+      <v-icon color="primary"> mdi-chevron-up </v-icon>
       <h1 class="text-body-1 text-primary">
         {{ $t('navigation.resumeWorkout') }}
       </h1>
@@ -40,27 +32,27 @@
 </template>
 
 <script lang="ts" setup>
-import { useAuthStore } from "./stores/auth.store";
-import { VSonner } from "vuetify-sonner";
-import { useWorkoutSessionStore } from "./stores/workoutSession.store";
-import "vuetify-sonner/style.css";
-import router from "./router";
+import { useAuthStore } from './stores/auth.store'
+import { VSonner } from 'vuetify-sonner'
+import { useWorkoutSessionStore } from './stores/workoutSession.store'
+import 'vuetify-sonner/style.css'
+import router from './router'
 
-const workoutSessionStore = useWorkoutSessionStore();
-const authStore = useAuthStore();
+const workoutSessionStore = useWorkoutSessionStore()
+const authStore = useAuthStore()
 
 const routeToSelectedWorkoutSession = () => {
   if (
     workoutSessionStore.selectedWorkoutSession &&
     'id' in workoutSessionStore.selectedWorkoutSession
   ) {
-    router.push("/session/" + workoutSessionStore.selectedWorkoutSession.id);
+    router.push('/session/' + workoutSessionStore.selectedWorkoutSession.id)
   }
-};
+}
 
 const checkPath = () => {
-  return !router.currentRoute.value.path.startsWith("/session");
-};
+  return !router.currentRoute.value.path.startsWith('/session')
+}
 </script>
 <style scoped>
 .resume-card {
