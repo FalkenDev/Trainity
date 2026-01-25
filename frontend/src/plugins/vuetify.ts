@@ -27,6 +27,7 @@ export default createVuetify({
           textSecondary: '#A1A1A1',
           cardBg: '#15181E',
           background: '#0C0E12',
+          iconBackground: '#304d00ff',
         },
       },
       light: {

@@ -26,6 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { UserWithoutPasswordDto } from '../auth/dto/UserWithoutPassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { UpdateUserPreferencesDto } from './dto/UpdateUserPreferences.dto';
 import { UploadService } from '../upload/upload.service';
 
 @ApiTags('users')
@@ -145,5 +146,18 @@ export class UserController {
       +req.user.id,
       body.weeklyWorkoutGoal,
     );
+  }
+
+  @Put('preferences')
+  @ApiOperation({ summary: 'Update user preferences and onboarding data' })
+  @ApiOkResponse({ type: UserWithoutPasswordDto })
+  updatePreferences(
+    @Req() req: RequestWithUser,
+    @Body() dto: UpdateUserPreferencesDto,
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.userService.updateUserPreferences(+req.user.id, dto);
   }
 }

@@ -9,6 +9,7 @@ import { User } from './user.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { UserWithoutPasswordDto } from '../auth/dto/UserWithoutPassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { UpdateUserPreferencesDto } from './dto/UpdateUserPreferences.dto';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { ActivityLog } from '../activityLog/activityLog.entity';
@@ -390,6 +391,43 @@ export class UserService {
     user.weeklyWorkoutGoal = weeklyWorkoutGoal;
     const updated = await this.userRepo.save(user);
 
+    return new UserWithoutPasswordDto(updated);
+  }
+
+  /**
+   * Update user preferences (onboarding data)
+   */
+  async updateUserPreferences(
+    userId: number,
+    dto: UpdateUserPreferencesDto,
+  ): Promise<UserWithoutPasswordDto> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update all provided fields
+    if (dto.unitScale !== undefined) user.unitScale = dto.unitScale;
+    if (dto.weight !== undefined) user.weight = dto.weight;
+    if (dto.height !== undefined) user.height = dto.height;
+    if (dto.dateOfBirth !== undefined)
+      user.dateOfBirth = new Date(dto.dateOfBirth);
+    if (dto.gender !== undefined) user.gender = dto.gender;
+    if (dto.primaryGoal !== undefined) user.primaryGoal = dto.primaryGoal;
+    if (dto.weeklyWorkoutGoal !== undefined) {
+      if (dto.weeklyWorkoutGoal < 1 || dto.weeklyWorkoutGoal > 7) {
+        throw new BadRequestException(
+          'Weekly workout goal must be between 1 and 7',
+        );
+      }
+      user.weeklyWorkoutGoal = dto.weeklyWorkoutGoal;
+    }
+    if (dto.targetWeight !== undefined) user.targetWeight = dto.targetWeight;
+    if (dto.goalTimeframe !== undefined) user.goalTimeframe = dto.goalTimeframe;
+    if (dto.onboardingCompleted !== undefined)
+      user.onboardingCompleted = dto.onboardingCompleted;
+
+    const updated = await this.userRepo.save(user);
     return new UserWithoutPasswordDto(updated);
   }
 }

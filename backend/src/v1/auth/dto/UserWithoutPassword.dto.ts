@@ -29,6 +29,33 @@ export class UserWithoutPasswordDto {
   @ApiProperty({ default: 0 })
   currentWeekWorkouts: number;
 
+  @ApiProperty({ required: false })
+  unitScale?: string;
+
+  @ApiProperty({ required: false })
+  weight?: number;
+
+  @ApiProperty({ required: false })
+  height?: number;
+
+  @ApiProperty({ required: false })
+  dateOfBirth?: Date;
+
+  @ApiProperty({ required: false })
+  gender?: string;
+
+  @ApiProperty({ required: false })
+  primaryGoal?: string;
+
+  @ApiProperty({ required: false })
+  targetWeight?: number;
+
+  @ApiProperty({ required: false })
+  goalTimeframe?: number;
+
+  @ApiProperty({ default: false })
+  onboardingCompleted: boolean;
+
   constructor(user: User) {
     this.id = user.id;
     this.email = user.email;
@@ -39,5 +66,14 @@ export class UserWithoutPasswordDto {
     this.weeklyWorkoutGoal = user.weeklyWorkoutGoal ?? 3;
     this.currentStreak = user.currentStreak ?? 0;
     this.currentWeekWorkouts = user.currentWeekWorkouts ?? 0;
+    this.unitScale = user.unitScale;
+    this.weight = user.weight;
+    this.height = user.height;
+    this.dateOfBirth = user.dateOfBirth;
+    this.gender = user.gender;
+    this.primaryGoal = user.primaryGoal;
+    this.targetWeight = user.targetWeight;
+    this.goalTimeframe = user.goalTimeframe;
+    this.onboardingCompleted = user.onboardingCompleted ?? false;
   }
 }

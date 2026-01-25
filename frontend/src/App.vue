@@ -27,7 +27,7 @@
       </h1>
       <div style="width: 40px" />
     </v-card>
-    <BottomNavigation v-if="authStore.isAuthenticated" />
+    <BottomNavigation v-if="authStore.isAuthenticated && !$route.meta.hideBottomNav" />
   </v-app>
 </template>
 
