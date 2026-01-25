@@ -1,156 +1,120 @@
 <template>
-  <v-container
-    class="fill-height pa-0 primary-gradient-bg"
-    fluid
-  >
-    <v-row
-      class="fill-height ma-0 background-image"
-      :class="smAndUp ? 'align-center' : 'align-end'"
-      justify="center"
-    >
-      <v-col
-        :class="smAndUp ? '' : 'pa-0'"
-        cols="12"
-        lg="5"
-        md="8"
-        sm="10"
-        xl="4"
+  <div class="login-page d-flex flex-column fill-height pa-0 background-background px-5 py-16">
+    <v-btn icon color="textSecondary" variant="text" @click="navigateToLogin">
+      <v-icon size="32">mdi-arrow-left</v-icon>
+    </v-btn>
+    <div class="my-5">
+      <h1 class="text-textPrimary">Register</h1>
+      <p class="text-textSecondary">Start your fitness transformation today</p>
+    </div>
+
+    <v-form ref="form" @submit.prevent="handleCreateAccount">
+      <v-text-field
+        v-model="fullName"
+        autocomplete="name"
+        class="mb-4"
+        :label="$t('auth.fullName')"
+        prepend-inner-icon="mdi-account-outline"
+        required
+        :rules="nameRules"
+        variant="outlined"
+        hide-details
+      />
+
+      <v-text-field
+        v-model="email"
+        class="mb-4"
+        autocomplete="email"
+        :label="$t('auth.emailAddress')"
+        prepend-inner-icon="mdi-email-outline"
+        required
+        :rules="emailRules"
+        type="email"
+        variant="outlined"
+        hide-details
+      />
+
+      <v-text-field
+        v-model="password_new"
+        :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
+        class="mb-4"
+        :label="$t('auth.password')"
+        autocomplete="new-password"
+        prepend-inner-icon="mdi-lock-outline"
+        required
+        :rules="passwordRules"
+        :type="showPassword ? 'text' : 'password'"
+        variant="outlined"
+        hide-details
+        @click:append-inner="showPassword = !showPassword"
+      />
+
+      <v-text-field
+        v-model="confirmPassword_new"
+        :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
+        class="mb-4"
+        :label="$t('auth.confirmPassword')"
+        autocomplete="new-password"
+        prepend-inner-icon="mdi-lock-check-outline"
+        required
+        :rules="confirmPasswordRules"
+        :type="showConfirmPassword ? 'text' : 'password'"
+        variant="outlined"
+        hide-details
+        @click:append-inner="showConfirmPassword = !showConfirmPassword"
+      />
+
+      <div class="d-flex flex-column ga-2 mt-4 mb-6">
+        <div class="d-flex align-cente">
+          <v-avatar size="20" class="mr-2" color="iconBackground">
+            <v-icon color="primary" size="14">mdi-check</v-icon>
+          </v-avatar>
+          <h1 class="text-textSecondary text-body-2 align-center d-flex">
+            Personalized workout plans
+          </h1>
+        </div>
+        <div class="d-flex align-cente">
+          <v-avatar size="20" class="mr-2" color="iconBackground">
+            <v-icon color="primary" size="14">mdi-check</v-icon>
+          </v-avatar>
+          <h1 class="text-textSecondary text-body-2 align-center d-flex">Track your progress</h1>
+        </div>
+        <div class="d-flex align-cente">
+          <v-avatar size="20" class="mr-2" color="iconBackground">
+            <v-icon color="primary" size="14">mdi-check</v-icon>
+          </v-avatar>
+          <h1 class="text-textSecondary text-body-2 align-center d-flex">Join the community</h1>
+        </div>
+      </div>
+
+      <v-btn
+        block
+        class="mb-6 mt-2 text-white"
+        color="primary"
+        :disabled="authStore.loading"
+        :loading="authStore.loading"
+        rounded="lg"
+        size="large"
+        type="submit"
       >
-        <v-card
-          class="pa-sm-8 pa-md-10 pa-6 mx-auto"
-          :class="smAndUp ? 'rounded-xl' : 'rounded-t-xl'"
-          elevation="12"
-        >
-          <v-card-title
-            class="text-h4 font-weight-bold text-center mb-2 primary--text"
-          >
-            <v-icon
-              class="mr-2"
-              color="primary"
-              size="large"
-            >
-              mdi-account-plus-outline
-            </v-icon>
-            {{ $t('auth.joinMovement') }}
-          </v-card-title>
-          <v-card-subtitle class="text-center mb-8">
-            {{ $t('auth.createAccountSubtitle') }}
-          </v-card-subtitle>
+        {{ $t('auth.createAccount') }}
+      </v-btn>
+    </v-form>
 
-          <v-form
-            ref="form"
-            @submit.prevent="handleCreateAccount"
-          >
-            <v-text-field
-              v-model="fullName"
-              autocomplete="name"
-              class="mb-4"
-              :label="$t('auth.fullName')"
-              prepend-inner-icon="mdi-account-outline"
-              required
-              :rules="nameRules"
-              variant="outlined"
-            />
+    <div class="text-center">
+      <span class="text-grey-darken-1 text-body-2">
+        {{ $t('auth.bySigningUp') }}
+        <a href="#" class="text-primary" @click.prevent="showTermsDialog = true">{{
+          $t('auth.termsAndConditions')
+        }}</a>
+        {{ $t('common.and') }}
+        <a href="#" class="text-primary" @click.prevent="showTermsDialog = true">{{
+          $t('auth.privacyPolicy')
+        }}</a>
+      </span>
+    </div>
 
-            <v-text-field
-              v-model="email"
-              class="mb-4"
-              autocomplete="email"
-              :label="$t('auth.emailAddress')"
-              prepend-inner-icon="mdi-email-outline"
-              required
-              :rules="emailRules"
-              type="email"
-              variant="outlined"
-            />
-
-            <v-text-field
-              v-model="password_new"
-              :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-              class="mb-4"
-              :label="$t('auth.password')"
-              autocomplete="new-password"
-              prepend-inner-icon="mdi-lock-outline"
-              required
-              :rules="passwordRules"
-              :type="showPassword ? 'text' : 'password'"
-              variant="outlined"
-              @click:append-inner="showPassword = !showPassword"
-            />
-
-            <v-text-field
-              v-model="confirmPassword_new"
-              :append-inner-icon="
-                showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'
-              "
-              class="mb-4"
-              :label="$t('auth.confirmPassword')"
-              autocomplete="new-password"
-              prepend-inner-icon="mdi-lock-check-outline"
-              required
-              :rules="confirmPasswordRules"
-              :type="showConfirmPassword ? 'text' : 'password'"
-              variant="outlined"
-              @click:append-inner="showConfirmPassword = !showConfirmPassword"
-            />
-
-            <v-checkbox
-              v-model="agreeToTerms"
-              class="mb-2"
-              required
-              :rules="[(v: boolean) => !!v || t('auth.mustAgreeToContinue')]"
-            >
-              <template #label>
-                <div class="text-body-2">
-                  {{ $t('auth.agreeToThe') }}
-                  <a
-                    href="#"
-                    @click.prevent="showTermsDialog = true"
-                  >{{ $t('auth.termsAndConditions') }}</a>
-                </div>
-              </template>
-            </v-checkbox>
-
-            <v-btn
-              block
-              class="mb-6 mt-2 text-white"
-              color="primary"
-              :disabled="authStore.loading"
-              :loading="authStore.loading"
-              rounded="lg"
-              size="large"
-              type="submit"
-            >
-              <v-icon
-                class="mr-2"
-                left
-              >
-                mdi-check-circle-outline
-              </v-icon>
-              {{ $t('auth.createAccount') }}
-            </v-btn>
-          </v-form>
-
-          <div class="text-center">
-            <span class="text-grey-darken-1">{{ $t('auth.alreadyHaveAccount') }}</span>
-            <v-btn
-              class="pl-1 text-capitalize"
-              color="primary"
-              size="small"
-              variant="text"
-              @click="navigateToLogin"
-            >
-              {{ $t('auth.login') }}
-            </v-btn>
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-dialog
-      v-model="showTermsDialog"
-      max-width="600px"
-    >
+    <v-dialog v-model="showTermsDialog" max-width="600px">
       <v-card rounded="lg">
         <v-card-title class="text-h5 primary--text">
           {{ $t('auth.termsAndConditions') }}
@@ -163,104 +127,86 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            color="primary"
-            text
-            @click="showTermsDialog = false"
-          >
+          <v-btn color="primary" text @click="showTermsDialog = false">
             {{ $t('common.close') }}
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { useRouter } from 'vue-router';
-  import { useAuthStore } from '@/stores/auth.store';
-  import type { VForm } from 'vuetify/components';
-  import { useDisplay } from 'vuetify';
-  import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.store'
+import type { VForm } from 'vuetify/components'
+import { useI18n } from 'vue-i18n'
 
-  const { smAndUp } = useDisplay();
+const router = useRouter()
+const authStore = useAuthStore()
+const { t } = useI18n({ useScope: 'global' })
 
-  const router = useRouter();
-  const authStore = useAuthStore();
-  const { t } = useI18n({ useScope: 'global' });
+const form = ref<VForm | null>(null)
+const fullName = ref('')
+const email = ref('')
+const password_new = ref('')
+const confirmPassword_new = ref('')
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+const showTermsDialog = ref(false)
 
-  const form = ref<VForm | null>(null);
-  const fullName = ref('');
-  const email = ref('');
-  const password_new = ref('');
-  const confirmPassword_new = ref('');
-  const showPassword = ref(false);
-  const showConfirmPassword = ref(false);
-  const agreeToTerms = ref(false);
-  const showTermsDialog = ref(false);
+const nameRules = [(v: string) => !!v || t('auth.fullNameRequired')]
+const emailRules = [
+  (v: string) => !!v || t('auth.emailRequired'),
+  (v: string) => /.+@.+\..+/.test(v) || t('auth.emailValid'),
+]
+const passwordRules = [
+  (v: string) => !!v || t('auth.passwordRequired'),
+  (v: string) => v.length >= 8 || t('auth.passwordMinLength'),
+]
+const confirmPasswordRules = computed(() => [
+  (v: string) => !!v || t('auth.confirmPasswordRequired'),
+  (v: string) => v === password_new.value || t('auth.passwordsDoNotMatch'),
+])
 
-  const nameRules = [(v: string) => !!v || t('auth.fullNameRequired')];
-  const emailRules = [
-    (v: string) => !!v || t('auth.emailRequired'),
-    (v: string) => /.+@.+\..+/.test(v) || t('auth.emailValid'),
-  ];
-  const passwordRules = [
-    (v: string) => !!v || t('auth.passwordRequired'),
-    (v: string) => v.length >= 8 || t('auth.passwordMinLength'),
-  ];
-  const confirmPasswordRules = computed(() => [
-    (v: string) => !!v || t('auth.confirmPasswordRequired'),
-    (v: string) => v === password_new.value || t('auth.passwordsDoNotMatch'),
-  ]);
+const handleCreateAccount = async () => {
+  if (!form.value) return
+  const { valid } = await form.value.validate()
 
-  const handleCreateAccount = async () => {
-    if (!form.value) return;
-    const { valid } = await form.value.validate();
+  if (password_new.value !== confirmPassword_new.value) {
+    alert(t('auth.passwordsDoNotMatchAlert'))
+    return
+  }
 
-    if (password_new.value !== confirmPassword_new.value) {
-      alert(t('auth.passwordsDoNotMatchAlert'));
-      return;
+  if (valid) {
+    const success = await authStore.createAccount({
+      fullName: fullName.value,
+      email: email.value,
+      password: password_new.value,
+    })
+    if (success) {
+      // Registration auto-logs in via the auth store, then redirect to onboarding
+      router.push('/onboarding')
     }
+  }
+}
 
-    if (valid) {
-      const success = await authStore.createAccount({
-        fullName: fullName.value,
-        email: email.value,
-        password: password_new.value,
-      });
-      if (success) {
-        // Registration auto-logs in via the auth store.
-        router.push('/');
-      }
-    }
-  };
-
-  const navigateToLogin = () => {
-    router.push('/login');
-  };
+const navigateToLogin = () => {
+  router.push('/login')
+}
 </script>
 
 <style scoped>
-.v-btn.bg-primary .v-btn__content {
-  color: white;
+:deep(.v-field) {
+  background-color: #15181e !important;
+  border-radius: 12px !important;
 }
 
-/* Style for the terms link */
-.v-label a {
-  color: rgb(var(--v-theme-primary));
-  text-decoration: none;
-}
-.v-label a:hover {
-  text-decoration: underline;
+:deep(.v-field__outline__start) {
+  border-radius: 12px 0 0 12px !important;
 }
 
-.background-image {
-  background-image: url("@/assets/gym.jpg");
-  background-size: cover;
-  background-position: center;
-  background-blend-mode: darken;
-  background-color: rgba(0, 0, 0, 0.5);
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+:deep(.v-field__outline__end) {
+  border-radius: 0 12px 12px 0 !important;
 }
 </style>
