@@ -136,8 +136,16 @@ const navigateToCreateAccount = () => {
 </script>
 
 <style scoped>
-:deep(.v-input__control) {
+:deep(.v-field) {
   background-color: #15181e !important;
-  border-radius: 6px;
+  border-radius: 12px !important;
+}
+
+:deep(.v-field__outline__start) {
+  border-radius: 12px 0 0 12px !important;
+}
+
+:deep(.v-field__outline__end) {
+  border-radius: 0 12px 12px 0 !important;
 }
 </style>
