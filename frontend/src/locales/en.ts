@@ -552,6 +552,7 @@ export default {
     emptyDescription: 'Create your first workout and start training.',
     createWorkout: 'Create workout',
     showAllWorkouts: 'Show all workouts',
+    addNewWorkout: 'Add new workout',
   },
   exerciseCatalog: {
     addFromGlobal: 'Add from global exercises',

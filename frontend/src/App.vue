@@ -13,19 +13,19 @@
     </v-main>
     <v-card
       v-if="authStore.isAuthenticated && workoutSessionStore.selectedWorkoutSession && checkPath()"
-      class="resume-card d-flex align-center justify-space-between px-5 border-b-md"
+      class="resume-card d-flex align-center justify-space-between px-5 border-t-sm border-b-sm"
+      style="border-color: #abff1a !important"
       height="45"
-      color="#262626"
+      color="cardBg"
       width="100%"
       elevation="0"
       rounded="0"
       @click="routeToSelectedWorkoutSession"
     >
-      <v-icon color="primary"> mdi-chevron-up </v-icon>
       <h1 class="text-body-1 text-primary">
         {{ $t('navigation.resumeWorkout') }}
       </h1>
-      <div style="width: 40px" />
+      <v-icon color="primary"> mdi-chevron-right </v-icon>
     </v-card>
     <BottomNavigation v-if="authStore.isAuthenticated && !$route.meta.hideBottomNav" />
   </v-app>
