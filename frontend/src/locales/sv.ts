@@ -547,6 +547,7 @@ export default {
     emptyDescription: 'Skapa ditt första träningspass och börja träna.',
     createWorkout: 'Skapa träningspass',
     showAllWorkouts: 'Visa alla träningspass',
+    addNewWorkout: 'Lägg till nytt träningspass',
   },
   exerciseCatalog: {
     addFromGlobal: 'Lägg till från globala övningar',
