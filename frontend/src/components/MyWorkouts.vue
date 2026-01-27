@@ -2,12 +2,9 @@
   <div class="pa-0">
     <div class="d-flex align-center justify-space-between mb-3">
       <div>
-        <h1 class="text-h6 font-weight-bold mb-0">
+        <h1 class="text-h6 font-weight-bold text-textPrimary mb-0">
           {{ $t('myWorkouts.title') }}
         </h1>
-        <div class="text-caption text-textSecondary mt-1">
-          {{ workouts.length }} {{ $t('common.total') }}
-        </div>
       </div>
     </div>
 
