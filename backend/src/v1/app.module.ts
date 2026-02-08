@@ -12,6 +12,7 @@ import { MuscleGroupModule } from './muscleGroup/muscleGroup.module';
 import { GlobalExerciseModule } from './globalExercise/globalExercise.module';
 import { ActivityModule } from './activity/activity.module';
 import { ActivityLogModule } from './activityLog/activityLog.module';
+import { WeightLogModule } from './weightLog/weightLog.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ActivityLogModule } from './activityLog/activityLog.module';
     WorkoutSessionModule,
     ActivityModule,
     ActivityLogModule,
+    WeightLogModule,
   ],
   providers: [AppService, JwtStrategy],
 })

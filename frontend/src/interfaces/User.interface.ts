@@ -17,6 +17,9 @@ export interface User {
   targetWeight?: number
   goalTimeframe?: number
   onboardingCompleted?: boolean
+  showWeightTracking?: boolean
+  weightGoalType?: string
+  startWeight?: number
   createdAt: string
   updatedAt: string
 }

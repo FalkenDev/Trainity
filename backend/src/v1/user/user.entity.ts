@@ -67,7 +67,16 @@ export class User {
   targetWeight: number;
 
   @Column({ type: 'int', nullable: true })
-  goalTimeframe: number; // in weeks
+  goalTimeframe: number;
+
+  @Column({ default: false })
+  showWeightTracking: boolean;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  weightGoalType: string;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  startWeight: number; // in weeks
 
   @Column({ default: false })
   onboardingCompleted: boolean;
