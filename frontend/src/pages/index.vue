@@ -26,16 +26,17 @@
     </v-card>
     <div class="d-flex ga-3">
       <v-btn
+        v-if="authStore.user?.showWeightTracking"
         class="flex-grow-1 bg-cardBg rounded-lg"
         style="border: 1px solid #474747; box-shadow: none"
         prepend-icon="mdi-weight"
         size="small"
-        @click="$router.push('/log-activity')"
+        @click="isWeightLogDialogOpen = true"
       >
         <template #prepend>
           <v-icon color="yellow-darken-1">mdi-weight</v-icon>
         </template>
-        <span class="text-caption">Log Weight</span>
+        <span class="text-caption">{{ $t('weightLog.logWeight') }}</span>
       </v-btn>
       <v-btn
         class="flex-grow-1 bg-cardBg rounded-lg"
@@ -88,17 +89,23 @@
       </v-card>
     </div>
     <MyWorkouts />
+
+    <WeightLogDialog v-model="isWeightLogDialogOpen" @weight-updated="loadStreakInfo" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { getStreakInfo } from '@/services/user.service'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
+import { useAuthStore } from '@/stores/auth.store'
+import WeightLogDialog from '@/components/WeightLogDialog.vue'
 import type { StreakInfo } from '@/interfaces/User.interface'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
 
 const workoutSessionStore = useWorkoutSessionStore()
+const authStore = useAuthStore()
 const streakInfo = ref<StreakInfo | null>(null)
+const isWeightLogDialogOpen = ref(false)
 
 // Get the start and end of the current week (Monday to Sunday)
 const currentWeekRange = computed(() => {

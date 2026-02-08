@@ -1,4 +1,12 @@
-import { IsBoolean, IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -29,4 +37,21 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   showRpe?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  showWeightTracking?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['lose', 'gain', 'maintain'])
+  weightGoalType?: string;
+
+  @IsOptional()
+  @IsNumber()
+  targetWeight?: number;
+
+  @IsOptional()
+  @IsNumber()
+  startWeight?: number;
 }

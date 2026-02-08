@@ -31,6 +31,7 @@ declare module 'vue' {
     SessionList: typeof import('./components/Settings/SessionList.vue')['default']
     TimerDialog: typeof import('./components/Session/TimerDialog.vue')['default']
     WeightAndRepsSettings: typeof import('./components/Workout/WeightAndRepsSettings.vue')['default']
+    WeightLogDialog: typeof import('./components/WeightLogDialog.vue')['default']
     WorkoutExerciseCard: typeof import('./components/Session/WorkoutExerciseCard.vue')['default']
     WorkoutList: typeof import('./components/Settings/WorkoutList.vue')['default']
   }

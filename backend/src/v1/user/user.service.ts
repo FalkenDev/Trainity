@@ -426,6 +426,11 @@ export class UserService {
     if (dto.goalTimeframe !== undefined) user.goalTimeframe = dto.goalTimeframe;
     if (dto.onboardingCompleted !== undefined)
       user.onboardingCompleted = dto.onboardingCompleted;
+    if (dto.showWeightTracking !== undefined)
+      user.showWeightTracking = dto.showWeightTracking;
+    if (dto.weightGoalType !== undefined)
+      user.weightGoalType = dto.weightGoalType;
+    if (dto.startWeight !== undefined) user.startWeight = dto.startWeight;
 
     const updated = await this.userRepo.save(user);
     return new UserWithoutPasswordDto(updated);

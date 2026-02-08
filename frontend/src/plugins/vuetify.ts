@@ -30,6 +30,7 @@ export default createVuetify({
           iconBackground: '#304d00ff',
           borderColor: '#474747',
           weekDayBg: '#242424',
+          avatarBg: '#3d462d',
         },
       },
       light: {

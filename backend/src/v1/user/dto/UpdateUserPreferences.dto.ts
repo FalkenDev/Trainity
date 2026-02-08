@@ -46,4 +46,16 @@ export class UpdateUserPreferencesDto {
   @IsOptional()
   @IsBoolean()
   onboardingCompleted?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  showWeightTracking?: boolean;
+
+  @IsOptional()
+  @IsString()
+  weightGoalType?: string;
+
+  @IsOptional()
+  @IsNumber()
+  startWeight?: number;
 }
