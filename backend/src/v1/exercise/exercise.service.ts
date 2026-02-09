@@ -58,6 +58,7 @@ export class ExerciseService {
     const exercise = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
       relations: ['muscleGroups'],
+      withDeleted: true,
     });
 
     if (!exercise) {

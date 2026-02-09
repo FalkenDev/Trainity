@@ -11,7 +11,6 @@ declare module 'vue' {
     AcceptDialog: typeof import('./components/basicUI/AcceptDialog.vue')['default']
     ActivityList: typeof import('./components/Settings/ActivityList.vue')['default']
     AddExerciseList: typeof import('./components/Exercise/AddExerciseList.vue')['default']
-    AddGlobalExerciseList: typeof import('./components/Exercise/AddGlobalExerciseList.vue')['default']
     BackHeader: typeof import('./components/BackHeader.vue')['default']
     BottomNavigation: typeof import('./components/BottomNavigation.vue')['default']
     CreateExercise: typeof import('./components/Exercise/CreateExercise.vue')['default']

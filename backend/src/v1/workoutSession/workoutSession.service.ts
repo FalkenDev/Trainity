@@ -39,10 +39,13 @@ export class WorkoutSessionService {
       where: { id, user: { id: userId } },
       relations: [
         'workout',
+        'workout.exercises',
+        'workout.exercises.exercise',
         'exercises',
         'exercises.exercise',
         'exercises.sets',
       ],
+      withDeleted: true,
     });
 
     if (!session) throw new NotFoundException('Workout session not found');
