@@ -20,19 +20,6 @@ export class ExerciseResponseDto {
   })
   isNameCustom?: boolean;
 
-  @ApiProperty({
-    required: false,
-    description: 'If true, the user has customized this exercise after importing it',
-  })
-  isCustomized?: boolean;
-
-  @ApiProperty({
-    required: false,
-    description:
-      'If created from a global exercise, this is the source globalExercise id',
-  })
-  globalExerciseId?: number;
-
   @ApiProperty({ required: false })
   description?: string;
 
@@ -50,6 +37,9 @@ export class ExerciseResponseDto {
 
   @ApiProperty()
   createdAt: Date;
+
+  @ApiProperty({ required: false })
+  deletedAt?: Date;
 
   @ApiProperty({ type: [MuscleGroupResponseDto] })
   muscleGroups: MuscleGroupResponseDto[];

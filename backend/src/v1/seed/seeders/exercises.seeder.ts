@@ -1,28 +1,34 @@
 import { DataSource } from 'typeorm';
-import { GlobalExercise } from '../../globalExercise/globalExercise.entity';
+import { Exercise } from '../../exercise/exercise.entity';
 import { MuscleGroup } from '../../muscleGroup/muscleGroup.entity';
+import { User } from '../../user/user.entity';
 import { exercisesToSeed } from '../data/exercises.data';
 
-export async function seedGlobalExercises(
+export async function seedUserExercises(
   dataSource: DataSource,
   mgMap: Map<string, MuscleGroup>,
+  user: User,
 ): Promise<void> {
-  const globalExRepo = dataSource.getRepository(GlobalExercise);
+  const exerciseRepo = dataSource.getRepository(Exercise);
 
   for (const ex of exercisesToSeed) {
-    const globalExercise = globalExRepo.create({
+    const exercise = exerciseRepo.create({
+      name: ex.defaultName,
       i18nKey: ex.i18nKey,
-      defaultName: ex.defaultName,
-      defaultDescription: ex.defaultDescription,
-      defaultSets: ex.defaultSets,
-      defaultReps: ex.defaultReps,
-      defaultPauseSeconds: ex.defaultPauseSeconds,
+      isNameCustom: false,
+      description: ex.defaultDescription ?? '',
+      defaultSets: ex.defaultSets ?? 3,
+      defaultReps: ex.defaultReps ?? 10,
+      defaultPauseSeconds: ex.defaultPauseSeconds ?? 60,
+      createdBy: user,
       muscleGroups: ex.muscleGroups
         .map((name) => mgMap.get(name))
         .filter((mg): mg is MuscleGroup => !!mg),
     });
-    await globalExRepo.save(globalExercise);
+    await exerciseRepo.save(exercise);
   }
 
-  console.log(`🌍 Seeded ${exercisesToSeed.length} global exercise(s)`);
+  console.log(
+    `💪 Seeded ${exercisesToSeed.length} exercise(s) for user ${user.email}`,
+  );
 }

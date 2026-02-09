@@ -6,11 +6,13 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from '../user/user.module';
 import { ActivityModule } from '../activity/activity.module';
+import { ExerciseModule } from '../exercise/exercise.module';
 
 @Module({
   imports: [
     UserModule,
     ActivityModule,
+    ExerciseModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     ConfigModule,
     JwtModule.registerAsync({

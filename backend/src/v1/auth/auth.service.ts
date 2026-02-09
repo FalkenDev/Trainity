@@ -14,6 +14,7 @@ import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ActivityService } from '../activity/activity.service';
 import { ActivityIcon } from '../activity/activity.entity';
+import { ExerciseSeedService } from '../exercise/exerciseSeed.service';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private jwtService: JwtService,
     private readonly activityService: ActivityService,
+    private readonly exerciseSeedService: ExerciseSeedService,
   ) {}
 
   async register(dto: RegisterDto): Promise<UserWithoutPasswordDto> {
@@ -48,6 +50,9 @@ export class AuthService {
 
     // Seed default activities for new user
     await this.seedDefaultActivities(savedUser.id);
+
+    // Seed default exercises for new user
+    await this.exerciseSeedService.seedDefaultExercises(savedUser.id);
 
     return new UserWithoutPasswordDto(savedUser);
   }
