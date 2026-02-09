@@ -142,6 +142,7 @@ export class WorkoutService {
         'exercises.exercise.muscleGroups',
         'createdBy',
       ],
+      withDeleted: true,
     });
 
     if (!workout) throw new NotFoundException('Workout not found');
@@ -157,6 +158,7 @@ export class WorkoutService {
         'exercises.exercise.muscleGroups',
         'createdBy',
       ],
+      withDeleted: true,
     });
 
     return workouts.map((w) => this.toResponseDto(w));
@@ -198,16 +200,9 @@ export class WorkoutService {
     });
     if (!workout) throw new NotFoundException('Workout not found');
 
-    await this.workoutSessionRepository
-      .createQueryBuilder()
-      .update()
-      .set({ workout: null as any })
-      .where('"workoutId" = :id', { id })
-      .execute();
+    await this.workoutRepo.softRemove(workout);
 
-    await this.workoutRepo.remove(workout);
-
-    return { message: 'Workout deleted and references removed' };
+    return { message: 'Workout deleted' };
   }
 
   async duplicateWorkout(
@@ -296,6 +291,7 @@ export class WorkoutService {
               id: e.exercise.id,
               name: e.exercise.name,
               description: e.exercise.description,
+              deletedAt: e.exercise.deletedAt,
               muscleGroups:
                 e.exercise.muscleGroups?.map((mg) => ({
                   id: mg.id,

@@ -60,24 +60,9 @@ export class WorkoutSessionService {
 
     if (!workout) throw new NotFoundException('Workout not found');
 
-    const workoutSnapshot = {
-      title: workout.title,
-      description: workout.description,
-      time: workout.time,
-      exercises: workout.exercises.map((ex) => ({
-        exerciseId: ex.exercise.id,
-        order: ex.order,
-        sets: ex.sets,
-        reps: ex.reps,
-        weight: ex.weight,
-        pauseSeconds: ex.pauseSeconds,
-      })),
-    };
-
     const session = this.sessionRepo.create({
       user: { id: userId },
       workout,
-      workoutSnapshot,
       exercises: [],
       startedAt: new Date(),
     });
@@ -89,12 +74,6 @@ export class WorkoutSessionService {
     const session = this.sessionRepo.create({
       user: { id: userId },
       workout: null,
-      workoutSnapshot: {
-        title: 'Empty Session',
-        description: '',
-        time: 0,
-        exercises: [],
-      },
       exercises: [],
       startedAt: new Date(),
     });
@@ -124,21 +103,14 @@ export class WorkoutSessionService {
     const exercise = await this.exerciseRepo.findOne({
       where: { id: exerciseId },
       relations: ['muscleGroups'],
+      withDeleted: true,
     });
 
     if (!exercise) throw new NotFoundException('Exercise not found');
 
-    const snapshot = {
-      name: exercise.name,
-      description: exercise.description,
-      img: undefined, // Optional image if you add it to Exercise
-      muscleGroups: exercise.muscleGroups?.map((mg) => mg.name),
-    };
-
     const sessionExercise = this.sessionExerciseRepo.create({
       session,
       exercise,
-      exerciseSnapshot: snapshot,
       sets: sets.map((s) => this.setRepo.create(s)),
     });
 
@@ -190,16 +162,13 @@ export class WorkoutSessionService {
           if (!sessionExercise) {
             const exercise = await manager.findOne(Exercise, {
               where: { id: ce.exerciseId },
+              withDeleted: true,
             });
             if (!exercise) throw new NotFoundException('Exercise not found');
 
             sessionExercise = manager.create(WorkoutSessionExercise, {
               session,
               exercise,
-              exerciseSnapshot: {
-                name: exercise.name,
-                description: exercise.description,
-              },
               notes: ce.notes,
             });
 
@@ -285,7 +254,13 @@ export class WorkoutSessionService {
 
       return manager.findOneOrFail(WorkoutSession, {
         where: { id: session.id },
-        relations: ['exercises', 'exercises.sets', 'exercises.exercise'],
+        relations: [
+          'exercises',
+          'exercises.sets',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+        ],
+        withDeleted: true,
       });
     });
   }

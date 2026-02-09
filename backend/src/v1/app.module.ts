@@ -9,7 +9,6 @@ import { JwtStrategy } from './strategies/Jwt.strategy';
 import { WorkoutModule } from './workout/workout.module';
 import { WorkoutSessionModule } from './workoutSession/workoutSession.module';
 import { MuscleGroupModule } from './muscleGroup/muscleGroup.module';
-import { GlobalExerciseModule } from './globalExercise/globalExercise.module';
 import { ActivityModule } from './activity/activity.module';
 import { ActivityLogModule } from './activityLog/activityLog.module';
 import { WeightLogModule } from './weightLog/weightLog.module';
@@ -36,7 +35,6 @@ import { WeightLogModule } from './weightLog/weightLog.module';
     }),
     AuthModule,
     ExerciseModule,
-    GlobalExerciseModule,
     MuscleGroupModule,
     UserModule,
     WorkoutModule,

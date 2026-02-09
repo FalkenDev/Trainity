@@ -9,14 +9,13 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { MuscleGroup } from '../muscleGroup/muscleGroup.entity';
-import { GlobalExercise } from '../globalExercise/globalExercise.entity';
 import { Activity } from '../activity/activity.entity';
 import { ActivityLog } from '../activityLog/activityLog.entity';
 
 // Seeders
 import { seedUsers } from './seeders/users.seeder';
 import { seedMuscleGroups } from './seeders/muscleGroups.seeder';
-import { seedGlobalExercises } from './seeders/exercises.seeder';
+import { seedUserExercises } from './seeders/exercises.seeder';
 import { seedActivities } from './seeders/activities.seeder';
 
 const AppDataSource = new DataSource({
@@ -29,7 +28,6 @@ const AppDataSource = new DataSource({
   entities: [
     User,
     Exercise,
-    GlobalExercise,
     Workout,
     WorkoutExercise,
     WorkoutSession,
@@ -40,7 +38,7 @@ const AppDataSource = new DataSource({
     ActivityLog,
   ],
   // Keep in sync with app.module.ts (synchronize: true). This makes the seed script
-  // resilient when we add new entities (like GlobalExercise).
+  // resilient when we add new entities.
   synchronize: true,
   logging: ['error', 'warn', 'query'],
 });
@@ -66,7 +64,6 @@ async function seed() {
         "workout_session",
         "workout_exercise",
         "workout",
-        "global_exercise_muscle_groups_muscle_group",
         "exercise_muscle_groups_muscle_group",
         "activity_log" RESTART IDENTITY CASCADE;
     `,
@@ -75,7 +72,6 @@ async function seed() {
     await AppDataSource.query(`
       TRUNCATE TABLE
         "exercise",
-        "global_exercise",
         "muscle_group",
         "activity",
         "user" RESTART IDENTITY CASCADE;
@@ -90,14 +86,11 @@ async function seed() {
     // Seed muscle groups
     const mgMap = await seedMuscleGroups(AppDataSource);
 
-    // Seed global exercises (predefined catalog)
-    await seedGlobalExercises(AppDataSource, mgMap);
+    // Seed default exercises for the test user
+    await seedUserExercises(AppDataSource, mgMap, mainUser);
 
     // Seed default activities for test user
     await seedActivities(AppDataSource, mainUser);
-
-    // NOTE: We intentionally do NOT seed user-owned exercises anymore.
-    // Users should import from the global exercise catalog via the API.
 
     await queryRunner.commitTransaction();
     console.log('✅ Database successfully seeded!');

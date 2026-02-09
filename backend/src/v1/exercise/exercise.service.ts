@@ -23,11 +23,10 @@ export class ExerciseService {
       name: exercise.name,
       i18nKey: exercise.i18nKey,
       isNameCustom: exercise.isNameCustom,
-      isCustomized: exercise.isCustomized,
-      globalExerciseId: exercise.globalExercise?.id,
       description: exercise.description,
       image: exercise.image,
       createdAt: exercise.createdAt,
+      deletedAt: exercise.deletedAt,
       defaultPauseSeconds: exercise.defaultPauseSeconds,
       defaultReps: exercise.defaultReps,
       defaultSets: exercise.defaultSets,
@@ -49,7 +48,7 @@ export class ExerciseService {
   async findAll(userId: number): Promise<ExerciseResponseDto[]> {
     const exercises = await this.exerciseRepo.find({
       where: { createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups'],
     });
 
     return this.toResponseList(exercises);
@@ -58,7 +57,7 @@ export class ExerciseService {
   async findOne(id: number, userId: number): Promise<ExerciseResponseDto> {
     const exercise = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups'],
     });
 
     if (!exercise) {
@@ -90,54 +89,18 @@ export class ExerciseService {
 
     const existing = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups'],
     });
 
     if (!existing) {
       throw new NotFoundException('Exercise not found');
     }
 
-    if (existing.globalExercise) {
-      const changedScalar =
-        (typeof exerciseData.name === 'string' &&
-          exerciseData.name !== existing.name) ||
-        (typeof exerciseData.description === 'string' &&
-          exerciseData.description !== existing.description) ||
-        (typeof exerciseData.image === 'string' &&
-          exerciseData.image !== existing.image) ||
-        (typeof exerciseData.defaultSets === 'number' &&
-          exerciseData.defaultSets !== existing.defaultSets) ||
-        (typeof exerciseData.defaultReps === 'number' &&
-          exerciseData.defaultReps !== existing.defaultReps) ||
-        (typeof exerciseData.defaultPauseSeconds === 'number' &&
-          exerciseData.defaultPauseSeconds !== existing.defaultPauseSeconds);
-
-      let changedMuscleGroups = false;
-      if (muscleGroupIds) {
-        const currentIds = new Set(
-          (existing.muscleGroups ?? []).map((mg) => mg.id),
-        );
-        const nextIds = new Set(muscleGroupIds);
-        if (currentIds.size !== nextIds.size) {
-          changedMuscleGroups = true;
-        } else {
-          for (const id of nextIds) {
-            if (!currentIds.has(id)) {
-              changedMuscleGroups = true;
-              break;
-            }
-          }
-        }
-      }
-
-      if (changedScalar || changedMuscleGroups) {
-        existing.isCustomized = true;
-      }
-    }
-
+    // If the user changes the name on an exercise that has an i18n key,
+    // mark it as custom so we stop using the translation.
     if (
       typeof exerciseData.name === 'string' &&
-      existing.globalExercise &&
+      existing.i18nKey &&
       exerciseData.name.trim() !== '' &&
       exerciseData.name !== existing.name
     ) {
@@ -167,7 +130,7 @@ export class ExerciseService {
       throw new NotFoundException('Exercise not found');
     }
 
-    await this.exerciseRepo.remove(exercise);
+    await this.exerciseRepo.softRemove(exercise);
     return { message: 'Exercise deleted' };
   }
 
@@ -178,7 +141,7 @@ export class ExerciseService {
   ): Promise<ExerciseResponseDto> {
     const exercise = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups'],
     });
 
     if (!exercise) {
@@ -192,9 +155,6 @@ export class ExerciseService {
 
     // Update image URL
     exercise.image = imageUrl;
-    if (exercise.globalExercise) {
-      exercise.isCustomized = true;
-    }
     const updated = await this.exerciseRepo.save(exercise);
 
     return this.toResponseDto(updated);

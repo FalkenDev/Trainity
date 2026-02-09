@@ -22,9 +22,6 @@ export class WorkoutSession {
   @ManyToOne(() => Workout, { onDelete: 'SET NULL', nullable: true })
   workout: Workout | null;
 
-  @Column({ type: 'jsonb', nullable: true })
-  workoutSnapshot: any;
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   startedAt: Date;
 

@@ -19,16 +19,8 @@ export class WorkoutSessionExercise {
   })
   session: WorkoutSession;
 
-  @ManyToOne(() => Exercise)
+  @ManyToOne(() => Exercise, { nullable: true })
   exercise: Exercise;
-
-  @Column({ type: 'jsonb', nullable: true })
-  exerciseSnapshot: {
-    name: string;
-    description?: string;
-    img?: string;
-    muscleGroups?: string[];
-  };
 
   @OneToMany(() => WorkoutSessionSet, (set) => set.sessionExercise, {
     cascade: true,
