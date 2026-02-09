@@ -142,6 +142,7 @@ export const useWorkoutSessionStore = defineStore(
       if (fromServer && session.exercises) {
         type ServerExercise = {
           exerciseId?: number
+          exercise?: { id: number }
           sets?: {
             setNumber?: number
             weight?: number
@@ -150,7 +151,7 @@ export const useWorkoutSessionStore = defineStore(
           notes?: string
         }
         for (const ex of session.exercises as ServerExercise[]) {
-          const exId = ex.exerciseId
+          const exId = ex.exerciseId ?? ex.exercise?.id
           if (typeof exId === 'undefined') continue
           type ServerSet = {
             setNumber?: number
@@ -175,6 +176,7 @@ export const useWorkoutSessionStore = defineStore(
         // Use the live workout relation to populate initial sets
         if (session.workout && Array.isArray(session.workout.exercises)) {
           for (const base of session.workout.exercises) {
+            const exId = base.exerciseId ?? base.exercise?.id
             const sets: LiveSet[] = []
             for (let i = 1; i <= (base.sets ?? 0); i++) {
               sets.push({
@@ -185,9 +187,9 @@ export const useWorkoutSessionStore = defineStore(
                 previous: 'N/A',
               })
             }
-            if (typeof base.exerciseId !== 'undefined') {
-              exercises[base.exerciseId] = {
-                exerciseId: base.exerciseId,
+            if (typeof exId !== 'undefined') {
+              exercises[exId] = {
+                exerciseId: exId,
                 sets,
                 rpe: undefined,
                 notes: '',

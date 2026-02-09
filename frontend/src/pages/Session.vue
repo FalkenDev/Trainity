@@ -137,12 +137,15 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
         { sets: number; reps: number; weight: number; pauseSeconds?: number }
       >()
       for (const base of workoutSession.value.workout?.exercises || []) {
-        workoutExById.set(base.exerciseId, {
-          sets: base.sets ?? 0,
-          reps: base.reps ?? 0,
-          weight: base.weight ?? 0,
-          pauseSeconds: base.pauseSeconds ?? 0,
-        })
+        const exId = base.exerciseId ?? base.exercise?.id
+        if (exId != null) {
+          workoutExById.set(exId, {
+            sets: base.sets ?? 0,
+            reps: base.reps ?? 0,
+            weight: base.weight ?? 0,
+            pauseSeconds: base.pauseSeconds ?? 0,
+          })
+        }
       }
 
       for (const id of toAdd) {
@@ -326,7 +329,9 @@ watchEffect(async () => {
     exerciseIds = idsFromLive
   } else {
     // Use the live workout relation to get exercise IDs
-    exerciseIds = (s.workout?.exercises || []).map(b => b.exerciseId)
+    exerciseIds = (s.workout?.exercises || [])
+      .map(b => b.exerciseId ?? b.exercise?.id)
+      .filter((id): id is number => typeof id === 'number')
   }
 
   const detailsList = await Promise.all(
@@ -337,7 +342,7 @@ watchEffect(async () => {
   )
 
   processedExercises.value = detailsList.map(({ id, d }) => {
-    const baseWorkoutEx = s.workout?.exercises?.find(b => b.exerciseId === id)
+    const baseWorkoutEx = s.workout?.exercises?.find(b => (b.exerciseId ?? b.exercise?.id) === id)
     const liveEx = live?.exercises[id]
 
     const plannedSets = liveEx?.sets?.length || baseWorkoutEx?.sets || d.defaultSets || 1
