@@ -42,19 +42,20 @@ export class ActivityLogService {
   }
 
   private toResponseDto(log: ActivityLog): ActivityLogResponseDto {
+    const activity = log.activity!;
     return {
       id: log.id,
       activity: {
-        id: log.activity.id,
-        name: log.activity.name,
-        description: log.activity.description,
-        icon: log.activity.icon,
-        trackDistance: log.activity.trackDistance,
-        trackPace: log.activity.trackPace,
-        trackElevation: log.activity.trackElevation,
-        trackCalories: log.activity.trackCalories,
-        createdAt: log.activity.createdAt,
-        updatedAt: log.activity.updatedAt,
+        id: activity.id,
+        name: activity.name,
+        description: activity.description,
+        icon: activity.icon,
+        trackDistance: activity.trackDistance,
+        trackPace: activity.trackPace,
+        trackElevation: activity.trackElevation,
+        trackCalories: activity.trackCalories,
+        createdAt: activity.createdAt,
+        updatedAt: activity.updatedAt,
       },
       date: log.date,
       duration: log.duration,
@@ -121,6 +122,9 @@ export class ActivityLogService {
       maxElevation: dto.maxElevation,
       calories: dto.calories,
       notes: dto.notes,
+      scheduledSession: dto.scheduledSessionId
+        ? ({ id: dto.scheduledSessionId } as any)
+        : null,
     });
 
     const saved = await this.activityLogRepo.save(log);

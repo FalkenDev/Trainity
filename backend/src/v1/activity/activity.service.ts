@@ -113,6 +113,6 @@ export class ActivityService {
       throw new NotFoundException('Activity not found');
     }
 
-    await this.activityRepo.remove(activity);
+    await this.activityRepo.softRemove(activity);
   }
 }

@@ -72,4 +72,9 @@ export class CreateActivityLogDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @ApiProperty({ required: false, description: 'Linked scheduled session ID' })
+  @IsOptional()
+  @IsInt()
+  scheduledSessionId?: number;
 }

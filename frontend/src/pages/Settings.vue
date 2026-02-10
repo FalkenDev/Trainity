@@ -72,6 +72,28 @@
       </div>
       <div>
         <h1 class="text-h6">
+          {{ $t('settings.content') }}
+        </h1>
+        <v-card
+          v-for="item in dataList"
+          :key="item.titleKey"
+          class="mb-4 d-flex flex-row justify-space-between align-center pa-4 rounded-lg"
+          color="cardBg"
+          style="border: 1px solid #474747"
+          :disabled="item.disabled"
+          @click="setDialogToOpen(item.type)"
+        >
+          <div class="d-flex align-center ga-2">
+            <v-avatar color="avatarBg" size="40">
+              <v-icon color="primary">{{ item.icon }}</v-icon>
+            </v-avatar>
+            <p>{{ $t(item.titleKey) }}</p>
+          </div>
+          <v-icon v-if="item.showArrow"> mdi-chevron-right </v-icon>
+        </v-card>
+      </div>
+      <div>
+        <h1 class="text-h6">
           {{ $t('settings.preferences') }}
         </h1>
         <v-list class="bg-transparent">

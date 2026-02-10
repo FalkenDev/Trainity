@@ -24,6 +24,7 @@ import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { RequestWithUser } from '../types/requestWithUser.type';
 import { CreateWorkoutSessionDto } from './dto/createWorkoutSession.dto';
 import { AddExerciseToSessionDto } from './dto/addExerciseToSession.dto';
+import { LogPastWorkoutSessionDto } from './dto/logPastWorkoutSession.dto';
 import { WorkoutSession } from './workoutSession.entity';
 import { UpdateWorkoutSessionDto } from './dto/updateWorkoutSession.dto';
 
@@ -57,14 +58,31 @@ export class WorkoutSessionController {
     return this.sessionService.createSession(
       dto.workoutId,
       this.getUserId(req),
+      dto.scheduledSessionId,
     );
   }
 
   @Post('empty')
   @ApiOperation({ summary: 'Create an empty workout session' })
   @ApiCreatedResponse({ type: WorkoutSession })
-  createEmpty(@Req() req: RequestWithUser): Promise<WorkoutSession> {
-    return this.sessionService.createEmptySession(this.getUserId(req));
+  createEmpty(
+    @Req() req: RequestWithUser,
+    @Body() body: { scheduledSessionId?: number },
+  ): Promise<WorkoutSession> {
+    return this.sessionService.createEmptySession(
+      this.getUserId(req),
+      body?.scheduledSessionId,
+    );
+  }
+
+  @Post('log-past')
+  @ApiOperation({ summary: 'Log a past workout session' })
+  @ApiCreatedResponse({ type: WorkoutSession })
+  logPast(
+    @Req() req: RequestWithUser,
+    @Body() dto: LogPastWorkoutSessionDto,
+  ): Promise<WorkoutSession> {
+    return this.sessionService.logPastSession(this.getUserId(req), dto);
   }
 
   @Get(':id')

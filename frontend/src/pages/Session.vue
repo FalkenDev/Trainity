@@ -72,6 +72,7 @@
 
 <script lang="ts" setup>
 import router from '@/router'
+import { useRoute } from 'vue-router'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.store'
@@ -86,6 +87,7 @@ const isAddExerciseOpen = ref(false)
 const isViewExerciseDetailsOpen = ref(false)
 const viewExerciseDetails = ref<Exercise | null>(null)
 const { t } = useI18n({ useScope: 'global' })
+const route = useRoute()
 const workoutSessionStore = useWorkoutSessionStore()
 const authStore = useAuthStore()
 const processedExercises = ref<Exercise[]>([])
@@ -293,7 +295,7 @@ const finnishSession = async () => {
       workoutSessionStore.resetClock()
       workoutSessionStore.clearLiveSession(sessionId.value)
       await workoutSessionStore.setWorkoutSessions(true)
-      router.push('/')
+      router.push((route.query.returnTo as string) || '/')
     } else {
       const finalPayload = { completedExercises, notes: '' }
       await finishWorkoutSession(sessionId.value, finalPayload)
@@ -303,7 +305,7 @@ const finnishSession = async () => {
       workoutSessionStore.resetClock()
       workoutSessionStore.clearLiveSession(sessionId.value)
       await workoutSessionStore.setWorkoutSessions(true)
-      router.push('/')
+      router.push((route.query.returnTo as string) || '/')
     }
   } catch {
     toast.error(t('session.finishError'), { progressBar: true, duration: 1000 })
