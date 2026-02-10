@@ -8,7 +8,7 @@
     </div>
     <div class="d-flex justify-space-between align-center">
       <div v-for="(day, index) in weekdays" :key="day">
-        <v-avatar :color="getDayColor(index)" size="40">
+        <v-avatar :color="getDayColor(index)" size="40" :style="getScheduledStyle(index)">
           <span class="text-body-2">{{ day }}</span>
         </v-avatar>
       </div>
@@ -19,11 +19,13 @@
 import { useI18n } from 'vue-i18n'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { useActivityStore } from '@/stores/activity.store'
+import { useScheduledSessionStore } from '@/stores/scheduledSession.store'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
 
 const { tm } = useI18n({ useScope: 'global' })
 const workoutSessionStore = useWorkoutSessionStore()
 const activityStore = useActivityStore()
+const scheduledSessionStore = useScheduledSessionStore()
 
 const weekdays = computed(() => {
   const v = tm('progress.weekdaysShort')
@@ -97,4 +99,45 @@ function getDayColor(dayIndex: number): string {
   }
   return 'grey-darken-3'
 }
+
+// Scheduled days this week (days that have a scheduled session but no completed session)
+const scheduledDaysThisWeek = computed(() => {
+  const scheduled = new Set<number>()
+  const rangeCache = scheduledSessionStore.rangeCache
+
+  if (!rangeCache || rangeCache.length === 0) return scheduled
+
+  const { start, end } = currentWeekRange.value
+
+  rangeCache.forEach(session => {
+    if (session.isCompleted) return
+    const sessionDate = new Date(session.resolvedDate + 'T12:00:00')
+    if (sessionDate >= start && sessionDate <= end) {
+      let dayOfWeek = sessionDate.getDay()
+      dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+      scheduled.add(dayOfWeek)
+    }
+  })
+
+  return scheduled
+})
+
+function getScheduledStyle(dayIndex: number): Record<string, string> {
+  if (scheduledDaysThisWeek.value.has(dayIndex) && !completedDaysThisWeek.value.has(dayIndex)) {
+    return { border: '2px solid #2196F3' }
+  }
+  return {}
+}
+
+// Fetch scheduled sessions for the current week on mount
+onMounted(async () => {
+  const { start, end } = currentWeekRange.value
+  const toStr = (d: Date) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+  await scheduledSessionStore.fetchForRange(toStr(start), toStr(end))
+})
 </script>

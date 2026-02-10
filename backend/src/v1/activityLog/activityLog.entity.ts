@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Activity } from '../activity/activity.entity';
+import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
 
 @Entity()
 export class ActivityLog {
@@ -16,8 +17,15 @@ export class ActivityLog {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Activity, { eager: true, onDelete: 'CASCADE' })
-  activity: Activity;
+  @ManyToOne(() => Activity, {
+    eager: true,
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  activity: Activity | null;
+
+  @ManyToOne(() => ScheduledSession, { onDelete: 'SET NULL', nullable: true })
+  scheduledSession: ScheduledSession | null;
 
   @Column({ type: 'date' })
   date: Date;

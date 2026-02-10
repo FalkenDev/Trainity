@@ -42,6 +42,7 @@ export interface WorkoutSession {
     totalWeight: number
     id: number
   }[]
+  scheduledSessionId?: number
   createdAt: string
   updatedAt: string
 }

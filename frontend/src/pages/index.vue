@@ -60,6 +60,43 @@
       </v-btn>
     </div>
     <ProgressBar />
+
+    <!-- Today's Schedule -->
+    <div v-if="todaySchedule.length > 0" class="d-flex flex-column ga-2">
+      <p class="text-caption text-uppercase font-weight-bold text-textSecondary">
+        {{ $t('schedule.todaySchedule') }}
+      </p>
+      <v-card
+        v-for="session in todaySchedule"
+        :key="session.id + session.resolvedDate"
+        class="bg-cardBg rounded-lg pa-3"
+        style="border: 1px solid #474747; box-shadow: none"
+        @click="handleScheduledClick(session)"
+      >
+        <div class="d-flex align-center justify-space-between">
+          <div class="d-flex align-center ga-3">
+            <v-avatar color="blue-darken-4" size="36">
+              <v-icon size="18" color="blue-lighten-1">
+                {{ session.type === 'workout' ? 'mdi-dumbbell' : 'mdi-run' }}
+              </v-icon>
+            </v-avatar>
+            <div>
+              <p class="text-body-2 font-weight-bold">
+                {{ session.type === 'workout' ? session.workout?.title : session.activity?.name }}
+              </p>
+              <v-chip size="x-small" :color="session.isCompleted ? 'green' : 'blue'" variant="flat">
+                {{ session.isCompleted ? $t('schedule.completed') : $t('schedule.scheduled') }}
+              </v-chip>
+            </div>
+          </div>
+          <v-icon v-if="!session.isCompleted" size="20" class="text-textSecondary"
+            >mdi-chevron-right</v-icon
+          >
+          <v-icon v-else size="20" color="green">mdi-check-circle</v-icon>
+        </div>
+      </v-card>
+    </div>
+
     <div class="d-flex ga-3">
       <v-card
         class="flex-grow-1 bg-cardBg justify-center align-center py-2 d-flex flex-column align-center rounded-lg"
@@ -98,12 +135,18 @@
 import { getStreakInfo } from '@/services/user.service'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { useAuthStore } from '@/stores/auth.store'
+import { useScheduledSessionStore } from '@/stores/scheduledSession.store'
+import { startWorkoutSession } from '@/services/workoutSession.service'
 import WeightLogDialog from '@/components/WeightLogDialog.vue'
 import type { StreakInfo } from '@/interfaces/User.interface'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
+import type { ScheduledSessionForDate } from '@/interfaces/ScheduledSession.interface'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const workoutSessionStore = useWorkoutSessionStore()
 const authStore = useAuthStore()
+const scheduledSessionStore = useScheduledSessionStore()
 const streakInfo = ref<StreakInfo | null>(null)
 const isWeightLogDialogOpen = ref(false)
 
@@ -154,7 +197,42 @@ const loadStreakInfo = async () => {
   }
 }
 
+// Today's scheduled sessions
+function getTodayStr(): string {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+const todaySchedule = computed<ScheduledSessionForDate[]>(() => {
+  return scheduledSessionStore.selectedDateSessions.filter(s => !s.isCompleted)
+})
+
+async function handleScheduledClick(session: ScheduledSessionForDate) {
+  if (session.isCompleted) return
+
+  if (session.type === 'workout' && session.workout) {
+    try {
+      const ws = await startWorkoutSession(session.workout.id, session.id)
+      await workoutSessionStore.fetchSelectedWorkoutSession(ws.id)
+      router.push(`/session/${ws.id}`)
+    } catch (error) {
+      console.error('Failed to start workout:', error)
+    }
+  } else if (session.type === 'activity' && session.activity) {
+    router.push(`/log-activity?activityId=${session.activity.id}&scheduledSessionId=${session.id}`)
+  }
+}
+
 onMounted(() => {
   loadStreakInfo()
+  scheduledSessionStore.fetchForDate(getTodayStr())
+})
+
+// Re-fetch when navigating back (e.g. after completing a session)
+onActivated(() => {
+  scheduledSessionStore.fetchForDate(getTodayStr())
 })
 </script>

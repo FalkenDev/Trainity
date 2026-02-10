@@ -12,6 +12,7 @@ import { WorkoutSessionSet } from './workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutStatus } from '../types/WorkoutStatus.type';
 import { UserService } from '../user/user.service';
+import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
 
 @Injectable()
 export class WorkoutSessionService {
@@ -55,6 +56,7 @@ export class WorkoutSessionService {
   async createSession(
     workoutId: number,
     userId: number,
+    scheduledSessionId?: number,
   ): Promise<WorkoutSession> {
     const workout = await this.workoutRepo.findOne({
       where: { id: workoutId },
@@ -68,20 +70,143 @@ export class WorkoutSessionService {
       workout,
       exercises: [],
       startedAt: new Date(),
+      scheduledSession: scheduledSessionId
+        ? ({ id: scheduledSessionId } as any)
+        : null,
     });
 
     return this.sessionRepo.save(session);
   }
 
-  async createEmptySession(userId: number): Promise<WorkoutSession> {
+  async createEmptySession(
+    userId: number,
+    scheduledSessionId?: number,
+  ): Promise<WorkoutSession> {
     const session = this.sessionRepo.create({
       user: { id: userId },
       workout: null,
       exercises: [],
       startedAt: new Date(),
+      scheduledSession: scheduledSessionId
+        ? ({ id: scheduledSessionId } as any)
+        : null,
     });
 
     return this.sessionRepo.save(session);
+  }
+
+  async logPastSession(
+    userId: number,
+    dto: {
+      workoutId?: number;
+      startedAt: string;
+      endedAt: string;
+      notes?: string;
+      scheduledSessionId?: number;
+      completedExercises?: {
+        exerciseId: number;
+        sets: { setNumber: number; weight: number; reps: number }[];
+      }[];
+    },
+  ): Promise<WorkoutSession> {
+    return this.dataSource.transaction(async (manager) => {
+      let workout: Workout | null = null;
+      if (dto.workoutId) {
+        workout = await manager.findOne(Workout, {
+          where: { id: dto.workoutId },
+          withDeleted: true,
+        });
+      }
+
+      const session = manager.create(WorkoutSession, {
+        user: { id: userId },
+        workout: workout || null,
+        exercises: [],
+        startedAt: new Date(dto.startedAt),
+        endedAt: new Date(dto.endedAt),
+        status: 'finished' as const,
+        totalWeight: 0,
+        exerciseStats: [],
+        notes: dto.notes || null,
+        scheduledSession: dto.scheduledSessionId
+          ? ({ id: dto.scheduledSessionId } as any)
+          : undefined,
+      } as any);
+
+      const saved = await manager.save(WorkoutSession, session);
+
+      // Save completed exercises & sets if provided
+      if (dto.completedExercises?.length) {
+        const sessionExercises: WorkoutSessionExercise[] = [];
+        const allSets: WorkoutSessionSet[] = [];
+
+        for (const ce of dto.completedExercises) {
+          const exercise = await manager.findOne(Exercise, {
+            where: { id: ce.exerciseId },
+            withDeleted: true,
+          });
+          if (!exercise)
+            throw new NotFoundException(`Exercise ${ce.exerciseId} not found`);
+
+          const sessionExercise = manager.create(WorkoutSessionExercise, {
+            session: saved,
+            exercise,
+          });
+          sessionExercises.push(sessionExercise);
+        }
+
+        await manager.save(WorkoutSessionExercise, sessionExercises);
+
+        for (let i = 0; i < dto.completedExercises.length; i++) {
+          const ce = dto.completedExercises[i];
+          const sessionExercise = sessionExercises[i];
+          const sets = (ce.sets ?? []).map((s) =>
+            manager.create(WorkoutSessionSet, {
+              setNumber: s.setNumber,
+              weight: s.weight,
+              reps: s.reps,
+              sessionExercise,
+            }),
+          );
+          allSets.push(...sets);
+        }
+
+        if (allSets.length) {
+          await manager.save(WorkoutSessionSet, allSets);
+        }
+
+        // Compute totalWeight & exerciseStats
+        let totalWeight = 0;
+        const stats: { exerciseId: number; totalWeight: number }[] = [];
+        for (let i = 0; i < dto.completedExercises.length; i++) {
+          const ce = dto.completedExercises[i];
+          let exTotal = 0;
+          for (const s of ce.sets ?? []) {
+            exTotal += s.weight * s.reps;
+          }
+          stats.push({ exerciseId: ce.exerciseId, totalWeight: exTotal });
+          totalWeight += exTotal;
+        }
+
+        saved.totalWeight = totalWeight;
+        saved.exerciseStats = stats;
+        await manager.save(WorkoutSession, saved);
+      }
+
+      // Update streak
+      await this.userService.updateStreakOnWorkoutCompletion(userId);
+
+      return manager.findOneOrFail(WorkoutSession, {
+        where: { id: saved.id },
+        relations: [
+          'exercises',
+          'exercises.sets',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+        ],
+        withDeleted: true,
+      });
+    });
   }
 
   async addExerciseToSession(

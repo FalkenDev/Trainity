@@ -2,10 +2,7 @@
   <div>
     <BackHeader :title="$t('activity.logActivity')" />
     <div class="px-5 py-4">
-      <v-form
-        ref="formRef"
-        @submit.prevent="handleSubmit"
-      >
+      <v-form ref="formRef" @submit.prevent="handleSubmit">
         <!-- Activity Selection -->
         <v-select
           v-model="formData.activityId"
@@ -108,13 +105,7 @@
         />
 
         <!-- Submit Button -->
-        <v-btn
-          :loading="isSubmitting"
-          type="submit"
-          size="large"
-          color="primary"
-          block
-        >
+        <v-btn :loading="isSubmitting" type="submit" size="large" color="primary" block>
           {{ $t('activity.save') }}
         </v-btn>
       </v-form>
@@ -134,18 +125,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { useActivityStore } from '@/stores/activity.store';
-import { createActivityLog } from '@/services/activityLog.service';
-import type { CreateActivityLogDto } from '@/interfaces/Activity.interface';
+import { ref, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useActivityStore } from '@/stores/activity.store'
+import { createActivityLog } from '@/services/activityLog.service'
+import type { CreateActivityLogDto } from '@/interfaces/Activity.interface'
 
-const router = useRouter();
-const activityStore = useActivityStore();
-const formRef = ref();
+const router = useRouter()
+const route = useRoute()
+const activityStore = useActivityStore()
+const formRef = ref()
 
 const formData = ref<CreateActivityLogDto>({
-  activityId: null as unknown as number,
+  activityId: route.query.activityId ? Number(route.query.activityId) : (null as unknown as number),
   date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD
   duration: null as unknown as number,
   distance: undefined,
@@ -153,31 +145,34 @@ const formData = ref<CreateActivityLogDto>({
   maxElevation: undefined,
   calories: undefined,
   notes: undefined,
-});
+  scheduledSessionId: route.query.scheduledSessionId
+    ? Number(route.query.scheduledSessionId)
+    : undefined,
+})
 
-const isSubmitting = ref(false);
+const isSubmitting = ref(false)
 
 const rules = {
   required: (v: string | number | null) => !!v || 'This field is required',
   positive: (v: number) => v > 0 || 'Must be greater than 0',
-};
+}
 
-const activityItems = computed(() => activityStore.activities);
+const activityItems = computed(() => activityStore.activities)
 
 const selectedActivity = computed(() => {
-  return activityStore.activities.find((a) => a.id === formData.value.activityId);
-});
+  return activityStore.activities.find(a => a.id === formData.value.activityId)
+})
 
 // Calculate pace from duration and distance
 const calculatedPace = computed(() => {
   if (!formData.value.duration || !formData.value.distance) {
-    return null;
+    return null
   }
-  const paceMinutes = formData.value.duration / formData.value.distance;
-  const minutes = Math.floor(paceMinutes);
-  const seconds = Math.round((paceMinutes - minutes) * 60);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-});
+  const paceMinutes = formData.value.duration / formData.value.distance
+  const minutes = Math.floor(paceMinutes)
+  const seconds = Math.round((paceMinutes - minutes) * 60)
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+})
 
 // Reset conditional fields when activity changes
 watch(
@@ -185,33 +180,34 @@ watch(
   () => {
     if (selectedActivity.value) {
       if (!selectedActivity.value.trackDistance) {
-        formData.value.distance = undefined;
+        formData.value.distance = undefined
       }
       if (!selectedActivity.value.trackElevation) {
-        formData.value.elevationGain = undefined;
-        formData.value.maxElevation = undefined;
+        formData.value.elevationGain = undefined
+        formData.value.maxElevation = undefined
       }
       if (!selectedActivity.value.trackCalories) {
-        formData.value.calories = undefined;
+        formData.value.calories = undefined
       }
     }
-  },
-);
+  }
+)
 
 async function handleSubmit() {
-  const { valid } = await formRef.value.validate();
-  if (!valid) return;
+  const { valid } = await formRef.value.validate()
+  if (!valid) return
 
-  isSubmitting.value = true;
+  isSubmitting.value = true
   try {
-    await createActivityLog(formData.value);
-    await activityStore.fetchActivityLogs(true);
-    router.push('/');
+    await createActivityLog(formData.value)
+    await activityStore.fetchActivityLogs(true)
+    const returnTo = (route.query.returnTo as string) || '/'
+    router.push(returnTo)
   } catch (error) {
-    console.error('Error creating activity log:', error);
-    alert('Failed to create activity log');
+    console.error('Error creating activity log:', error)
+    alert('Failed to create activity log')
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
 }
 </script>

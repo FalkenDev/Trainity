@@ -10,6 +10,7 @@ import {
 import { User } from '../user/user.entity';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSessionExercise } from './workoutSessionExercise.entity';
+import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
 
 @Entity()
 export class WorkoutSession {
@@ -21,6 +22,9 @@ export class WorkoutSession {
 
   @ManyToOne(() => Workout, { onDelete: 'SET NULL', nullable: true })
   workout: Workout | null;
+
+  @ManyToOne(() => ScheduledSession, { onDelete: 'SET NULL', nullable: true })
+  scheduledSession: ScheduledSession | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   startedAt: Date;
