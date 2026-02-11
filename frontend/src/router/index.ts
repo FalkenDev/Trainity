@@ -10,6 +10,7 @@ import Calendar from '@/pages/Calendar.vue'
 import Settings from '@/pages/Settings.vue'
 import AddWorkout from '@/pages/AddWorkout.vue'
 import LogActivity from '@/pages/LogActivity.vue'
+import Statistics from '@/pages/Statistics.vue'
 
 const routes = [
   {
@@ -37,7 +38,7 @@ const routes = [
   {
     path: '/statistics',
     name: 'Statistics',
-    component: Home,
+    component: Statistics,
     meta: { requiresAuth: true },
   },
   {

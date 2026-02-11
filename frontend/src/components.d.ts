@@ -21,6 +21,7 @@ declare module 'vue' {
     EditWorkout: typeof import('./components/Workout/EditWorkout.vue')['default']
     EditWorkoutExercise: typeof import('./components/Workout/EditWorkoutExercise.vue')['default']
     ExerciseList: typeof import('./components/Exercise/ExerciseList.vue')['default']
+    ExerciseStatisticsDetail: typeof import('./components/Statistics/ExerciseStatisticsDetail.vue')['default']
     ExitHeader: typeof import('./components/basicUI/ExitHeader.vue')['default']
     HomeHeader: typeof import('./components/HomeHeader.vue')['default']
     ImageUpload: typeof import('./components/basicUI/ImageUpload.vue')['default']
@@ -36,5 +37,6 @@ declare module 'vue' {
     WeightLogDialog: typeof import('./components/WeightLogDialog.vue')['default']
     WorkoutExerciseCard: typeof import('./components/Session/WorkoutExerciseCard.vue')['default']
     WorkoutList: typeof import('./components/Settings/WorkoutList.vue')['default']
+    WorkoutStatisticsDetail: typeof import('./components/Statistics/WorkoutStatisticsDetail.vue')['default']
   }
 }

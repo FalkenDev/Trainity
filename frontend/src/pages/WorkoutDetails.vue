@@ -1,10 +1,6 @@
 <template>
   <div>
-    <BackHeader
-      :show-menu="true"
-      :title="$t('workout.workoutTitle')"
-      :route-to="`/`"
-    >
+    <BackHeader :show-menu="true" :title="$t('workout.workoutTitle')" :route-to="`/`">
       <template #menuAppend>
         <v-list>
           <v-list-item @click="isWeightAndRepsOpen = true">
@@ -34,12 +30,7 @@
         <p>{{ workout?.description }}</p>
 
         <div class="d-flex ga-2 align-center mt-2 flex-wrap">
-          <v-chip
-            label
-            color="orange-lighten-1"
-          >
-            {{ workout?.time }} min
-          </v-chip>
+          <v-chip label color="orange-lighten-1"> {{ workout?.time }} min </v-chip>
 
           <v-chip
             v-for="group in visibleGroups"
@@ -76,18 +67,61 @@
         {{ $t('workout.startSession') }}
       </v-btn>
 
-      <div
-        v-else
-        class="text-center my-5"
-      >
+      <div v-else class="text-center my-5">
         <p class="text-subtitle-1 mb-4">
           {{ $t('workout.noExercisesYet') }}
         </p>
-        <v-btn
-          color="primary"
-          @click="isAddExerciseOpen = true"
-        >
+        <v-btn color="primary" @click="isAddExerciseOpen = true">
           {{ $t('session.addExercise') }}
+        </v-btn>
+      </div>
+
+      <!-- Compact Workout History -->
+      <div v-if="workoutQuickStats" class="mt-3 mb-2">
+        <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
+          {{ $t('statistics.workoutStats') }}
+        </p>
+        <div class="d-flex flex-wrap ga-2 mb-3">
+          <v-chip size="small" variant="tonal">
+            {{ workoutQuickStats.timesCompleted }}
+            {{ $t('statistics.timesCompleted').toLowerCase() }}
+          </v-chip>
+          <v-chip v-if="workoutQuickStats.averageDuration" size="small" variant="tonal">
+            ~{{ Math.round(workoutQuickStats.averageDuration) }} min
+            {{ $t('statistics.avgDuration').toLowerCase() }}
+          </v-chip>
+          <v-chip v-if="workoutQuickStats.lastPerformed" size="small" variant="tonal">
+            {{ $t('statistics.lastPerformed') }}: {{ formatDate(workoutQuickStats.lastPerformed) }}
+          </v-chip>
+        </div>
+        <div v-if="workoutQuickStats.recentSessions.length > 0">
+          <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-1">
+            {{ $t('statistics.recentSessions') }}
+          </p>
+          <v-card
+            v-for="(session, idx) in workoutQuickStats.recentSessions"
+            :key="idx"
+            class="bg-cardBg pa-2 px-3 rounded-lg mb-1"
+            style="border: 1px solid #474747; box-shadow: none"
+          >
+            <div class="d-flex align-center justify-space-between">
+              <span class="text-caption">{{ formatDate(session.date) }}</span>
+              <span class="text-caption text-textSecondary">
+                {{ formatDuration(session.duration) }}
+                · {{ session.totalVolume?.toLocaleString() ?? 0 }} kg
+              </span>
+            </div>
+          </v-card>
+        </div>
+        <v-btn
+          variant="text"
+          color="primary"
+          size="small"
+          class="px-0"
+          @click="$router.push('/statistics')"
+        >
+          {{ $t('statistics.viewFullHistory') }}
+          <v-icon end size="14">mdi-arrow-right</v-icon>
         </v-btn>
       </div>
 
@@ -110,7 +144,7 @@
               v-if="false /*TODO: Remove when image upload is added */"
               class="bg-grey"
               style="width: 65px; height: 65px"
-            >
+            />
             <div class="d-flex flex-column ga-1">
               <h2 class="text-h6">
                 {{ exercise.exercise ? displayName(exercise.exercise) : '' }}
@@ -122,9 +156,7 @@
                 <p class="text-body-2">
                   {{ $t('workout.pauseSeconds', { seconds: exercise.pauseSeconds }) }}
                 </p>
-                <p class="text-body-2">
-                  {{ exercise.weight }}kg
-                </p>
+                <p class="text-body-2">{{ exercise.weight }}kg</p>
               </div>
             </div>
           </div>
@@ -140,23 +172,14 @@
       </v-card-title>
       <v-divider />
       <div class="pa-4 d-flex flex-wrap ga-2">
-        <v-chip
-          v-for="group in groups"
-          :key="group"
-          label
-          size="small"
-          color="green-lighten-1"
-        >
+        <v-chip v-for="group in groups" :key="group" label size="small" color="green-lighten-1">
           {{ group }}
         </v-chip>
       </div>
     </v-card>
   </v-bottom-sheet>
 
-  <v-dialog
-    v-model="isAddExerciseOpen"
-    fullscreen
-  >
+  <v-dialog v-model="isAddExerciseOpen" fullscreen>
     <AddExerciseList
       v-if="isAddExerciseOpen"
       :initial-selected-ids="selectedExerciseIds"
@@ -165,10 +188,7 @@
     />
   </v-dialog>
 
-  <v-dialog
-    v-model="isEditExerciseOpen"
-    fullscreen
-  >
+  <v-dialog v-model="isEditExerciseOpen" fullscreen>
     <EditWorkoutExercise
       :selected-exercise="selectedExercise!"
       :workout-id="workout?.id ? Number(workout.id) : undefined"
@@ -178,10 +198,7 @@
     />
   </v-dialog>
 
-  <v-dialog
-    v-model="isEditWorkoutOpen"
-    fullscreen
-  >
+  <v-dialog v-model="isEditWorkoutOpen" fullscreen>
     <EditWorkout
       :workout="workout"
       @close="isEditWorkoutOpen = false"
@@ -189,10 +206,7 @@
     />
   </v-dialog>
 
-  <v-dialog
-    v-model="isWeightAndRepsOpen"
-    fullscreen
-  >
+  <v-dialog v-model="isWeightAndRepsOpen" fullscreen>
     <WeightAndRepsSettings
       :workout-id="workout?.id || undefined"
       :default-weight-and-reps="workout?.defaultWeightAndReps ?? ''"
@@ -210,235 +224,260 @@
 </template>
 
 <script lang="ts" setup>
-import BackHeader from "@/components/BackHeader.vue";
-import router from "@/router";
-import { useWorkoutStore } from "@/stores/workout.store";
-import { startWorkoutSession } from "@/services/workoutSession.service";
-import { useWorkoutSessionStore } from "@/stores/workoutSession.store";
-import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
-import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
-import type { Workout, Exercise } from "@/interfaces/Workout.interface";
+import BackHeader from '@/components/BackHeader.vue'
+import router from '@/router'
+import { useWorkoutStore } from '@/stores/workout.store'
+import { startWorkoutSession } from '@/services/workoutSession.service'
+import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
+import { useMuscleGroupStore } from '@/stores/muscleGroup.store'
+import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface'
+import type { Workout, Exercise } from '@/interfaces/Workout.interface'
 import {
   deleteWorkout,
   dublicateWorkout,
   removeExercisesFromWorkout,
   addExercisesToWorkout,
   reorderExercises,
-} from "@/services/workout.service";
-import { toast } from "vuetify-sonner";
-import EditWorkoutExercise from "@/components/Workout/EditWorkoutExercise.vue";
-import { useI18n } from 'vue-i18n';
-import { displayExerciseName } from '@/utils/exerciseDisplay';
+} from '@/services/workout.service'
+import { toast } from 'vuetify-sonner'
+import EditWorkoutExercise from '@/components/Workout/EditWorkoutExercise.vue'
+import { useI18n } from 'vue-i18n'
+import { displayExerciseName } from '@/utils/exerciseDisplay'
+import { useStatisticsStore } from '@/stores/statistics.store'
+import type { WorkoutQuickStats } from '@/interfaces/Statistics.interface'
 
-const { t } = useI18n({ useScope: 'global' });
+const { t } = useI18n({ useScope: 'global' })
 
-const isAddExerciseOpen = ref<boolean>(false);
-const isEditExerciseOpen = ref<boolean>(false);
-const isDeleteDialogOpen = ref<boolean>(false);
-const isEditWorkoutOpen = ref<boolean>(false);
-const isWeightAndRepsOpen = ref<boolean>(false);
-const isUpdatingWorkout = ref<boolean>(false);
+const isAddExerciseOpen = ref<boolean>(false)
+const isEditExerciseOpen = ref<boolean>(false)
+const isDeleteDialogOpen = ref<boolean>(false)
+const isEditWorkoutOpen = ref<boolean>(false)
+const isWeightAndRepsOpen = ref<boolean>(false)
+const isUpdatingWorkout = ref<boolean>(false)
 
-const muscleGroupStore = useMuscleGroupStore();
-const workoutStore = useWorkoutStore();
-const workoutSessionStore = useWorkoutSessionStore();
-const workout = computed<Workout | null>(() => workoutStore.currentWorkout);
-const selectedExercise = ref<Exercise | null>(null);
+const muscleGroupStore = useMuscleGroupStore()
+const workoutStore = useWorkoutStore()
+const workoutSessionStore = useWorkoutSessionStore()
+const statisticsStore = useStatisticsStore()
+const workout = computed<Workout | null>(() => workoutStore.currentWorkout)
+const selectedExercise = ref<Exercise | null>(null)
 
 // Drag and drop state
-const draggedIndex = ref<number | null>(null);
-const dragOverIndex = ref<number | null>(null);
+const draggedIndex = ref<number | null>(null)
+const dragOverIndex = ref<number | null>(null)
 
 // Sorted exercises for display
 const sortedExercises = computed(() => {
-  if (!workout.value?.exercises) return [];
-  return [...workout.value.exercises].sort((a, b) => a.order - b.order);
-});
+  if (!workout.value?.exercises) return []
+  return [...workout.value.exercises].sort((a, b) => a.order - b.order)
+})
 
-const displayName = (exercise: NonNullable<Exercise['exercise']>) => displayExerciseName({ t }, exercise);
+const displayName = (exercise: NonNullable<Exercise['exercise']>) =>
+  displayExerciseName({ t }, exercise)
 
-type GroupStat = { name: string; count: number };
+type GroupStat = { name: string; count: number }
 
 const groupStats = computed<GroupStat[]>(() => {
   if (!workout.value?.exercises || workout.value.exercises.length === 0) {
-    return [];
+    return []
   }
 
-  const muscleGroups = muscleGroupStore.muscleGroups as MuscleGroup[];
-  const names: string[] = workout.value.exercises.flatMap((ex) => {
+  const muscleGroups = muscleGroupStore.muscleGroups as MuscleGroup[]
+  const names: string[] = workout.value.exercises.flatMap(ex => {
     const ids =
-      (ex.exercise.muscleGroups || []).map((mg) =>
-        typeof mg === "object" && mg !== null ? mg.id : mg
-      ) ?? [];
+      (ex.exercise.muscleGroups || []).map(mg =>
+        typeof mg === 'object' && mg !== null ? mg.id : mg
+      ) ?? []
     return ids
-      .map((id) => muscleGroups.find((g) => g.id === id)?.name || t('common.unknown'))
-      .filter(Boolean);
-  });
+      .map(id => muscleGroups.find(g => g.id === id)?.name || t('common.unknown'))
+      .filter(Boolean)
+  })
 
-  const freq = new Map<string, number>();
-  for (const n of names) freq.set(n, (freq.get(n) ?? 0) + 1);
+  const freq = new Map<string, number>()
+  for (const n of names) freq.set(n, (freq.get(n) ?? 0) + 1)
 
   return Array.from(freq.entries())
     .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => (b.count - a.count) || a.name.localeCompare(b.name));
-});
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+})
 
-const groups = computed<string[]>(() => groupStats.value.map((g) => g.name));
+const groups = computed<string[]>(() => groupStats.value.map(g => g.name))
 
-const MAX_VISIBLE = 3;
-const visibleGroups = computed<string[]>(() =>
-  groups.value.slice(0, MAX_VISIBLE)
-);
-const hiddenCount = computed<number>(() =>
-  Math.max(groups.value.length - MAX_VISIBLE, 0)
-);
-const isAllGroupsOpen = ref(false);
+const MAX_VISIBLE = 3
+const visibleGroups = computed<string[]>(() => groups.value.slice(0, MAX_VISIBLE))
+const hiddenCount = computed<number>(() => Math.max(groups.value.length - MAX_VISIBLE, 0))
+const isAllGroupsOpen = ref(false)
 
 const selectedExerciseIds = computed<number[]>(() => {
   return (
-    workout.value?.exercises
-      .map((item) => item.exercise?.id)
-      .filter((id): id is number => !!id) ?? []
-  );
-});
+    workout.value?.exercises.map(item => item.exercise?.id).filter((id): id is number => !!id) ?? []
+  )
+})
 
 const updateWorkoutExercises = async (newExerciseIds: number[]) => {
-  if (!workout.value) return;
+  if (!workout.value) return
 
-  isUpdatingWorkout.value = true;
+  isUpdatingWorkout.value = true
   try {
-    await workoutStore.setWorkouts(true);
+    await workoutStore.setWorkouts(true)
 
-    const existingExerciseIds = selectedExerciseIds.value;
+    const existingExerciseIds = selectedExerciseIds.value
 
-    const exercisesToAdd = newExerciseIds.filter(
-      (id) => !existingExerciseIds.includes(id)
-    );
+    const exercisesToAdd = newExerciseIds.filter(id => !existingExerciseIds.includes(id))
 
-    const exercisesToRemove = existingExerciseIds.filter(
-      (id) => !newExerciseIds.includes(id)
-    );
+    const exercisesToRemove = existingExerciseIds.filter(id => !newExerciseIds.includes(id))
 
     if (exercisesToRemove.length > 0) {
-      await removeExercisesFromWorkout(+workout.value.id, exercisesToRemove);
+      await removeExercisesFromWorkout(+workout.value.id, exercisesToRemove)
     }
 
     if (exercisesToAdd.length > 0) {
-      await addExercisesToWorkout(+workout.value!.id, exercisesToAdd);
+      await addExercisesToWorkout(+workout.value!.id, exercisesToAdd)
     }
 
-    const hasBeenUpdated =
-      exercisesToAdd.length > 0 || exercisesToRemove.length > 0;
+    const hasBeenUpdated = exercisesToAdd.length > 0 || exercisesToRemove.length > 0
 
     if (hasBeenUpdated) {
-      toast.success(t('workout.updatedNoBang'), { progressBar: true, duration: 1000 });
-      await workoutStore.setWorkouts(true);
+      toast.success(t('workout.updatedNoBang'), { progressBar: true, duration: 1000 })
+      await workoutStore.setWorkouts(true)
     }
   } catch (error) {
-    console.error("Error updating workout exercises:", error);
-    toast.error(t('workout.failedToUpdate'), { progressBar: true, duration: 1000 });
+    console.error('Error updating workout exercises:', error)
+    toast.error(t('workout.failedToUpdate'), { progressBar: true, duration: 1000 })
   } finally {
-    isUpdatingWorkout.value = false;
+    isUpdatingWorkout.value = false
   }
-};
+}
 
 const dublicate = async () => {
   if (workout.value) {
-    const response = await dublicateWorkout(workout.value.id);
+    const response = await dublicateWorkout(workout.value.id)
     if (response && response.id) {
-      await workoutStore.setWorkouts(true);
-      workoutStore.setCurrentWorkout(response.id);
-      toast.success(t('workout.duplicated'), { progressBar: true, duration: 1000 });
-      router.push(`/workout/${response.id}`);
+      await workoutStore.setWorkouts(true)
+      workoutStore.setCurrentWorkout(response.id)
+      toast.success(t('workout.duplicated'), { progressBar: true, duration: 1000 })
+      router.push(`/workout/${response.id}`)
     } else {
-      console.error("Failed to duplicate workout");
+      console.error('Failed to duplicate workout')
     }
   }
-};
+}
 
 const deleteExercise = async () => {
   try {
     if (workout.value) {
-      const response = await deleteWorkout(workout.value.id);
+      const response = await deleteWorkout(workout.value.id)
       if (response) {
-        workoutStore.setWorkouts(true);
-        workoutStore.currentWorkout = null;
-        isDeleteDialogOpen.value = false;
-        toast.success(t('workout.deleted'), { progressBar: true, duration: 1000 });
-        router.push("/");
+        workoutStore.setWorkouts(true)
+        workoutStore.currentWorkout = null
+        isDeleteDialogOpen.value = false
+        toast.success(t('workout.deleted'), { progressBar: true, duration: 1000 })
+        router.push('/')
       } else {
-        console.error("Failed to delete exercise");
+        console.error('Failed to delete exercise')
       }
     }
   } catch (error) {
-    console.error("Error deleting exercise:", error);
-    toast.error(t('workout.failedToDelete'), { progressBar: true, duration: 1000 });
-    isDeleteDialogOpen.value = false;
+    console.error('Error deleting exercise:', error)
+    toast.error(t('workout.failedToDelete'), { progressBar: true, duration: 1000 })
+    isDeleteDialogOpen.value = false
   }
-};
+}
 
 const selectExercise = (exercise: Exercise) => {
-  selectedExercise.value = exercise;
-  isEditExerciseOpen.value = true;
-};
+  selectedExercise.value = exercise
+  isEditExerciseOpen.value = true
+}
 
 const onEditExerciseClose = async () => {
-  isEditExerciseOpen.value = false;
+  isEditExerciseOpen.value = false
   // Refresh workout to get updated exercise details
-  await workoutStore.setWorkouts(true);
-};
+  await workoutStore.setWorkouts(true)
+}
 
 const startSession = async () => {
   if (workout.value) {
-    const response = await startWorkoutSession(workout.value.id);
+    const response = await startWorkoutSession(workout.value.id)
     if (response && response.id) {
-      await workoutSessionStore.fetchSelectedWorkoutSession(response.id);
-      router.push(`/session/${response.id}`);
+      await workoutSessionStore.fetchSelectedWorkoutSession(response.id)
+      router.push(`/session/${response.id}`)
     } else {
-      console.error("Failed to start session:", response);
-      toast.error(t('workout.failedToStartSession'), { progressBar: true, duration: 1000 });
+      console.error('Failed to start session:', response)
+      toast.error(t('workout.failedToStartSession'), { progressBar: true, duration: 1000 })
     }
   }
-};
+}
 
 // Drag and drop handlers
 const onDragStart = (index: number) => {
-  draggedIndex.value = index;
-};
+  draggedIndex.value = index
+}
 
 const onDragOver = (index: number) => {
   if (draggedIndex.value !== null && draggedIndex.value !== index) {
-    dragOverIndex.value = index;
+    dragOverIndex.value = index
   }
-};
+}
 
 const onDrop = async (dropIndex: number) => {
   if (draggedIndex.value === null || draggedIndex.value === dropIndex || !workout.value) {
-    return;
+    return
   }
 
-  const exercises = [...sortedExercises.value];
-  const [draggedExercise] = exercises.splice(draggedIndex.value, 1);
-  exercises.splice(dropIndex, 0, draggedExercise);
+  const exercises = [...sortedExercises.value]
+  const [draggedExercise] = exercises.splice(draggedIndex.value, 1)
+  exercises.splice(dropIndex, 0, draggedExercise)
 
   // Update order values for all exercises
   const reorderedExercises = exercises.map((ex, idx) => ({
     workoutExerciseId: ex.id,
     order: idx + 1,
-  }));
+  }))
 
   try {
-    await reorderExercises(workout.value.id, reorderedExercises);
-    await workoutStore.setWorkouts(true);
-    toast.success(t('workout.exercisesReordered'), { progressBar: true, duration: 1000 });
+    await reorderExercises(workout.value.id, reorderedExercises)
+    await workoutStore.setWorkouts(true)
+    toast.success(t('workout.exercisesReordered'), { progressBar: true, duration: 1000 })
   } catch (error) {
-    console.error('Error reordering exercises:', error);
-    toast.error(t('workout.failedToReorder'), { progressBar: true, duration: 1000 });
+    console.error('Error reordering exercises:', error)
+    toast.error(t('workout.failedToReorder'), { progressBar: true, duration: 1000 })
   }
-};
+}
 
 const onDragEnd = () => {
-  draggedIndex.value = null;
-  dragOverIndex.value = null;
-};
+  draggedIndex.value = null
+  dragOverIndex.value = null
+}
+
+// Workout quick stats
+const workoutQuickStats = computed<WorkoutQuickStats | null>(
+  () => statisticsStore.workoutQuickStats
+)
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+function formatDuration(minutes: number): string {
+  if (!minutes) return '0 min'
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h > 0 && m > 0) return `${h}h ${m}m`
+  if (h > 0) return `${h}h`
+  return `${m} min`
+}
+
+watch(
+  workout,
+  w => {
+    if (w?.id) {
+      statisticsStore.fetchWorkoutQuickStats(w.id)
+    }
+  },
+  { immediate: true }
+)
 </script>

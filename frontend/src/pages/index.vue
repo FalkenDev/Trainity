@@ -42,6 +42,7 @@
         class="flex-grow-1 bg-cardBg rounded-lg"
         style="border: 1px solid #474747; box-shadow: none"
         size="small"
+        @click="$router.push('/statistics')"
       >
         <template #prepend>
           <v-icon color="green-darken-1">mdi-chart-line</v-icon>
@@ -52,6 +53,7 @@
         class="flex-grow-1 bg-cardBg rounded-lg"
         style="border: 1px solid #474747; box-shadow: none"
         size="small"
+        @click="$router.push('/statistics')"
       >
         <template #prepend>
           <v-icon color="red-darken-1">mdi-chart-box</v-icon>

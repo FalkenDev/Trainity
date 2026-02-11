@@ -9,8 +9,8 @@
     <v-btn icon to="/workout">
       <v-icon color="primary" size="40"> mdi-plus-circle </v-icon>
     </v-btn>
-    <v-btn icon to="/statistics" :disabled="true">
-      <v-icon>mdi-chart-bar</v-icon>
+    <v-btn icon to="/statistics">
+      <v-icon :color="route.path === '/statistics' ? 'primary' : ''">mdi-chart-bar</v-icon>
     </v-btn>
     <v-btn icon to="/settings">
       <v-icon :color="route.path === '/settings' ? 'primary' : ''">mdi-account</v-icon>
