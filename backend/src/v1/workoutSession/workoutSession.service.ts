@@ -13,6 +13,7 @@ import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutStatus } from '../types/WorkoutStatus.type';
 import { UserService } from '../user/user.service';
 import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
+import { StatisticsService } from '../statistics/statistics.service';
 
 @Injectable()
 export class WorkoutSessionService {
@@ -29,6 +30,7 @@ export class WorkoutSessionService {
     private readonly setRepo: Repository<WorkoutSessionSet>,
     private readonly dataSource: DataSource,
     private readonly userService: UserService,
+    private readonly statisticsService: StatisticsService,
   ) {}
 
   async getAllSessions(userId: number): Promise<WorkoutSession[]> {
@@ -195,6 +197,27 @@ export class WorkoutSessionService {
 
       // Update streak
       await this.userService.updateStreakOnWorkoutCompletion(userId);
+
+      // Compute and upsert personal records for logged past sessions
+      if (dto.completedExercises?.length) {
+        const completedForRecords = dto.completedExercises
+          .filter((ce) => ce.sets?.length)
+          .map((ce) => ({
+            exerciseId: ce.exerciseId,
+            sets: (ce.sets ?? []).map((s) => ({
+              weight: s.weight ?? 0,
+              reps: s.reps ?? 0,
+            })),
+          }));
+
+        if (completedForRecords.length) {
+          await this.statisticsService.computeAndUpsertRecords(
+            userId,
+            saved.id,
+            completedForRecords,
+          );
+        }
+      }
 
       return manager.findOneOrFail(WorkoutSession, {
         where: { id: saved.id },
@@ -380,7 +403,28 @@ export class WorkoutSessionService {
       // Update user's streak after finishing workout
       await this.userService.updateStreakOnWorkoutCompletion(userId);
 
-      return manager.findOneOrFail(WorkoutSession, {
+      // Compute and upsert personal records
+      const completedForRecords = (session.exercises ?? [])
+        .filter((ex) => ex.exercise?.id && ex.sets?.length)
+        .map((ex) => ({
+          exerciseId: ex.exercise.id,
+          sets: (ex.sets ?? []).map((s) => ({
+            weight: s.weight ?? 0,
+            reps: s.reps ?? 0,
+            rpe: s.rpe,
+          })),
+        }));
+
+      let newRecords: any[] = [];
+      if (completedForRecords.length) {
+        newRecords = await this.statisticsService.computeAndUpsertRecords(
+          userId,
+          session.id,
+          completedForRecords,
+        );
+      }
+
+      const result = await manager.findOneOrFail(WorkoutSession, {
         where: { id: session.id },
         relations: [
           'exercises',
@@ -390,6 +434,8 @@ export class WorkoutSessionService {
         ],
         withDeleted: true,
       });
+
+      return { ...result, newRecords } as any;
     });
   }
 

@@ -298,8 +298,23 @@ const finnishSession = async () => {
       router.push((route.query.returnTo as string) || '/')
     } else {
       const finalPayload = { completedExercises, notes: '' }
-      await finishWorkoutSession(sessionId.value, finalPayload)
+      const result = await finishWorkoutSession(sessionId.value, finalPayload)
       toast.success(t('session.finished'), { progressBar: true, duration: 1000 })
+
+      // Show PR toasts
+      if (result?.newRecords?.length) {
+        for (const record of result.newRecords) {
+          const exerciseName = record.exercise?.name ?? t('statistics.exercise')
+          toast.success(
+            `🏆 ${t('statistics.newPR')}: ${exerciseName} — ${record.value} ${record.recordType === 'max_reps' ? 'reps' : 'kg'}`,
+            {
+              progressBar: true,
+              duration: 3000,
+            }
+          )
+        }
+      }
+
       workoutSessionStore.stopClock()
       workoutSessionStore.selectedWorkoutSession = null
       workoutSessionStore.resetClock()
