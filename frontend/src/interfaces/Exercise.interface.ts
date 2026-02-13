@@ -1,3 +1,12 @@
+export type ExerciseType = 'compound' | 'isolation' | 'bodyweight'
+
+export interface ExerciseMedia {
+  id: number
+  type: 'image' | 'video'
+  url: string
+  order: number
+}
+
 export interface Exercise {
   id: number
   name: string
@@ -5,10 +14,17 @@ export interface Exercise {
   isNameCustom?: boolean
   description?: string | null
   image?: string | null
+  exerciseType?: ExerciseType | null
   muscleGroups: MuscleGroup[]
-  defaultSets: number
-  defaultReps: number
-  defaultPauseSeconds: number
+  primaryMuscleGroup?: MuscleGroup | null
+  equipment?: string[]
+  instructions?: string[]
+  proTips?: string[]
+  mistakes?: string[]
+  media?: ExerciseMedia[]
+  defaultSets?: number
+  defaultReps?: number
+  defaultPauseSeconds?: number
   createdBy: string
   createdAt: string
   updatedAt: string
@@ -17,23 +33,35 @@ export interface Exercise {
 
 export interface CreateExercise {
   name: string
-  description: string
+  description?: string
   image?: string | null
+  exerciseType?: ExerciseType | null
   muscleGroupIds: number[]
-  defaultSets: number
-  defaultReps: number
-  defaultPauseSeconds: number
+  primaryMuscleGroupId?: number | null
+  equipment?: string[]
+  instructions?: string[]
+  proTips?: string[]
+  mistakes?: string[]
+  defaultSets?: number
+  defaultReps?: number
+  defaultPauseSeconds?: number
 }
 
 export interface UpdateExercise {
   id: number
   name: string
-  description: string
+  description?: string
   image?: string | null
-  muscleGroups: number[]
-  defaultSets: number
-  defaultReps: number
-  defaultPauseSeconds: number
+  exerciseType?: ExerciseType | null
+  muscleGroupIds: number[]
+  primaryMuscleGroupId?: number | null
+  equipment?: string[]
+  instructions?: string[]
+  proTips?: string[]
+  mistakes?: string[]
+  defaultSets?: number
+  defaultReps?: number
+  defaultPauseSeconds?: number
 }
 
 export interface MuscleGroup {

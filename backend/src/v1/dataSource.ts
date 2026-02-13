@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 
 import { User } from './user/user.entity';
 import { Exercise } from './exercise/exercise.entity';
+import { ExerciseMedia } from './exercise/exerciseMedia.entity';
 import { Workout } from './workout/workout.entity';
 import { WorkoutExercise } from './workout/workoutExercise.entity';
 import { WorkoutSession } from './workoutSession/workoutSession.entity';
@@ -27,6 +28,7 @@ export const AppDataSource = new DataSource({
     User,
     MuscleGroup,
     Exercise,
+    ExerciseMedia,
     Workout,
     WorkoutExercise,
     WorkoutSession,

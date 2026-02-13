@@ -4,12 +4,13 @@ import { ExerciseSeedService } from './exerciseSeed.service';
 import { ExerciseController } from './exercise.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Exercise } from './exercise.entity';
+import { ExerciseMedia } from './exerciseMedia.entity';
 import { MuscleGroupModule } from '../muscleGroup/muscleGroup.module';
 import { UploadModule } from '../upload/upload.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Exercise]),
+    TypeOrmModule.forFeature([Exercise, ExerciseMedia]),
     MuscleGroupModule,
     UploadModule,
   ],

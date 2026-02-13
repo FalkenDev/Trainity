@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-5">
+  <div class="mx-5 mb-5">
     <v-card
       class="d-flex flex-column align-center justify-center py-5 my-5 rounded-lg"
       color="cardBg"
@@ -49,7 +49,7 @@
     </v-card>
     <div class="d-flex flex-column ga-5">
       <div>
-        <h1 class="text-h6">
+        <h1 class="text-h6 mb-3">
           {{ $t('settings.content') }}
         </h1>
         <v-card
@@ -71,9 +71,7 @@
         </v-card>
       </div>
       <div>
-        <h1 class="text-h6">
-          {{ $t('settings.content') }}
-        </h1>
+        <h1 class="text-h6 mb-3">Data</h1>
         <v-card
           v-for="item in dataList"
           :key="item.titleKey"
@@ -93,20 +91,24 @@
         </v-card>
       </div>
       <div>
-        <h1 class="text-h6">
-          {{ $t('settings.preferences') }}
-        </h1>
-        <v-list class="bg-transparent">
+        <h1 class="text-h6 mb-3">Preferences</h1>
+        <v-list class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
           <v-list-item
             v-for="item in preferencesList"
             :key="item.titleKey"
-            class="px-0"
+            class="px-5"
+            :class="{ 'border-b': item !== preferencesList[preferencesList.length - 1] }"
             :disabled="item.disabled"
             @click="setPreferenceDialogToOpen(item.type)"
           >
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
               <p>{{ $t(item.titleKey) }}</p>
               <v-icon v-if="item.showArrow"> mdi-chevron-right </v-icon>
+              <v-switch
+                v-if="item.type === 'darkMode'"
+                color="primary"
+                class="d-flex align-center pr-2"
+              />
             </v-list-item-title>
           </v-list-item>
         </v-list>
@@ -810,7 +812,7 @@ const preferencesList = [
   { titleKey: 'settings.userInformation', showArrow: true, disabled: false, type: 'account' },
   { titleKey: 'settings.appearance', showArrow: true, disabled: false, type: 'appearance' },
   { titleKey: 'settings.goals', showArrow: true, disabled: false, type: 'goals' },
-  { titleKey: 'settings.darkMode', showArrow: false, disabled: true, type: 'darkMode' },
+  { titleKey: 'settings.darkMode', showArrow: false, disabled: false, type: 'darkMode' },
   { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language' },
   { titleKey: 'settings.helpAndSupport', showArrow: true, disabled: true },
   { titleKey: 'settings.logout', showArrow: false, disabled: false, type: 'logout' },

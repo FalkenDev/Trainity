@@ -9,6 +9,7 @@ export class UploadService {
   private readonly uploadsDir = path.join(process.cwd(), 'uploads');
   private readonly exercisesDir = path.join(this.uploadsDir, 'exercises');
   private readonly avatarsDir = path.join(this.uploadsDir, 'avatars');
+  private readonly mediaDir = path.join(this.exercisesDir, 'media');
 
   constructor() {
     this.ensureDirectoriesExist();
@@ -19,6 +20,7 @@ export class UploadService {
       await fs.mkdir(this.uploadsDir, { recursive: true });
       await fs.mkdir(this.exercisesDir, { recursive: true });
       await fs.mkdir(this.avatarsDir, { recursive: true });
+      await fs.mkdir(this.mediaDir, { recursive: true });
     } catch (error) {
       console.error('Error creating upload directories:', error);
     }
@@ -65,6 +67,33 @@ export class UploadService {
   }
 
   /**
+   * Process exercise media (image or video).
+   * Images are converted to WebP; videos are stored as-is.
+   */
+  async processExerciseMedia(
+    file: Express.Multer.File,
+  ): Promise<{ url: string; type: 'image' | 'video' }> {
+    const isVideo = file.mimetype === 'video/mp4';
+
+    if (isVideo) {
+      const filename = `${randomBytes(16).toString('hex')}.mp4`;
+      const filepath = path.join(this.mediaDir, filename);
+      await fs.writeFile(filepath, file.buffer);
+      return { url: `/uploads/exercises/media/${filename}`, type: 'video' };
+    }
+
+    // Image processing
+    const filename = `${randomBytes(16).toString('hex')}.webp`;
+    const filepath = path.join(this.mediaDir, filename);
+    await sharp(file.buffer)
+      .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
+      .toFile(filepath);
+
+    return { url: `/uploads/exercises/media/${filename}`, type: 'image' };
+  }
+
+  /**
    * Delete an image file from the filesystem
    */
   async deleteImage(imageUrl: string): Promise<void> {
@@ -80,7 +109,7 @@ export class UploadService {
   }
 
   /**
-   * Validate uploaded file
+   * Validate uploaded file (images only)
    */
   validateImageFile(file: Express.Multer.File): {
     valid: boolean;
@@ -107,6 +136,40 @@ export class UploadService {
 
     if (file.size > maxSize) {
       return { valid: false, error: 'File too large. Maximum size is 10MB' };
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Validate uploaded media file (images + video)
+   */
+  validateMediaFile(file: Express.Multer.File): {
+    valid: boolean;
+    error?: string;
+  } {
+    const maxSize = 50 * 1024 * 1024; // 50MB for video
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/jpg',
+      'video/mp4',
+    ];
+
+    if (!file) {
+      return { valid: false, error: 'No file provided' };
+    }
+
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      return {
+        valid: false,
+        error: 'Invalid file type. Only JPEG, PNG, WebP, and MP4 are allowed',
+      };
+    }
+
+    if (file.size > maxSize) {
+      return { valid: false, error: 'File too large. Maximum size is 50MB' };
     }
 
     return { valid: true };
