@@ -1,27 +1,27 @@
-import { fetchWrapper } from '@/utils/fetchWrapper';
-import type { CreateExercise, Exercise } from '@/interfaces/Exercise.interface';
+import { fetchWrapper } from '@/utils/fetchWrapper'
+import type { CreateExercise, Exercise, UpdateExercise } from '@/interfaces/Exercise.interface'
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1'
 
 export const fetchAllExercises = async () => {
   try {
-    const data = await fetchWrapper<Exercise[]>(`${apiUrl}/exercises`);
-    return Array.isArray(data) ? data : [];
+    const data = await fetchWrapper<Exercise[]>(`${apiUrl}/exercises`)
+    return Array.isArray(data) ? data : []
   } catch (error) {
-    console.error('Error fetching exercises:', error);
-    throw new Error('Failed to fetch exercises');
+    console.error('Error fetching exercises:', error)
+    throw new Error('Failed to fetch exercises')
   }
-};
+}
 
 export const fetchExerciseById = async (exerciseId: number) => {
   try {
-    const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises/${exerciseId}`);
-    return data;
+    const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises/${exerciseId}`)
+    return data
   } catch (error) {
-    console.error('Error fetching exercise:', error);
-    throw new Error('Failed to fetch exercise');
+    console.error('Error fetching exercise:', error)
+    throw new Error('Failed to fetch exercise')
   }
-};
+}
 
 export const createExercise = async (exercise: CreateExercise) => {
   try {
@@ -29,55 +29,98 @@ export const createExercise = async (exercise: CreateExercise) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(exercise),
-    });
-    return data;
+    })
+    return data
   } catch (error) {
-    console.error('Error creating exercise:', error);
-    throw new Error('Failed to create exercise');
+    console.error('Error creating exercise:', error)
+    throw new Error('Failed to create exercise')
   }
-};
+}
 
 export const updateExercise = async (
   exerciseId: number,
-  exercise: CreateExercise,
+  exercise: Partial<CreateExercise | UpdateExercise>
 ) => {
   try {
     const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises/${exerciseId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(exercise),
-    });
-    return data;
+    })
+    return data
   } catch (error) {
-    console.error('Error updating exercise:', error);
-    throw new Error('Failed to update exercise');
+    console.error('Error updating exercise:', error)
+    throw new Error('Failed to update exercise')
   }
-};
+}
 
 export const deleteExercise = async (exerciseId: number) => {
   try {
     await fetchWrapper<void>(`${apiUrl}/exercises/${exerciseId}`, {
       method: 'DELETE',
-    });
-    return true;
+    })
+    return true
   } catch (error) {
-    console.error('Error deleting exercise:', error);
-    throw new Error('Failed to delete exercise');
+    console.error('Error deleting exercise:', error)
+    throw new Error('Failed to delete exercise')
   }
-};
+}
 
 export const uploadExerciseImage = async (exerciseId: number, file: File) => {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
+    const formData = new FormData()
+    formData.append('file', file)
 
     const data = await fetchWrapper(`${apiUrl}/exercises/${exerciseId}/image`, {
       method: 'POST',
       body: formData,
-    });
-    return data;
+    })
+    return data
   } catch (error) {
-    console.error('Error uploading exercise image:', error);
-    throw new Error('Failed to upload exercise image');
+    console.error('Error uploading exercise image:', error)
+    throw new Error('Failed to upload exercise image')
   }
-};
+}
+
+export const uploadExerciseMedia = async (exerciseId: number, file: File) => {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises/${exerciseId}/media`, {
+      method: 'POST',
+      body: formData,
+    })
+    return data
+  } catch (error) {
+    console.error('Error uploading exercise media:', error)
+    throw new Error('Failed to upload exercise media')
+  }
+}
+
+export const deleteExerciseMedia = async (exerciseId: number, mediaId: number) => {
+  try {
+    const data = await fetchWrapper<Exercise>(
+      `${apiUrl}/exercises/${exerciseId}/media/${mediaId}`,
+      { method: 'DELETE' }
+    )
+    return data
+  } catch (error) {
+    console.error('Error deleting exercise media:', error)
+    throw new Error('Failed to delete exercise media')
+  }
+}
+
+export const reorderExerciseMedia = async (exerciseId: number, mediaIds: number[]) => {
+  try {
+    const data = await fetchWrapper<Exercise>(`${apiUrl}/exercises/${exerciseId}/media/reorder`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mediaIds }),
+    })
+    return data
+  } catch (error) {
+    console.error('Error reordering exercise media:', error)
+    throw new Error('Failed to reorder exercise media')
+  }
+}

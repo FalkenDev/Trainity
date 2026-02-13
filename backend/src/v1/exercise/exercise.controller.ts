@@ -112,10 +112,7 @@ export class ExerciseController {
     schema: {
       type: 'object',
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
+        file: { type: 'string', format: 'binary' },
       },
     },
   })
@@ -145,5 +142,78 @@ export class ExerciseController {
 
     // Update the exercise with the new image URL
     return this.exerciseService.updateImage(id, imageUrl, +req.user.id);
+  }
+
+  // --- Media endpoints ---
+
+  @Post(':id/media')
+  @ApiOperation({ summary: 'Upload media (image or video) for an exercise' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiOkResponse({ type: ExerciseResponseDto })
+  @UseInterceptors(FileInterceptor('file', { storage: undefined }))
+  async uploadExerciseMedia(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithUser,
+  ): Promise<ExerciseResponseDto> {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const validation = this.uploadService.validateMediaFile(file);
+    if (!validation.valid) {
+      throw new BadRequestException(validation.error);
+    }
+
+    const result = await this.uploadService.processExerciseMedia(file);
+
+    return this.exerciseService.addMedia(
+      id,
+      +req.user.id,
+      result.url,
+      result.type,
+    );
+  }
+
+  @Delete(':id/media/:mediaId')
+  @ApiOperation({ summary: 'Delete a media item from an exercise' })
+  @ApiOkResponse({ type: ExerciseResponseDto })
+  async deleteExerciseMedia(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('mediaId', ParseIntPipe) mediaId: number,
+    @Req() req: RequestWithUser,
+  ): Promise<ExerciseResponseDto> {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
+    return this.exerciseService.removeMedia(id, mediaId, +req.user.id);
+  }
+
+  @Put(':id/media/reorder')
+  @ApiOperation({ summary: 'Reorder media items for an exercise' })
+  @ApiOkResponse({ type: ExerciseResponseDto })
+  async reorderExerciseMedia(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { mediaIds: number[] },
+    @Req() req: RequestWithUser,
+  ): Promise<ExerciseResponseDto> {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
+    return this.exerciseService.reorderMedia(id, body.mediaIds, +req.user.id);
   }
 }

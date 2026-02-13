@@ -1,75 +1,120 @@
 <template>
-  <div class="d-flex flex-column fill-height bg-grey-darken-4 content-scroll">
-    <BackHeader
-      :title="$t('exerciseForm.createTitle')"
-      :show-menu="false"
-      @close="emit('close')"
-    />
-    <v-form class="mx-5">
-      <ImageUpload
-        v-model="imageFile"
-        :placeholder="$t('exerciseForm.imageOptionalPlaceholder')"
-        :helper-text="$t('exerciseForm.imageHelperReference')"
-        class="mb-4"
-      />
-      
+  <div class="d-flex flex-column fill-height bg-background content-scroll">
+    <BackHeader :title="$t('exerciseForm.createTitle')" :show-menu="false" @close="emit('close')" />
+
+    <v-form ref="formRef" class="mx-5 mt-2 pb-10">
+      <!-- Exercise Name -->
       <v-text-field
-        v-model="newExercise.name"
+        v-model="form.name"
         :label="$t('exerciseForm.nameLabel')"
+        variant="outlined"
         required
-        variant="outlined"
+        :rules="[v => !!v || $t('exerciseForm.nameRequired')]"
       />
+
+      <!-- About / Description (optional) -->
       <v-textarea
-        v-model="newExercise.description"
-        :label="$t('common.description')"
-        rows="2"
+        v-model="form.description"
+        :label="$t('exerciseForm.aboutLabel')"
         variant="outlined"
+        rows="2"
+        auto-grow
+        class="mt-1"
       />
+
+      <!-- Exercise Type -->
       <v-select
-        v-model="newExercise.muscleGroupIds"
+        v-model="form.exerciseType"
+        :label="$t('exerciseForm.exerciseTypeLabel')"
+        :items="exerciseTypeItems"
+        variant="outlined"
+        clearable
+        class="mt-1"
+      />
+
+      <!-- Target Muscles (multi-select chips) -->
+      <v-select
+        v-model="form.muscleGroupIds"
         :label="$t('exerciseForm.muscleGroupsLabel')"
         :items="muscleGroupItems"
-        required
-        class="mt-3"
-        multiple
         item-title="name"
         item-value="id"
         variant="outlined"
-        :menu-props="{ maxHeight: '200px' }"
+        multiple
+        chips
+        closable-chips
+        class="mt-1"
+        :menu-props="{ maxHeight: '250px' }"
       />
-      <v-text-field
-        v-model="newExercise.defaultSets"
-        :label="$t('exerciseForm.setsLabel')"
-        type="number"
-        min="1"
-        required
-        class="mt-3"
+
+      <!-- Primary Muscle (from selected targets) -->
+      <v-select
+        v-model="form.primaryMuscleGroupId"
+        :label="$t('exerciseForm.primaryMuscleLabel')"
+        :items="selectedMuscleGroupItems"
+        item-title="name"
+        item-value="id"
         variant="outlined"
-        @update:model-value="val => newExercise.defaultSets = parseInt(val, 10) || 1"
+        clearable
+        class="mt-1"
+        :disabled="form.muscleGroupIds.length === 0"
       />
-      <v-text-field
-        v-model="newExercise.defaultReps"
-        :label="$t('exerciseForm.repsLabel')"
-        type="number"
-        min="1"
-        required
-        class="mt-3"
-        variant="outlined"
-        @update:model-value="val => newExercise.defaultReps = parseInt(val, 10) || 1"
-      />
-      <v-text-field
-        v-model="newExercise.defaultPauseSeconds"
-        :label="$t('exerciseForm.pauseSecondsLabel')"
-        type="number"
-        min="0"
-        required
-        class="mt-3"
-        variant="outlined"
-        @update:model-value="val => newExercise.defaultPauseSeconds = parseInt(val, 10) || 0"
-      />
+
+      <!-- Equipment (chip input) -->
+      <div class="mt-1">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.equipmentLabel') }}</p>
+        <ChipTextInput
+          v-model="form.equipment"
+          :placeholder="$t('exerciseForm.equipmentPlaceholder')"
+        />
+      </div>
+
+      <!-- Media Upload -->
+      <div class="mt-2">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.mediaLabel') }}</p>
+        <MediaUpload v-model="newMediaItems" />
+      </div>
+
+      <!-- How to Perform (draggable list) -->
+      <div class="mt-6">
+        <p class="text-body-2 text-textSecondary mb-2">
+          {{ $t('exerciseForm.instructionsLabel') }}
+        </p>
+        <DraggableTextList
+          v-model="form.instructions"
+          :placeholder="$t('exerciseForm.instructionsPlaceholder')"
+          icon="mdi-numeric"
+          numbered
+        />
+      </div>
+
+      <!-- Pro Tips (draggable list) -->
+      <div class="mt-6">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.proTipsLabel') }}</p>
+        <DraggableTextList
+          v-model="form.proTips"
+          :placeholder="$t('exerciseForm.proTipsPlaceholder')"
+          icon="mdi-lightbulb-on-outline"
+          icon-color="primary"
+        />
+      </div>
+
+      <!-- Avoid These Mistakes (draggable list) -->
+      <div class="mt-6">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.mistakesLabel') }}</p>
+        <DraggableTextList
+          v-model="form.mistakes"
+          :placeholder="$t('exerciseForm.mistakesPlaceholder')"
+          icon="mdi-close"
+          icon-color="error"
+        />
+      </div>
+
+      <!-- Create Button -->
       <v-btn
         color="primary"
-        class="w-100"
+        class="w-100 mt-8"
+        size="large"
         :loading="isCreating"
         @click="createNewExercise"
       >
@@ -78,90 +123,133 @@
     </v-form>
   </div>
 </template>
-<script lang="ts" setup>
-import { createExercise, uploadExerciseImage } from "@/services/exercise.service";
-import type { CreateExercise } from "@/interfaces/Exercise.interface";
-import { useMuscleGroupStore } from "@/stores/muscleGroup.store";
-import { useExerciseStore } from "@/stores/exercise.store";
-import { toast } from "vuetify-sonner";
-import type { MuscleGroup } from "@/interfaces/MuscleGroup.interface";
-import ImageUpload from "@/components/basicUI/ImageUpload.vue";
-import { useI18n } from 'vue-i18n';
+
+<script setup lang="ts">
+import type { ExerciseType } from '@/interfaces/Exercise.interface'
+import type { MediaItem } from '@/components/basicUI/MediaUpload.vue'
+import { createExercise, uploadExerciseMedia } from '@/services/exercise.service'
+import { useMuscleGroupStore } from '@/stores/muscleGroup.store'
+import { useExerciseStore } from '@/stores/exercise.store'
+import { toast } from 'vuetify-sonner'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits<{
-  (e: "close"): void;
-}>();
+  (e: 'close'): void
+}>()
 
-const exerciseStore = useExerciseStore();
-const muscleGroupStore = useMuscleGroupStore();
-const isCreating = ref(false);
-const imageFile = ref<File | null>(null);
-const { t } = useI18n({ useScope: 'global' });
+const exerciseStore = useExerciseStore()
+const muscleGroupStore = useMuscleGroupStore()
+const isCreating = ref(false)
+const newMediaItems = ref<MediaItem[]>([])
+const { t } = useI18n({ useScope: 'global' })
 
-const newExercise = ref<CreateExercise>({
-  name: "",
-  description: "",
+const exerciseTypeItems = [
+  { title: 'Compound', value: 'compound' as ExerciseType },
+  { title: 'Isolation', value: 'isolation' as ExerciseType },
+  { title: 'Bodyweight', value: 'bodyweight' as ExerciseType },
+]
+
+const form = ref({
+  name: '',
+  description: '',
+  exerciseType: null as ExerciseType | null,
   muscleGroupIds: [] as number[],
-  defaultSets: 1,
-  defaultReps: 1,
-  defaultPauseSeconds: 0,
-});
-
+  primaryMuscleGroupId: null as number | null,
+  equipment: [] as string[],
+  instructions: [] as string[],
+  proTips: [] as string[],
+  mistakes: [] as string[],
+})
 
 const muscleGroupItems = computed(() =>
-  muscleGroupStore.muscleGroups.map((group: MuscleGroup) => ({
-    ...group,
-    name: group.name,
-    id: group.id,
-  }))
-);
+  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, id: g.id }))
+)
+
+const selectedMuscleGroupItems = computed(() =>
+  muscleGroupItems.value.filter(g => form.value.muscleGroupIds.includes(g.id))
+)
+
+watch(
+  () => form.value.muscleGroupIds,
+  ids => {
+    if (form.value.primaryMuscleGroupId && !ids.includes(form.value.primaryMuscleGroupId)) {
+      form.value.primaryMuscleGroupId = null
+    }
+  }
+)
+
+const resetForm = () => {
+  form.value = {
+    name: '',
+    description: '',
+    exerciseType: null,
+    muscleGroupIds: [],
+    primaryMuscleGroupId: null,
+    equipment: [],
+    instructions: [],
+    proTips: [],
+    mistakes: [],
+  }
+  newMediaItems.value = []
+}
 
 const createNewExercise = async () => {
-  isCreating.value = true;
+  if (!form.value.name.trim()) {
+    toast.error(t('exerciseForm.nameRequired'), { progressBar: true, duration: 1000 })
+    return
+  }
+
+  isCreating.value = true
   try {
-    const response = await createExercise(newExercise.value);
-    
+    const payload = {
+      name: form.value.name.trim(),
+      description: form.value.description.trim() || undefined,
+      exerciseType: form.value.exerciseType || undefined,
+      muscleGroupIds: form.value.muscleGroupIds,
+      primaryMuscleGroupId: form.value.primaryMuscleGroupId || undefined,
+      equipment: form.value.equipment.length > 0 ? form.value.equipment : undefined,
+      instructions: form.value.instructions.length > 0 ? form.value.instructions : undefined,
+      proTips: form.value.proTips.length > 0 ? form.value.proTips : undefined,
+      mistakes: form.value.mistakes.length > 0 ? form.value.mistakes : undefined,
+    }
+
+    const response = await createExercise(payload)
+
     if (response) {
-      if (imageFile.value) {
-        try {
-          await uploadExerciseImage(response.id, imageFile.value);
-        } catch (imageError) {
-          console.error("Error uploading image:", imageError);
-          toast.warning(t('exercise.createdImageUploadFailed'), { progressBar: true, duration: 1000 });
+      // Upload media items
+      for (const item of newMediaItems.value) {
+        if (item.file) {
+          try {
+            await uploadExerciseMedia(response.id, item.file)
+          } catch {
+            toast.warning(t('exerciseForm.mediaUploadFailed'), {
+              progressBar: true,
+              duration: 1500,
+            })
+          }
         }
       }
-      
-      toast.success(t('exercise.created'), { progressBar: true, duration: 1000 });
-      
-      newExercise.value = {
-        name: "",
-        description: "",
-        muscleGroupIds: [],
-        defaultSets: 1,
-        defaultReps: 1,
-        defaultPauseSeconds: 0,
-      };
-      imageFile.value = null;
-      
-      exerciseStore.setExercises(true);
-      emit("close");
+
+      toast.success(t('exercise.created'), { progressBar: true, duration: 1000 })
+      resetForm()
+      exerciseStore.setExercises(true)
+      emit('close')
     } else {
-      toast.error(t('exercise.failedToCreate'), { progressBar: true, duration: 1000 });
+      toast.error(t('exercise.failedToCreate'), { progressBar: true, duration: 1000 })
     }
-  } catch (error) {
-    console.error("Error creating exercise:", error);
-    toast.error(t('exercise.createGenericError'), { progressBar: true, duration: 1000 });
+  } catch {
+    toast.error(t('exercise.createGenericError'), { progressBar: true, duration: 1000 })
   } finally {
-    isCreating.value = false;
+    isCreating.value = false
   }
-};
+}
 </script>
-<style>
+
+<style scoped>
 .content-scroll {
-  height: calc(100vh - 100px);
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 16px;
 }
 </style>

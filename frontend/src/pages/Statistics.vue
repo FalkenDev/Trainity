@@ -1,6 +1,9 @@
 <template>
   <div class="pa-5 d-flex flex-column ga-4">
-    <BackHeader :title="$t('statistics.title')" />
+    <div>
+      <h1>{{ $t('statistics.title') }}</h1>
+      <p>{{ $t('statistics.description') }}</p>
+    </div>
 
     <v-tabs v-model="activeTab" color="primary" density="compact" grow>
       <v-tab value="overview">{{ $t('statistics.overview') }}</v-tab>

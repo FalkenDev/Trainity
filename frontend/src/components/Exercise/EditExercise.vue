@@ -1,258 +1,155 @@
 <template>
-  <div class="w-100 bg-grey-darken-4" style="height: 150vh">
-    <BackHeader
-      :show-menu="!props.hideMenu"
-      :title="isViewExercise ? $t('exerciseForm.viewTitle') : $t('exerciseForm.editTitle')"
-      @close="isViewExercise ? emit('close') : (isViewExercise = true)"
-    >
-      <template #menuAppend>
-        <v-list>
-          <v-list-item @click="isViewExercise = false">
-            <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="isDeleteExerciseOpen = true">
-            <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </template>
-    </BackHeader>
+  <div class="d-flex flex-column fill-height bg-background content-scroll">
+    <BackHeader :title="$t('exerciseForm.editTitle')" :show-menu="false" @close="emit('close')" />
 
-    <div v-if="selectedExercise">
-      <div v-if="selectedExercise?.image" class="exercise-image-container">
-        <v-img :src="getImageUrl(selectedExercise.image)" height="200" cover />
+    <v-form ref="formRef" class="mx-5 mt-2 pb-10">
+      <!-- Exercise Name -->
+      <v-text-field
+        v-model="form.name"
+        :label="$t('exerciseForm.nameLabel')"
+        variant="outlined"
+        required
+        :rules="[v => !!v || $t('exerciseForm.nameRequired')]"
+      />
+
+      <!-- About / Description (optional) -->
+      <v-textarea
+        v-model="form.description"
+        :label="$t('exerciseForm.aboutLabel')"
+        variant="outlined"
+        rows="2"
+        auto-grow
+        class="mt-1"
+      />
+
+      <!-- Exercise Type -->
+      <v-select
+        v-model="form.exerciseType"
+        :label="$t('exerciseForm.exerciseTypeLabel')"
+        :items="exerciseTypeItems"
+        variant="outlined"
+        clearable
+        class="mt-1"
+      />
+
+      <!-- Target Muscles (multi-select chips) -->
+      <v-select
+        v-model="form.muscleGroupIds"
+        :label="$t('exerciseForm.muscleGroupsLabel')"
+        :items="muscleGroupItems"
+        item-title="name"
+        item-value="id"
+        variant="outlined"
+        multiple
+        chips
+        closable-chips
+        class="mt-1"
+        :menu-props="{ maxHeight: '250px' }"
+      />
+
+      <!-- Primary Muscle (from selected targets) -->
+      <v-select
+        v-model="form.primaryMuscleGroupId"
+        :label="$t('exerciseForm.primaryMuscleLabel')"
+        :items="selectedMuscleGroupItems"
+        item-title="name"
+        item-value="id"
+        variant="outlined"
+        clearable
+        class="mt-1"
+        :disabled="form.muscleGroupIds.length === 0"
+      />
+
+      <!-- Equipment (chip input) -->
+      <div class="mt-1">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.equipmentLabel') }}</p>
+        <ChipTextInput
+          v-model="form.equipment"
+          :placeholder="$t('exerciseForm.equipmentPlaceholder')"
+        />
       </div>
-      <v-card v-else height="200" class="bg-white" />
-      <div class="mx-5">
-        <div class="py-4">
-          <h1 class="text-h5 font-weight-bold">
-            {{ selectedExercise?.name }}
-          </h1>
-          <p>
-            {{ selectedExercise?.description }}
-          </p>
-          <div
-            v-if="selectedExercise?.muscleGroups"
-            class="d-flex ga-2 align-center mt-2 flex-wrap"
-          >
-            <v-chip
-              v-for="group in selectedExercise.muscleGroups"
-              :key="group.id"
-              color="green-lighten-1"
-              label
-            >
-              {{ group.name }}
-            </v-chip>
-          </div>
-        </div>
-        <v-divider />
-        <div v-if="isViewExercise">
-          <v-list lines="one">
-            <v-list-item>
-              <template #prepend>
-                <v-icon color="primary"> mdi-numeric </v-icon>
-              </template>
-              <v-list-item-title>
-                <span class="font-weight-medium">{{ $t('exerciseForm.defaultSets') }}:</span>
-                <span class="ml-2">
-                  {{ selectedExercise?.defaultSets || 0 }}
-                </span>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <template #prepend>
-                <v-icon color="primary"> mdi-repeat </v-icon>
-              </template>
-              <v-list-item-title>
-                <span class="font-weight-medium">{{ $t('exerciseForm.defaultReps') }}:</span>
-                <span class="ml-2">
-                  {{ selectedExercise?.defaultReps || 0 }}
-                </span>
-              </v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <template #prepend>
-                <v-icon color="primary"> mdi-timer-outline </v-icon>
-              </template>
-              <v-list-item-title>
-                <span class="font-weight-medium">{{ $t('exerciseForm.defaultPause') }}:</span>
-                <span class="ml-2">
-                  {{ selectedExercise?.defaultPauseSeconds || 0 }}
-                  {{ $t('units.sec') }}
-                </span>
-              </v-list-item-title>
-            </v-list-item>
-            <v-divider class="my-2" />
-            <v-list-item>
-              <template #prepend>
-                <v-icon color="grey"> mdi-calendar-plus </v-icon>
-              </template>
-              <v-list-item-title>
-                <span class="font-weight-medium">{{ $t('common.createdAt') }}:</span>
-                <span class="ml-2">
-                  {{
-                    selectedExercise?.createdAt
-                      ? new Date(selectedExercise.createdAt).toLocaleDateString()
-                      : ''
-                  }}
-                </span>
-              </v-list-item-title>
-            </v-list-item>
-          </v-list>
 
-          <!-- Compact Exercise History -->
-          <div v-if="quickStats" class="mt-3">
-            <v-divider class="mb-3" />
-            <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
-              {{ $t('statistics.personalRecords') }}
-            </p>
-            <div class="d-flex flex-wrap ga-2 mb-3">
-              <v-chip
-                v-if="quickStats.records.maxWeight"
-                size="small"
-                variant="tonal"
-                color="amber"
-              >
-                <v-icon start size="12">mdi-trophy</v-icon>
-                {{ quickStats.records.maxWeight.value }} kg
-                {{ $t('statistics.records.maxWeight').toLowerCase() }}
-              </v-chip>
-              <v-chip
-                v-if="quickStats.records.estimatedOneRepMax"
-                size="small"
-                variant="tonal"
-                color="amber"
-              >
-                <v-icon start size="12">mdi-trophy</v-icon>
-                {{ quickStats.records.estimatedOneRepMax.value }} kg
-                {{ $t('statistics.records.estimated1RM') }}
-              </v-chip>
-              <v-chip v-if="quickStats.records.maxReps" size="small" variant="tonal" color="amber">
-                <v-icon start size="12">mdi-trophy</v-icon>
-                {{ quickStats.records.maxReps.value }}
-                {{ $t('statistics.records.maxReps').toLowerCase() }}
-              </v-chip>
-            </div>
-
-            <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
-              {{ $t('statistics.recentSessions') }}
-            </p>
-            <div
-              v-if="quickStats.recentHistory.length === 0"
-              class="text-caption text-textSecondary mb-2"
-            >
-              {{ $t('statistics.noHistory') }}
-            </div>
-            <v-card
-              v-for="(session, idx) in quickStats.recentHistory"
-              :key="idx"
-              class="bg-cardBg pa-2 px-3 rounded-lg mb-1"
-              style="border: 1px solid #474747; box-shadow: none"
-              density="compact"
-            >
-              <div class="d-flex align-center justify-space-between">
-                <span class="text-caption">{{ formatDate(session.date) }}</span>
-                <span class="text-caption text-textSecondary">
-                  {{ session.sets.length }} {{ $t('statistics.sets') }} ·
-                  {{ session.totalVolume }} kg
-                </span>
-              </div>
-            </v-card>
-
-            <v-btn
-              variant="text"
-              color="primary"
-              size="small"
-              class="mt-1 px-0"
-              @click="navigateToStatistics"
-            >
-              {{ $t('statistics.viewFullHistory') }}
-              <v-icon end size="14">mdi-arrow-right</v-icon>
-            </v-btn>
-          </div>
-        </div>
-        <div v-else>
-          <v-btn class="w-100 my-4" color="primary" :loading="isLoading" @click="updateExercise">
-            {{ $t('common.saveChanges') }}
-          </v-btn>
-          <v-form v-if="editExercise" class="py-4 d-flex ga-5 flex-column">
-            <ImageUpload
-              v-model="imageFile"
-              :existing-image-url="
-                selectedExercise?.image ? getImageUrl(selectedExercise.image) : null
-              "
-              :placeholder="$t('exerciseForm.changeImagePlaceholder')"
-              :helper-text="$t('exerciseForm.changeImageHelper')"
-            />
-
-            <v-text-field
-              v-model="editExercise.name"
-              :label="$t('common.name')"
-              type="string"
-              variant="outlined"
-              hide-details
-              density="compact"
-            />
-            <v-text-field
-              v-model="editExercise.description"
-              :label="$t('common.description')"
-              type="string"
-              variant="outlined"
-              hide-details
-              density="compact"
-            />
-            <v-select
-              v-model="editExercise.muscleGroups"
-              :items="muscleGroupStore.muscleGroups"
-              :label="$t('exerciseForm.muscleGroupsLabel')"
-              multiple
-              variant="outlined"
-              hide-details
-              item-title="name"
-              item-value="id"
-              density="compact"
-            />
-            <v-text-field
-              v-model="editExercise.defaultSets"
-              :label="$t('exerciseForm.setsLabel')"
-              type="number"
-              variant="outlined"
-              hide-details
-              density="compact"
-            />
-            <v-text-field
-              v-model="editExercise.defaultReps"
-              :label="$t('exerciseForm.repsLabel')"
-              type="number"
-              variant="outlined"
-              hide-details
-              density="compact"
-            />
-            <v-text-field
-              v-model="editExercise.defaultPauseSeconds"
-              :label="$t('exerciseForm.pauseSecondsLabel')"
-              type="number"
-              variant="outlined"
-              hide-details
-              density="compact"
-            />
-          </v-form>
-        </div>
+      <!-- Media Upload -->
+      <div class="mt-2">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.mediaLabel') }}</p>
+        <MediaUpload
+          v-model="newMediaItems"
+          :existing-media="exercise?.media"
+          @remove-existing="removeExistingMedia"
+        />
       </div>
-    </div>
-    <v-dialog v-model="isDeleteExerciseOpen" max-width="500" persistent>
-      <v-card>
-        <v-card-title class="text-h6">
-          {{ $t('exerciseForm.deleteTitle') }}
-        </v-card-title>
-        <v-card-text>
-          {{ $t('exerciseForm.deleteConfirm') }}
-        </v-card-text>
-        <v-card-actions>
+
+      <!-- How to Perform (draggable list) -->
+      <div class="mt-6">
+        <p class="text-body-2 text-textSecondary mb-2">
+          {{ $t('exerciseForm.instructionsLabel') }}
+        </p>
+        <DraggableTextList
+          v-model="form.instructions"
+          :placeholder="$t('exerciseForm.instructionsPlaceholder')"
+          icon="mdi-numeric"
+          numbered
+        />
+      </div>
+
+      <!-- Pro Tips (draggable list) -->
+      <div class="mt-6">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.proTipsLabel') }}</p>
+        <DraggableTextList
+          v-model="form.proTips"
+          :placeholder="$t('exerciseForm.proTipsPlaceholder')"
+          icon="mdi-lightbulb-on-outline"
+          icon-color="primary"
+        />
+      </div>
+
+      <!-- Avoid These Mistakes (draggable list) -->
+      <div class="mt-6">
+        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.mistakesLabel') }}</p>
+        <DraggableTextList
+          v-model="form.mistakes"
+          :placeholder="$t('exerciseForm.mistakesPlaceholder')"
+          icon="mdi-close"
+          icon-color="error"
+        />
+      </div>
+
+      <!-- Save Button -->
+      <v-btn
+        color="primary"
+        class="w-100 mt-8"
+        size="large"
+        :loading="isSaving"
+        @click="saveExercise"
+      >
+        {{ $t('exerciseForm.saveButton') }}
+      </v-btn>
+
+      <!-- Delete Button -->
+      <v-btn
+        color="error"
+        variant="outlined"
+        class="w-100 mt-3"
+        size="large"
+        @click="isDeleteDialogOpen = true"
+      >
+        {{ $t('exerciseForm.deleteTitle') }}
+      </v-btn>
+    </v-form>
+
+    <!-- Delete Confirmation Dialog -->
+    <v-dialog v-model="isDeleteDialogOpen" max-width="360">
+      <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+        <v-card-title class="text-h6 pt-5 px-5">{{ $t('exerciseForm.deleteTitle') }}</v-card-title>
+        <v-card-text class="text-textSecondary px-5">{{
+          $t('exerciseForm.deleteConfirm')
+        }}</v-card-text>
+        <v-card-actions class="px-5 pb-5">
           <v-spacer />
-          <v-btn color="grey" @click="isDeleteExerciseOpen = false">
-            {{ $t('common.cancel') }}
-          </v-btn>
-          <v-btn color="red" @click="removeExercise">
+          <v-btn variant="text" @click="isDeleteDialogOpen = false">{{
+            $t('common.cancel')
+          }}</v-btn>
+          <v-btn color="error" variant="flat" :loading="isDeleting" @click="confirmDelete">
             {{ $t('common.delete') }}
           </v-btn>
         </v-card-actions>
@@ -260,192 +157,160 @@
     </v-dialog>
   </div>
 </template>
+
 <script setup lang="ts">
-import type { Exercise, UpdateExercise } from '@/interfaces/Exercise.interface'
-import { useExerciseStore } from '@/stores/exercise.store'
+import type { Exercise, ExerciseType } from '@/interfaces/Exercise.interface'
+import type { MediaItem } from '@/components/basicUI/MediaUpload.vue'
 import {
-  updateExercise as updateExerciseInExercise,
+  updateExercise,
   deleteExercise,
-  uploadExerciseImage,
+  uploadExerciseMedia,
+  deleteExerciseMedia,
 } from '@/services/exercise.service'
 import { useMuscleGroupStore } from '@/stores/muscleGroup.store'
-import { useStatisticsStore } from '@/stores/statistics.store'
+import { useExerciseStore } from '@/stores/exercise.store'
 import { toast } from 'vuetify-sonner'
-import ImageUpload from '@/components/basicUI/ImageUpload.vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 
 const props = defineProps<{
-  workoutId?: number
-  selectedExercise: Exercise | null
-  isViewExercise: boolean
-  hideMenu?: boolean
+  exercise: Exercise
 }>()
-
-const isViewExercise = ref(props.isViewExercise)
-const muscleGroupStore = useMuscleGroupStore()
-const exerciseStore = useExerciseStore()
-const statisticsStore = useStatisticsStore()
-const router = useRouter()
-const isLoading = ref<boolean>(false)
-const isDeleteExerciseOpen = ref<boolean>(false)
-const imageFile = ref<File | null>(null)
-const { t } = useI18n({ useScope: 'global' })
-
-// Use a computed property that updates from the store after changes
-const selectedExercise = computed(() => {
-  // Find the exercise in the store to get the latest data
-  const exerciseInStore = exerciseStore.exercises.find(ex => ex.id === props.selectedExercise?.id)
-  return exerciseInStore || props.selectedExercise
-})
-
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1'
-
-const getImageUrl = (imagePath: string) => {
-  if (imagePath.startsWith('http')) {
-    return imagePath
-  }
-  // Remove /v1 from API URL for static assets
-  const baseUrl = apiUrl.replace('/v1', '')
-  return `${baseUrl}${imagePath}`
-}
-
-const editExercise = ref<UpdateExercise | null>(null)
-
-// Watch for changes in selectedExercise and update editExercise
-watch(
-  () => selectedExercise.value,
-  newExercise => {
-    if (newExercise) {
-      editExercise.value = {
-        id: Number(newExercise.id || 0),
-        name: newExercise.name || '',
-        description: newExercise.description || '',
-        image: newExercise.image || null,
-        muscleGroups: newExercise.muscleGroups?.map(group => group.id) || [],
-        defaultSets: newExercise.defaultSets || 0,
-        defaultReps: newExercise.defaultReps || 0,
-        defaultPauseSeconds: newExercise.defaultPauseSeconds || 0,
-      }
-    }
-  },
-  { immediate: true }
-)
 
 const emit = defineEmits<{
   (e: 'close'): void
+  (e: 'saved'): void
 }>()
 
-const removeExercise = async () => {
+const muscleGroupStore = useMuscleGroupStore()
+const exerciseStore = useExerciseStore()
+const { t } = useI18n({ useScope: 'global' })
+
+const isSaving = ref(false)
+const isDeleting = ref(false)
+const isDeleteDialogOpen = ref(false)
+const newMediaItems = ref<MediaItem[]>([])
+
+const exerciseTypeItems = [
+  { title: 'Compound', value: 'compound' as ExerciseType },
+  { title: 'Isolation', value: 'isolation' as ExerciseType },
+  { title: 'Bodyweight', value: 'bodyweight' as ExerciseType },
+]
+
+const form = ref({
+  name: props.exercise.name || '',
+  description: props.exercise.description || '',
+  exerciseType: props.exercise.exerciseType || (null as ExerciseType | null),
+  muscleGroupIds: props.exercise.muscleGroups?.map(mg => mg.id) || ([] as number[]),
+  primaryMuscleGroupId: props.exercise.primaryMuscleGroup?.id || (null as number | null),
+  equipment: props.exercise.equipment || ([] as string[]),
+  instructions: props.exercise.instructions || ([] as string[]),
+  proTips: props.exercise.proTips || ([] as string[]),
+  mistakes: props.exercise.mistakes || ([] as string[]),
+})
+
+const muscleGroupItems = computed(() =>
+  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, id: g.id }))
+)
+
+const selectedMuscleGroupItems = computed(() =>
+  muscleGroupItems.value.filter(g => form.value.muscleGroupIds.includes(g.id))
+)
+
+// Clear primary muscle group if it's no longer in the selected muscle groups
+watch(
+  () => form.value.muscleGroupIds,
+  ids => {
+    if (form.value.primaryMuscleGroupId && !ids.includes(form.value.primaryMuscleGroupId)) {
+      form.value.primaryMuscleGroupId = null
+    }
+  }
+)
+
+const removeExistingMedia = async (mediaId: number) => {
   try {
-    if (!selectedExercise.value && !props.workoutId) {
-      console.error('No exercise or workout ID provided.')
-      return
-    }
-
-    let response = null
-
-    response = await deleteExercise(selectedExercise.value?.id ?? 0)
-
-    if (response) {
-      toast.success(t('exercise.deleted'), { progressBar: true, duration: 1000 })
-      await exerciseStore.setExercises(true)
-      emit('close')
-    } else {
-      console.error('Failed to remove exercise.')
-    }
-  } catch (error) {
-    console.error('Error in removeExerciseFromWorkout:', error)
-    toast.error(t('exercise.removeError'), { progressBar: true, duration: 1000 })
+    await deleteExerciseMedia(props.exercise.id, mediaId)
+    await exerciseStore.setExercises(true)
+    toast.success(t('exerciseForm.mediaRemoved'), { progressBar: true, duration: 1000 })
+  } catch {
+    toast.error(t('exerciseForm.mediaRemoveError'), { progressBar: true, duration: 1000 })
   }
 }
 
-const getSanitizedExerciseData = () => {
-  return {
-    name: String(editExercise.value?.name || '').trim(),
-    description: String(editExercise.value?.description || '').trim(),
-    defaultSets: Number(editExercise.value?.defaultSets || 0),
-    defaultReps: Number(editExercise.value?.defaultReps || 0),
-    defaultPauseSeconds: Number(editExercise.value?.defaultPauseSeconds || 0),
-    muscleGroupIds: editExercise.value?.muscleGroups?.map(id => Number(id)) || [],
+const saveExercise = async () => {
+  if (!form.value.name.trim()) {
+    toast.error(t('exerciseForm.nameRequired'), { progressBar: true, duration: 1000 })
+    return
   }
-}
 
-const updateExercise = async () => {
+  isSaving.value = true
   try {
-    isLoading.value = true
-    if (!editExercise.value) {
-      toast.error(t('exercise.updateNoData'))
-      return
+    const payload = {
+      name: form.value.name.trim(),
+      description: form.value.description.trim() || undefined,
+      exerciseType: form.value.exerciseType || undefined,
+      muscleGroupIds: form.value.muscleGroupIds,
+      primaryMuscleGroupId: form.value.primaryMuscleGroupId || undefined,
+      equipment: form.value.equipment.length > 0 ? form.value.equipment : undefined,
+      instructions: form.value.instructions.length > 0 ? form.value.instructions : undefined,
+      proTips: form.value.proTips.length > 0 ? form.value.proTips : undefined,
+      mistakes: form.value.mistakes.length > 0 ? form.value.mistakes : undefined,
     }
-    if (!selectedExercise.value) {
-      toast.error(t('exercise.updateNoSelected'))
-      return
-    }
-    const response = await updateExerciseInExercise(
-      selectedExercise.value?.id,
-      getSanitizedExerciseData() || {}
-    )
+
+    const response = await updateExercise(props.exercise.id, payload)
+
     if (response) {
-      // If there's a new image, upload it
-      if (imageFile.value) {
-        try {
-          await uploadExerciseImage(selectedExercise.value.id, imageFile.value)
-          imageFile.value = null
-        } catch (imageError) {
-          console.error('Error uploading image:', imageError)
-          toast.warning(t('exercise.updatedImageUploadFailed'), {
-            progressBar: true,
-            duration: 1000,
-          })
+      // Upload new media items
+      for (const item of newMediaItems.value) {
+        if (item.file) {
+          try {
+            await uploadExerciseMedia(props.exercise.id, item.file)
+          } catch {
+            toast.warning(t('exerciseForm.mediaUploadFailed'), {
+              progressBar: true,
+              duration: 1500,
+            })
+          }
         }
       }
 
       toast.success(t('exercise.updated'), { progressBar: true, duration: 1000 })
       await exerciseStore.setExercises(true)
-      isViewExercise.value = true
+      newMediaItems.value = []
+      emit('saved')
+      emit('close')
     } else {
       toast.error(t('exercise.failedToUpdate'), { progressBar: true, duration: 1000 })
     }
-  } catch (error) {
+  } catch {
     toast.error(t('exercise.updateError'), { progressBar: true, duration: 1000 })
-    console.error('Error in updateExercise:', error)
   } finally {
-    isLoading.value = false
+    isSaving.value = false
   }
 }
 
-// Quick stats for compact history
-const quickStats = computed(() => statisticsStore.exerciseQuickStats)
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
-function navigateToStatistics() {
-  router.push('/statistics')
-}
-
-// Load quick stats when exercise changes
-watch(
-  selectedExercise,
-  ex => {
-    if (ex?.id) {
-      statisticsStore.fetchExerciseQuickStats(ex.id)
+const confirmDelete = async () => {
+  isDeleting.value = true
+  try {
+    const response = await deleteExercise(props.exercise.id)
+    if (response) {
+      toast.success(t('exercise.deleted'), { progressBar: true, duration: 1000 })
+      await exerciseStore.setExercises(true)
+      isDeleteDialogOpen.value = false
+      emit('close')
     }
-  },
-  { immediate: true }
-)
+  } catch {
+    toast.error(t('exercise.failedToDelete'), { progressBar: true, duration: 1000 })
+  } finally {
+    isDeleting.value = false
+  }
+}
 </script>
 
 <style scoped>
-.exercise-image-container {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
+.content-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 </style>

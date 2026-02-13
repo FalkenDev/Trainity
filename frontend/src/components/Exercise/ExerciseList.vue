@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column fill-height bg-grey-darken-4">
+  <div class="d-flex flex-column fill-height bg-background">
     <BackHeader
       :title="$t('settings.exercises')"
       show-menu
@@ -14,7 +14,8 @@
         </v-list>
       </template>
     </BackHeader>
-    <div class="d-flex flex-row mx-2 ga-5 mb-3">
+
+    <div class="mx-5 mt-2 mb-8">
       <v-text-field
         v-model="searchQuery"
         variant="outlined"
@@ -23,87 +24,133 @@
         clearable
         hide-details
         density="compact"
-      />
-      <v-badge color="error" :content="selectedMuscleGroups.length" offset-x="0" offset-y="0">
-        <v-btn height="40" variant="outlined">
-          {{ $t('common.filter') }}
-          <v-menu activator="parent" :close-on-content-click="false">
-            <v-list v-model:selected="selectedMuscleGroups" select-strategy="classic">
-              <v-list-item @click="selectedMuscleGroups = []">
-                <v-list-item-title>
-                  <v-icon class="mr-2" color="grey-lighten-1"> mdi-close </v-icon>
+      >
+        <template #append-inner>
+          <v-badge
+            :model-value="activeFilterCount > 0"
+            color="error"
+            :content="activeFilterCount"
+            floating
+            offset-x="-2"
+            offset-y="-2"
+          >
+            <v-icon class="cursor-pointer" @click.stop="isFilterMenuOpen = !isFilterMenuOpen">
+              mdi-filter-variant
+            </v-icon>
+          </v-badge>
+          <v-menu
+            v-model="isFilterMenuOpen"
+            :close-on-content-click="false"
+            location="bottom end"
+            activator="parent"
+          >
+            <v-card class="bg-cardBg pa-3" style="border: 1px solid #474747; min-width: 220px">
+              <div class="d-flex justify-space-between align-center mb-2">
+                <p class="text-body-2 font-weight-bold">{{ $t('common.filter') }}</p>
+                <v-btn variant="text" size="small" color="textSecondary" @click="resetFilters">
                   {{ $t('common.reset') }}
-                </v-list-item-title>
-              </v-list-item>
-              <v-divider />
-              <v-list-item
-                v-for="muscleGroup in muscleGroups"
-                :key="muscleGroup.id"
-                :value="muscleGroup.id"
+                </v-btn>
+              </div>
+
+              <p class="text-caption text-textSecondary mb-1">
+                {{ $t('exerciseForm.muscleGroupsLabel') }}
+              </p>
+              <v-chip-group
+                v-model="selectedMuscleGroups"
+                multiple
+                column
+                selected-class="text-primary"
               >
-                <template #prepend="{ isActive }">
-                  <v-list-item-action start>
-                    <v-checkbox-btn :model-value="isActive" />
-                  </v-list-item-action>
-                </template>
-                <v-list-item-title>
-                  {{ muscleGroup.name }}
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
+                <v-chip
+                  v-for="mg in muscleGroups"
+                  :key="mg.id"
+                  :value="mg.id"
+                  variant="outlined"
+                  size="small"
+                  filter
+                >
+                  {{ mg.name }}
+                </v-chip>
+              </v-chip-group>
+
+              <p class="text-caption text-textSecondary mt-3 mb-1">
+                {{ $t('exerciseForm.exerciseTypeLabel') }}
+              </p>
+              <v-chip-group v-model="selectedTypes" multiple column selected-class="text-primary">
+                <v-chip value="compound" variant="outlined" size="small" filter>Compound</v-chip>
+                <v-chip value="isolation" variant="outlined" size="small" filter>Isolation</v-chip>
+                <v-chip value="bodyweight" variant="outlined" size="small" filter
+                  >Bodyweight</v-chip
+                >
+              </v-chip-group>
+            </v-card>
           </v-menu>
-        </v-btn>
-      </v-badge>
+        </template>
+      </v-text-field>
     </div>
-    <v-list class="flex-grow-1 overflow-y-auto pa-0 pb-5">
+
+    <div class="flex-grow-1 overflow-y-auto pa-0 pb-5 bg-background d-flex ga-3 flex-column">
       <v-list-item
         v-for="exercise in exercises"
         :key="exercise.id"
-        class="border-t-sm border-b-sm py-2"
+        class="border-t-sm border-b-sm py-2 bg-cardBg rounded-lg mx-5"
         two-line
         @click.stop="openViewExercise(exercise)"
       >
         <div class="d-flex justify-space-between align-center w-100">
-          <div class="d-flex align-center ga-3">
-            <v-list-item-title class="text-body-1 font-weight-bold">
-              {{ displayName(exercise) }}
-            </v-list-item-title>
+          <div class="d-flex align-center ga-4">
+            <v-avatar color="avatarBg" size="50" tile class="rounded-lg">
+              <v-icon color="primary">mdi-dumbbell</v-icon>
+            </v-avatar>
+            <div class="d-flex flex-column ga-2">
+              <v-list-item-title class="text-body-1 font-weight-bold">
+                {{ displayName(exercise) }}
+              </v-list-item-title>
+              <div class="d-flex ga-2 align-center">
+                <v-chip v-if="getPrimaryMuscle(exercise)" size="x-small">
+                  {{ getPrimaryMuscle(exercise) }}
+                </v-chip>
+                <p
+                  v-if="exercise.exerciseType"
+                  class="text-textSecondary text-caption text-capitalize"
+                >
+                  {{ exercise.exerciseType }}
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <v-icon color="grey-lighten-1"> mdi-chevron-right </v-icon>
-          </div>
+          <v-icon color="grey-lighten-1">mdi-chevron-right</v-icon>
         </div>
       </v-list-item>
-      <v-list-item
-        class="border-t-sm border-b-sm py-2"
-        two-line
-        @click="isCreateExerciseOpen = true"
-      >
-        <div class="d-flex justify-space-between align-center w-100">
-          <div class="d-flex align-center ga-3">
-            <v-list-item-title class="text-body-1 font-weight-bold text-grey-lighten-1">
-              {{ $t('exercise.createNewExercise') }}
-            </v-list-item-title>
-          </div>
-          <div>
-            <v-icon color="grey-lighten-1"> mdi-plus </v-icon>
-          </div>
-        </div>
-      </v-list-item>
-    </v-list>
+
+      <div class="d-flex justify-center mt-2 mx-5">
+        <v-btn
+          outlined
+          block
+          color="cardBg"
+          style="border: 1px solid #474747; box-shadow: none; border-style: dashed"
+          class="text-primary rounded-lg"
+          height="50"
+          @click="isCreateExerciseOpen = true"
+        >
+          {{ $t('exercise.createNewExercise') }}
+        </v-btn>
+      </div>
+    </div>
   </div>
+
   <v-dialog v-model="isCreateExerciseOpen" fullscreen>
     <CreateExercise @close="onCreateExerciseClose" />
   </v-dialog>
   <v-dialog v-model="isViewExerciseOpen" fullscreen>
-    <EditExercise
+    <ExerciseDetails
       :selected-exercise="viewExercise"
       :is-view-exercise="true"
-      :is-view-workout-exercise="false"
-      @close="onEditExerciseClose"
+      @close="onViewExerciseClose"
     />
   </v-dialog>
 </template>
+
 <script lang="ts" setup>
 import type { Exercise } from '@/interfaces/Exercise.interface'
 import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface'
@@ -113,43 +160,54 @@ import { useI18n } from 'vue-i18n'
 import { displayExerciseName } from '@/utils/exerciseDisplay'
 
 const muscleGroupStore = useMuscleGroupStore()
-const searchQuery = ref<string>('')
+const searchQuery = ref('')
 const exerciseStore = useExerciseStore()
 const { t } = useI18n({ useScope: 'global' })
-const isLoading = ref<boolean>(false)
+const isLoading = ref(false)
 const viewExercise = ref<Exercise | null>(null)
-const isViewExerciseOpen = ref<boolean>(false)
-const isCreateExerciseOpen = ref<boolean>(false)
+const isViewExerciseOpen = ref(false)
+const isCreateExerciseOpen = ref(false)
+const isFilterMenuOpen = ref(false)
+const selectedMuscleGroups = ref<number[]>([])
+const selectedTypes = ref<string[]>([])
 
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-const muscleGroups = computed(() => {
-  return muscleGroupStore.muscleGroups.map(group => ({
-    name: group.name,
-    id: group.id,
-  }))
-})
+const muscleGroups = computed(() =>
+  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, id: g.id }))
+)
 
-const selectedMuscleGroups = ref<number[]>([])
+const activeFilterCount = computed(
+  () => selectedMuscleGroups.value.length + selectedTypes.value.length
+)
+
+const resetFilters = () => {
+  selectedMuscleGroups.value = []
+  selectedTypes.value = []
+}
 
 const displayName = (exercise: Exercise) => displayExerciseName({ t }, exercise)
+
+const getPrimaryMuscle = (exercise: Exercise): string | null => {
+  if (exercise.primaryMuscleGroup) return exercise.primaryMuscleGroup.name
+  if (exercise.muscleGroups?.length) return exercise.muscleGroups[0].name
+  return null
+}
 
 const openViewExercise = (exercise: Exercise) => {
   viewExercise.value = exercise
   isViewExerciseOpen.value = true
 }
 
-const onEditExerciseClose = async () => {
+const onViewExerciseClose = async () => {
   isViewExerciseOpen.value = false
-  // Refresh exercises to get updated exercise details
   await exerciseStore.setExercises(true)
 }
 
 const onCreateExerciseClose = async () => {
   isCreateExerciseOpen.value = false
-  // Refresh exercises after creating new one
   await exerciseStore.setExercises(true)
 }
 
@@ -157,15 +215,24 @@ const exercises = computed<Exercise[]>(() =>
   exerciseStore.exercises.filter((exercise: Exercise) => {
     const name = displayName(exercise).toLowerCase()
     const desc = (exercise.description ?? '').toLowerCase()
-    const matchesSearch =
-      name.includes(searchQuery.value.toLowerCase()) ||
-      desc.includes(searchQuery.value.toLowerCase())
+    const query = (searchQuery.value || '').toLowerCase()
+    const matchesSearch = name.includes(query) || desc.includes(query)
 
     const matchesMuscleGroup =
       selectedMuscleGroups.value.length === 0 ||
       exercise.muscleGroups?.some((mg: MuscleGroup) => selectedMuscleGroups.value.includes(mg.id))
 
-    return matchesSearch && matchesMuscleGroup
+    const matchesType =
+      selectedTypes.value.length === 0 ||
+      (exercise.exerciseType && selectedTypes.value.includes(exercise.exerciseType))
+
+    return matchesSearch && matchesMuscleGroup && matchesType
   })
 )
 </script>
+
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+</style>
