@@ -49,15 +49,6 @@ export class Exercise {
   @Column({ type: 'enum', enum: ExerciseType, nullable: true })
   exerciseType?: ExerciseType;
 
-  @Column()
-  defaultSets: number;
-
-  @Column()
-  defaultReps: number;
-
-  @Column()
-  defaultPauseSeconds: number;
-
   @Column({ type: 'jsonb', nullable: true })
   equipment?: string[];
 

@@ -208,9 +208,18 @@ const createNewExercise = async () => {
       muscleGroupIds: form.value.muscleGroupIds,
       primaryMuscleGroupId: form.value.primaryMuscleGroupId || undefined,
       equipment: form.value.equipment.length > 0 ? form.value.equipment : undefined,
-      instructions: form.value.instructions.length > 0 ? form.value.instructions : undefined,
-      proTips: form.value.proTips.length > 0 ? form.value.proTips : undefined,
-      mistakes: form.value.mistakes.length > 0 ? form.value.mistakes : undefined,
+      instructions:
+        form.value.instructions.filter(s => s.trim() !== '').length > 0
+          ? form.value.instructions.filter(s => s.trim() !== '')
+          : undefined,
+      proTips:
+        form.value.proTips.filter(s => s.trim() !== '').length > 0
+          ? form.value.proTips.filter(s => s.trim() !== '')
+          : undefined,
+      mistakes:
+        form.value.mistakes.filter(s => s.trim() !== '').length > 0
+          ? form.value.mistakes.filter(s => s.trim() !== '')
+          : undefined,
     }
 
     const response = await createExercise(payload)

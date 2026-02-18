@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="upload-area rounded-lg pa-4 text-center cursor-pointer" @click="triggerFileInput">
+    <div
+      class="upload-area rounded-lg pa-4 text-center cursor-pointer bg-cardBg"
+      @click="triggerFileInput"
+    >
       <input
         ref="fileInput"
         type="file"

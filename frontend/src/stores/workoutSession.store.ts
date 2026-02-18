@@ -173,9 +173,12 @@ export const useWorkoutSessionStore = defineStore(
           }
         }
       } else {
-        // Use the live workout relation to populate initial sets
+        // Use the live workout relation to populate initial sets (sorted by order)
         if (session.workout && Array.isArray(session.workout.exercises)) {
-          for (const base of session.workout.exercises) {
+          const sorted = [...session.workout.exercises].sort(
+            (a, b) => (a.order ?? 0) - (b.order ?? 0)
+          )
+          for (const base of sorted) {
             const exId = base.exerciseId ?? base.exercise?.id
             const sets: LiveSet[] = []
             for (let i = 1; i <= (base.sets ?? 0); i++) {

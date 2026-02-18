@@ -1,10 +1,14 @@
+export type WorkoutType = 'strength' | 'cardio' | 'hiit' | 'flexibility' | 'endurance'
+
 export interface Workout {
   id: number
   title: string
   time: number
   description?: string
+  type?: WorkoutType | null
   exercises: Exercise[]
-  defaultWeightAndReps: 'default' | 'latest' | 'exercise'
+  targetMuscleGroups?: MuscleGroup[]
+  defaultWeightAndReps: 'default' | 'latest'
   createdAt: Date
   updatedAt: Date
 }
@@ -25,9 +29,7 @@ export interface Exercise {
     description?: string | null
     img: string
     muscleGroups: MuscleGroup[]
-    defaultSets: number
-    defaultReps: number
-    defaultPauseSeconds: number
+    primaryMuscleGroup?: { id: number; name: string } | null
     createdBy: string
     createdAt: string
     updatedAt: string
@@ -67,13 +69,17 @@ export interface CreateWorkout {
   title: string
   time: number
   description?: string
+  type?: WorkoutType
+  targetMuscleGroupIds?: number[]
 }
 
 export interface UpdateWorkout {
   title?: string
   time?: number
   description?: string
-  defaultWeightAndReps: 'default' | 'latest' | 'exercise'
+  type?: WorkoutType | null
+  targetMuscleGroupIds?: number[]
+  defaultWeightAndReps?: 'default' | 'latest'
 }
 
 export interface AddExerciseToWorkout {

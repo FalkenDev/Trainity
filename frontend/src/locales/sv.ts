@@ -215,7 +215,7 @@ export default {
     startSession: 'Starta pass',
     noExercisesYet: 'Inga övningar tillagda ännu.',
     setsTimesReps: '{sets} × {reps} reps',
-    pauseSeconds: '{seconds} sek vila',
+    pauseSeconds: '{seconds}s vila',
     moreCount: '+{count} till',
     showMoreMuscleGroupsAria: 'Visa {count} fler muskelgrupper',
     deleteWorkoutTitle: 'Ta bort träningspass',
@@ -226,6 +226,10 @@ export default {
     startNewWorkout: 'Starta nytt träningspass',
     addPreviousWorkout: 'Lägg till tidigare träningspass',
     createNewWorkout: 'Skapa nytt träningspass',
+    duration: 'Tid',
+    caloriesBurned: 'Kalorier',
+    exercisesCount: 'Övningar',
+    exercises: 'Övningar',
   },
   activity: {
     logActivity: 'Logga aktivitet',
@@ -453,9 +457,7 @@ export default {
     setsLabel: 'Set',
     repsLabel: 'Reps',
     pauseSecondsLabel: 'Vila (s)',
-    defaultSets: 'Standardset',
-    defaultReps: 'Standardreps',
-    defaultPause: 'Standardvila',
+
     deleteTitle: 'Ta bort övning',
     deleteConfirm: 'Är du säker på att du vill ta bort denna övning?',
     mediaRemoved: 'Media borttagen',
@@ -487,10 +489,6 @@ export default {
       latest: {
         label: 'Senaste',
         description: 'Använd vikter och reps från senaste gången du gjorde detta pass',
-      },
-      exercise: {
-        label: 'Övning',
-        description: 'Använd vikter och reps från övningen',
       },
     },
   },
@@ -763,6 +761,18 @@ export default {
       maxVolumeSession: 'Bästa pass-volym',
       maxReps: 'Max reps',
       volume: 'Volym',
+    },
+  },
+  editWorkout: {
+    trainingType: 'Typ av träning',
+    restSeconds: 'Vila (s)',
+    addExercisesToSeeMuscles: 'Lägg till övningar för att se målmuskler',
+    types: {
+      strength: 'Styrka',
+      cardio: 'Kondition',
+      hiit: 'HIIT',
+      flexibility: 'Rörlighet',
+      endurance: 'Uthållighet',
     },
   },
 } as const

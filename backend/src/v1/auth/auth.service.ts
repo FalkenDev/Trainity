@@ -13,8 +13,8 @@ import { UserWithoutPasswordDto } from './dto/UserWithoutPassword.dto';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ActivityService } from '../activity/activity.service';
-import { ActivityIcon } from '../activity/activity.entity';
 import { ExerciseSeedService } from '../exercise/exerciseSeed.service';
+import { activitiesToSeed } from '../seed/data/activities.data';
 
 @Injectable()
 export class AuthService {
@@ -58,76 +58,11 @@ export class AuthService {
   }
 
   /**
-   * Seed default activities for a new user
+   * Seed default activities for a new user.
+   * Uses the shared activitiesToSeed list so updates only need to happen in one place.
    */
   private async seedDefaultActivities(userId: number): Promise<void> {
-    const defaultActivities = [
-      {
-        name: 'Running',
-        description: 'Outdoor running sessions',
-        icon: ActivityIcon.RUNNING,
-        trackDistance: true,
-        trackPace: true,
-        trackElevation: true,
-        trackCalories: true,
-      },
-      {
-        name: 'Walking',
-        description: 'Walking and hiking',
-        icon: ActivityIcon.WALKING,
-        trackDistance: true,
-        trackPace: true,
-        trackElevation: true,
-        trackCalories: true,
-      },
-      {
-        name: 'Cycling',
-        description: 'Road and mountain biking',
-        icon: ActivityIcon.CYCLING,
-        trackDistance: true,
-        trackPace: false,
-        trackElevation: true,
-        trackCalories: true,
-      },
-      {
-        name: 'Floorball',
-        description: 'Floorball training and matches',
-        icon: ActivityIcon.OTHER,
-        trackDistance: false,
-        trackPace: false,
-        trackElevation: false,
-        trackCalories: true,
-      },
-      {
-        name: 'Football',
-        description: 'Football training and matches',
-        icon: ActivityIcon.FOOTBALL,
-        trackDistance: false,
-        trackPace: false,
-        trackElevation: false,
-        trackCalories: true,
-      },
-      {
-        name: 'Swimming',
-        description: 'Swimming sessions',
-        icon: ActivityIcon.SWIMMING,
-        trackDistance: true,
-        trackPace: false,
-        trackElevation: false,
-        trackCalories: true,
-      },
-      {
-        name: 'Kayaking',
-        description: 'Kayaking and canoeing',
-        icon: ActivityIcon.KAYAKING,
-        trackDistance: true,
-        trackPace: false,
-        trackElevation: false,
-        trackCalories: true,
-      },
-    ];
-
-    for (const activity of defaultActivities) {
+    for (const activity of activitiesToSeed) {
       try {
         await this.activityService.create(activity, userId);
       } catch (error) {
@@ -143,7 +78,15 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.userRepo.findOne({
       where: { email: dto.email },
-      select: ['id', 'email', 'firstName', 'lastName', 'password', 'showRpe'],
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'password',
+        'showRpe',
+        'onboardingCompleted',
+      ],
     });
 
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {

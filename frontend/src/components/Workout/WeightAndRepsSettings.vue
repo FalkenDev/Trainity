@@ -1,23 +1,21 @@
 <template>
-  <div class="bg-grey-darken-4 h-100 w-100">
-    <ExitHeader
+  <div class="bg-background h-100 w-100">
+    <BackHeader
       :title="$t('weightAndReps.title')"
-      show-menu
       @close="$emit('close')"
     />
-    <v-list>
+    <v-list class="bg-background">
       <v-list-item
         v-for="option in options"
         :key="option.value"
-        :disabled="defaultWeightAndReps !== option.value /* TODO: DISABLE until use latest and exercise functions is added*/"
-        class="border-t-sm border-b-sm py-2"
+        :disabled="option.value === 'latest'"
+        class="py-2 mx-3 my-2 rounded-lg bg-cardBg"
+        style="border: 1px solid #474747"
         two-line
-        @click="
-          editWeightAndReps(option.value as 'default' | 'latest' | 'exercise')
-        "
+        @click="editWeightAndReps(option.value as 'default' | 'latest')"
       >
         <div class="d-flex w-100 align-center ga-4">
-          <div class="d-flex flex-column">
+          <div class="d-flex flex-column flex-grow-1">
             <v-list-item-title class="text-body-1 font-weight-bold">
               {{ $t(option.label) }}
             </v-list-item-title>
@@ -58,18 +56,12 @@ const options = [
   },
   {
     label: "weightAndReps.options.latest.label",
-    description:
-      "weightAndReps.options.latest.description",
+    description: "weightAndReps.options.latest.description",
     value: "latest",
-  },
-  {
-    label: "weightAndReps.options.exercise.label",
-    description: "weightAndReps.options.exercise.description",
-    value: "exercise",
   },
 ];
 
-const editWeightAndReps = async (value: "default" | "latest" | "exercise") => {
+const editWeightAndReps = async (value: "default" | "latest") => {
   try {
     if (!props.workoutId) {
       console.error("Workout ID is not defined");

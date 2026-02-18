@@ -44,15 +44,6 @@ export class ExerciseResponseDto {
   @ApiProperty({ required: false, enum: ExerciseType })
   exerciseType?: ExerciseType;
 
-  @ApiProperty({ required: false })
-  defaultSets?: number;
-
-  @ApiProperty({ required: false })
-  defaultReps?: number;
-
-  @ApiProperty({ required: false })
-  defaultPauseSeconds?: number;
-
   @ApiProperty({ required: false, type: [String] })
   equipment?: string[];
 

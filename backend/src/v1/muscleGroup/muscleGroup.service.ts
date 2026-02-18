@@ -1,20 +1,39 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { MuscleGroup } from './muscleGroup.entity';
 import { CreateMuscleGroupDto } from './dto/createMuscleGroup.dto';
 import { UpdateMuscleGroupDto } from './dto/updateMuscleGroup.dto';
+import { muscleGroupsToSeed } from '../seed/data/muscleGroups.data';
 
 @Injectable()
-export class MuscleGroupService {
+export class MuscleGroupService implements OnModuleInit {
+  private readonly logger = new Logger(MuscleGroupService.name);
+
   constructor(
     @InjectRepository(MuscleGroup)
     private readonly muscleGroupRepo: Repository<MuscleGroup>,
   ) {}
+
+  /**
+   * Automatically seed the default muscle groups when the application starts
+   * if the table is empty. This ensures muscle groups are always available
+   * without requiring a manual seed step.
+   */
+  async onModuleInit(): Promise<void> {
+    const count = await this.muscleGroupRepo.count();
+    if (count === 0) {
+      this.logger.log('No muscle groups found – seeding defaults…');
+      await this.muscleGroupRepo.save(muscleGroupsToSeed);
+      this.logger.log(`Seeded ${muscleGroupsToSeed.length} muscle group(s)`);
+    }
+  }
 
   async findAll(): Promise<MuscleGroup[]> {
     return this.muscleGroupRepo.find();

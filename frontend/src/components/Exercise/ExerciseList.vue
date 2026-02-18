@@ -102,7 +102,7 @@
             <v-avatar color="avatarBg" size="50" tile class="rounded-lg">
               <v-icon color="primary">mdi-dumbbell</v-icon>
             </v-avatar>
-            <div class="d-flex flex-column ga-2">
+            <div class="d-flex flex-column">
               <v-list-item-title class="text-body-1 font-weight-bold">
                 {{ displayName(exercise) }}
               </v-list-item-title>
