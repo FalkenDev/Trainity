@@ -265,6 +265,7 @@ export default {
     failedToCreateLog: 'Kunde inte skapa aktivitetslogg',
     failedToDeleteLog: 'Kunde inte ta bort aktivitetslogg',
     noActivities: 'Inga aktiviteter ännu. Skapa en för att komma igång!',
+    searchActivities: 'Sök aktiviteter',
   },
   exercise: {
     created: 'Övningen skapades!',

@@ -267,6 +267,7 @@ export default {
     failedToCreateLog: 'Failed to create activity log',
     failedToDeleteLog: 'Failed to delete activity log',
     noActivities: 'No activities yet. Create one to get started!',
+    searchActivities: 'Search activities',
   },
   exercise: {
     createExercise: 'Create exercise',
