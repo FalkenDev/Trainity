@@ -17,9 +17,11 @@ export async function seedUserExercises(
       i18nKey: ex.i18nKey,
       isNameCustom: false,
       description: ex.defaultDescription ?? '',
-      defaultSets: ex.defaultSets ?? 3,
-      defaultReps: ex.defaultReps ?? 10,
-      defaultPauseSeconds: ex.defaultPauseSeconds ?? 60,
+      exerciseType: ex.exerciseType,
+      equipment: ex.equipment,
+      instructions: ex.instructions,
+      proTips: ex.proTips,
+      mistakes: ex.mistakes,
       createdBy: user,
       muscleGroups: ex.muscleGroups
         .map((name) => mgMap.get(name))

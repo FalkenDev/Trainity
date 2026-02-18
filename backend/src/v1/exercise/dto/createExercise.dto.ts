@@ -101,22 +101,4 @@ export class CreateExerciseDto {
   @IsArray()
   @IsString({ each: true })
   mistakes?: string[];
-
-  @ApiProperty({ example: 3, required: false })
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  defaultSets?: number;
-
-  @ApiProperty({ example: 10, required: false })
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  defaultReps?: number;
-
-  @ApiProperty({ example: 60, required: false })
-  @IsOptional()
-  @IsInt()
-  @Min(0)
-  defaultPauseSeconds?: number;
 }

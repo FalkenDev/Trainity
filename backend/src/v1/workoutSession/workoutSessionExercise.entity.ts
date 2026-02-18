@@ -22,6 +22,9 @@ export class WorkoutSessionExercise {
   @ManyToOne(() => Exercise, { nullable: true })
   exercise: Exercise;
 
+  @Column({ default: 0 })
+  order: number;
+
   @OneToMany(() => WorkoutSessionSet, (set) => set.sessionExercise, {
     cascade: true,
     eager: true,

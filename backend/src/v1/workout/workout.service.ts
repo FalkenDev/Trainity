@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { In, Like, Repository } from 'typeorm';
-import { Workout } from './workout.entity';
+import { Workout, WorkoutType } from './workout.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
 import { WorkoutResponseDto } from './dto/workoutResponse.dto';
@@ -10,6 +10,7 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
 import { WorkoutExercise } from './workoutExercise.entity';
 import { Exercise } from '../exercise/exercise.entity';
+import { MuscleGroup } from '../muscleGroup/muscleGroup.entity';
 import { UpdateWorkoutExerciseDto } from './dto/updateWorkoutExercise.dto';
 import { DataSource } from 'typeorm';
 
@@ -22,6 +23,8 @@ export class WorkoutService {
     private workoutExerciseRepo: Repository<WorkoutExercise>,
     @InjectRepository(WorkoutSession)
     private readonly workoutSessionRepository: Repository<WorkoutSession>,
+    @InjectRepository(MuscleGroup)
+    private readonly muscleGroupRepo: Repository<MuscleGroup>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -82,7 +85,8 @@ export class WorkoutService {
       );
     }
 
-    await this.workoutExerciseRepo.remove(workoutExercisesToRemove);
+    const idsToRemove = workoutExercisesToRemove.map((we) => we.id);
+    await this.workoutExerciseRepo.delete(idsToRemove);
     return { message: 'Exercises removed successfully' };
   }
 
@@ -140,9 +144,10 @@ export class WorkoutService {
         'exercises',
         'exercises.exercise',
         'exercises.exercise.muscleGroups',
+        'exercises.exercise.primaryMuscleGroup',
+        'targetMuscleGroups',
         'createdBy',
       ],
-      withDeleted: true,
     });
 
     if (!workout) throw new NotFoundException('Workout not found');
@@ -156,9 +161,10 @@ export class WorkoutService {
         'exercises',
         'exercises.exercise',
         'exercises.exercise.muscleGroups',
+        'exercises.exercise.primaryMuscleGroup',
+        'targetMuscleGroups',
         'createdBy',
       ],
-      withDeleted: true,
     });
 
     return workouts.map((w) => this.toResponseDto(w));
@@ -168,13 +174,21 @@ export class WorkoutService {
     dto: CreateWorkoutDto,
     userId: number,
   ): Promise<WorkoutResponseDto> {
+    const { targetMuscleGroupIds, type, ...workoutData } = dto;
     const workout = this.workoutRepo.create({
-      ...dto,
+      ...workoutData,
+      ...(type ? { type: type as WorkoutType } : {}),
       createdBy: { id: userId } as User,
     });
 
-    const saved = await this.workoutRepo.save(workout);
-    return this.toResponseDto(saved);
+    if (targetMuscleGroupIds?.length) {
+      workout.targetMuscleGroups = await this.muscleGroupRepo.findBy({
+        id: In(targetMuscleGroupIds),
+      });
+    }
+
+    const saved = (await this.workoutRepo.save(workout)) as Workout;
+    return this.getWorkout(saved.id, userId);
   }
   async updateWorkout(
     id: number,
@@ -183,12 +197,28 @@ export class WorkoutService {
   ): Promise<WorkoutResponseDto> {
     const workout = await this.workoutRepo.findOne({
       where: { id, createdBy: { id: userId } },
+      relations: ['targetMuscleGroups'],
     });
     if (!workout) throw new NotFoundException('Workout not found');
 
-    Object.assign(workout, dto);
-    const updated = await this.workoutRepo.save(workout);
-    return this.toResponseDto(updated);
+    const { targetMuscleGroupIds, type, ...workoutData } = dto;
+    Object.assign(workout, workoutData);
+    if (type !== undefined) {
+      workout.type = type as WorkoutType;
+    }
+
+    if (targetMuscleGroupIds !== undefined) {
+      if (targetMuscleGroupIds.length) {
+        workout.targetMuscleGroups = await this.muscleGroupRepo.findBy({
+          id: In(targetMuscleGroupIds),
+        });
+      } else {
+        workout.targetMuscleGroups = [];
+      }
+    }
+
+    await this.workoutRepo.save(workout);
+    return this.getWorkout(id, userId);
   }
 
   async deleteWorkout(
@@ -200,7 +230,7 @@ export class WorkoutService {
     });
     if (!workout) throw new NotFoundException('Workout not found');
 
-    await this.workoutRepo.softRemove(workout);
+    await this.workoutRepo.softDelete(id);
 
     return { message: 'Workout deleted' };
   }
@@ -211,7 +241,12 @@ export class WorkoutService {
   ): Promise<WorkoutResponseDto> {
     const original = await this.workoutRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['exercises', 'exercises.exercise', 'createdBy'],
+      relations: [
+        'exercises',
+        'exercises.exercise',
+        'exercises.exercise.primaryMuscleGroup',
+        'createdBy',
+      ],
     });
 
     if (!original) throw new NotFoundException('Workout not found');
@@ -263,6 +298,8 @@ export class WorkoutService {
           'exercises',
           'exercises.exercise',
           'exercises.exercise.muscleGroups',
+          'exercises.exercise.primaryMuscleGroup',
+          'targetMuscleGroups',
           'createdBy',
         ],
       });
@@ -277,7 +314,16 @@ export class WorkoutService {
       title: workout.title,
       description: workout.description,
       time: workout.time,
+      type: workout.type ?? undefined,
       defaultWeightAndReps: workout.defaultWeightAndReps,
+      targetMuscleGroups:
+        workout.targetMuscleGroups?.map((mg) => ({
+          id: mg.id,
+          name: mg.name,
+          description: mg.description,
+          createdAt: mg.createdAt,
+          updatedAt: mg.updatedAt,
+        })) ?? [],
       exercises:
         workout.exercises
           ?.map((e) => ({
@@ -291,6 +337,12 @@ export class WorkoutService {
               id: e.exercise.id,
               name: e.exercise.name,
               description: e.exercise.description,
+              primaryMuscleGroup: e.exercise.primaryMuscleGroup
+                ? {
+                    id: e.exercise.primaryMuscleGroup.id,
+                    name: e.exercise.primaryMuscleGroup.name,
+                  }
+                : null,
               deletedAt: e.exercise.deletedAt,
               muscleGroups:
                 e.exercise.muscleGroups?.map((mg) => ({

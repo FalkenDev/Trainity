@@ -22,9 +22,6 @@ export interface Exercise {
   proTips?: string[]
   mistakes?: string[]
   media?: ExerciseMedia[]
-  defaultSets?: number
-  defaultReps?: number
-  defaultPauseSeconds?: number
   createdBy: string
   createdAt: string
   updatedAt: string
@@ -42,9 +39,6 @@ export interface CreateExercise {
   instructions?: string[]
   proTips?: string[]
   mistakes?: string[]
-  defaultSets?: number
-  defaultReps?: number
-  defaultPauseSeconds?: number
 }
 
 export interface UpdateExercise {
@@ -59,9 +53,6 @@ export interface UpdateExercise {
   instructions?: string[]
   proTips?: string[]
   mistakes?: string[]
-  defaultSets?: number
-  defaultReps?: number
-  defaultPauseSeconds?: number
 }
 
 export interface MuscleGroup {

@@ -1,41 +1,55 @@
 <template>
   <div class="d-flex flex-column fill-height bg-background content-scroll">
-    <BackHeader :title="$t('exerciseForm.editTitle')" :show-menu="false" @close="emit('close')" />
+    <BackHeader
+      :title="$t('exerciseForm.editTitle')"
+      :show-menu="false"
+      :show-save="true"
+      class="sticky-header"
+      @close="emit('close')"
+      @save="saveExercise"
+    />
 
     <v-form ref="formRef" class="mx-5 mt-2 pb-10">
       <!-- Exercise Name -->
+      <v-label class="text-body-2 font-weight-bold text-textPrimary mb-1"
+        >{{ $t('exerciseForm.nameLabel') }} <span class="text-error text-h6 ml-1">*</span></v-label
+      >
       <v-text-field
         v-model="form.name"
-        :label="$t('exerciseForm.nameLabel')"
         variant="outlined"
         required
         :rules="[v => !!v || $t('exerciseForm.nameRequired')]"
       />
 
       <!-- About / Description (optional) -->
+      <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
+        $t('exerciseForm.aboutLabel')
+      }}</v-label>
       <v-textarea
         v-model="form.description"
-        :label="$t('exerciseForm.aboutLabel')"
         variant="outlined"
-        rows="2"
+        rows="5"
         auto-grow
-        class="mt-1"
+        class="small-textarea"
       />
 
       <!-- Exercise Type -->
+      <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
+        $t('exerciseForm.exerciseTypeLabel')
+      }}</v-label>
       <v-select
         v-model="form.exerciseType"
-        :label="$t('exerciseForm.exerciseTypeLabel')"
         :items="exerciseTypeItems"
         variant="outlined"
         clearable
-        class="mt-1"
       />
 
       <!-- Target Muscles (multi-select chips) -->
+      <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
+        $t('exerciseForm.muscleGroupsLabel')
+      }}</v-label>
       <v-select
         v-model="form.muscleGroupIds"
-        :label="$t('exerciseForm.muscleGroupsLabel')"
         :items="muscleGroupItems"
         item-title="name"
         item-value="id"
@@ -43,26 +57,28 @@
         multiple
         chips
         closable-chips
-        class="mt-1"
         :menu-props="{ maxHeight: '250px' }"
       />
 
       <!-- Primary Muscle (from selected targets) -->
+      <v-label class="text-body-2 font-weight-bold text-textPrimary mt-4 mb-2">{{
+        $t('exerciseForm.primaryMuscleLabel')
+      }}</v-label>
       <v-select
         v-model="form.primaryMuscleGroupId"
-        :label="$t('exerciseForm.primaryMuscleLabel')"
         :items="selectedMuscleGroupItems"
         item-title="name"
         item-value="id"
         variant="outlined"
         clearable
-        class="mt-1"
         :disabled="form.muscleGroupIds.length === 0"
       />
 
       <!-- Equipment (chip input) -->
-      <div class="mt-1">
-        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.equipmentLabel') }}</p>
+      <div class="mb-5">
+        <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
+          $t('exerciseForm.equipmentLabel')
+        }}</v-label>
         <ChipTextInput
           v-model="form.equipment"
           :placeholder="$t('exerciseForm.equipmentPlaceholder')"
@@ -71,7 +87,9 @@
 
       <!-- Media Upload -->
       <div class="mt-2">
-        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.mediaLabel') }}</p>
+        <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
+          $t('exerciseForm.mediaLabel')
+        }}</v-label>
         <MediaUpload
           v-model="newMediaItems"
           :existing-media="exercise?.media"
@@ -81,9 +99,9 @@
 
       <!-- How to Perform (draggable list) -->
       <div class="mt-6">
-        <p class="text-body-2 text-textSecondary mb-2">
-          {{ $t('exerciseForm.instructionsLabel') }}
-        </p>
+        <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
+          $t('exerciseForm.instructionsLabel')
+        }}</v-label>
         <DraggableTextList
           v-model="form.instructions"
           :placeholder="$t('exerciseForm.instructionsPlaceholder')"
@@ -94,7 +112,9 @@
 
       <!-- Pro Tips (draggable list) -->
       <div class="mt-6">
-        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.proTipsLabel') }}</p>
+        <v-label class="text-body-2 font-weight-bold text-textPrimary mb-1">{{
+          $t('exerciseForm.proTipsLabel')
+        }}</v-label>
         <DraggableTextList
           v-model="form.proTips"
           :placeholder="$t('exerciseForm.proTipsPlaceholder')"
@@ -105,7 +125,9 @@
 
       <!-- Avoid These Mistakes (draggable list) -->
       <div class="mt-6">
-        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.mistakesLabel') }}</p>
+        <v-label class="text-body-2 font-weight-bold text-textPrimary mb-1">{{
+          $t('exerciseForm.mistakesLabel')
+        }}</v-label>
         <DraggableTextList
           v-model="form.mistakes"
           :placeholder="$t('exerciseForm.mistakesPlaceholder')"
@@ -113,17 +135,6 @@
           icon-color="error"
         />
       </div>
-
-      <!-- Save Button -->
-      <v-btn
-        color="primary"
-        class="w-100 mt-8"
-        size="large"
-        :loading="isSaving"
-        @click="saveExercise"
-      >
-        {{ $t('exerciseForm.saveButton') }}
-      </v-btn>
 
       <!-- Delete Button -->
       <v-btn
@@ -251,9 +262,18 @@ const saveExercise = async () => {
       muscleGroupIds: form.value.muscleGroupIds,
       primaryMuscleGroupId: form.value.primaryMuscleGroupId || undefined,
       equipment: form.value.equipment.length > 0 ? form.value.equipment : undefined,
-      instructions: form.value.instructions.length > 0 ? form.value.instructions : undefined,
-      proTips: form.value.proTips.length > 0 ? form.value.proTips : undefined,
-      mistakes: form.value.mistakes.length > 0 ? form.value.mistakes : undefined,
+      instructions:
+        form.value.instructions.filter(s => s.trim() !== '').length > 0
+          ? form.value.instructions.filter(s => s.trim() !== '')
+          : undefined,
+      proTips:
+        form.value.proTips.filter(s => s.trim() !== '').length > 0
+          ? form.value.proTips.filter(s => s.trim() !== '')
+          : undefined,
+      mistakes:
+        form.value.mistakes.filter(s => s.trim() !== '').length > 0
+          ? form.value.mistakes.filter(s => s.trim() !== '')
+          : undefined,
     }
 
     const response = await updateExercise(props.exercise.id, payload)
@@ -307,10 +327,34 @@ const confirmDelete = async () => {
 </script>
 
 <style scoped>
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: rgb(var(--v-theme-background));
+}
+
 .content-scroll {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+}
+
+.small-textarea :deep(textarea) {
+  font-size: 0.9rem; /* or 12px */
+}
+
+:deep(.v-field) {
+  background-color: #15181e !important;
+  border-radius: 12px !important;
+}
+
+:deep(.v-field__outline__start) {
+  border-radius: 6px 0 0 6px !important;
+}
+
+:deep(.v-field__outline__end) {
+  border-radius: 0 6px 6px 0 !important;
 }
 </style>

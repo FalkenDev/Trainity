@@ -154,10 +154,10 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
         const details = await fetchExerciseById(id)
 
         const snap = workoutExById.get(id)
-        const plannedSets = (snap?.sets ?? 0) || details.defaultSets || 1
-        const plannedReps = (snap?.reps ?? 0) || details.defaultReps || 8
+        const plannedSets = (snap?.sets ?? 0) || 1
+        const plannedReps = (snap?.reps ?? 0) || 8
         const plannedWeight = (snap?.weight ?? 0) || 0
-        const pauseSeconds = snap?.pauseSeconds ?? undefined ?? details.defaultPauseSeconds ?? 60
+        const pauseSeconds = snap?.pauseSeconds ?? 60
 
         workoutSessionStore.upsertExercise(sessionId.value, id)
 
@@ -190,9 +190,6 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
             description: details.description,
             img: details.image ?? '',
             muscleGroups: details.muscleGroups ?? [],
-            defaultSets: details.defaultSets ?? 0,
-            defaultReps: details.defaultReps ?? 0,
-            defaultPauseSeconds: details.defaultPauseSeconds ?? 0,
             createdBy: details.createdBy ?? '',
             createdAt: details.createdAt ?? '',
             updatedAt: details.updatedAt ?? '',
@@ -343,10 +340,22 @@ watchEffect(async () => {
 
   let exerciseIds: number[]
   if (idsFromLive.length) {
-    exerciseIds = idsFromLive
+    // Sort live exercise IDs by workout exercise order
+    const workoutExercises = [...(s.workout?.exercises || [])].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    )
+    const orderedIds = workoutExercises
+      .map(b => b.exerciseId ?? b.exercise?.id)
+      .filter((id): id is number => typeof id === 'number')
+
+    // Ordered IDs from workout first, then any extras added during session
+    const orderedSet = new Set(orderedIds)
+    const extras = idsFromLive.filter(id => !orderedSet.has(id))
+    exerciseIds = [...orderedIds.filter(id => idsFromLive.includes(id)), ...extras]
   } else {
-    // Use the live workout relation to get exercise IDs
-    exerciseIds = (s.workout?.exercises || [])
+    // Use the live workout relation to get exercise IDs (sorted by order)
+    exerciseIds = [...(s.workout?.exercises || [])]
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       .map(b => b.exerciseId ?? b.exercise?.id)
       .filter((id): id is number => typeof id === 'number')
   }
@@ -362,14 +371,13 @@ watchEffect(async () => {
     const baseWorkoutEx = s.workout?.exercises?.find(b => (b.exerciseId ?? b.exercise?.id) === id)
     const liveEx = live?.exercises[id]
 
-    const plannedSets = liveEx?.sets?.length || baseWorkoutEx?.sets || d.defaultSets || 1
+    const plannedSets = liveEx?.sets?.length || baseWorkoutEx?.sets || 1
 
-    const plannedReps =
-      (liveEx?.sets?.[0]?.reps ?? undefined) || baseWorkoutEx?.reps || d.defaultReps || 8
+    const plannedReps = (liveEx?.sets?.[0]?.reps ?? undefined) || baseWorkoutEx?.reps || 8
 
     const plannedWeight = (liveEx?.sets?.[0]?.weight ?? undefined) || baseWorkoutEx?.weight || 0
 
-    const pauseSeconds = baseWorkoutEx?.pauseSeconds ?? d.defaultPauseSeconds ?? 60
+    const pauseSeconds = baseWorkoutEx?.pauseSeconds ?? 60
 
     return {
       exerciseId: id,
@@ -385,9 +393,6 @@ watchEffect(async () => {
         description: d.description,
         img: d.image ?? '',
         muscleGroups: d.muscleGroups ?? [],
-        defaultSets: d.defaultSets ?? 0,
-        defaultReps: d.defaultReps ?? 0,
-        defaultPauseSeconds: d.defaultPauseSeconds ?? 0,
         createdBy: d.createdBy ?? '',
         createdAt: d.createdAt ?? '',
         updatedAt: d.updatedAt ?? '',

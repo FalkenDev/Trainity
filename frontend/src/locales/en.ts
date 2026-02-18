@@ -215,7 +215,6 @@ export default {
     deleteWorkoutConfirm: 'Are you sure you want to delete this workout?',
     deleted: 'Workout deleted successfully',
     failedToDelete: 'Failed to delete workout',
-
     created: 'Workout created successfully!',
     failedToCreate: 'Failed to create workout',
     updated: 'Workout updated successfully!',
@@ -229,6 +228,10 @@ export default {
     startNewWorkout: 'Start new workout',
     addPreviousWorkout: 'Add previous workout',
     createNewWorkout: 'Create new workout',
+    duration: 'Duration',
+    caloriesBurned: 'Calories',
+    exercisesCount: 'Exercises',
+    exercises: 'Exercises',
   },
   activity: {
     logActivity: 'Log Activity',
@@ -457,9 +460,7 @@ export default {
     setsLabel: 'Sets',
     repsLabel: 'Reps',
     pauseSecondsLabel: 'Pause (s)',
-    defaultSets: 'Default sets',
-    defaultReps: 'Default reps',
-    defaultPause: 'Default pause',
+
     deleteTitle: 'Delete exercise',
     deleteConfirm: 'Are you sure you want to delete this exercise?',
     mediaRemoved: 'Media removed',
@@ -491,10 +492,6 @@ export default {
       latest: {
         label: 'Latest',
         description: 'Use weights and repetitions from the last time you did this workout',
-      },
-      exercise: {
-        label: 'Exercise',
-        description: 'Use the weights and repetitions set from exercise',
       },
     },
   },
@@ -769,6 +766,18 @@ export default {
       maxVolumeSession: 'Best Session Volume',
       maxReps: 'Max Reps',
       volume: 'Volume',
+    },
+  },
+  editWorkout: {
+    trainingType: 'Type of training',
+    restSeconds: 'Rest (s)',
+    addExercisesToSeeMuscles: 'Add exercises to see target muscles',
+    types: {
+      strength: 'Strength',
+      cardio: 'Cardio',
+      hiit: 'HIIT',
+      flexibility: 'Flexibility',
+      endurance: 'Endurance',
     },
   },
 } as const

@@ -52,6 +52,16 @@ export class WorkoutSessionService {
     });
 
     if (!session) throw new NotFoundException('Workout session not found');
+
+    // Sort session exercises by order
+    if (session.exercises) {
+      session.exercises.sort((a, b) => a.order - b.order);
+    }
+    // Sort workout exercises by order
+    if (session.workout?.exercises) {
+      session.workout.exercises.sort((a, b) => a.order - b.order);
+    }
+
     return session;
   }
 
@@ -67,10 +77,24 @@ export class WorkoutSessionService {
 
     if (!workout) throw new NotFoundException('Workout not found');
 
+    // Sort workout exercises by order
+    const sortedExercises = [...(workout.exercises || [])].sort(
+      (a, b) => a.order - b.order,
+    );
+
+    // Pre-populate session exercises from workout exercises
+    const sessionExercises = sortedExercises.map((we) =>
+      this.sessionExerciseRepo.create({
+        exercise: we.exercise,
+        order: we.order,
+        sets: [],
+      }),
+    );
+
     const session = this.sessionRepo.create({
       user: { id: userId },
       workout,
-      exercises: [],
+      exercises: sessionExercises,
       startedAt: new Date(),
       scheduledSession: scheduledSessionId
         ? ({ id: scheduledSessionId } as any)
@@ -153,6 +177,7 @@ export class WorkoutSessionService {
           const sessionExercise = manager.create(WorkoutSessionExercise, {
             session: saved,
             exercise,
+            order: sessionExercises.length + 1,
           });
           sessionExercises.push(sessionExercise);
         }
@@ -259,9 +284,16 @@ export class WorkoutSessionService {
 
     if (!exercise) throw new NotFoundException('Exercise not found');
 
+    // Assign order as next after current max
+    const maxOrder = session.exercises.reduce(
+      (max, e) => Math.max(max, e.order ?? 0),
+      0,
+    );
+
     const sessionExercise = this.sessionExerciseRepo.create({
       session,
       exercise,
+      order: maxOrder + 1,
       sets: sets.map((s) => this.setRepo.create(s)),
     });
 
@@ -317,9 +349,16 @@ export class WorkoutSessionService {
             });
             if (!exercise) throw new NotFoundException('Exercise not found');
 
+            // Assign order as next after current max
+            const currentMax = (session.exercises ?? []).reduce(
+              (max, e) => Math.max(max, e.order ?? 0),
+              0,
+            );
+
             sessionExercise = manager.create(WorkoutSessionExercise, {
               session,
               exercise,
+              order: currentMax + 1,
               notes: ce.notes,
             });
 
