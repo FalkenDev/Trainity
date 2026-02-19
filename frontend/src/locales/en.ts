@@ -76,8 +76,8 @@ export default {
     updateAvatar: 'Update avatar',
     avatarPlaceholder: 'Click to upload avatar',
     avatarHelper: 'JPEG, PNG, or WebP. Recommended: 400x400px',
-    useRpe: 'Use RPE in workout sessions',
-    useRpeHint: 'When disabled, RPE will be hidden in active sessions.',
+    useRpe: 'Show RPE',
+    useRpeHint: 'Rate of Perceived Exertion (1-10)',
     weightAndProgression: 'Weight and progression',
     achievements: 'Achievements',
     preferencesSaved: 'Preferences saved',
@@ -682,8 +682,7 @@ export default {
     logWeight: 'Log Weight',
     weightTracking: 'Weight Tracking',
     enableTracking: 'Enable weight tracking',
-    enableTrackingHint:
-      'When enabled, a "Log Weight" button will appear on the home screen so you can track your weight over time.',
+    enableTrackingHint: 'Track your weight over time.',
     goalType: 'Goal type',
     goalTypeHint:
       'What is your weight goal? This helps us show your progress in the right direction.',

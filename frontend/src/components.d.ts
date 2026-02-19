@@ -9,9 +9,11 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AcceptDialog: typeof import('./components/basicUI/AcceptDialog.vue')['default']
+    AccountDialog: typeof import('./components/Settings/AccountDialog.vue')['default']
     ActivityList: typeof import('./components/Settings/ActivityList.vue')['default']
     AddExerciseList: typeof import('./components/Exercise/AddExerciseList.vue')['default']
     AddPastSessionDialog: typeof import('./components/Session/AddPastSessionDialog.vue')['default']
+    AppearanceDialog: typeof import('./components/Settings/AppearanceDialog.vue')['default']
     BackHeader: typeof import('./components/BackHeader.vue')['default']
     BottomNavigation: typeof import('./components/BottomNavigation.vue')['default']
     ChipTextInput: typeof import('./components/basicUI/ChipTextInput.vue')['default']
@@ -29,8 +31,10 @@ declare module 'vue' {
     ExerciseList: typeof import('./components/Exercise/ExerciseList.vue')['default']
     ExerciseStatisticsDetail: typeof import('./components/Statistics/ExerciseStatisticsDetail.vue')['default']
     ExitHeader: typeof import('./components/basicUI/ExitHeader.vue')['default']
+    GoalsDialog: typeof import('./components/Settings/GoalsDialog.vue')['default']
     HomeHeader: typeof import('./components/HomeHeader.vue')['default']
     ImageUpload: typeof import('./components/basicUI/ImageUpload.vue')['default']
+    LanguageDialog: typeof import('./components/Settings/LanguageDialog.vue')['default']
     MediaUpload: typeof import('./components/basicUI/MediaUpload.vue')['default']
     MyWorkouts: typeof import('./components/MyWorkouts.vue')['default']
     ProgressBar: typeof import('./components/ProgressBar.vue')['default']
