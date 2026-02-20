@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Param,
   Body,
@@ -12,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ActivityLogService } from './activityLog.service';
 import { CreateActivityLogDto } from './dto/createActivityLog.dto';
+import { UpdateActivityLogDto } from './dto/updateActivityLog.dto';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -79,5 +81,19 @@ export class ActivityLogController {
       throw new UnauthorizedException('User not authenticated');
     }
     return this.activityLogService.delete(id, +req.user.id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update an activity log' })
+  @ApiOkResponse({ type: ActivityLogResponseDto })
+  updateActivityLog(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateActivityLogDto,
+    @Req() req: RequestWithUser,
+  ): Promise<ActivityLogResponseDto> {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.activityLogService.update(id, body, +req.user.id);
   }
 }

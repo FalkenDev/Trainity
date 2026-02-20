@@ -64,16 +64,16 @@ export class User {
   primaryGoal: string;
 
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
-  targetWeight: number;
+  targetWeight: number | null;
 
   @Column({ type: 'int', nullable: true })
-  goalTimeframe: number;
+  goalTimeframe: number | null;
 
   @Column({ default: false })
   showWeightTracking: boolean;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
-  weightGoalType: string;
+  weightGoalType: string | null;
 
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   startWeight: number; // in weeks

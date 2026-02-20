@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia'
 import * as workoutSessionService from '@/services/workoutSession.service'
 import { useAuthStore } from './auth.store'
-import type { tempWorkoutSession } from '@/interfaces/workoutSession.interface'
+import type { WorkoutSession, tempWorkoutSession } from '@/interfaces/workoutSession.interface'
+
+export type CompletedSessionSummary = {
+  session: WorkoutSession
+  durationSeconds: number
+}
 
 type LiveSet = {
   set: number
@@ -52,6 +57,9 @@ export const useWorkoutSessionStore = defineStore(
     }
 
     const liveSessions = ref<Record<number, LiveSessionState>>({})
+    // Ephemeral summary data populated right before navigating to the post-workout summary page.
+    // Not persisted — used only during the navigation transition.
+    const lastCompletedSummary = ref<CompletedSessionSummary | null>(null)
 
     async function setWorkoutSessions(reload = false) {
       const now = Date.now()
@@ -354,6 +362,7 @@ export const useWorkoutSessionStore = defineStore(
       deleteSession,
       resetStore,
       startedAt,
+      lastCompletedSummary,
     }
   },
   {

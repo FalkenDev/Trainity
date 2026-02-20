@@ -125,14 +125,45 @@
           hide-details
         />
 
-        <v-select
-          v-model="formData.goalTimeframe"
-          class="mb-6"
-          :items="timeframeOptions"
-          :label="`${$t('onboarding.timeframe')} (${$t('common.optional')})`"
-          variant="outlined"
-          hide-details
-        />
+        <div class="mb-4">
+          <p class="text-body-2 text-textSecondary mb-2">
+            {{ $t('onboarding.goalDuration') }}
+            <span class="text-caption">({{ $t('common.optional') }})</span>
+          </p>
+          <div class="d-flex ga-2 align-start">
+            <v-text-field
+              v-model.number="goalDurationValue"
+              type="number"
+              step="1"
+              min="1"
+              variant="outlined"
+              hide-details
+              style="flex: 1"
+            />
+            <v-btn-toggle
+              v-model="goalDurationUnit"
+              mandatory
+              color="primary"
+              divided
+              style="height: 56px"
+            >
+              <v-btn value="weeks" style="padding: 0 16px">{{
+                $t('weightLog.goalDurationWeeks')
+              }}</v-btn>
+              <v-btn value="months" style="padding: 0 16px">{{
+                $t('weightLog.goalDurationMonths')
+              }}</v-btn>
+            </v-btn-toggle>
+          </div>
+        </div>
+
+        <div class="d-flex justify-space-between align-center mb-6">
+          <div>
+            <p class="text-body-1 text-textPrimary">{{ $t('settings.useRpe') }}</p>
+            <p class="text-body-2 text-textSecondary mt-1">{{ $t('settings.useRpeHint') }}</p>
+          </div>
+          <v-switch v-model="formData.showRpe" color="primary" inset hide-details />
+        </div>
 
         <v-btn
           block
@@ -169,6 +200,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.store'
 import { updateUserPreferences } from '@/services/user.service'
+import { createWeightLog } from '@/services/weightLog.service'
 import { toast } from 'vuetify-sonner'
 import type { VForm } from 'vuetify/components'
 
@@ -191,6 +223,7 @@ const formData = ref({
   weeklyWorkoutGoal: 3,
   targetWeight: undefined as number | undefined,
   goalTimeframe: undefined as number | undefined,
+  showRpe: true,
 })
 
 const genderOptions = computed(() => [
@@ -218,6 +251,24 @@ const timeframeOptions = computed(() => [
   { title: t('onboarding.oneYear'), value: 52 },
 ])
 
+const goalDurationValue = ref<number | undefined>(undefined)
+const goalDurationUnit = ref<'weeks' | 'months'>('weeks')
+
+// Derive goalTimeframe in weeks from goalDurationValue + goalDurationUnit
+const derivedGoalTimeframeWeeks = computed(() => {
+  if (!goalDurationValue.value || goalDurationValue.value <= 0) return undefined
+  return goalDurationUnit.value === 'months'
+    ? Math.round(goalDurationValue.value * 4.333)
+    : goalDurationValue.value
+})
+
+// Auto-derive weightGoalType from primaryGoal
+const derivedWeightGoalType = computed(() => {
+  if (formData.value.primaryGoal === 'lose_weight') return 'lose'
+  if (formData.value.primaryGoal === 'gain_weight') return 'gain'
+  return undefined
+})
+
 const nextStep = async () => {
   if (currentStep.value === 1) {
     if (!personalInfoForm.value) return
@@ -240,9 +291,22 @@ const completeOnboarding = async () => {
 
   loading.value = true
   try {
-    const preferences = {
+    const preferences: Record<string, unknown> = {
       ...formData.value,
       onboardingCompleted: true,
+    }
+
+    // Auto-enable weight tracking if the user provided their weight
+    if (formData.value.weight && formData.value.weight > 0) {
+      preferences.showWeightTracking = true
+    }
+
+    // Use derived values
+    if (derivedGoalTimeframeWeeks.value) {
+      preferences.goalTimeframe = derivedGoalTimeframeWeeks.value
+    }
+    if (derivedWeightGoalType.value) {
+      preferences.weightGoalType = derivedWeightGoalType.value
     }
 
     const updatedUser = await updateUserPreferences(preferences)
@@ -250,6 +314,18 @@ const completeOnboarding = async () => {
     // Update user in auth store
     if (authStore.user) {
       authStore.user = updatedUser
+    }
+
+    // Create the initial weight log entry so the first-time setup dialog is skipped
+    if (formData.value.weight && formData.value.weight > 0) {
+      const weightInKg =
+        formData.value.unitScale === 'imperial'
+          ? formData.value.weight / 2.20462
+          : formData.value.weight
+      await createWeightLog({
+        date: new Date().toISOString().split('T')[0],
+        weight: Number(weightInKg.toFixed(2)),
+      })
     }
 
     toast.success(t('onboarding.completed'))

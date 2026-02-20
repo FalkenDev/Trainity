@@ -6,11 +6,13 @@ import Register from '@/pages/Register.vue'
 import Onboarding from '@/pages/Onboarding.vue'
 import WorkoutDetails from '@/pages/WorkoutDetails.vue'
 import Session from '@/pages/Session.vue'
+import SessionSummary from '@/pages/SessionSummary.vue'
 import Calendar from '@/pages/Calendar.vue'
 import Settings from '@/pages/Settings.vue'
 import AddWorkout from '@/pages/AddWorkout.vue'
 import LogActivity from '@/pages/LogActivity.vue'
 import Statistics from '@/pages/Statistics.vue'
+import SessionDetail from '@/pages/SessionDetail.vue'
 
 const routes = [
   {
@@ -64,6 +66,18 @@ const routes = [
     name: 'SessionDetails',
     component: Session,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/session-summary',
+    name: 'SessionSummary',
+    component: SessionSummary,
+    meta: { requiresAuth: true, hideBottomNav: true },
+  },
+  {
+    path: '/session-history/:type/:id',
+    name: 'SessionDetail',
+    component: SessionDetail,
+    meta: { requiresAuth: true, hideBottomNav: true },
   },
   {
     path: '/calendar',

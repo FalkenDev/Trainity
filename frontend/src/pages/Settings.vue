@@ -35,8 +35,8 @@
         <v-divider vertical class="flex-grow-0" color="textSecondary" :thickness="2" />
 
         <div class="d-flex flex-column align-center flex-1-0-0 min-w-0">
-          <h1 class="text-h6">47</h1>
-          <p class="text-subtitle-2 text-textSecondary text-center">Day streak</p>
+          <h1 class="text-h6">{{ streakInfo?.currentStreak ?? '—' }}</h1>
+          <p class="text-subtitle-2 text-textSecondary text-center">Streak</p>
         </div>
 
         <v-divider vertical class="flex-grow-0" color="textSecondary" :thickness="2" />
@@ -161,8 +161,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentUser } from '@/services/user.service'
-import type { User } from '@/interfaces/User.interface'
+import { getCurrentUser, getStreakInfo } from '@/services/user.service'
+import type { User, StreakInfo } from '@/interfaces/User.interface'
 import { toast } from 'vuetify-sonner'
 import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
@@ -183,6 +183,7 @@ const isLanguageDialogOpen = ref(false)
 const isGoalsDialogOpen = ref(false)
 const currentUser = ref<User | null>(null)
 const weightTrackingEnabled = ref(false)
+const streakInfo = ref<StreakInfo | null>(null)
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1'
 
@@ -312,6 +313,11 @@ const preferencesList = [
 onMounted(() => {
   locale.value = appStore.locale
   loadUserData()
+  getStreakInfo()
+    .then(info => {
+      streakInfo.value = info
+    })
+    .catch(() => {})
 })
 </script>
 

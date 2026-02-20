@@ -54,6 +54,9 @@ export class WorkoutSession {
   @Column({ nullable: true })
   notes: string;
 
+  @Column({ type: 'int', nullable: true })
+  caloriesBurned: number | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

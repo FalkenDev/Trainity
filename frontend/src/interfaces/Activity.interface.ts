@@ -22,6 +22,7 @@ export interface Activity {
   name: string
   description?: string
   icon: ActivityIcon
+  equipment?: string[]
   trackDistance: boolean
   trackPace: boolean
   trackElevation: boolean
@@ -34,6 +35,7 @@ export interface CreateActivityDto {
   name: string
   description?: string
   icon: ActivityIcon
+  equipment?: string[]
   trackDistance: boolean
   trackPace: boolean
   trackElevation: boolean
@@ -64,4 +66,14 @@ export interface CreateActivityLogDto {
   calories?: number
   notes?: string
   scheduledSessionId?: number
+}
+
+export interface UpdateActivityLogDto {
+  date?: string
+  duration?: number
+  distance?: number
+  elevationGain?: number
+  maxElevation?: number
+  calories?: number
+  notes?: string
 }

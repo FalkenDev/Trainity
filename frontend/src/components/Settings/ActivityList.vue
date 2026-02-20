@@ -33,7 +33,7 @@
         :key="activity.id"
         class="border-t-sm border-b-sm py-2 bg-cardBg rounded-lg mx-5"
         two-line
-        @click.stop="openEditDialog(activity)"
+        @click.stop="openDetailsDialog(activity)"
       >
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-4">
@@ -68,90 +68,31 @@
       </div>
     </div>
 
-    <!-- Create/Edit Activity Dialog -->
-    <v-dialog v-model="isDialogOpen" max-width="600">
-      <v-card>
-        <v-card-title>
-          {{ editingActivity ? $t('activity.editActivity') : $t('activity.createActivity') }}
-        </v-card-title>
-        <v-card-text>
-          <v-form ref="formRef">
-            <v-text-field
-              v-model="formData.name"
-              :label="$t('activity.activityName')"
-              :rules="[rules.required]"
-              variant="outlined"
-              class="mb-3"
-            />
-            <v-textarea
-              v-model="formData.description"
-              :label="$t('activity.activityDescription')"
-              variant="outlined"
-              rows="2"
-              class="mb-3"
-            />
-            <v-select
-              v-model="formData.icon"
-              :items="iconOptions"
-              :label="$t('activity.selectIcon')"
-              :rules="[rules.required]"
-              item-title="label"
-              item-value="value"
-              variant="outlined"
-              class="mb-3"
-            >
-              <template #prepend-inner>
-                <v-icon>mdi-{{ getIconName(formData.icon) }}</v-icon>
-              </template>
-            </v-select>
+    <!-- Activity Details Dialog -->
+    <v-dialog v-model="isDetailsOpen" fullscreen>
+      <ActivityDetails
+        v-if="selectedActivity"
+        :activity="selectedActivity"
+        @close="isDetailsOpen = false"
+      />
+    </v-dialog>
 
-            <div class="mb-3">
-              <v-checkbox
-                v-model="formData.trackDistance"
-                :label="$t('activity.trackDistance')"
-                hide-details
-              />
-              <v-checkbox
-                v-model="formData.trackPace"
-                :label="$t('activity.trackPace')"
-                hide-details
-              />
-              <v-checkbox
-                v-model="formData.trackElevation"
-                :label="$t('activity.trackElevation')"
-                hide-details
-              />
-              <v-checkbox
-                v-model="formData.trackCalories"
-                :label="$t('activity.trackCalories')"
-                hide-details
-              />
-            </div>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="closeDialog">
-            {{ $t('common.cancel') }}
-          </v-btn>
-          <v-btn color="primary" :loading="isSaving" @click="saveActivity">
-            {{ $t('common.save') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+    <!-- Create Activity Dialog -->
+    <v-dialog v-model="isCreateOpen" fullscreen>
+      <CreateActivity @close="isCreateOpen = false" />
     </v-dialog>
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="isDeleteDialogOpen" max-width="400">
-      <v-card>
+      <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
         <v-card-title>{{ $t('activity.deleteActivity') }}</v-card-title>
-        <v-card-text> Are you sure you want to delete "{{ activityToDelete?.name }}"? </v-card-text>
+        <v-card-text>Are you sure you want to delete "{{ activityToDelete?.name }}"?</v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="isDeleteDialogOpen = false">
+          <v-btn variant="text" @click="isDeleteDialogOpen = false">
             {{ $t('common.cancel') }}
           </v-btn>
-          <v-btn color="error" :loading="isDeleting" @click="deleteActivity">
+          <v-btn color="error" variant="flat" :loading="isDeleting" @click="deleteActivity">
             {{ $t('common.delete') }}
           </v-btn>
         </v-card-actions>
@@ -163,12 +104,10 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
 import { useActivityStore } from '@/stores/activity.store'
-import {
-  createActivity,
-  updateActivity,
-  deleteActivity as deleteActivityService,
-} from '@/services/activity.service'
-import type { Activity, ActivityIcon, CreateActivityDto } from '@/interfaces/Activity.interface'
+import { deleteActivity as deleteActivityService } from '@/services/activity.service'
+import type { Activity, ActivityIcon } from '@/interfaces/Activity.interface'
+import ActivityDetails from '@/components/Activity/ActivityDetails.vue'
+import CreateActivity from '@/components/Activity/CreateActivity.vue'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
 
@@ -190,47 +129,13 @@ const filteredActivities = computed(() => {
   })
 })
 
-const isDialogOpen = ref(false)
-const editingActivity = ref<Activity | null>(null)
-const formRef = ref()
-const isSaving = ref(false)
+const isDetailsOpen = ref(false)
+const isCreateOpen = ref(false)
+const selectedActivity = ref<Activity | null>(null)
 
 const isDeleteDialogOpen = ref(false)
 const activityToDelete = ref<Activity | null>(null)
 const isDeleting = ref(false)
-
-const formData = ref<CreateActivityDto>({
-  name: '',
-  description: '',
-  icon: 'other' as ActivityIcon,
-  trackDistance: false,
-  trackPace: false,
-  trackElevation: false,
-  trackCalories: false,
-})
-
-const rules = {
-  required: (v: string | number | null) => !!v || t('common.required'),
-}
-
-const iconOptions = [
-  { label: 'Running', value: 'running' },
-  { label: 'Walking', value: 'walking' },
-  { label: 'Cycling', value: 'cycling' },
-  { label: 'Football', value: 'football' },
-  { label: 'Swimming', value: 'swimming' },
-  { label: 'Kayaking', value: 'kayaking' },
-  { label: 'Hiking', value: 'hiking' },
-  { label: 'Yoga', value: 'yoga' },
-  { label: 'Boxing', value: 'boxing' },
-  { label: 'Tennis', value: 'tennis' },
-  { label: 'Basketball', value: 'basketball' },
-  { label: 'Volleyball', value: 'volleyball' },
-  { label: 'Skiing', value: 'skiing' },
-  { label: 'Skating', value: 'skating' },
-  { label: 'Rowing', value: 'rowing' },
-  { label: 'Other', value: 'other' },
-]
 
 function getIconName(icon: ActivityIcon): string {
   const iconMap: Record<ActivityIcon, string> = {
@@ -255,63 +160,12 @@ function getIconName(icon: ActivityIcon): string {
 }
 
 function openCreateDialog() {
-  editingActivity.value = null
-  formData.value = {
-    name: '',
-    description: '',
-    icon: 'other' as ActivityIcon,
-    trackDistance: false,
-    trackPace: false,
-    trackElevation: false,
-    trackCalories: false,
-  }
-  isDialogOpen.value = true
+  isCreateOpen.value = true
 }
 
-function openEditDialog(activity: Activity) {
-  editingActivity.value = activity
-  formData.value = {
-    name: activity.name,
-    description: activity.description,
-    icon: activity.icon,
-    trackDistance: activity.trackDistance,
-    trackPace: activity.trackPace,
-    trackElevation: activity.trackElevation,
-    trackCalories: activity.trackCalories,
-  }
-  isDialogOpen.value = true
-}
-
-function closeDialog() {
-  isDialogOpen.value = false
-  editingActivity.value = null
-}
-
-async function saveActivity() {
-  const { valid } = await formRef.value.validate()
-  if (!valid) return
-
-  isSaving.value = true
-  try {
-    if (editingActivity.value) {
-      await updateActivity(editingActivity.value.id, formData.value)
-      toast.success(t('activity.updated'))
-    } else {
-      await createActivity(formData.value)
-      toast.success(t('activity.created'))
-    }
-    await activityStore.fetchActivities(true)
-    closeDialog()
-  } catch (error: unknown) {
-    toast.error((error as Error).message || t('activity.failedToCreate'))
-  } finally {
-    isSaving.value = false
-  }
-}
-
-function confirmDelete(activity: Activity) {
-  activityToDelete.value = activity
-  isDeleteDialogOpen.value = true
+function openDetailsDialog(activity: Activity) {
+  selectedActivity.value = activity
+  isDetailsOpen.value = true
 }
 
 async function deleteActivity() {

@@ -10,6 +10,10 @@ export class UploadService {
   private readonly exercisesDir = path.join(this.uploadsDir, 'exercises');
   private readonly avatarsDir = path.join(this.uploadsDir, 'avatars');
   private readonly mediaDir = path.join(this.exercisesDir, 'media');
+  private readonly progressPhotosDir = path.join(
+    this.uploadsDir,
+    'progress-photos',
+  );
 
   constructor() {
     this.ensureDirectoriesExist();
@@ -21,6 +25,7 @@ export class UploadService {
       await fs.mkdir(this.exercisesDir, { recursive: true });
       await fs.mkdir(this.avatarsDir, { recursive: true });
       await fs.mkdir(this.mediaDir, { recursive: true });
+      await fs.mkdir(this.progressPhotosDir, { recursive: true });
     } catch (error) {
       console.error('Error creating upload directories:', error);
     }
@@ -106,6 +111,25 @@ export class UploadService {
       // File might not exist, which is fine
       console.log('Image deletion failed (file may not exist):', error.message);
     }
+  }
+
+  /**
+   * Process and optimize a progress photo
+   * Max 1080px wide, preserves portrait aspect ratio
+   */
+  async processProgressPhoto(file: Express.Multer.File): Promise<string> {
+    const filename = `${randomBytes(16).toString('hex')}.webp`;
+    const filepath = path.join(this.progressPhotosDir, filename);
+
+    await sharp(file.buffer)
+      .resize(1080, 1920, {
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 85 })
+      .toFile(filepath);
+
+    return `/uploads/progress-photos/${filename}`;
   }
 
   /**

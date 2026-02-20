@@ -14,6 +14,9 @@ export class ActivityResponseDto {
   @ApiProperty({ enum: ActivityIcon })
   icon: ActivityIcon;
 
+  @ApiProperty({ required: false, type: [String] })
+  equipment?: string[];
+
   @ApiProperty()
   trackDistance: boolean;
 

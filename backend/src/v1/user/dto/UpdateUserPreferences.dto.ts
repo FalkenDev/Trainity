@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsDateString,
   IsBoolean,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateUserPreferencesDto {
@@ -36,12 +37,18 @@ export class UpdateUserPreferencesDto {
   weeklyWorkoutGoal?: number;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsNumber()
-  targetWeight?: number;
+  targetWeight?: number | null;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsNumber()
-  goalTimeframe?: number;
+  goalTimeframe?: number | null;
+
+  @IsOptional()
+  @IsBoolean()
+  showRpe?: boolean;
 
   @IsOptional()
   @IsBoolean()
@@ -52,8 +59,9 @@ export class UpdateUserPreferencesDto {
   showWeightTracking?: boolean;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsString()
-  weightGoalType?: string;
+  weightGoalType?: string | null;
 
   @IsOptional()
   @IsNumber()

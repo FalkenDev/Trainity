@@ -295,21 +295,13 @@ const finnishSession = async () => {
       router.push((route.query.returnTo as string) || '/')
     } else {
       const finalPayload = { completedExercises, notes: '' }
+      const durationSeconds = workoutSessionStore.secondsElapsed
       const result = await finishWorkoutSession(sessionId.value, finalPayload)
-      toast.success(t('session.finished'), { progressBar: true, duration: 1000 })
 
-      // Show PR toasts
-      if (result?.newRecords?.length) {
-        for (const record of result.newRecords) {
-          const exerciseName = record.exercise?.name ?? t('statistics.exercise')
-          toast.success(
-            `🏆 ${t('statistics.newPR')}: ${exerciseName} — ${record.value} ${record.recordType === 'max_reps' ? 'reps' : 'kg'}`,
-            {
-              progressBar: true,
-              duration: 3000,
-            }
-          )
-        }
+      // Store summary for the post-workout summary page (ephemeral, not persisted)
+      workoutSessionStore.lastCompletedSummary = {
+        session: result,
+        durationSeconds,
       }
 
       workoutSessionStore.stopClock()
@@ -317,7 +309,7 @@ const finnishSession = async () => {
       workoutSessionStore.resetClock()
       workoutSessionStore.clearLiveSession(sessionId.value)
       await workoutSessionStore.setWorkoutSessions(true)
-      router.push((route.query.returnTo as string) || '/')
+      router.push('/session-summary')
     }
   } catch {
     toast.error(t('session.finishError'), { progressBar: true, duration: 1000 })

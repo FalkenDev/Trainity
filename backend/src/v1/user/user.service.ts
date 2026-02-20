@@ -217,12 +217,12 @@ export class UserService {
           (7 * 24 * 60 * 60 * 1000),
       );
 
-      // Count unique days with activities (sessions OR logs) in the previous week
+      // Count total sessions with activities (sessions OR logs) in the previous week
       const lastWeekSunday = new Date(currentWeekMonday);
       lastWeekSunday.setDate(lastWeekSunday.getDate() - 1);
       lastWeekSunday.setHours(23, 59, 59, 999);
 
-      const workoutDays = await this.countUniqueDaysWithActivity(
+      const workoutDays = await this.countTotalSessionsWithActivity(
         user.id,
         lastWeekMonday,
         lastWeekSunday,
@@ -245,14 +245,14 @@ export class UserService {
   }
 
   /**
-   * Count unique days with either workout sessions or activity logs in a date range
+   * Count total sessions with either workout sessions or activity logs in a date range
    */
-  private async countUniqueDaysWithActivity(
+  private async countTotalSessionsWithActivity(
     userId: number,
     startDate: Date,
     endDate: Date,
   ): Promise<number> {
-    // Get all workout session dates
+    // Get all workout sessions
     const sessions = await this.sessionRepo.find({
       where: {
         user: { id: userId },
@@ -260,7 +260,7 @@ export class UserService {
       select: ['startedAt'],
     });
 
-    // Get all activity log dates
+    // Get all activity logs
     const activityLogs = await this.activityLogRepo.find({
       where: {
         user: { id: userId },
@@ -268,26 +268,23 @@ export class UserService {
       select: ['date'],
     });
 
-    // Collect unique date strings (YYYY-MM-DD)
-    const uniqueDays = new Set<string>();
+    let count = 0;
 
     sessions.forEach((session) => {
       const date = new Date(session.startedAt);
       if (date >= startDate && date <= endDate) {
-        const dateString = date.toISOString().split('T')[0];
-        uniqueDays.add(dateString);
+        count++;
       }
     });
 
     activityLogs.forEach((log) => {
       const date = new Date(log.date);
       if (date >= startDate && date <= endDate) {
-        const dateString = date.toISOString().split('T')[0];
-        uniqueDays.add(dateString);
+        count++;
       }
     });
 
-    return uniqueDays.size;
+    return count;
   }
 
   /**
@@ -346,7 +343,7 @@ export class UserService {
     currentWeekSunday.setDate(currentWeekSunday.getDate() + 6);
     currentWeekSunday.setHours(23, 59, 59, 999);
 
-    user.currentWeekWorkouts = await this.countUniqueDaysWithActivity(
+    user.currentWeekWorkouts = await this.countTotalSessionsWithActivity(
       userId,
       currentWeekMonday,
       currentWeekSunday,
@@ -424,6 +421,7 @@ export class UserService {
     }
     if (dto.targetWeight !== undefined) user.targetWeight = dto.targetWeight;
     if (dto.goalTimeframe !== undefined) user.goalTimeframe = dto.goalTimeframe;
+    if (dto.showRpe !== undefined) user.showRpe = dto.showRpe;
     if (dto.onboardingCompleted !== undefined)
       user.onboardingCompleted = dto.onboardingCompleted;
     if (dto.showWeightTracking !== undefined)

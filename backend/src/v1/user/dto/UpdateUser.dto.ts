@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -43,15 +44,22 @@ export class UpdateUserDto {
   showWeightTracking?: boolean;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsString()
   @IsIn(['lose', 'gain', 'maintain'])
-  weightGoalType?: string;
+  weightGoalType?: string | null;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @IsNumber()
-  targetWeight?: number;
+  targetWeight?: number | null;
 
   @IsOptional()
   @IsNumber()
   startWeight?: number;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsNumber()
+  goalTimeframe?: number | null;
 }
