@@ -10,7 +10,7 @@
           {{ user ? user.firstName + ' ' + user.lastName : $t('home.guest') }}
         </h1>
         <p class="text-body-2">
-          {{ $t('home.ready') }}
+          {{ greeting }}
         </p>
       </div>
     </div>
@@ -28,10 +28,18 @@
 </template>
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth.store'
-import type { User } from '@/interfaces/User.interface'
+import type { User, StreakInfo } from '@/interfaces/User.interface'
+import { useGreeting } from '@/composables/useGreeting'
 import { onMounted } from 'vue'
 
+const props = withDefaults(defineProps<{ streakInfo?: StreakInfo | null }>(), {
+  streakInfo: null,
+})
+
 const authStore = useAuthStore()
+
+const streakInfoRef = computed(() => props.streakInfo)
+const { greeting } = useGreeting(streakInfoRef)
 
 const user = computed<User | null>(() => authStore.user)
 

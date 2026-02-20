@@ -89,7 +89,7 @@ export const getWorkoutSessionById = async (sessionId: number): Promise<WorkoutS
 
 export const updateWorkoutSession = async (
   sessionId: number,
-  sessionData: WorkoutSession
+  sessionData: Partial<WorkoutSession>
 ): Promise<WorkoutSession> => {
   try {
     const data = await fetchWrapper<WorkoutSession>(`${apiUrl}/workoutSessions/${sessionId}`, {

@@ -51,6 +51,9 @@ export class Activity {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   createdBy: User;
 
+  @Column({ type: 'simple-array', nullable: true })
+  equipment?: string[];
+
   // Configuration flags for which fields to track
   @Column({ default: false })
   trackDistance: boolean;

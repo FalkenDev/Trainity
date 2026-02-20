@@ -1,8 +1,8 @@
 <template>
-  <v-card>
+  <v-card class="bg-background">
     <BackHeader :title="$t('settings.language')" @close="emit('close')" />
     <v-card-text class="pa-0">
-      <v-list>
+      <v-list class="bg-transparent">
         <v-list-item :active="currentLocale === 'en'" @click="selectLanguage('en')">
           <v-list-item-title>{{ $t('settings.english') }}</v-list-item-title>
           <template #append>

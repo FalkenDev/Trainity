@@ -81,11 +81,11 @@ export class UserWithoutPasswordDto {
     this.dateOfBirth = user.dateOfBirth;
     this.gender = user.gender;
     this.primaryGoal = user.primaryGoal;
-    this.targetWeight = user.targetWeight;
-    this.goalTimeframe = user.goalTimeframe;
+    this.targetWeight = user.targetWeight ?? undefined;
+    this.goalTimeframe = user.goalTimeframe ?? undefined;
     this.onboardingCompleted = user.onboardingCompleted ?? false;
     this.showWeightTracking = user.showWeightTracking ?? false;
-    this.weightGoalType = user.weightGoalType;
+    this.weightGoalType = user.weightGoalType ?? undefined;
     this.startWeight = user.startWeight;
   }
 }

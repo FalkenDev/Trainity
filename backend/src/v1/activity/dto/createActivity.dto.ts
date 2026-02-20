@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsEnum,
   IsNotEmpty,
+  IsArray,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ActivityIcon } from '../activity.entity';
@@ -22,6 +23,12 @@ export class CreateActivityDto {
   @ApiProperty({ enum: ActivityIcon, example: ActivityIcon.RUNNING })
   @IsEnum(ActivityIcon)
   icon: ActivityIcon;
+
+  @ApiProperty({ example: ['Bicycle', 'Helmet'], required: false })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  equipment?: string[];
 
   @ApiProperty({ example: true, description: 'Track distance in kilometers' })
   @IsBoolean()

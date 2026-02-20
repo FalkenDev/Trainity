@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { ActivityLog } from './activityLog.entity';
 import { Activity } from '../activity/activity.entity';
 import { CreateActivityLogDto } from './dto/createActivityLog.dto';
+import { UpdateActivityLogDto } from './dto/updateActivityLog.dto';
 import { ActivityLogResponseDto } from './dto/activityLogResponse.dto';
 import { UserService } from '../user/user.service';
 
@@ -155,6 +156,44 @@ export class ActivityLogService {
     }
 
     await this.activityLogRepo.remove(log);
+  }
+
+  async update(
+    id: number,
+    dto: UpdateActivityLogDto,
+    userId: number,
+  ): Promise<ActivityLogResponseDto> {
+    const log = await this.activityLogRepo.findOne({
+      where: { id, user: { id: userId } },
+      relations: ['activity'],
+    });
+
+    if (!log) {
+      throw new NotFoundException('Activity log not found');
+    }
+
+    if (dto.date !== undefined) log.date = new Date(dto.date);
+    if (dto.duration !== undefined) log.duration = dto.duration;
+    if (dto.distance !== undefined) log.distance = dto.distance;
+    if (dto.elevationGain !== undefined) log.elevationGain = dto.elevationGain;
+    if (dto.maxElevation !== undefined) log.maxElevation = dto.maxElevation;
+    if (dto.calories !== undefined) log.calories = dto.calories;
+    if (dto.notes !== undefined) log.notes = dto.notes;
+
+    // Recalculate pace if distance or duration changed
+    if (log.distance && log.duration) {
+      log.pace = this.calculatePace(log.duration, log.distance) ?? undefined;
+    }
+
+    const saved = await this.activityLogRepo.save(log);
+
+    const withRelations = await this.activityLogRepo.findOne({
+      where: { id: saved.id },
+      relations: ['activity'],
+    });
+
+    if (!withRelations) throw new Error('Failed to fetch updated activity log');
+    return this.toResponseDto(withRelations);
   }
 
   /**

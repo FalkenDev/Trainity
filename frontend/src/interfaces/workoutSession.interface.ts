@@ -43,6 +43,12 @@ export interface WorkoutSession {
     id: number
   }[]
   scheduledSessionId?: number
+  caloriesBurned?: number | null
+  newRecords?: {
+    exercise?: { name: string }
+    value: number
+    recordType: string
+  }[]
   createdAt: string
   updatedAt: string
 }

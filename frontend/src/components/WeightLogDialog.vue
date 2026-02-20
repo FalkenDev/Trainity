@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialogOpen" fullscreen transition="slide-y-transition" persistent>
-    <v-card class="d-flex flex-column bg-background">
+    <v-card class="d-flex flex-column bg-background" style="height: 100vh; overflow: hidden">
       <BackHeader :title="$t('weightLog.title')" @close="close" />
 
       <!-- First-time setup: no startWeight set yet -->
@@ -40,6 +40,38 @@
             variant="outlined"
           />
 
+          <div>
+            <p class="text-body-2 text-textSecondary mb-2">
+              {{ $t('weightLog.goalDuration') }}
+              <span class="text-caption">({{ $t('common.optional') }})</span>
+            </p>
+            <div class="d-flex ga-2 align-start">
+              <v-text-field
+                v-model.number="setupGoalDurationValue"
+                type="number"
+                step="1"
+                min="1"
+                variant="outlined"
+                hide-details
+                style="flex: 1"
+              />
+              <v-btn-toggle
+                v-model="setupGoalDurationUnit"
+                mandatory
+                color="primary"
+                divided
+                style="height: 56px"
+              >
+                <v-btn value="weeks" style="padding: 0 16px">{{
+                  $t('weightLog.goalDurationWeeks')
+                }}</v-btn>
+                <v-btn value="months" style="padding: 0 16px">{{
+                  $t('weightLog.goalDurationMonths')
+                }}</v-btn>
+              </v-btn-toggle>
+            </div>
+          </div>
+
           <v-btn
             color="primary"
             size="large"
@@ -55,169 +87,253 @@
 
       <!-- Main weight log view -->
       <template v-else>
-        <v-card-text class="pa-5 flex-grow-1 overflow-y-auto">
-          <!-- Stats summary cards -->
-          <div class="d-flex ga-3 mb-5">
-            <v-card
-              class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-              style="border: 1px solid #474747; box-shadow: none; flex: 1"
-            >
-              <p class="text-caption text-textSecondary text-uppercase mb-1">
-                {{ $t('weightLog.current') }}
-              </p>
-              <h2 class="text-h6 text-textPrimary">
-                {{ formatWeight(stats?.currentWeight) }}
-              </h2>
-              <p class="text-caption text-textSecondary">{{ weightUnit }}</p>
-            </v-card>
-            <v-card
-              class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-              style="border: 1px solid #474747; box-shadow: none; flex: 1"
-            >
-              <p class="text-caption text-textSecondary text-uppercase mb-1">
-                {{ $t('weightLog.sinceStart') }}
-              </p>
-              <h2 class="text-h6" :class="changeColor(stats?.changeFromStart)">
-                {{ formatChange(stats?.changeFromStart) }}
-              </h2>
-              <p class="text-caption text-textSecondary">{{ weightUnit }}</p>
-            </v-card>
-            <v-card
-              class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-              style="border: 1px solid #474747; box-shadow: none; flex: 1"
-            >
-              <p class="text-caption text-textSecondary text-uppercase mb-1">
-                {{ $t('weightLog.sinceLast') }}
-              </p>
-              <h2 class="text-h6" :class="changeColor(stats?.changeFromLastLog)">
-                {{ formatChange(stats?.changeFromLastLog) }}
-              </h2>
-              <p class="text-caption text-textSecondary">{{ weightUnit }}</p>
-            </v-card>
-          </div>
+        <div class="d-flex flex-column" style="flex: 1 1 0; min-height: 0; overflow: hidden">
+          <!-- Tab header -->
+          <v-tabs v-model="activeTab" color="primary" grow style="flex: 0 0 auto">
+            <v-tab value="log">{{ $t('progressPhotos.logTab') }}</v-tab>
+            <v-tab value="photos">{{ $t('progressPhotos.tab') }}</v-tab>
+          </v-tabs>
+          <v-divider style="flex: 0 0 auto" />
 
-          <!-- Target weight indicator -->
-          <v-card
-            v-if="stats?.targetWeight"
-            class="bg-cardBg pa-3 mb-5 rounded-lg d-flex align-center ga-3"
-            style="border: 1px solid #474747; box-shadow: none"
-          >
-            <v-icon color="primary" size="20">mdi-flag-checkered</v-icon>
-            <div class="flex-grow-1">
-              <p class="text-body-2 text-textPrimary">
-                {{ $t('weightLog.targetWeight') }}: {{ formatWeight(stats.targetWeight) }}
-                {{ weightUnit }}
-              </p>
-              <p
-                v-if="stats.currentWeight && stats.targetWeight"
-                class="text-caption text-textSecondary"
-              >
-                {{ formatWeight(Math.abs(stats.currentWeight - stats.targetWeight)) }}
-                {{ weightUnit }}
-                {{ $t('weightLog.toGo') }}
-              </p>
-            </div>
-          </v-card>
+          <v-tabs-window v-model="activeTab" style="flex: 1 1 0; min-height: 0; overflow: hidden">
+            <!-- Log tab -->
+            <v-tabs-window-item value="log">
+              <div class="pa-5">
+                <!-- Stats summary cards -->
+                <div class="d-flex ga-3 mb-5">
+                  <v-card
+                    class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
+                    style="border: 1px solid #474747; box-shadow: none; flex: 1"
+                  >
+                    <p class="text-caption text-textSecondary text-uppercase mb-1">
+                      {{ $t('weightLog.current') }}
+                    </p>
+                    <h2 class="text-h6 text-textPrimary">
+                      {{ formatWeight(stats?.currentWeight) }}
+                    </h2>
+                    <p class="text-caption text-textSecondary">{{ weightUnit }}</p>
+                  </v-card>
+                  <v-card
+                    class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
+                    style="border: 1px solid #474747; box-shadow: none; flex: 1"
+                  >
+                    <p class="text-caption text-textSecondary text-uppercase mb-1">
+                      {{ $t('weightLog.sinceStart') }}
+                    </p>
+                    <h2 class="text-h6" :class="changeColor(stats?.changeFromStart)">
+                      {{ formatChange(stats?.changeFromStart) }}
+                    </h2>
+                    <p class="text-caption text-textSecondary">{{ weightUnit }}</p>
+                  </v-card>
+                  <v-card
+                    class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
+                    style="border: 1px solid #474747; box-shadow: none; flex: 1"
+                  >
+                    <p class="text-caption text-textSecondary text-uppercase mb-1">
+                      {{ $t('weightLog.sinceLast') }}
+                    </p>
+                    <h2 class="text-h6" :class="changeColor(stats?.changeFromLastLog)">
+                      {{ formatChange(stats?.changeFromLastLog) }}
+                    </h2>
+                    <p class="text-caption text-textSecondary">{{ weightUnit }}</p>
+                  </v-card>
+                </div>
 
-          <!-- Chart -->
-          <v-card
-            class="bg-cardBg pa-4 mb-5 rounded-lg"
-            style="border: 1px solid #474747; box-shadow: none"
-          >
-            <h3 class="text-subtitle-1 text-textPrimary mb-3">{{ $t('weightLog.progress') }}</h3>
-            <div v-if="chartData && sortedLogs.length > 1" style="height: 220px">
-              <Line :data="chartData" :options="chartOptions" />
-            </div>
-            <div
-              v-else
-              class="d-flex align-center justify-center text-textSecondary"
-              style="height: 120px"
-            >
-              <p class="text-body-2">{{ $t('weightLog.needMoreData') }}</p>
-            </div>
-          </v-card>
+                <!-- Target weight indicator -->
+                <v-card
+                  v-if="stats?.targetWeight"
+                  class="bg-cardBg pa-3 mb-5 rounded-lg d-flex align-center ga-3"
+                  style="border: 1px solid #474747; box-shadow: none"
+                >
+                  <v-icon color="primary" size="20">mdi-flag-checkered</v-icon>
+                  <div class="flex-grow-1">
+                    <p class="text-body-2 text-textPrimary">
+                      {{ $t('weightLog.targetWeight') }}: {{ formatWeight(stats.targetWeight) }}
+                      {{ weightUnit }}
+                    </p>
+                    <p
+                      v-if="stats.currentWeight && stats.targetWeight"
+                      class="text-caption text-textSecondary"
+                    >
+                      {{ formatWeight(Math.abs(stats.currentWeight - stats.targetWeight)) }}
+                      {{ weightUnit }}
+                      {{ $t('weightLog.toGo') }}
+                    </p>
+                  </div>
+                </v-card>
 
-          <!-- History table -->
-          <div class="d-flex justify-space-between align-center mb-3">
-            <h3 class="text-subtitle-1 text-textPrimary">{{ $t('weightLog.history') }}</h3>
-            <v-btn
-              color="primary"
-              size="small"
-              variant="tonal"
-              prepend-icon="mdi-plus"
-              @click="openAddDialog"
-            >
-              {{ $t('weightLog.addEntry') }}
-            </v-btn>
-          </div>
+                <!-- Goal progress card -->
+                <v-card
+                  v-if="goalProgress"
+                  class="bg-cardBg pa-3 mb-5 rounded-lg"
+                  style="border: 1px solid #474747; box-shadow: none"
+                >
+                  <div class="d-flex align-center justify-space-between mb-3">
+                    <div class="d-flex align-center ga-2">
+                      <v-icon color="primary" size="18">mdi-trending-up</v-icon>
+                      <p class="text-body-2 text-textPrimary">{{ $t('weightLog.idealPace') }}</p>
+                    </div>
+                    <v-chip size="small" :color="goalProgress.badgeColor" variant="tonal">
+                      {{ $t(`weightLog.${goalProgress.badge}`) }}
+                    </v-chip>
+                  </div>
+                  <div class="d-flex ga-4">
+                    <div>
+                      <p class="text-caption text-textSecondary text-uppercase mb-1">
+                        {{ $t('weightLog.idealPace') }}
+                      </p>
+                      <p class="text-body-1 text-textPrimary">
+                        {{ formatWeight(goalProgress.idealWeightKg) }} {{ weightUnit }}
+                      </p>
+                    </div>
+                    <v-divider vertical />
+                    <div>
+                      <p class="text-caption text-textSecondary text-uppercase mb-1">
+                        {{ $t('weightLog.goalEndDate') }}
+                      </p>
+                      <p class="text-body-1 text-textPrimary">
+                        {{ goalProgress.goalEndDateFormatted }}
+                      </p>
+                    </div>
+                  </div>
+                </v-card>
 
-          <v-card
-            v-if="sortedLogs.length === 0"
-            class="bg-cardBg pa-6 rounded-lg d-flex flex-column align-center"
-            style="border: 1px solid #474747; box-shadow: none"
-          >
-            <v-icon size="48" color="textSecondary" class="mb-2">mdi-scale-bathroom</v-icon>
-            <p class="text-body-2 text-textSecondary">{{ $t('weightLog.noEntries') }}</p>
-          </v-card>
+                <!-- Chart -->
+                <v-card
+                  class="bg-cardBg pa-4 mb-5 rounded-lg"
+                  style="border: 1px solid #474747; box-shadow: none"
+                >
+                  <h3 class="text-subtitle-1 text-textPrimary mb-3">
+                    {{ $t('weightLog.progress') }}
+                  </h3>
+                  <div v-if="chartData && sortedLogs.length > 1" style="height: 220px">
+                    <Line :data="chartData" :options="chartOptions" />
+                  </div>
+                  <div
+                    v-else
+                    class="d-flex align-center justify-center text-textSecondary"
+                    style="height: 120px"
+                  >
+                    <p class="text-body-2">{{ $t('weightLog.needMoreData') }}</p>
+                  </div>
+                  <!-- Chart legend -->
+                  <div v-if="chartData && sortedLogs.length > 1" class="d-flex flex-wrap ga-3 mt-3">
+                    <div class="d-flex align-center ga-1">
+                      <div
+                        style="width: 16px; height: 3px; background: #abff1a; border-radius: 2px"
+                      ></div>
+                      <span class="text-caption text-textSecondary">{{
+                        $t('weightLog.weight')
+                      }}</span>
+                    </div>
+                    <div v-if="goalProgress" class="d-flex align-center ga-1">
+                      <div
+                        style="width: 16px; height: 2px; background: #4fc3f7; border-radius: 2px"
+                      ></div>
+                      <span class="text-caption text-textSecondary">{{
+                        $t('weightLog.idealPace')
+                      }}</span>
+                    </div>
+                    <div v-if="stats?.targetWeight" class="d-flex align-center ga-1">
+                      <div
+                        style="width: 16px; height: 2px; background: #ff6b6b; border-radius: 2px"
+                      ></div>
+                      <span class="text-caption text-textSecondary">{{
+                        $t('weightLog.targetWeight')
+                      }}</span>
+                    </div>
+                  </div>
+                </v-card>
 
-          <div v-else class="d-flex flex-column ga-2">
-            <!-- Table header -->
-            <div
-              class="d-flex px-3 py-2"
-              style="font-size: 11px; text-transform: uppercase; color: #9e9e9e"
-            >
-              <div style="flex: 2">{{ $t('common.date') }}</div>
-              <div style="flex: 1.5; text-align: right">{{ $t('weightLog.weight') }}</div>
-              <div style="flex: 1.5; text-align: right">{{ $t('weightLog.result') }}</div>
-              <div style="flex: 1.5; text-align: right">{{ $t('common.total') }}</div>
-              <div style="width: 36px"></div>
-            </div>
+                <!-- History table -->
+                <div class="d-flex justify-space-between align-center mb-3">
+                  <h3 class="text-subtitle-1 text-textPrimary">{{ $t('weightLog.history') }}</h3>
+                  <v-btn
+                    color="primary"
+                    size="small"
+                    variant="tonal"
+                    prepend-icon="mdi-plus"
+                    @click="openAddDialog"
+                  >
+                    {{ $t('weightLog.addEntry') }}
+                  </v-btn>
+                </div>
 
-            <!-- Table rows -->
-            <v-card
-              v-for="(entry, index) in sortedLogs"
-              :key="entry.id"
-              class="bg-cardBg px-3 py-2 rounded-lg d-flex align-center"
-              style="border: 1px solid #474747; box-shadow: none"
-            >
-              <div style="flex: 2">
-                <p class="text-body-2 text-textPrimary">{{ formatDate(entry.date) }}</p>
+                <v-card
+                  v-if="sortedLogs.length === 0"
+                  class="bg-cardBg pa-6 rounded-lg d-flex flex-column align-center"
+                  style="border: 1px solid #474747; box-shadow: none"
+                >
+                  <v-icon size="48" color="textSecondary" class="mb-2">mdi-scale-bathroom</v-icon>
+                  <p class="text-body-2 text-textSecondary">{{ $t('weightLog.noEntries') }}</p>
+                </v-card>
+
+                <div v-else class="d-flex flex-column ga-2">
+                  <!-- Table header -->
+                  <div
+                    class="d-flex px-3 py-2"
+                    style="font-size: 11px; text-transform: uppercase; color: #9e9e9e"
+                  >
+                    <div style="flex: 2">{{ $t('common.date') }}</div>
+                    <div style="flex: 1.5; text-align: right">{{ $t('weightLog.weight') }}</div>
+                    <div style="flex: 1.5; text-align: right">{{ $t('weightLog.result') }}</div>
+                    <div style="flex: 1.5; text-align: right">{{ $t('common.total') }}</div>
+                    <div style="width: 36px"></div>
+                  </div>
+
+                  <!-- Table rows -->
+                  <v-card
+                    v-for="(entry, index) in sortedLogs"
+                    :key="entry.id"
+                    class="bg-cardBg px-3 py-2 rounded-lg d-flex align-center"
+                    style="border: 1px solid #474747; box-shadow: none"
+                  >
+                    <div style="flex: 2">
+                      <p class="text-body-2 text-textPrimary">{{ formatDate(entry.date) }}</p>
+                    </div>
+                    <div style="flex: 1.5; text-align: right">
+                      <p class="text-body-2 text-textPrimary">
+                        {{ formatWeight(entry.weight) }}
+                      </p>
+                    </div>
+                    <div style="flex: 1.5; text-align: right">
+                      <p class="text-body-2" :class="changeColor(getResult(index))">
+                        {{ formatChange(getResult(index)) }}
+                      </p>
+                    </div>
+                    <div style="flex: 1.5; text-align: right">
+                      <p class="text-body-2" :class="changeColor(getTotal(entry))">
+                        {{ formatChange(getTotal(entry)) }}
+                      </p>
+                    </div>
+                    <div style="width: 36px" class="d-flex justify-end">
+                      <v-menu>
+                        <template #activator="{ props: menuProps }">
+                          <v-btn v-bind="menuProps" icon size="x-small" variant="text">
+                            <v-icon size="16">mdi-dots-vertical</v-icon>
+                          </v-btn>
+                        </template>
+                        <v-list density="compact">
+                          <v-list-item @click="openEditDialog(entry)">
+                            <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item class="text-error" @click="confirmDelete(entry)">
+                            <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+                    </div>
+                  </v-card>
+                </div>
               </div>
-              <div style="flex: 1.5; text-align: right">
-                <p class="text-body-2 text-textPrimary">
-                  {{ formatWeight(entry.weight) }}
-                </p>
-              </div>
-              <div style="flex: 1.5; text-align: right">
-                <p class="text-body-2" :class="changeColor(getResult(index))">
-                  {{ formatChange(getResult(index)) }}
-                </p>
-              </div>
-              <div style="flex: 1.5; text-align: right">
-                <p class="text-body-2" :class="changeColor(getTotal(entry))">
-                  {{ formatChange(getTotal(entry)) }}
-                </p>
-              </div>
-              <div style="width: 36px" class="d-flex justify-end">
-                <v-menu>
-                  <template #activator="{ props: menuProps }">
-                    <v-btn v-bind="menuProps" icon size="x-small" variant="text">
-                      <v-icon size="16">mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </template>
-                  <v-list density="compact">
-                    <v-list-item @click="openEditDialog(entry)">
-                      <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
-                    </v-list-item>
-                    <v-list-item class="text-error" @click="confirmDelete(entry)">
-                      <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </div>
-            </v-card>
-          </div>
-        </v-card-text>
+            </v-tabs-window-item>
+
+            <!-- Photos tab -->
+            <v-tabs-window-item value="photos">
+              <ProgressPhotosPanel />
+            </v-tabs-window-item>
+          </v-tabs-window>
+        </div>
       </template>
     </v-card>
   </v-dialog>
@@ -304,11 +420,13 @@ import {
 } from 'chart.js'
 import { useWeightLogStore } from '@/stores/weightLog.store'
 import { useAuthStore } from '@/stores/auth.store'
+import { useProgressPhotoStore } from '@/stores/progressPhoto.store'
 import * as weightLogService from '@/services/weightLog.service'
-import { updateUser } from '@/services/user.service'
+import { updateUser, updateUserPreferences } from '@/services/user.service'
 import type { WeightLog } from '@/interfaces/WeightLog.interface'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
+import ProgressPhotosPanel from '@/components/ProgressPhotosPanel.vue'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler)
 
@@ -325,6 +443,10 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore()
 const weightLogStore = useWeightLogStore()
+const photoStore = useProgressPhotoStore()
+
+// Active tab
+const activeTab = ref<'log' | 'photos'>('log')
 
 const dialogOpen = computed({
   get: () => props.modelValue,
@@ -346,6 +468,7 @@ const showFirstTimeSetup = computed(() => {
   return (
     currentUser.value?.showWeightTracking &&
     !currentUser.value?.startWeight &&
+    !currentUser.value?.weight &&
     sortedLogs.value.length === 0
   )
 })
@@ -353,7 +476,17 @@ const showFirstTimeSetup = computed(() => {
 const setupWeight = ref<number | null>(null)
 const setupTargetWeight = ref<number | null>(null)
 const setupGoalType = ref<string | null>(null)
+const setupGoalDurationValue = ref<number | undefined>(undefined)
+const setupGoalDurationUnit = ref<'weeks' | 'months'>('weeks')
 const isSavingSetup = ref(false)
+
+// Goal settings panel
+const goalSettingsOpen = ref(false)
+const goalSettingsTargetWeight = ref<number | null>(null)
+const goalSettingsGoalType = ref<string | null>(null)
+const goalSettingsDurationValue = ref<number | undefined>(undefined)
+const goalSettingsDurationUnit = ref<'weeks' | 'months'>('weeks')
+const isSavingGoalSettings = ref(false)
 
 const goalTypeItems = computed(() => [
   { title: t('weightLog.goalLose'), value: 'lose' },
@@ -405,24 +538,109 @@ const getTotal = (entry: WeightLog) => {
   return Number((Number(entry.weight) - stats.value.startWeight).toFixed(2))
 }
 
+// Goal pace data — only valid when startWeight + targetWeight + goalTimeframe all set
+const goalPaceData = computed(() => {
+  const sw = stats.value?.startWeight
+  const tw = stats.value?.targetWeight
+  const gtf = currentUser.value?.goalTimeframe
+  if (!sw || !tw || !gtf || sortedLogs.value.length === 0) return null
+
+  const chronological = [...sortedLogs.value].reverse()
+  const goalStartDate = new Date(chronological[0].date)
+  goalStartDate.setHours(0, 0, 0, 0)
+  const totalDays = gtf * 7
+  const goalEndDate = new Date(goalStartDate)
+  goalEndDate.setDate(goalStartDate.getDate() + totalDays)
+
+  return { sw, tw, gtf, goalStartDate, goalEndDate, totalDays }
+})
+
+// Goal progress — today's ideal weight and pace badge
+const goalProgress = computed(() => {
+  const pace = goalPaceData.value
+  if (!pace) return null
+
+  const { sw, tw, goalStartDate, goalEndDate, totalDays } = pace
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const daysSinceStart = (today.getTime() - goalStartDate.getTime()) / (1000 * 60 * 60 * 24)
+  const progress = Math.max(0, Math.min(1, daysSinceStart / totalDays))
+  const idealWeightKg = sw + (tw - sw) * progress
+
+  const current = stats.value?.currentWeight
+  if (!current) return null
+
+  const diff = current - idealWeightKg
+  const goalType = stats.value?.weightGoalType
+
+  let badge: string
+  let badgeColor: string
+  if (Math.abs(diff) <= 0.5) {
+    badge = 'paceOnTrack'
+    badgeColor = 'primary'
+  } else if (goalType === 'lose') {
+    badge = diff < 0 ? 'paceAhead' : 'paceBehind'
+    badgeColor = diff < 0 ? 'success' : 'error'
+  } else if (goalType === 'gain') {
+    badge = diff > 0 ? 'paceAhead' : 'paceBehind'
+    badgeColor = diff > 0 ? 'success' : 'error'
+  } else {
+    badge = diff > 0 ? 'paceBehind' : 'paceAhead'
+    badgeColor = 'textSecondary'
+  }
+
+  const goalEndDateFormatted = goalEndDate.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
+  return { idealWeightKg, badge, badgeColor, goalEndDateFormatted }
+})
+
 // Chart
 const chartData = computed((): ChartData<'line'> | null => {
   if (sortedLogs.value.length < 2) return null
 
-  // Reverse to get chronological order (oldest first)
   const chronological = [...sortedLogs.value].reverse()
+  const pace = goalPaceData.value
 
-  const labels = chronological.map(log => {
-    const d = new Date(log.date)
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-  })
+  interface ChartPoint {
+    date: Date
+    dateLabel: string
+    actualWeight: number | null
+  }
 
-  const data = chronological.map(log => fromKg(Number(log.weight)))
+  const points: ChartPoint[] = chronological.map(log => ({
+    date: new Date(log.date),
+    dateLabel: new Date(log.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+    actualWeight: fromKg(Number(log.weight)),
+  }))
+
+  // Extend x-axis to goal end date so the ideal pace line shows future target
+  if (pace) {
+    const lastLogDate = points[points.length - 1].date
+    lastLogDate.setHours(0, 0, 0, 0)
+    if (pace.goalEndDate > lastLogDate) {
+      points.push({
+        date: new Date(pace.goalEndDate),
+        dateLabel: pace.goalEndDate.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+        }),
+        actualWeight: null,
+      })
+    }
+  }
+
+  const labels = points.map(p => p.dateLabel)
+  const actualWeightData = points.map(p => p.actualWeight)
 
   const datasets: ChartData<'line'>['datasets'] = [
     {
       label: t('weightLog.weight'),
-      data,
+      data: actualWeightData as number[],
       borderColor: '#abff1a',
       backgroundColor: 'rgba(171, 255, 26, 0.1)',
       fill: true,
@@ -433,7 +651,7 @@ const chartData = computed((): ChartData<'line'> | null => {
     },
   ]
 
-  // Target weight dashed line
+  // Target weight flat dashed line
   if (stats.value?.targetWeight) {
     const targetVal = fromKg(stats.value.targetWeight)
     datasets.push({
@@ -445,6 +663,25 @@ const chartData = computed((): ChartData<'line'> | null => {
       fill: false,
       tension: 0,
     })
+  }
+
+  // Ideal pace diagonal line
+  if (pace) {
+    const idealData = points.map(p => {
+      const daysSinceStart =
+        (p.date.getTime() - pace.goalStartDate.getTime()) / (1000 * 60 * 60 * 24)
+      const progress = Math.max(0, Math.min(1, daysSinceStart / pace.totalDays))
+      return fromKg(pace.sw + (pace.tw - pace.sw) * progress)
+    })
+    datasets.push({
+      label: t('weightLog.idealPace'),
+      data: idealData,
+      borderColor: '#4fc3f7',
+      borderDash: [6, 3],
+      pointRadius: 0,
+      fill: false,
+      tension: 0,
+    } as ChartData<'line'>['datasets'][number])
   }
 
   return { labels, datasets }
@@ -594,8 +831,14 @@ const saveFirstTimeSetup = async () => {
     if (setupGoalType.value) {
       prefs.weightGoalType = setupGoalType.value
     }
+    if (setupGoalDurationValue.value && setupGoalDurationValue.value > 0) {
+      prefs.goalTimeframe =
+        setupGoalDurationUnit.value === 'months'
+          ? Math.round(setupGoalDurationValue.value * 4.333)
+          : setupGoalDurationValue.value
+    }
     if (Object.keys(prefs).length > 0) {
-      await updateUser(prefs)
+      await updateUserPreferences(prefs)
     }
 
     await weightLogStore.refreshAll()
@@ -614,10 +857,90 @@ const close = () => {
   dialogOpen.value = false
 }
 
+// Save goal settings from the expandable panel
+const saveGoalSettings = async () => {
+  isSavingGoalSettings.value = true
+  try {
+    const prefs: Record<string, unknown> = {}
+
+    if (goalSettingsTargetWeight.value && goalSettingsTargetWeight.value > 0) {
+      prefs.targetWeight = Number(toKg(goalSettingsTargetWeight.value).toFixed(2))
+    } else {
+      prefs.targetWeight = null
+    }
+
+    prefs.weightGoalType = goalSettingsGoalType.value || null
+
+    if (goalSettingsDurationValue.value && goalSettingsDurationValue.value > 0) {
+      prefs.goalTimeframe =
+        goalSettingsDurationUnit.value === 'months'
+          ? Math.round(goalSettingsDurationValue.value * 4.333)
+          : goalSettingsDurationValue.value
+    } else {
+      prefs.goalTimeframe = null
+    }
+
+    await updateUserPreferences(prefs)
+    await weightLogStore.refreshAll()
+    await authStore.refreshUser()
+    emit('weight-updated')
+    toast.success(t('weightLog.goalSettingsSaved'), { progressBar: true, duration: 1000 })
+    goalSettingsOpen.value = false
+  } catch (error) {
+    console.error('Failed to save goal settings:', error)
+    toast.error(t('weightLog.goalSettingsFailed'), { progressBar: true, duration: 1000 })
+  } finally {
+    isSavingGoalSettings.value = false
+  }
+}
+
 // Load data when dialog opens
 watch(dialogOpen, async open => {
   if (open) {
+    activeTab.value = 'log'
     await weightLogStore.refreshAll()
+    await photoStore.fetchPhotos()
+
+    // Populate goal settings panel from current user data
+    const user = authStore.user
+    if (user) {
+      goalSettingsTargetWeight.value = user.targetWeight
+        ? Number(fromKg(user.targetWeight).toFixed(1))
+        : null
+      goalSettingsGoalType.value = user.weightGoalType || null
+
+      const gtf = user.goalTimeframe
+      if (gtf) {
+        // Try to display as months if evenly divisible
+        if (gtf % 4 === 0 && gtf >= 4) {
+          goalSettingsDurationValue.value = gtf / 4
+          goalSettingsDurationUnit.value = 'months'
+        } else {
+          goalSettingsDurationValue.value = gtf
+          goalSettingsDurationUnit.value = 'weeks'
+        }
+      } else {
+        goalSettingsDurationValue.value = undefined
+        goalSettingsDurationUnit.value = 'weeks'
+      }
+    }
   }
 })
 </script>
+
+<style scoped>
+/* Prevent Vuetify tabs bar from growing beyond its natural height */
+:deep(.v-tabs) {
+  flex: 0 0 auto !important;
+  height: auto !important;
+}
+/* Make the tabs-window fill remaining card height and allow each item to scroll */
+:deep(.v-window__container) {
+  height: 100%;
+  min-height: 0;
+}
+:deep(.v-window-item) {
+  height: 100%;
+  overflow-y: auto;
+}
+</style>

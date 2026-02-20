@@ -14,6 +14,7 @@ import { ActivityLogModule } from './activityLog/activityLog.module';
 import { WeightLogModule } from './weightLog/weightLog.module';
 import { ScheduledSessionModule } from './scheduledSession/scheduledSession.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { ProgressPhotoModule } from './progressPhoto/progressPhoto.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { StatisticsModule } from './statistics/statistics.module';
     WeightLogModule,
     ScheduledSessionModule,
     StatisticsModule,
+    ProgressPhotoModule,
   ],
   providers: [AppService, JwtStrategy],
 })

@@ -23,6 +23,7 @@ export class ActivityService {
       name: activity.name,
       description: activity.description,
       icon: activity.icon,
+      equipment: activity.equipment,
       trackDistance: activity.trackDistance,
       trackPace: activity.trackPace,
       trackElevation: activity.trackElevation,

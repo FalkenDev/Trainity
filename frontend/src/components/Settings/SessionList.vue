@@ -1,296 +1,105 @@
 <template>
-  <div class="d-flex flex-column fill-height bg-grey-darken-4">
-    <BackHeader :title="$t('sessionList.title')" show-menu @close="emit('close')" />
+  <div class="d-flex flex-column fill-height bg-background">
+    <BackHeader :title="$t('sessionList.title')" @close="emit('close')" />
 
-    <div class="content-scroll">
-      <v-row>
-        <v-col cols="12">
-          <v-card elevation="0">
-            <v-card-title class="d-flex ga-10 justify-space-between align-center">
-              <div class="text-h6 w-100">
-                <v-text-field
-                  v-model="searchQuery"
-                  variant="outlined"
-                  prepend-inner-icon="mdi-magnify"
-                  :label="$t('common.search')"
-                  clearable
-                  hide-details
-                  density="compact"
-                  width="100%"
-                />
-              </div>
-              <div class="text-caption text-medium-emphasis">
-                {{ sessions.length }} {{ $t('common.total') }}
-              </div>
-            </v-card-title>
+    <!-- Search -->
+    <div class="mx-5 mt-2 mb-4">
+      <v-text-field
+        v-model="searchQuery"
+        variant="outlined"
+        prepend-inner-icon="mdi-magnify"
+        :label="$t('common.search')"
+        clearable
+        hide-details
+        density="compact"
+      />
+    </div>
 
-            <v-divider />
+    <!-- List -->
+    <div class="flex-grow-1 overflow-y-auto pb-5 d-flex ga-3 flex-column">
+      <template v-if="sessions.length > 0">
+        <div
+          v-for="session in sessions"
+          :key="`${session.type}-${session.data.id}`"
+          class="bg-cardBg rounded-lg mx-5 py-3 px-4 cursor-pointer"
+          style="border: 1px solid #474747"
+          @click="openDetail(session)"
+        >
+          <div class="d-flex align-center ga-4">
+            <v-avatar color="avatarBg" size="50" tile class="rounded-lg flex-shrink-0">
+              <v-icon color="primary">{{ sessionIcon(session) }}</v-icon>
+            </v-avatar>
 
-            <v-card-text v-if="sessions.length > 0" class="pa-0">
-              <v-expansion-panels multiple>
-                <v-expansion-panel
-                  v-for="session in sessions"
-                  :key="`${session.type}-${session.data.id}`"
+            <div class="flex-grow-1" style="min-width: 0">
+              <div class="d-flex align-center ga-1 mb-1 flex-wrap">
+                <v-chip
+                  :color="session.type === 'workout' ? 'primary' : 'secondary'"
+                  size="x-small"
+                  variant="tonal"
                 >
-                  <v-expansion-panel-title>
-                    <div class="d-flex flex-wrap align-center w-100 ga-2">
-                      <div class="mr-4">
-                        <div class="text-subtitle-1 font-weight-medium">
-                          {{ title(session) }}
-                        </div>
-                        <div class="text-caption text-medium-emphasis">
-                          <!-- Workout Session -->
-                          <template v-if="session.type === 'workout'">
-                            {{ $t('sessionList.started') }}:
-                            {{ formatDateTime((session.data as WorkoutSession).startedAt) }}
-                            <span v-if="(session.data as WorkoutSession).endedAt">
-                              • {{ $t('sessionList.ended') }}:
-                              {{ formatDateTime((session.data as WorkoutSession).endedAt) }}
-                            </span>
-                            • {{ $t('sessionList.duration') }}:
-                            {{
-                              durationMinutes(
-                                (session.data as WorkoutSession).startedAt,
-                                (session.data as WorkoutSession).endedAt || undefined
-                              )
-                            }}
-                          </template>
-                          <!-- Activity Log -->
-                          <template v-else>
-                            {{ $t('common.date') }}:
-                            {{ formatDateTime((session.data as ActivityLog).date) }} •
-                            {{ $t('sessionList.duration') }}:
-                            {{
-                              durationMinutes(
-                                undefined,
-                                undefined,
-                                (session.data as ActivityLog).duration
-                              )
-                            }}
-                            <span v-if="(session.data as ActivityLog).distance">
-                              • {{ $t('activity.distance') }}:
-                              {{ (session.data as ActivityLog).distance }} {{ $t('units.km') }}
-                            </span>
-                          </template>
-                        </div>
-                      </div>
+                  {{
+                    session.type === 'workout'
+                      ? $t('sessionList.workoutSession')
+                      : $t('sessionList.activityLog')
+                  }}
+                </v-chip>
+                <v-chip
+                  v-if="session.type === 'workout'"
+                  :color="statusColor((session.data as WorkoutSession).status)"
+                  size="x-small"
+                  variant="flat"
+                  class="text-uppercase"
+                >
+                  {{ statusLabel((session.data as WorkoutSession).status) }}
+                </v-chip>
+              </div>
 
-                      <div class="d-flex ga-2 flex-wrap">
-                        <!-- Type chip -->
-                        <v-chip
-                          :color="session.type === 'workout' ? 'primary' : 'secondary'"
-                          size="small"
-                          variant="flat"
-                        >
-                          {{
-                            session.type === 'workout'
-                              ? $t('sessionList.workoutSession')
-                              : $t('sessionList.activityLog')
-                          }}
-                        </v-chip>
+              <p class="text-body-1 font-weight-bold text-textPrimary text-truncate">
+                {{ title(session) }}
+              </p>
 
-                        <!-- Workout Session: Status chip -->
-                        <v-chip
-                          v-if="session.type === 'workout'"
-                          :color="statusColor((session.data as WorkoutSession).status)"
-                          size="small"
-                          variant="flat"
-                          class="text-uppercase"
-                        >
-                          {{ statusLabel((session.data as WorkoutSession).status) }}
-                        </v-chip>
-
-                        <!-- Workout Session: Total Weight -->
-                        <v-chip v-if="session.type === 'workout'" size="small" variant="outlined">
-                          {{ $t('sessionList.totalWeight') }}:
-                          {{ (session.data as WorkoutSession).totalWeight }}
-                          {{ $t('units.kgShort') }}
-                        </v-chip>
-
-                        <!-- Activity Log: Calories -->
-                        <v-chip
-                          v-if="
-                            session.type === 'activity' && (session.data as ActivityLog).calories
-                          "
-                          size="small"
-                          variant="outlined"
-                        >
-                          {{ $t('activity.calories') }}:
-                          {{ (session.data as ActivityLog).calories }} {{ $t('units.kcal') }}
-                        </v-chip>
-                      </div>
-                    </div>
-                  </v-expansion-panel-title>
-
-                  <v-expansion-panel-text>
-                    <!-- Workout Session Details -->
-                    <template v-if="session.type === 'workout'">
-                      <v-row class="mb-2">
-                        <v-col cols="12" md="8">
-                          <div class="text-body-2">
-                            {{
-                              (session.data as WorkoutSession).workout?.description ||
-                              $t('common.noDescription')
-                            }}
-                          </div>
-                        </v-col>
-                        <v-col cols="12" md="4" class="d-flex justify-end">
-                          <div class="text-caption text-medium-emphasis">
-                            {{ $t('common.createdAt') }}:
-                            {{ formatDateTime(session.data.createdAt) }} <br />
-                            {{ $t('common.updatedAt') }}:
-                            {{ formatDateTime(session.data.updatedAt) }}
-                          </div>
-                        </v-col>
-                      </v-row>
-
-                      <v-divider class="my-2" />
-
-                      <div class="text-subtitle-2 mb-2">
-                        {{ $t('sessionList.exercises') }}
-                      </div>
-                      <v-row>
-                        <v-col
-                          v-for="ex in (session.data as WorkoutSession).exercises"
-                          :key="ex.exerciseId"
-                          cols="12"
-                        >
-                          <v-card variant="text" class="pa-2">
-                            <div class="d-flex justify-space-between align-start">
-                              <div>
-                                <div class="text-subtitle-2">
-                                  {{ ex.exercise?.name || $t('sessionList.exerciseFallback') }}
-                                </div>
-                                <div class="text-caption text-medium-emphasis">
-                                  {{ ex.exercise?.description || '' }}
-                                </div>
-                              </div>
-
-                              <div class="text-caption text-medium-emphasis">
-                                {{ $t('sessionList.sets') }}: {{ ex.sets?.length || 0 }}
-                              </div>
-                            </div>
-
-                            <v-table density="comfortable" class="mt-2">
-                              <thead>
-                                <tr>
-                                  <th class="text-left">
-                                    {{ $t('table.set') }}
-                                  </th>
-                                  <th class="text-left">
-                                    {{ $t('sessionList.weightKg') }}
-                                  </th>
-                                  <th class="text-left">
-                                    {{ $t('table.reps') }}
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr v-for="s in ex.sets" :key="s.setNumber">
-                                  <td>#{{ s.setNumber }}</td>
-                                  <td>{{ s.weight }}</td>
-                                  <td>{{ s.reps }}</td>
-                                </tr>
-                                <tr v-if="!ex.sets || ex.sets.length === 0">
-                                  <td colspan="5" class="text-medium-emphasis">
-                                    {{ $t('sessionList.noSetsRecorded') }}
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </v-table>
-                          </v-card>
-                        </v-col>
-                      </v-row>
-                    </template>
-
-                    <!-- Activity Log Details -->
-                    <template v-else>
-                      <v-row class="mb-2">
-                        <v-col cols="12">
-                          <v-card variant="text" class="pa-2">
-                            <div class="text-subtitle-2 mb-2">
-                              {{ $t('sessionList.activityDetails') }}
-                            </div>
-                            <v-row dense>
-                              <v-col v-if="(session.data as ActivityLog).distance" cols="6">
-                                <div class="text-caption text-medium-emphasis">
-                                  {{ $t('activity.distance') }}
-                                </div>
-                                <div class="text-body-1">
-                                  {{ (session.data as ActivityLog).distance }} {{ $t('units.km') }}
-                                </div>
-                              </v-col>
-                              <v-col v-if="(session.data as ActivityLog).pace" cols="6">
-                                <div class="text-caption text-medium-emphasis">
-                                  {{ $t('activity.pace') }}
-                                </div>
-                                <div class="text-body-1">
-                                  {{ (session.data as ActivityLog).pace }}
-                                </div>
-                              </v-col>
-                              <v-col v-if="(session.data as ActivityLog).calories" cols="6">
-                                <div class="text-caption text-medium-emphasis">
-                                  {{ $t('activity.calories') }}
-                                </div>
-                                <div class="text-body-1">
-                                  {{ (session.data as ActivityLog).calories }}
-                                  {{ $t('units.kcal') }}
-                                </div>
-                              </v-col>
-                              <v-col cols="6">
-                                <div class="text-caption text-medium-emphasis">
-                                  {{ $t('sessionList.duration') }}
-                                </div>
-                                <div class="text-body-1">
-                                  {{
-                                    durationMinutes(
-                                      undefined,
-                                      undefined,
-                                      (session.data as ActivityLog).duration
-                                    )
-                                  }}
-                                </div>
-                              </v-col>
-                            </v-row>
-                          </v-card>
-                        </v-col>
-                        <v-col cols="12">
-                          <div class="text-caption text-medium-emphasis">
-                            {{ $t('common.createdAt') }}:
-                            {{ formatDateTime(session.data.createdAt) }}
-                          </div>
-                        </v-col>
-                      </v-row>
-                    </template>
-
-                    <v-divider class="my-2" />
-
-                    <div class="d-flex align-center justify-space-between mt-4">
-                      <div class="text-caption">
-                        {{ $t('sessionList.sessionNotes') }}: {{ session.data.notes || '—' }}
-                      </div>
-                      <v-btn
-                        color="error"
-                        variant="text"
-                        size="small"
-                        prepend-icon="mdi-delete"
-                        @click="handleDelete(session.type, session.data.id)"
-                      >
-                        {{ $t('common.delete') }}
-                      </v-btn>
-                    </div>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-card-text>
-            <div v-else class="py-10">
-              <p class="text-center text-subtitle text-medium-emphasis">
-                {{ $t('sessionList.noSessionsFound') }}
+              <p class="text-caption text-textSecondary">
+                <template v-if="session.type === 'workout'">
+                  {{ formatDate((session.data as WorkoutSession).startedAt) }}
+                  &nbsp;·&nbsp;
+                  {{
+                    durationMinutes(
+                      (session.data as WorkoutSession).startedAt,
+                      (session.data as WorkoutSession).endedAt || undefined
+                    )
+                  }}
+                  &nbsp;·&nbsp;
+                  {{ (session.data as WorkoutSession).totalWeight }} kg
+                </template>
+                <template v-else>
+                  {{ formatDate((session.data as ActivityLog).date) }}
+                  &nbsp;·&nbsp;
+                  {{ (session.data as ActivityLog).duration }} {{ $t('units.minShort') }}
+                  <template v-if="(session.data as ActivityLog).distance">
+                    &nbsp;·&nbsp;{{ (session.data as ActivityLog).distance }} {{ $t('units.km') }}
+                  </template>
+                </template>
               </p>
             </div>
-          </v-card>
-        </v-col>
-      </v-row>
+
+            <v-icon color="grey-lighten-1" class="flex-shrink-0">mdi-chevron-right</v-icon>
+          </div>
+        </div>
+      </template>
+
+      <!-- Empty state -->
+      <div
+        v-if="sessions.length === 0"
+        class="d-flex flex-column align-center justify-center flex-grow-1 py-16"
+      >
+        <v-icon size="56" color="textSecondary" class="mb-4">mdi-history</v-icon>
+        <p class="text-subtitle-1 font-weight-bold text-textPrimary mb-1">
+          {{ $t('sessionList.noSessionsFound') }}
+        </p>
+        <p class="text-body-2 text-textSecondary text-center">
+          {{ $t('statistics.noHistory') }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -301,8 +110,10 @@ import { useActivityStore } from '@/stores/activity.store'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
 import type { ActivityLog } from '@/interfaces/Activity.interface'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n({ useScope: 'global' })
+const router = useRouter()
 
 const searchQuery = ref('')
 const workoutSessionStore = useWorkoutSessionStore()
@@ -366,23 +177,45 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-function formatDateTime(iso?: string) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  return d.toLocaleString()
+function sessionIcon(session: UnifiedSession) {
+  if (session.type === 'activity') {
+    const icon = (session.data as ActivityLog).activity?.icon
+    const iconMap: Record<string, string> = {
+      running: 'mdi-run',
+      walking: 'mdi-walk',
+      cycling: 'mdi-bike',
+      swimming: 'mdi-swim',
+      hiking: 'mdi-hiking',
+      rowing: 'mdi-rowing',
+      yoga: 'mdi-yoga',
+      boxing: 'mdi-boxing-glove',
+      skiing: 'mdi-ski',
+      skating: 'mdi-skate',
+    }
+    return icon ? (iconMap[icon] ?? 'mdi-run-fast') : 'mdi-run-fast'
+  }
+  return 'mdi-dumbbell'
 }
 
-function durationMinutes(start?: string, end?: string, duration?: number) {
-  // For activity logs with duration field
-  if (duration !== undefined) {
-    return `${duration} ${t('units.minShort')}`
-  }
-  // For workout sessions with start/end times
+function formatDate(iso?: string) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function durationMinutes(start?: string, end?: string) {
   if (!start) return ''
   const s = new Date(start).getTime()
   const e = end ? new Date(end).getTime() : Date.now()
   const mins = Math.max(0, Math.round((e - s) / 60000))
   return `${mins} ${t('units.minShort')}`
+}
+
+function openDetail(session: UnifiedSession) {
+  router.push(`/session-history/${session.type}/${session.data.id}`)
 }
 
 function statusLabel(status: WorkoutSession['status']) {
@@ -417,16 +250,6 @@ function title(session: UnifiedSession) {
   }
 }
 
-async function handleDelete(sessionType: 'workout' | 'activity', sessionId: number) {
-  if (confirm(t('sessionList.deleteConfirm'))) {
-    if (sessionType === 'workout') {
-      await workoutSessionStore.deleteSession(sessionId)
-    } else {
-      await activityStore.deleteActivityLog(sessionId)
-    }
-  }
-}
-
 onMounted(() => {
   workoutSessionStore.setWorkoutSessions(true)
   activityStore.fetchActivityLogs(true)
@@ -434,10 +257,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.content-scroll {
-  height: calc(100vh - 56px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

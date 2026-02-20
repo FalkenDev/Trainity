@@ -1,6 +1,6 @@
 <template>
   <div class="pa-5 d-flex flex-column ga-5">
-    <HomeHeader />
+    <HomeHeader :streak-info="streakInfo" />
     <v-card
       v-if="streakInfo && streakInfo.currentStreak > 0"
       class="bg-cardBg pa-4 d-flex flex-column ga-2 rounded-lg"
@@ -14,13 +14,13 @@
         <div class="d-flex align-center">
           <v-icon size="20" color="primary">mdi-fire</v-icon>
           <span class="text-body-2 text-primary font-weight-bold" style="margin-top: 1px">
-            {{ streakInfo.currentStreak }} Day Streak
+            {{ streakInfo.currentStreak }} Streak
           </span>
         </div>
       </div>
       <div>
         <p class="text-body-2 text-textPrimary">
-          You're on fire! Keep pushing to hit {{ streakInfo.currentStreak + 2 }} days.
+          You're on fire! Keep pushing to hit {{ streakInfo.currentStreak + 2 }} workouts.
         </p>
       </div>
     </v-card>
@@ -106,7 +106,7 @@
       >
         <v-icon size="24" color="primary">mdi-fire</v-icon>
         <h2 class="text-h5 text-textPrimary mt-1">{{ streakInfo?.currentStreak || 0 }}</h2>
-        <p class="text-caption text-textSecondary text-uppercase">Day streak</p>
+        <p class="text-caption text-textSecondary text-uppercase">Streak</p>
       </v-card>
       <v-card
         class="flex-grow-1 bg-cardBg justify-center align-center py-2 d-flex flex-column align-center rounded-lg"
