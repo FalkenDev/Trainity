@@ -341,7 +341,7 @@ const completeOnboarding = async () => {
 
 <style scoped>
 :deep(.v-field) {
-  background-color: #15181e !important;
+  background-color: rgb(var(--v-theme-cardBg)) !important;
   border-radius: 12px !important;
 }
 

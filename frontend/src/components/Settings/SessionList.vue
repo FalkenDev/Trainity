@@ -22,7 +22,7 @@
           v-for="session in sessions"
           :key="`${session.type}-${session.data.id}`"
           class="bg-cardBg rounded-lg mx-5 py-3 px-4 cursor-pointer"
-          style="border: 1px solid #474747"
+          style="border: 1px solid rgb(var(--v-theme-borderColor))"
           @click="openDetail(session)"
         >
           <div class="d-flex align-center ga-4">

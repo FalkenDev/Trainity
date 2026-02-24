@@ -16,6 +16,7 @@
     "@fontsource/roboto": "5.2.5",
     "@mdi/font": "7.4.47",
     "chart.js": "^4.5.1",
+    "countup.js": "^2.9.0",
     "pinia-plugin-persistedstate": "^4.3.0",
     "prettier": "^3.5.3",
     "prettier-eslint": "^16.4.2",
@@ -29,7 +30,7 @@
     "vuetify-sonner": "^0.3.21"
   },
   "devDependencies": {
-    "@microsoft/eslint-formatter-sarif": "^3.1.0",
+    "@microsoft/eslint-formatter-sarif": "^2.1.5",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.9.0",
     "@typescript-eslint/eslint-plugin": "^8.34.0",
@@ -41,7 +42,7 @@
     "eslint-config-vuetify": "^3.0.3",
     "eslint-plugin-vue": "^10.2.0",
     "eslint-plugin-vuetify": "^2.5.2",
-    "npm-run-all2": "^7.0.2",
+    "npm-run-all2": "^8.0.4",
     "pinia": "^3.0.1",
     "sass-embedded": "^1.86.3",
     "typescript": "~5.8.2",
@@ -53,6 +54,6 @@
     "vite-plugin-vue-layouts-next": "^0.0.8",
     "vite-plugin-vuetify": "^2.1.1",
     "vue-router": "^4.5.0",
-    "vue-tsc": "^2.2.8"
+    "vue-tsc": "^3.2.5"
   }
 }

@@ -150,7 +150,7 @@
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="isDeleteDialogOpen" max-width="360">
-      <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+      <v-card class="bg-cardBg rounded-lg" style="border: 1px solid rgb(var(--v-theme-borderColor))">
         <v-card-title class="text-h6 pt-5 px-5">{{ $t('exerciseForm.deleteTitle') }}</v-card-title>
         <v-card-text class="text-textSecondary px-5">{{
           $t('exerciseForm.deleteConfirm')
@@ -346,7 +346,7 @@ const confirmDelete = async () => {
 }
 
 :deep(.v-field) {
-  background-color: #15181e !important;
+  background-color: rgb(var(--v-theme-cardBg)) !important;
   border-radius: 12px !important;
 }
 

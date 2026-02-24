@@ -3,7 +3,7 @@
     <v-card
       class="d-flex flex-column align-center justify-center py-5 my-5 rounded-lg"
       color="cardBg"
-      style="border: 1px solid #474747"
+      :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
     >
       <div class="avatar-wrapper">
         <v-avatar class="mb-4" size="100" color="primary" @click="openAccountDialog">
@@ -57,7 +57,7 @@
           :key="item.titleKey"
           class="mb-4 d-flex flex-row justify-space-between align-center pa-4 rounded-lg"
           color="cardBg"
-          style="border: 1px solid #474747"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
           :disabled="item.disabled"
           @click="setDialogToOpen(item.type)"
         >
@@ -77,7 +77,7 @@
           :key="item.titleKey"
           class="mb-4 d-flex flex-row justify-space-between align-center pa-4 rounded-lg"
           color="cardBg"
-          style="border: 1px solid #474747"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
           :disabled="item.disabled"
           @click="setDialogToOpen(item.type)"
         >
@@ -92,7 +92,10 @@
       </div>
       <div>
         <h1 class="text-h6 mb-3">Preferences</h1>
-        <v-list class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+        <v-list
+          class="bg-cardBg rounded-lg"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
+        >
           <v-list-item
             v-for="item in preferencesList"
             :key="item.titleKey"
@@ -106,8 +109,11 @@
               <v-icon v-if="item.showArrow"> mdi-chevron-right </v-icon>
               <v-switch
                 v-if="item.type === 'darkMode'"
+                v-model="isDarkMode"
                 color="primary"
                 class="d-flex align-center pr-2"
+                @update:model-value="toggleDarkMode"
+                @click.stop
               />
             </v-list-item-title>
           </v-list-item>
@@ -168,10 +174,21 @@ import { onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
+import { useTheme } from 'vuetify'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
 const { t, locale } = useI18n({ useScope: 'global' })
+const theme = useTheme()
+
+const isDarkMode = ref(appStore.darkMode)
+
+const toggleDarkMode = (value: boolean | null) => {
+  const isDark = value ?? true
+  isDarkMode.value = isDark
+  appStore.setDarkMode(isDark)
+  theme.global.name.value = isDark ? 'dark' : 'light'
+}
 
 const isExerciseListOpen = ref(false)
 const isActivityListOpen = ref(false)

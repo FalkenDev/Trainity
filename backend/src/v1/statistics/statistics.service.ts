@@ -6,6 +6,7 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class StatisticsService {
@@ -20,6 +21,8 @@ export class StatisticsService {
     private readonly setRepo: Repository<WorkoutSessionSet>,
     @InjectRepository(Exercise)
     private readonly exerciseRepo: Repository<Exercise>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
   // ─── Exercise History ────────────────────────────────────
@@ -270,6 +273,7 @@ export class StatisticsService {
 
     const exerciseCount = new Map<number, { name: string; count: number }>();
     const muscleGroupCount = new Map<number, { name: string; count: number }>();
+    const muscleGroupVolume = new Map<number, { name: string; volume: number }>();
 
     for (const s of allSessions) {
       totalVolume += s.totalWeight ?? 0;
@@ -292,6 +296,11 @@ export class StatisticsService {
           curr.count++;
           exerciseCount.set(ex.exercise.id, curr);
 
+          // Compute volume for this exercise across sets (approximate per muscle group)
+          const exVolume = s.totalWeight ?? 0;
+          const mgCount = (ex.exercise.muscleGroups ?? []).length || 1;
+          const volPerMg = exVolume / mgCount;
+
           for (const mg of ex.exercise.muscleGroups ?? []) {
             const currMg = muscleGroupCount.get(mg.id) ?? {
               name: mg.name,
@@ -299,10 +308,22 @@ export class StatisticsService {
             };
             currMg.count++;
             muscleGroupCount.set(mg.id, currMg);
+
+            const currMgVol = muscleGroupVolume.get(mg.id) ?? {
+              name: mg.name,
+              volume: 0,
+            };
+            currMgVol.volume += volPerMg;
+            muscleGroupVolume.set(mg.id, currMgVol);
           }
         }
       }
     }
+
+    // Use the persisted user streak (same as home page) instead of computing our own
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    const currentStreak = user?.currentStreak ?? 0;
+    const { longestStreak } = this.computeStreaks(allSessions);
 
     const recentPRs = await this.recordRepo.find({
       where: { user: { id: userId } },
@@ -321,12 +342,18 @@ export class StatisticsService {
         totalWorkouts > 0
           ? Math.round(totalDuration / totalWorkouts / 60000)
           : 0,
+      currentStreak,
+      longestStreak,
       mostTrainedExercises: [...exerciseCount.values()]
         .sort((a, b) => b.count - a.count)
         .slice(0, 5),
       mostTrainedMuscleGroups: [...muscleGroupCount.values()]
         .sort((a, b) => b.count - a.count)
         .slice(0, 5),
+      muscleGroupVolume: [...muscleGroupVolume.values()]
+        .sort((a, b) => b.volume - a.volume)
+        .slice(0, 8)
+        .map((mg) => ({ name: mg.name, volume: Math.round(mg.volume) })),
       recentPRs: recentPRs.map((r) => ({
         exerciseId: r.exercise?.id,
         exerciseName: r.exercise?.name,
@@ -552,6 +579,216 @@ export class StatisticsService {
   }
 
   // ─── Helper Functions ────────────────────────────────────
+
+  private computeStreaks(sessions: WorkoutSession[]): {
+    currentStreak: number;
+    longestStreak: number;
+  } {
+    if (sessions.length === 0) return { currentStreak: 0, longestStreak: 0 };
+
+    // Get unique workout dates (YYYY-MM-DD) sorted descending
+    const dateSet = new Set<string>();
+    for (const s of sessions) {
+      const d = s.endedAt ?? s.startedAt;
+      if (d) {
+        const dateStr = new Date(d).toISOString().split('T')[0];
+        dateSet.add(dateStr);
+      }
+    }
+    const uniqueDates = [...dateSet].sort().reverse(); // most recent first
+
+    if (uniqueDates.length === 0) return { currentStreak: 0, longestStreak: 0 };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const todayStr = today.toISOString().split('T')[0];
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    // Current streak: count consecutive days from today or yesterday backwards
+    let currentStreak = 0;
+    if (uniqueDates[0] === todayStr || uniqueDates[0] === yesterdayStr) {
+      let checkDate = new Date(uniqueDates[0]);
+      for (const dateStr of uniqueDates) {
+        const d = new Date(dateStr);
+        d.setHours(0, 0, 0, 0);
+        checkDate.setHours(0, 0, 0, 0);
+        if (d.getTime() === checkDate.getTime()) {
+          currentStreak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else if (d.getTime() < checkDate.getTime()) {
+          break;
+        }
+      }
+    }
+
+    // Longest streak
+    let longestStreak = 1;
+    let streak = 1;
+    const sorted = [...uniqueDates].sort(); // ascending
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = new Date(sorted[i - 1]);
+      const curr = new Date(sorted[i]);
+      const diffDays = Math.round(
+        (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      if (diffDays === 1) {
+        streak++;
+        longestStreak = Math.max(longestStreak, streak);
+      } else {
+        streak = 1;
+      }
+    }
+
+    return { currentStreak, longestStreak };
+  }
+
+  // ─── Weekly Trends ───────────────────────────────────────
+  async getWeeklyTrends(userId: number, weeks: number = 12) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - weeks * 7);
+    startDate.setHours(0, 0, 0, 0);
+
+    const sessions = await this.sessionRepo.find({
+      where: {
+        user: { id: userId },
+        status: 'finished' as const,
+      },
+      select: ['id', 'startedAt', 'endedAt', 'totalWeight'],
+    });
+
+    // Build week buckets
+    const weekBuckets = new Map<
+      string,
+      { weekStart: string; totalVolume: number; workoutCount: number; totalDuration: number }
+    >();
+
+    // Initialize all weeks
+    for (let i = 0; i < weeks; i++) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + i * 7);
+      const mondayOfWeek = this.getStartOfWeek(d);
+      const key = mondayOfWeek.toISOString().split('T')[0];
+      weekBuckets.set(key, {
+        weekStart: key,
+        totalVolume: 0,
+        workoutCount: 0,
+        totalDuration: 0,
+      });
+    }
+
+    for (const s of sessions) {
+      const endDate = s.endedAt ?? s.startedAt;
+      if (!endDate || new Date(endDate) < startDate) continue;
+
+      const monday = this.getStartOfWeek(new Date(endDate));
+      const key = monday.toISOString().split('T')[0];
+      const bucket = weekBuckets.get(key);
+      if (bucket) {
+        bucket.workoutCount++;
+        bucket.totalVolume += s.totalWeight ?? 0;
+        const dur =
+          s.endedAt && s.startedAt
+            ? new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()
+            : 0;
+        bucket.totalDuration += Math.round(dur / 60000);
+      }
+    }
+
+    return [...weekBuckets.values()].sort(
+      (a, b) => a.weekStart.localeCompare(b.weekStart),
+    );
+  }
+
+  // ─── Comparison (This vs Last Week/Month) ────────────────
+  async getComparison(userId: number) {
+    const now = new Date();
+    const currentWeekStart = this.getStartOfWeek(now);
+    const lastWeekStart = new Date(currentWeekStart);
+    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(currentMonthStart);
+    lastMonthEnd.setMilliseconds(-1);
+
+    const sessions = await this.sessionRepo.find({
+      where: {
+        user: { id: userId },
+        status: 'finished' as const,
+      },
+      select: ['id', 'startedAt', 'endedAt', 'totalWeight'],
+    });
+
+    const aggregate = (filtered: typeof sessions) => {
+      let workouts = 0;
+      let volume = 0;
+      let duration = 0;
+      for (const s of filtered) {
+        workouts++;
+        volume += s.totalWeight ?? 0;
+        const dur =
+          s.endedAt && s.startedAt
+            ? new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()
+            : 0;
+        duration += Math.round(dur / 60000);
+      }
+      return { workouts, volume, duration };
+    };
+
+    const inRange = (s: WorkoutSession, start: Date, end: Date) => {
+      const d = s.endedAt ?? s.startedAt;
+      return d && new Date(d) >= start && new Date(d) < end;
+    };
+
+    return {
+      weekly: {
+        current: aggregate(
+          sessions.filter((s) => inRange(s, currentWeekStart, now)),
+        ),
+        previous: aggregate(
+          sessions.filter((s) => inRange(s, lastWeekStart, currentWeekStart)),
+        ),
+      },
+      monthly: {
+        current: aggregate(
+          sessions.filter((s) => inRange(s, currentMonthStart, now)),
+        ),
+        previous: aggregate(
+          sessions.filter((s) => inRange(s, lastMonthStart, lastMonthEnd)),
+        ),
+      },
+    };
+  }
+
+  // ─── Activity Heatmap ────────────────────────────────────
+  async getActivityHeatmap(userId: number, weeks: number = 12) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - weeks * 7);
+    startDate.setHours(0, 0, 0, 0);
+
+    const sessions = await this.sessionRepo.find({
+      where: {
+        user: { id: userId },
+        status: 'finished' as const,
+      },
+      select: ['id', 'endedAt', 'startedAt'],
+    });
+
+    const dayCounts = new Map<string, number>();    
+    for (const s of sessions) {
+      const d = s.endedAt ?? s.startedAt;
+      if (!d || new Date(d) < startDate) continue;
+      const dateStr = new Date(d).toISOString().split('T')[0];
+      dayCounts.set(dateStr, (dayCounts.get(dateStr) ?? 0) + 1);
+    }
+
+    return [...dayCounts.entries()]
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
 
   private epley(weight: number, reps: number): number {
     if (reps <= 0 || weight <= 0) return 0;

@@ -28,7 +28,7 @@
       <div class="d-flex w-100 ga-3">
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg flex-1-1-0"
-          style="border: 1px solid #474747; box-shadow: none"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         >
           <v-icon color="primary" size="28">mdi-timer-outline</v-icon>
           <div class="text-h6 font-weight-bold text-textPrimary mt-2">{{ formattedDuration }}</div>
@@ -37,7 +37,7 @@
 
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg flex-1-1-0"
-          style="border: 1px solid #474747; box-shadow: none"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         >
           <v-icon color="primary" size="28">mdi-weight-kilogram</v-icon>
           <div class="text-h6 font-weight-bold text-textPrimary mt-2">
@@ -51,7 +51,7 @@
       <div class="d-flex w-100 ga-3">
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg flex-1-1-0"
-          style="border: 1px solid #474747; box-shadow: none"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         >
           <v-icon color="primary" size="28">mdi-dumbbell</v-icon>
           <div class="text-h6 font-weight-bold text-textPrimary mt-2">{{ exerciseCount }}</div>
@@ -60,7 +60,7 @@
 
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg flex-1-1-0"
-          style="border: 1px solid #474747; box-shadow: none"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         >
           <v-icon color="primary" size="28">mdi-check-circle-outline</v-icon>
           <div class="text-h6 font-weight-bold text-textPrimary mt-2">{{ totalSets }}</div>

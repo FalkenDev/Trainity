@@ -99,8 +99,11 @@ export interface OverviewStatistics {
   workoutsThisWeek: number
   workoutsThisMonth: number
   averageSessionDuration: number
+  currentStreak: number
+  longestStreak: number
   mostTrainedExercises: { name: string; count: number }[]
   mostTrainedMuscleGroups: { name: string; count: number }[]
+  muscleGroupVolume: { name: string; volume: number }[]
   recentPRs: PersonalRecord[]
 }
 
@@ -122,3 +125,32 @@ export interface NewRecordNotification {
 
 export type ProgressMetric = 'estimated_1rm' | 'max_weight' | 'total_volume' | 'max_reps'
 export type ProgressPeriod = '1m' | '3m' | '6m' | '1y' | 'all'
+
+export interface WeeklyTrend {
+  weekStart: string
+  totalVolume: number
+  workoutCount: number
+  totalDuration: number
+}
+
+export interface ComparisonPeriod {
+  workouts: number
+  volume: number
+  duration: number
+}
+
+export interface ComparisonStats {
+  weekly: {
+    current: ComparisonPeriod
+    previous: ComparisonPeriod
+  }
+  monthly: {
+    current: ComparisonPeriod
+    previous: ComparisonPeriod
+  }
+}
+
+export interface HeatmapDay {
+  date: string
+  count: number
+}

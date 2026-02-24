@@ -55,7 +55,7 @@
           <v-list
             v-if="itemList.length > 0"
             class="bg-cardBg rounded-lg"
-            style="border: 1px solid #474747"
+            style="border: 1px solid rgb(var(--v-theme-borderColor))"
           >
             <v-list-item
               v-for="item in itemList"
@@ -78,7 +78,7 @@
           <v-card
             v-else
             class="bg-cardBg rounded-lg pa-4 d-flex align-center justify-center"
-            style="border: 1px solid #474747"
+            style="border: 1px solid rgb(var(--v-theme-borderColor))"
           >
             <p class="text-body-2 text-textSecondary">
               {{

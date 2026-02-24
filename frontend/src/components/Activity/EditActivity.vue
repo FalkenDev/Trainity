@@ -54,7 +54,7 @@
           :variant="form.icon === opt.value ? 'flat' : 'outlined'"
           size="small"
           class="rounded-lg text-caption"
-          style="border-color: #474747"
+          style="border-color: rgb(var(--v-theme-borderColor))"
           @click="form.icon = opt.value"
         >
           <v-icon size="16" class="mr-1">mdi-{{ getIconName(opt.value) }}</v-icon>
@@ -263,7 +263,7 @@ async function deleteActivity() {
 }
 
 :deep(.v-field) {
-  background-color: #15181e !important;
+  background-color: rgb(var(--v-theme-cardBg)) !important;
   border-radius: 12px !important;
 }
 

@@ -111,7 +111,11 @@ export class UserService {
 
     // Destructure to exclude sensitive fields before saving
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { currentPassword, newPassword, email, ...safeDto } = dto;
+    const { currentPassword, newPassword, email, dateOfBirth, ...safeDto } =
+      dto;
+    if (dateOfBirth !== undefined) {
+      user.dateOfBirth = new Date(dateOfBirth);
+    }
     Object.assign(user, safeDto);
     const updated = await this.userRepo.save(user);
 

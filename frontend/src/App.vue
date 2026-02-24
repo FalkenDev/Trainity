@@ -3,15 +3,15 @@
     <VSonner position="top-center" />
     <v-main
       :style="{
-        paddingBottom: authStore.isAuthenticated && isActiveSession && checkPath() ? '101px' : '',
+        paddingBottom: showResumeBar ? '101px' : '',
       }"
     >
       <router-view :key="$route.name" />
     </v-main>
     <v-card
-      v-if="authStore.isAuthenticated && isActiveSession && checkPath()"
+      v-if="showResumeBar"
       class="resume-card d-flex align-center justify-space-between px-5 border-t-sm border-b-sm"
-      style="border-color: #abff1a !important"
+      :style="{ borderColor: theme.current.value.colors.primary + ' !important' }"
       height="45"
       color="cardBg"
       width="100%"
@@ -19,9 +19,12 @@
       rounded="0"
       @click="routeToSelectedWorkoutSession"
     >
-      <h1 class="text-body-1 text-primary">
-        {{ $t('navigation.resumeWorkout') }}
-      </h1>
+      <div class="d-flex align-center ga-2">
+        <v-icon color="primary" size="small">mdi-dumbbell</v-icon>
+        <h1 class="text-body-1 text-primary font-weight-bold">
+          {{ $t('navigation.resumeWorkout') }}
+        </h1>
+      </div>
       <v-icon color="primary"> mdi-chevron-right </v-icon>
     </v-card>
     <BottomNavigation v-if="authStore.isAuthenticated && !$route.meta.hideBottomNav" />
@@ -34,13 +37,31 @@ import { VSonner } from 'vuetify-sonner'
 import { useWorkoutSessionStore } from './stores/workoutSession.store'
 import 'vuetify-sonner/style.css'
 import router from './router'
+import { useRoute } from 'vue-router'
+import { useAppStore } from './stores/app'
+import { useTheme } from 'vuetify'
 
 const workoutSessionStore = useWorkoutSessionStore()
 const authStore = useAuthStore()
+const appStore = useAppStore()
+const theme = useTheme()
+const route = useRoute()
+
+// Initialize theme from persisted preference
+theme.global.name.value = appStore.darkMode ? 'dark' : 'light'
 
 const isActiveSession = computed(() => {
   const session = workoutSessionStore.selectedWorkoutSession as { status?: string } | null
   return session != null && session.status === 'in_progress'
+})
+
+const isOnSessionPage = computed(() => {
+  const path = route.path
+  return path.startsWith('/session') || path.startsWith('/session-history')
+})
+
+const showResumeBar = computed(() => {
+  return authStore.isAuthenticated && isActiveSession.value && !isOnSessionPage.value
 })
 
 const routeToSelectedWorkoutSession = () => {
@@ -50,11 +71,6 @@ const routeToSelectedWorkoutSession = () => {
   ) {
     router.push('/session/' + workoutSessionStore.selectedWorkoutSession.id)
   }
-}
-
-const checkPath = () => {
-  const path = router.currentRoute.value.path
-  return !path.startsWith('/session') && !path.startsWith('/session-history')
 }
 </script>
 <style scoped>
@@ -77,7 +93,7 @@ const checkPath = () => {
 }
 
 :deep(.v-field) {
-  background-color: #15181e !important;
+  background-color: rgb(var(--v-theme-cardBg)) !important;
   border-radius: 12px !important;
 }
 

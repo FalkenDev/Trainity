@@ -111,7 +111,7 @@
         <!-- Info row -->
         <div
           class="pa-2 bg-cardBg rounded-b-lg"
-          style="border: 1px solid #474747; border-top: none"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', borderTop: 'none' }"
         >
           <p class="text-caption text-textPrimary">{{ formatDate(photo.date) }}</p>
           <p v-if="weightOnDay(photo.date)" class="text-caption text-textSecondary">
@@ -162,7 +162,7 @@
 
   <!-- Upload bottom sheet -->
   <v-bottom-sheet v-model="uploadSheetOpen" max-width="600">
-    <v-card class="bg-cardBg rounded-t-xl pa-5" style="border-top: 1px solid #474747">
+    <v-card class="bg-cardBg rounded-t-xl pa-5" :style="{ borderTop: '1px solid rgb(var(--v-theme-borderColor))' }">
       <h3 class="text-subtitle-1 text-textPrimary mb-4">{{ $t('progressPhotos.uploadPhoto') }}</h3>
 
       <div class="mb-4">
@@ -175,7 +175,7 @@
         />
         <v-card
           class="d-flex flex-column align-center justify-center pa-6 rounded-lg"
-          style="border: 2px dashed #474747; cursor: pointer; background: transparent"
+          :style="{ border: '2px dashed rgb(var(--v-theme-borderColor))', cursor: 'pointer', background: 'transparent' }"
           @click="fileInputRef?.click()"
         >
           <v-img
@@ -315,7 +315,7 @@
 
   <!-- Delete confirmation -->
   <v-dialog v-model="deleteDialogOpen" max-width="360">
-    <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+    <v-card class="bg-cardBg rounded-lg" :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }">
       <v-card-title class="text-h6 pa-4">{{ $t('progressPhotos.deletePhoto') }}</v-card-title>
       <v-card-text class="px-4">
         <p class="text-body-2 text-textSecondary">{{ $t('progressPhotos.deleteConfirm') }}</p>

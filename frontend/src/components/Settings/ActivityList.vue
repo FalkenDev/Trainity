@@ -31,7 +31,7 @@
       <v-list-item
         v-for="activity in filteredActivities"
         :key="activity.id"
-        class="border-t-sm border-b-sm py-2 bg-cardBg rounded-lg mx-5"
+        class="border-sm py-2 bg-cardBg rounded-lg mx-5"
         two-line
         @click.stop="openDetailsDialog(activity)"
       >
@@ -58,7 +58,7 @@
           outlined
           block
           color="cardBg"
-          style="border: 1px solid #474747; box-shadow: none; border-style: dashed"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; border-style: dashed"
           class="text-primary rounded-lg"
           height="50"
           @click="openCreateDialog"
@@ -84,7 +84,7 @@
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="isDeleteDialogOpen" max-width="400">
-      <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+      <v-card class="bg-cardBg rounded-lg" style="border: 1px solid rgb(var(--v-theme-borderColor))">
         <v-card-title>{{ $t('activity.deleteActivity') }}</v-card-title>
         <v-card-text>Are you sure you want to delete "{{ activityToDelete?.name }}"?</v-card-text>
         <v-card-actions>

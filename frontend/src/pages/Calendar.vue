@@ -9,7 +9,7 @@
     <!-- Dynamic Stats Card -->
     <v-card
       class="bg-cardBg pa-5 d-flex justify-space-between rounded-lg"
-      style="border: 1px solid #474747"
+      :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
     >
       <div class="d-flex align-center ga-4">
         <v-avatar color="avatarBg" size="48">
@@ -34,8 +34,8 @@
     <!-- Calendar Grid -->
     <v-card
       elevation="0"
-      class="calendar-card bg-cardBg pt-5 px-2 rounded-lg"
-      style="border: 1px solid #474747"
+      class="calendar-card bg-cardBg pt-5 px-1 rounded-lg"
+      :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
     >
       <div class="d-flex align-center justify-space-between">
         <v-btn icon variant="text" size="large" @click="previousMonth">
@@ -120,7 +120,7 @@
           v-for="session in scheduledForSelectedDate"
           :key="'sched-' + session.id + session.resolvedDate"
           class="bg-cardBg rounded-lg pa-4"
-          style="border: 1px solid #474747"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
           @click="openBottomSheet(session)"
         >
           <div class="d-flex align-center justify-space-between">
@@ -170,7 +170,7 @@
           v-for="event in completedForSelectedDate"
           :key="event.id"
           class="bg-cardBg rounded-lg pa-4"
-          style="border: 1px solid #474747"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
         >
           <div class="d-flex align-center ga-3">
             <v-avatar
@@ -212,7 +212,7 @@
       <v-card
         v-if="completedForSelectedDate.length === 0 && scheduledForSelectedDate.length === 0"
         class="bg-cardBg rounded-lg pa-8 d-flex flex-column align-center ga-3"
-        style="border: 1px solid #474747"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
       >
         <v-icon size="48" class="text-textSecondary">mdi-calendar-blank</v-icon>
         <p class="text-body-1 font-weight-bold text-textSecondary">
@@ -655,7 +655,20 @@ async function onScheduleStarted() {
 .modern-calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 2px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Force grid children to shrink below content size */
+.modern-calendar > * {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.calendar-card {
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .calendar-cell {
@@ -664,6 +677,7 @@ async function onScheduleStarted() {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  box-sizing: border-box;
 }
 
 .calendar-cell:hover {
@@ -704,13 +718,14 @@ async function onScheduleStarted() {
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 8px 4px;
+  padding: 4px 2px;
 }
 
 .day-number {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  line-height: 1.2;
 }
 
 .activity-indicators {
@@ -754,7 +769,28 @@ async function onScheduleStarted() {
 
 @media (max-width: 600px) {
   .day-number {
-    font-size: 14px;
+    font-size: 13px;
+  }
+
+  .modern-calendar {
+    gap: 1px;
+  }
+
+  .calendar-cell {
+    border-radius: 8px;
+  }
+
+  .cell-content {
+    padding: 2px 1px;
+  }
+
+  .activity-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .activity-indicators {
+    gap: 2px;
   }
 }
 </style>

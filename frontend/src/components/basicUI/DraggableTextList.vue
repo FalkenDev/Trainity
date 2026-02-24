@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2 py-4 bg-cardBg rounded-lg" style="border: 1px solid #474747; box-shadow: none">
+  <div class="px-2 py-4 bg-cardBg rounded-lg" style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none">
     <div
       v-for="(item, index) in localItems"
       :key="index"

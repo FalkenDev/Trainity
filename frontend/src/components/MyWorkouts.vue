@@ -14,7 +14,7 @@
         :key="n"
         type="list-item-two-line, list-item"
         class="mb-3 bg-cardBg rounded-lg"
-        style="border: 1px solid #474747"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
       />
     </div>
 
@@ -23,7 +23,7 @@
         v-for="workout in workouts.slice(0, 3)"
         :key="workout.id"
         class="bg-cardBg pa-4 rounded-lg d-flex justify-space-between align-center"
-        style="border: 1px solid #474747; box-shadow: none"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         @click="routeTo(workout.id)"
       >
         <div>
@@ -50,7 +50,7 @@
     <v-card
       v-else
       class="bg-cardBg pa-6 rounded-lg"
-      style="border: 1px solid #474747; box-shadow: none"
+      :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
     >
       <div class="d-flex flex-column align-center text-center">
         <v-icon color="primary" size="48">mdi-dumbbell</v-icon>
@@ -68,7 +68,11 @@
         outlined
         block
         color="cardBg"
-        style="border: 1px solid #474747; box-shadow: none; border-style: dashed"
+        style="
+          border: 1px solid rgb(var(--v-theme-borderColor));
+          box-shadow: none;
+          border-style: dashed;
+        "
         class="text-primary rounded-lg"
         height="50"
         @click="isCreateWorkoutOpen = true"

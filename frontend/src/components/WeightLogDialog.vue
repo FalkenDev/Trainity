@@ -103,7 +103,7 @@
                 <div class="d-flex ga-3 mb-5">
                   <v-card
                     class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-                    style="border: 1px solid #474747; box-shadow: none; flex: 1"
+                    style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1"
                   >
                     <p class="text-caption text-textSecondary text-uppercase mb-1">
                       {{ $t('weightLog.current') }}
@@ -115,7 +115,7 @@
                   </v-card>
                   <v-card
                     class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-                    style="border: 1px solid #474747; box-shadow: none; flex: 1"
+                    style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1"
                   >
                     <p class="text-caption text-textSecondary text-uppercase mb-1">
                       {{ $t('weightLog.sinceStart') }}
@@ -127,7 +127,7 @@
                   </v-card>
                   <v-card
                     class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-                    style="border: 1px solid #474747; box-shadow: none; flex: 1"
+                    style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1"
                   >
                     <p class="text-caption text-textSecondary text-uppercase mb-1">
                       {{ $t('weightLog.sinceLast') }}
@@ -143,7 +143,7 @@
                 <v-card
                   v-if="stats?.targetWeight"
                   class="bg-cardBg pa-3 mb-5 rounded-lg d-flex align-center ga-3"
-                  style="border: 1px solid #474747; box-shadow: none"
+                  style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
                 >
                   <v-icon color="primary" size="20">mdi-flag-checkered</v-icon>
                   <div class="flex-grow-1">
@@ -166,7 +166,7 @@
                 <v-card
                   v-if="goalProgress"
                   class="bg-cardBg pa-3 mb-5 rounded-lg"
-                  style="border: 1px solid #474747; box-shadow: none"
+                  style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
                 >
                   <div class="d-flex align-center justify-space-between mb-3">
                     <div class="d-flex align-center ga-2">
@@ -201,7 +201,7 @@
                 <!-- Chart -->
                 <v-card
                   class="bg-cardBg pa-4 mb-5 rounded-lg"
-                  style="border: 1px solid #474747; box-shadow: none"
+                  style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
                 >
                   <h3 class="text-subtitle-1 text-textPrimary mb-3">
                     {{ $t('weightLog.progress') }}
@@ -262,7 +262,7 @@
                 <v-card
                   v-if="sortedLogs.length === 0"
                   class="bg-cardBg pa-6 rounded-lg d-flex flex-column align-center"
-                  style="border: 1px solid #474747; box-shadow: none"
+                  style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
                 >
                   <v-icon size="48" color="textSecondary" class="mb-2">mdi-scale-bathroom</v-icon>
                   <p class="text-body-2 text-textSecondary">{{ $t('weightLog.noEntries') }}</p>
@@ -286,7 +286,7 @@
                     v-for="(entry, index) in sortedLogs"
                     :key="entry.id"
                     class="bg-cardBg px-3 py-2 rounded-lg d-flex align-center"
-                    style="border: 1px solid #474747; box-shadow: none"
+                    style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
                   >
                     <div style="flex: 2">
                       <p class="text-body-2 text-textPrimary">{{ formatDate(entry.date) }}</p>
@@ -340,7 +340,7 @@
 
   <!-- Add / Edit weight entry dialog -->
   <v-dialog v-model="entryDialogOpen" max-width="400" persistent>
-    <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+    <v-card class="bg-cardBg rounded-lg" style="border: 1px solid rgb(var(--v-theme-borderColor))">
       <v-card-title class="text-h6 pa-4">
         {{ editingEntry ? $t('weightLog.editEntry') : $t('weightLog.addEntry') }}
       </v-card-title>
@@ -387,7 +387,7 @@
 
   <!-- Delete confirmation dialog -->
   <v-dialog v-model="deleteDialogOpen" max-width="360">
-    <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+    <v-card class="bg-cardBg rounded-lg" style="border: 1px solid rgb(var(--v-theme-borderColor))">
       <v-card-title class="text-h6 pa-4">{{ $t('weightLog.deleteEntry') }}</v-card-title>
       <v-card-text class="px-4">
         <p class="text-body-2 text-textSecondary">{{ $t('weightLog.deleteConfirm') }}</p>
@@ -698,7 +698,7 @@ const chartOptions = computed(
         backgroundColor: '#1e1e1e',
         titleColor: '#fff',
         bodyColor: '#ccc',
-        borderColor: '#474747',
+        borderColor: 'rgb(var(--v-theme-borderColor))',
         borderWidth: 1,
       },
     },

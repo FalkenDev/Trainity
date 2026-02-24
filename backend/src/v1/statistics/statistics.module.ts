@@ -7,6 +7,7 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
+import { User } from '../user/user.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Exercise } from '../exercise/exercise.entity';
       WorkoutSessionExercise,
       WorkoutSessionSet,
       Exercise,
+      User,
     ]),
   ],
   controllers: [StatisticsController],

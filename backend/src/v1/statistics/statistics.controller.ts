@@ -115,4 +115,34 @@ export class StatisticsController {
       workoutId,
     );
   }
+
+  @Get('weekly-trends')
+  @ApiOperation({ summary: 'Get weekly volume/workout trends for the last N weeks' })
+  getWeeklyTrends(
+    @Req() req: RequestWithUser,
+    @Query('weeks') weeks?: string,
+  ) {
+    return this.statisticsService.getWeeklyTrends(
+      this.getUserId(req),
+      parseInt(weeks ?? '12', 10),
+    );
+  }
+
+  @Get('comparison')
+  @ApiOperation({ summary: 'Get this week vs last week and this month vs last month comparison' })
+  getComparison(@Req() req: RequestWithUser) {
+    return this.statisticsService.getComparison(this.getUserId(req));
+  }
+
+  @Get('activity-heatmap')
+  @ApiOperation({ summary: 'Get daily activity counts for heatmap visualization' })
+  getActivityHeatmap(
+    @Req() req: RequestWithUser,
+    @Query('weeks') weeks?: string,
+  ) {
+    return this.statisticsService.getActivityHeatmap(
+      this.getUserId(req),
+      parseInt(weeks ?? '12', 10),
+    );
+  }
 }

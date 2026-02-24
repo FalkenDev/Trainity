@@ -4,11 +4,12 @@
     <v-card
       v-if="streakInfo && streakInfo.currentStreak > 0"
       class="bg-cardBg pa-4 d-flex flex-column ga-2 rounded-lg"
-      style="
-        border: 1px solid #474747;
-        box-shadow: none;
-        background: linear-gradient(135deg, #355300 0%, #15181e 100%);
-      "
+      :style="{
+        border: '1px solid rgb(var(--v-theme-borderColor))',
+        boxShadow: 'none',
+        background:
+          'linear-gradient(135deg, rgb(var(--v-theme-iconBackground)) 0%, rgb(var(--v-theme-cardBg)) 100%)',
+      }"
     >
       <div class="d-flex align-center justify-between">
         <div class="d-flex align-center">
@@ -28,7 +29,7 @@
       <v-btn
         v-if="authStore.user?.showWeightTracking"
         class="flex-grow-1 bg-cardBg rounded-lg"
-        style="border: 1px solid #474747; box-shadow: none"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         prepend-icon="mdi-weight"
         size="small"
         @click="isWeightLogDialogOpen = true"
@@ -40,7 +41,7 @@
       </v-btn>
       <v-btn
         class="flex-grow-1 bg-cardBg rounded-lg"
-        style="border: 1px solid #474747; box-shadow: none"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         size="small"
         @click="$router.push('/statistics')"
       >
@@ -51,7 +52,7 @@
       </v-btn>
       <v-btn
         class="flex-grow-1 bg-cardBg rounded-lg"
-        style="border: 1px solid #474747; box-shadow: none"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         size="small"
         @click="$router.push('/statistics')"
       >
@@ -72,7 +73,7 @@
         v-for="session in todaySchedule"
         :key="session.id + session.resolvedDate"
         class="bg-cardBg rounded-lg pa-3"
-        style="border: 1px solid #474747; box-shadow: none"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
         @click="handleScheduledClick(session)"
       >
         <div class="d-flex align-center justify-space-between">
@@ -102,7 +103,11 @@
     <div class="d-flex ga-3">
       <v-card
         class="flex-grow-1 bg-cardBg justify-center align-center py-2 d-flex flex-column align-center rounded-lg"
-        style="border: 1px solid #474747; box-shadow: none; flex: 1"
+        :style="{
+          border: '1px solid rgb(var(--v-theme-borderColor))',
+          boxShadow: 'none',
+          flex: '1',
+        }"
       >
         <v-icon size="24" color="primary">mdi-fire</v-icon>
         <h2 class="text-h5 text-textPrimary mt-1">{{ streakInfo?.currentStreak || 0 }}</h2>
@@ -110,7 +115,11 @@
       </v-card>
       <v-card
         class="flex-grow-1 bg-cardBg justify-center align-center py-2 d-flex flex-column align-center rounded-lg"
-        style="border: 1px solid #474747; box-shadow: none; flex: 1"
+        :style="{
+          border: '1px solid rgb(var(--v-theme-borderColor))',
+          boxShadow: 'none',
+          flex: '1',
+        }"
       >
         <v-icon size="24" color="primary">mdi-bullseye</v-icon>
         <h2 class="text-h5 text-textPrimary mt-1">
@@ -120,7 +129,11 @@
       </v-card>
       <v-card
         class="flex-grow-1 bg-cardBg justify-center align-center py-2 d-flex flex-column align-center rounded-lg"
-        style="border: 1px solid #474747; box-shadow: none; flex: 1"
+        :style="{
+          border: '1px solid rgb(var(--v-theme-borderColor))',
+          boxShadow: 'none',
+          flex: '1',
+        }"
       >
         <v-icon size="24" color="primary">mdi-timer</v-icon>
         <h2 class="text-h5 text-textPrimary mt-1">{{ totalMinutesThisWeek }}</h2>
