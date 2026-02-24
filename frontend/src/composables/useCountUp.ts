@@ -37,7 +37,7 @@ export function useCountUp(
 
     // Use IntersectionObserver for scroll-triggered animation
     const observer = new IntersectionObserver(
-      (entries) => {
+      entries => {
         for (const entry of entries) {
           if (entry.isIntersecting && !hasAnimated.value) {
             hasAnimated.value = true
@@ -64,7 +64,7 @@ export function useCountUp(
     }
   })
 
-  watch(endValue, (val) => {
+  watch(endValue, val => {
     if (val > 0 && !hasAnimated.value) {
       initCountUp()
     } else if (val > 0 && hasAnimated.value) {

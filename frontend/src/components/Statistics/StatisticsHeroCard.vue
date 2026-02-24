@@ -19,16 +19,15 @@
 
     <!-- Hero stats - single row with compact items -->
     <div v-else class="hero-stats-row">
-      <div
-        v-for="stat in heroStats"
-        :key="stat.key"
-        class="hero-stat"
-      >
+      <div v-for="stat in heroStats" :key="stat.key" class="hero-stat">
         <div class="d-flex align-center ga-1 mb-1">
           <v-icon :color="stat.iconColor" size="14">{{ stat.icon }}</v-icon>
           <span class="text-caption text-textSecondary text-no-wrap">{{ stat.label }}</span>
         </div>
-        <p :ref="(el: any) => setRef(stat.key, el)" class="text-h6 font-weight-black text-primary hero-value">
+        <p
+          :ref="(el: any) => setRef(stat.key, el)"
+          class="text-h6 font-weight-black text-primary hero-value"
+        >
           {{ stat.displayValue }}
         </p>
         <div v-if="stat.delta !== null" class="mt-1">
@@ -38,7 +37,9 @@
             size="x-small"
             class="font-weight-bold"
           >
-            <v-icon start size="10">{{ stat.delta >= 0 ? 'mdi-trending-up' : 'mdi-trending-down' }}</v-icon>
+            <v-icon start size="10">{{
+              stat.delta >= 0 ? 'mdi-trending-up' : 'mdi-trending-down'
+            }}</v-icon>
             {{ stat.delta >= 0 ? '+' : '' }}{{ stat.deltaDisplay }}
           </v-chip>
         </div>
@@ -149,7 +150,7 @@ function animateNumbers() {
 
 watch(
   () => props.overview,
-  async (val) => {
+  async val => {
     if (val && val.totalWorkouts > 0) {
       await nextTick()
       animateNumbers()
@@ -179,11 +180,7 @@ onMounted(async () => {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle at 30% 50%,
-    rgba(171, 255, 26, 0.04) 0%,
-    transparent 50%
-  );
+  background: radial-gradient(circle at 30% 50%, rgba(171, 255, 26, 0.04) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -214,7 +211,14 @@ onMounted(async () => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 </style>

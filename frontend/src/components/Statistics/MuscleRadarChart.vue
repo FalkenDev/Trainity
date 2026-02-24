@@ -8,7 +8,10 @@
       class="bg-cardBg pa-4 rounded-lg"
       style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
     >
-      <div v-if="!muscleData || muscleData.length === 0" class="text-center py-6 text-textSecondary">
+      <div
+        v-if="!muscleData || muscleData.length === 0"
+        class="text-center py-6 text-textSecondary"
+      >
         <v-icon size="32" class="mb-2" style="opacity: 0.4">mdi-arm-flex</v-icon>
         <p class="text-caption">{{ $t('statistics.muscleBalance.empty') }}</p>
       </div>
@@ -42,11 +45,11 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const chartData = computed(() => ({
-  labels: props.muscleData.map((m) => m.name),
+  labels: props.muscleData.map(m => m.name),
   datasets: [
     {
       label: t('statistics.totalVolume'),
-      data: props.muscleData.map((m) => m.volume),
+      data: props.muscleData.map(m => m.volume),
       backgroundColor: 'rgba(171, 255, 26, 0.15)',
       borderColor: '#ABFF1A',
       borderWidth: 2,

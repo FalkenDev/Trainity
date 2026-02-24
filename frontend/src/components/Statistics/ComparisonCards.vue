@@ -16,13 +16,17 @@
       >
         <div class="d-flex align-center ga-2 mb-3">
           <v-icon size="16" color="primary">mdi-calendar-week</v-icon>
-          <span class="text-body-2 font-weight-bold">{{ $t('statistics.comparison.weeklyTitle') }}</span>
+          <span class="text-body-2 font-weight-bold">{{
+            $t('statistics.comparison.weeklyTitle')
+          }}</span>
         </div>
 
         <div class="d-flex ga-3">
           <!-- Current week - highlighted -->
           <div class="flex-grow-1 comparison-period current-period pa-3 rounded-lg">
-            <p class="text-caption font-weight-bold text-primary mb-2">{{ $t('statistics.comparison.thisWeek') }}</p>
+            <p class="text-caption font-weight-bold text-primary mb-2">
+              {{ $t('statistics.comparison.thisWeek') }}
+            </p>
             <div class="d-flex flex-column ga-1">
               <ComparisonMetric
                 icon="mdi-dumbbell"
@@ -49,7 +53,9 @@
 
           <!-- Previous week -->
           <div class="flex-grow-1 comparison-period pa-3 rounded-lg text-right">
-            <p class="text-caption text-textSecondary mb-2">{{ $t('statistics.comparison.lastWeek') }}</p>
+            <p class="text-caption text-textSecondary mb-2">
+              {{ $t('statistics.comparison.lastWeek') }}
+            </p>
             <div class="d-flex flex-column ga-1 align-end">
               <ComparisonMetric
                 :value="comparison.weekly.previous.workouts"
@@ -90,12 +96,16 @@
       >
         <div class="d-flex align-center ga-2 mb-3">
           <v-icon size="16" color="blue">mdi-calendar-month</v-icon>
-          <span class="text-body-2 font-weight-bold">{{ $t('statistics.comparison.monthlyTitle') }}</span>
+          <span class="text-body-2 font-weight-bold">{{
+            $t('statistics.comparison.monthlyTitle')
+          }}</span>
         </div>
 
         <div class="d-flex ga-3">
           <div class="flex-grow-1 comparison-period current-period pa-3 rounded-lg">
-            <p class="text-caption font-weight-bold text-primary mb-2">{{ $t('statistics.comparison.thisMonth') }}</p>
+            <p class="text-caption font-weight-bold text-primary mb-2">
+              {{ $t('statistics.comparison.thisMonth') }}
+            </p>
             <div class="d-flex flex-column ga-1">
               <ComparisonMetric
                 icon="mdi-dumbbell"
@@ -120,7 +130,9 @@
           </div>
 
           <div class="flex-grow-1 comparison-period pa-3 rounded-lg text-right">
-            <p class="text-caption text-textSecondary mb-2">{{ $t('statistics.comparison.lastMonth') }}</p>
+            <p class="text-caption text-textSecondary mb-2">
+              {{ $t('statistics.comparison.lastMonth') }}
+            </p>
             <div class="d-flex flex-column ga-1 align-end">
               <ComparisonMetric
                 :value="comparison.monthly.previous.workouts"
@@ -185,7 +197,7 @@ const ComparisonMetric: FunctionalComponent<{
   value: string | number
   suffix?: string
   align?: string
-}> = (props) =>
+}> = props =>
   h(
     'div',
     {
@@ -203,7 +215,7 @@ const DeltaChip: FunctionalComponent<{
   current: number
   previous: number
   label: string
-}> = (props) => {
+}> = props => {
   const diff = props.current - props.previous
   if (diff === 0 && props.current === 0 && props.previous === 0) return null
 
@@ -222,7 +234,8 @@ const DeltaChip: FunctionalComponent<{
     'div',
     {
       class: `v-chip v-chip--size-x-small v-theme--dark v-chip--density-default v-chip--variant-tonal bg-${color} font-weight-bold`,
-      style: 'font-size: 10px; height: 20px; padding: 0 6px; border-radius: 10px; display: inline-flex; align-items: center; gap: 2px;',
+      style:
+        'font-size: 10px; height: 20px; padding: 0 6px; border-radius: 10px; display: inline-flex; align-items: center; gap: 2px;',
     },
     [
       h('i', {

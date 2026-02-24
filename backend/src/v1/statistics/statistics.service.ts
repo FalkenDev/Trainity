@@ -273,7 +273,10 @@ export class StatisticsService {
 
     const exerciseCount = new Map<number, { name: string; count: number }>();
     const muscleGroupCount = new Map<number, { name: string; count: number }>();
-    const muscleGroupVolume = new Map<number, { name: string; volume: number }>();
+    const muscleGroupVolume = new Map<
+      number,
+      { name: string; volume: number }
+    >();
 
     for (const s of allSessions) {
       totalVolume += s.totalWeight ?? 0;
@@ -610,7 +613,7 @@ export class StatisticsService {
     // Current streak: count consecutive days from today or yesterday backwards
     let currentStreak = 0;
     if (uniqueDates[0] === todayStr || uniqueDates[0] === yesterdayStr) {
-      let checkDate = new Date(uniqueDates[0]);
+      const checkDate = new Date(uniqueDates[0]);
       for (const dateStr of uniqueDates) {
         const d = new Date(dateStr);
         d.setHours(0, 0, 0, 0);
@@ -662,7 +665,12 @@ export class StatisticsService {
     // Build week buckets
     const weekBuckets = new Map<
       string,
-      { weekStart: string; totalVolume: number; workoutCount: number; totalDuration: number }
+      {
+        weekStart: string;
+        totalVolume: number;
+        workoutCount: number;
+        totalDuration: number;
+      }
     >();
 
     // Initialize all weeks
@@ -697,8 +705,8 @@ export class StatisticsService {
       }
     }
 
-    return [...weekBuckets.values()].sort(
-      (a, b) => a.weekStart.localeCompare(b.weekStart),
+    return [...weekBuckets.values()].sort((a, b) =>
+      a.weekStart.localeCompare(b.weekStart),
     );
   }
 
@@ -777,7 +785,7 @@ export class StatisticsService {
       select: ['id', 'endedAt', 'startedAt'],
     });
 
-    const dayCounts = new Map<string, number>();    
+    const dayCounts = new Map<string, number>();
     for (const s of sessions) {
       const d = s.endedAt ?? s.startedAt;
       if (!d || new Date(d) < startDate) continue;

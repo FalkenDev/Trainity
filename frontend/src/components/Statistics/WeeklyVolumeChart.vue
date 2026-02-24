@@ -20,7 +20,9 @@
             <span class="text-body-2 font-weight-bold text-textPrimary">
               {{ formatVolume(latestWeekVolume) }}
             </span>
-            <span class="text-caption text-textSecondary">{{ $t('statistics.weeklyVolume.thisWeek') }}</span>
+            <span class="text-caption text-textSecondary">{{
+              $t('statistics.weeklyVolume.thisWeek')
+            }}</span>
           </div>
           <v-chip
             v-if="weekOverWeekDelta !== null"
@@ -29,7 +31,9 @@
             size="x-small"
             class="font-weight-bold"
           >
-            <v-icon start size="10">{{ weekOverWeekDelta >= 0 ? 'mdi-trending-up' : 'mdi-trending-down' }}</v-icon>
+            <v-icon start size="10">{{
+              weekOverWeekDelta >= 0 ? 'mdi-trending-up' : 'mdi-trending-down'
+            }}</v-icon>
             {{ weekOverWeekDelta >= 0 ? '+' : '' }}{{ weekOverWeekDelta }}%
           </v-chip>
         </div>
@@ -89,14 +93,14 @@ const weekOverWeekDelta = computed(() => {
 })
 
 const chartData = computed(() => {
-  const maxVolume = Math.max(...props.trends.map((t) => t.totalVolume), 1)
+  const maxVolume = Math.max(...props.trends.map(t => t.totalVolume), 1)
 
   return {
-    labels: props.trends.map((t) => formatWeekLabel(t.weekStart)),
+    labels: props.trends.map(t => formatWeekLabel(t.weekStart)),
     datasets: [
       {
         label: t('statistics.totalVolume'),
-        data: props.trends.map((t) => t.totalVolume),
+        data: props.trends.map(t => t.totalVolume),
         backgroundColor: props.trends.map((trend, idx) => {
           // Highlight the latest bar with full primary, others with lower opacity
           const isLatest = idx === props.trends.length - 1

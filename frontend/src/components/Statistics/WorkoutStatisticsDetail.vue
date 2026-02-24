@@ -22,7 +22,11 @@
             v-for="card in summaryCards"
             :key="card.label"
             class="flex-grow-1 bg-cardBg pa-3 rounded-lg"
-            style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; min-width: 140px"
+            style="
+              border: 1px solid rgb(var(--v-theme-borderColor));
+              box-shadow: none;
+              min-width: 140px;
+            "
           >
             <p class="text-caption text-textSecondary">{{ card.label }}</p>
             <p class="text-body-1 font-weight-bold text-primary">{{ card.value }}</p>
