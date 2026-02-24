@@ -23,7 +23,7 @@
         v-for="(item, index) in allItems"
         :key="item.key"
         class="media-thumb rounded-lg bg-cardBg position-relative"
-        style="border: 1px solid #474747; box-shadow: none"
+        style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
       >
         <img
           v-if="item.type === 'image'"

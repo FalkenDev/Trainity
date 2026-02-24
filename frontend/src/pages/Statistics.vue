@@ -1,105 +1,122 @@
 <template>
-  <div class="pa-5 d-flex flex-column ga-4">
+  <div class="pa-5 d-flex flex-column ga-4 statistics-page">
     <div>
       <h1>{{ $t('statistics.title') }}</h1>
-      <p>{{ $t('statistics.description') }}</p>
+      <p class="text-textSecondary">{{ $t('statistics.description') }}</p>
     </div>
 
-    <v-tabs v-model="activeTab" color="primary" density="compact" grow>
+    <v-tabs v-model="activeTab" color="primary" density="compact" grow class="stats-tabs">
       <v-tab value="overview">{{ $t('statistics.overview') }}</v-tab>
       <v-tab value="exercises">{{ $t('statistics.exercises') }}</v-tab>
       <v-tab value="workouts">{{ $t('statistics.workouts') }}</v-tab>
     </v-tabs>
 
-    <!-- Overview Tab -->
-    <div v-if="activeTab === 'overview'">
-      <div v-if="statisticsStore.isLoadingOverview" class="d-flex justify-center pa-8">
-        <v-progress-circular indeterminate color="primary" />
+    <!-- ═══════ OVERVIEW TAB ═══════ -->
+    <div v-if="activeTab === 'overview'" class="d-flex flex-column ga-4 fade-in">
+      <!-- Loading skeleton -->
+      <div v-if="statisticsStore.isLoadingOverview" class="d-flex flex-column ga-4">
+        <v-skeleton-loader type="card" class="rounded-lg" />
+        <v-skeleton-loader type="card" class="rounded-lg" />
+        <v-skeleton-loader type="card" class="rounded-lg" />
       </div>
-      <div v-else-if="statisticsStore.overview" class="d-flex flex-column ga-4">
-        <!-- Key Stats Grid -->
-        <div class="d-flex flex-wrap ga-3">
+
+      <template v-else>
+        <!-- Hero Stats Card with animated numbers -->
+        <StatisticsHeroCard
+          :overview="statisticsStore.overview"
+          :comparison="statisticsStore.comparison"
+        />
+
+        <!-- Activity Heatmap -->
+        <ActivityHeatmap :data="statisticsStore.heatmap" :weeks="12" />
+
+        <!-- Quick Stats Grid (secondary metrics) -->
+        <div v-if="statisticsStore.overview" class="d-flex flex-wrap ga-2">
           <v-card
-            v-for="stat in overviewCards"
+            v-for="stat in secondaryStats"
             :key="stat.label"
-            class="flex-grow-1 bg-cardBg pa-3 rounded-lg"
-            style="border: 1px solid #474747; box-shadow: none; min-width: 140px"
+            class="flex-grow-1 bg-cardBg pa-3 rounded-lg stat-card-mini"
+            style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; min-width: 100px"
           >
-            <p class="text-caption text-textSecondary">{{ stat.label }}</p>
-            <p class="text-h6 font-weight-bold text-primary">{{ stat.value }}</p>
-          </v-card>
-        </div>
-
-        <!-- Recent Personal Records -->
-        <div v-if="statisticsStore.overview.recentPRs.length > 0">
-          <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
-            {{ $t('statistics.recentPRs') }}
-          </p>
-          <v-card
-            v-for="pr in statisticsStore.overview.recentPRs.slice(0, 5)"
-            :key="`${pr.exerciseId}-${pr.recordType}`"
-            class="bg-cardBg pa-3 rounded-lg mb-2"
-            style="border: 1px solid #474747; box-shadow: none"
-          >
-            <div class="d-flex align-center justify-space-between">
-              <div class="d-flex align-center ga-2">
-                <v-icon size="18" color="amber">mdi-trophy</v-icon>
-                <div>
-                  <p class="text-body-2 font-weight-bold">{{ pr.exerciseName }}</p>
-                  <p class="text-caption text-textSecondary">
-                    {{ formatRecordType(pr.recordType) }}: {{ formatRecordValue(pr) }}
-                  </p>
-                </div>
-              </div>
-              <span class="text-caption text-textSecondary">
-                {{ formatDate(pr.date) }}
-              </span>
+            <div class="d-flex align-center ga-2 mb-1">
+              <v-icon :color="stat.color" size="14">{{ stat.icon }}</v-icon>
+              <span class="text-caption text-textSecondary">{{ stat.label }}</span>
             </div>
+            <p class="text-body-1 font-weight-bold">{{ stat.value }}</p>
           </v-card>
         </div>
 
-        <!-- Most Trained -->
-        <div v-if="statisticsStore.overview.mostTrainedMuscleGroups.length > 0">
-          <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
-            {{ $t('statistics.mostTrainedMuscles') }}
-          </p>
-          <div class="d-flex flex-wrap ga-2">
-            <v-chip
-              v-for="mg in statisticsStore.overview.mostTrainedMuscleGroups"
-              :key="mg.name"
-              size="small"
-              color="primary"
-              variant="tonal"
-            >
-              {{ mg.name }} ({{ mg.count }})
-            </v-chip>
+        <!-- Comparison Cards -->
+        <ComparisonCards :comparison="statisticsStore.comparison" />
+
+        <!-- Weekly Volume Bar Chart -->
+        <WeeklyVolumeChart :trends="statisticsStore.weeklyTrends" />
+
+        <!-- Muscle Balance Radar -->
+        <MuscleRadarChart
+          v-if="statisticsStore.overview?.muscleGroupVolume?.length"
+          :muscle-data="statisticsStore.overview.muscleGroupVolume"
+        />
+
+        <!-- PR Trophy Timeline -->
+        <PRTimeline
+          v-if="statisticsStore.overview?.recentPRs?.length"
+          :prs="statisticsStore.overview.recentPRs"
+          @select-exercise="handlePRExerciseClick"
+        />
+
+        <!-- Most Trained Chips -->
+        <div
+          v-if="statisticsStore.overview?.mostTrainedMuscleGroups?.length"
+          class="d-flex flex-column ga-3"
+        >
+          <div>
+            <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
+              {{ $t('statistics.mostTrainedMuscles') }}
+            </p>
+            <div class="d-flex flex-wrap ga-2">
+              <v-chip
+                v-for="mg in statisticsStore.overview.mostTrainedMuscleGroups"
+                :key="mg.name"
+                size="small"
+                color="primary"
+                variant="tonal"
+              >
+                {{ mg.name }} ({{ mg.count }})
+              </v-chip>
+            </div>
+          </div>
+
+          <div v-if="statisticsStore.overview.mostTrainedExercises?.length">
+            <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
+              {{ $t('statistics.mostTrainedExercises') }}
+            </p>
+            <div class="d-flex flex-wrap ga-2">
+              <v-chip
+                v-for="ex in statisticsStore.overview.mostTrainedExercises"
+                :key="ex.name"
+                size="small"
+                variant="tonal"
+              >
+                {{ ex.name }} ({{ ex.count }})
+              </v-chip>
+            </div>
           </div>
         </div>
 
-        <div v-if="statisticsStore.overview.mostTrainedExercises.length > 0" class="mt-1">
-          <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
-            {{ $t('statistics.mostTrainedExercises') }}
-          </p>
-          <div class="d-flex flex-wrap ga-2">
-            <v-chip
-              v-for="ex in statisticsStore.overview.mostTrainedExercises"
-              :key="ex.name"
-              size="small"
-              variant="tonal"
-            >
-              {{ ex.name }} ({{ ex.count }})
-            </v-chip>
-          </div>
+        <!-- Empty state (no data at all) -->
+        <div
+          v-if="!statisticsStore.overview || statisticsStore.overview.totalWorkouts === 0"
+          class="text-center pa-6 text-textSecondary"
+        >
+          <v-icon size="48" class="mb-2" style="opacity: 0.3">mdi-chart-areaspline</v-icon>
+          <p>{{ $t('statistics.noData') }}</p>
         </div>
-      </div>
-      <div v-else class="text-center pa-8 text-textSecondary">
-        <v-icon size="48" class="mb-2">mdi-chart-bar</v-icon>
-        <p>{{ $t('statistics.noData') }}</p>
-      </div>
+      </template>
     </div>
 
-    <!-- Exercises Tab -->
-    <div v-if="activeTab === 'exercises'">
+    <!-- ═══════ EXERCISES TAB ═══════ -->
+    <div v-if="activeTab === 'exercises'" class="fade-in">
       <v-text-field
         v-model="exerciseSearch"
         :placeholder="$t('exercise.searchExercises')"
@@ -111,22 +128,22 @@
         bg-color="cardBg"
       />
       <div v-if="filteredExercises.length === 0" class="text-center pa-8 text-textSecondary">
-        <v-icon size="48" class="mb-2">mdi-dumbbell</v-icon>
+        <v-icon size="48" class="mb-2" style="opacity: 0.3">mdi-dumbbell</v-icon>
         <p>{{ $t('statistics.noExercises') }}</p>
       </div>
       <v-card
         v-for="exercise in filteredExercises"
         :key="exercise.id"
-        class="bg-cardBg pa-3 rounded-lg mb-2 cursor-pointer"
-        style="border: 1px solid #474747; box-shadow: none"
+        class="bg-cardBg pa-3 rounded-lg mb-2 cursor-pointer exercise-card"
+        style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
         @click="openExerciseDetail(exercise)"
       >
         <div class="d-flex align-center justify-space-between">
           <div class="d-flex align-center ga-3">
-            <v-avatar v-if="exercise.image" size="36" rounded>
+            <v-avatar v-if="exercise.image" size="40" rounded="lg">
               <v-img :src="getImageUrl(exercise.image)" />
             </v-avatar>
-            <v-avatar v-else color="blue-grey-darken-3" size="36" rounded>
+            <v-avatar v-else color="blue-grey-darken-3" size="40" rounded="lg">
               <v-icon size="18">mdi-dumbbell</v-icon>
             </v-avatar>
             <div>
@@ -143,38 +160,38 @@
               </div>
             </div>
           </div>
-          <v-icon size="20" class="text-textSecondary">mdi-chevron-right</v-icon>
+          <v-icon size="18" class="text-textSecondary">mdi-chevron-right</v-icon>
         </div>
       </v-card>
     </div>
 
-    <!-- Workouts Tab -->
-    <div v-if="activeTab === 'workouts'">
+    <!-- ═══════ WORKOUTS TAB ═══════ -->
+    <div v-if="activeTab === 'workouts'" class="fade-in">
       <div v-if="workoutStore.workouts.length === 0" class="text-center pa-8 text-textSecondary">
-        <v-icon size="48" class="mb-2">mdi-clipboard-list</v-icon>
+        <v-icon size="48" class="mb-2" style="opacity: 0.3">mdi-clipboard-list</v-icon>
         <p>{{ $t('statistics.noWorkouts') }}</p>
       </div>
       <v-card
         v-for="workout in workoutStore.workouts"
         :key="workout.id"
-        class="bg-cardBg pa-3 rounded-lg mb-2 cursor-pointer"
-        style="border: 1px solid #474747; box-shadow: none"
+        class="bg-cardBg pa-3 rounded-lg mb-2 cursor-pointer exercise-card"
+        style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
         @click="openWorkoutDetail(workout)"
       >
         <div class="d-flex align-center justify-space-between">
           <div class="d-flex align-center ga-3">
-            <v-avatar color="deep-purple-darken-3" size="36" rounded>
+            <v-avatar color="deep-purple-darken-3" size="40" rounded="lg">
               <v-icon size="18">mdi-clipboard-list</v-icon>
             </v-avatar>
             <div>
               <p class="text-body-2 font-weight-bold">{{ workout.title }}</p>
               <p class="text-caption text-textSecondary">
-                {{ workout.exercises?.length ?? 0 }} {{ $t('statistics.exercisesCount') }} ·
+                {{ workout.exercises?.length ?? 0 }} {{ $t('statistics.exercises') }} ·
                 {{ workout.time }} {{ $t('units.minShort') }}
               </p>
             </div>
           </div>
-          <v-icon size="20" class="text-textSecondary">mdi-chevron-right</v-icon>
+          <v-icon size="18" class="text-textSecondary">mdi-chevron-right</v-icon>
         </div>
       </v-card>
     </div>
@@ -190,7 +207,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import BackHeader from '@/components/BackHeader.vue'
+import StatisticsHeroCard from '@/components/Statistics/StatisticsHeroCard.vue'
+import ActivityHeatmap from '@/components/Statistics/ActivityHeatmap.vue'
+import WeeklyVolumeChart from '@/components/Statistics/WeeklyVolumeChart.vue'
+import MuscleRadarChart from '@/components/Statistics/MuscleRadarChart.vue'
+import PRTimeline from '@/components/Statistics/PRTimeline.vue'
+import ComparisonCards from '@/components/Statistics/ComparisonCards.vue'
 import ExerciseStatisticsDetail from '@/components/Statistics/ExerciseStatisticsDetail.vue'
 import WorkoutStatisticsDetail from '@/components/Statistics/WorkoutStatisticsDetail.vue'
 import { useStatisticsStore } from '@/stores/statistics.store'
@@ -198,7 +220,6 @@ import { useExerciseStore } from '@/stores/exercise.store'
 import { useWorkoutStore } from '@/stores/workout.store'
 import type { Exercise } from '@/interfaces/Exercise.interface'
 import type { Workout } from '@/interfaces/Workout.interface'
-import type { PersonalRecord, RecordType } from '@/interfaces/Statistics.interface'
 
 const { t } = useI18n()
 const statisticsStore = useStatisticsStore()
@@ -224,53 +245,50 @@ const filteredExercises = computed(() => {
   const search = exerciseSearch.value.toLowerCase()
   if (!search) return exerciseStore.exercises
   return exerciseStore.exercises.filter(
-    e =>
+    (e) =>
       e.name.toLowerCase().includes(search) ||
-      e.muscleGroups?.some(mg => mg.name.toLowerCase().includes(search))
+      e.muscleGroups?.some((mg) => mg.name.toLowerCase().includes(search))
   )
 })
 
-const overviewCards = computed(() => {
+const secondaryStats = computed(() => {
   const o = statisticsStore.overview
   if (!o) return []
   return [
-    { label: t('statistics.totalWorkouts'), value: o.totalWorkouts },
-    { label: t('statistics.totalVolume'), value: formatVolume(o.totalVolume) },
-    { label: t('statistics.thisWeek'), value: o.workoutsThisWeek },
-    { label: t('statistics.thisMonth'), value: o.workoutsThisMonth },
     {
+      icon: 'mdi-calendar-week',
+      color: 'blue',
+      label: t('statistics.thisWeek'),
+      value: `${o.workoutsThisWeek}`,
+    },
+    {
+      icon: 'mdi-calendar-month',
+      color: 'purple',
+      label: t('statistics.thisMonth'),
+      value: `${o.workoutsThisMonth}`,
+    },
+    {
+      icon: 'mdi-clock-outline',
+      color: 'teal',
       label: t('statistics.avgDuration'),
       value: `${o.averageSessionDuration} ${t('units.minShort')}`,
     },
-    { label: t('statistics.totalTime'), value: `${o.totalDuration} ${t('units.minShort')}` },
+    {
+      icon: 'mdi-timer-sand',
+      color: 'orange',
+      label: t('statistics.totalTime'),
+      value: formatDuration(o.totalDuration),
+    },
   ]
 })
 
-function formatVolume(v: number): string {
-  if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M kg`
-  if (v >= 1000) return `${(v / 1000).toFixed(1)}K kg`
-  return `${v} kg`
-}
-
-function formatRecordType(type: RecordType): string {
-  const map: Record<string, string> = {
-    max_weight: t('statistics.records.maxWeight'),
-    estimated_1rm: t('statistics.records.estimated1RM'),
-    max_volume_set: t('statistics.records.maxVolumeSet'),
-    max_volume_session: t('statistics.records.maxVolumeSession'),
-    max_reps: t('statistics.records.maxReps'),
-  }
-  return map[type] || type
-}
-
-function formatRecordValue(pr: PersonalRecord): string {
-  if (pr.recordType === 'max_reps') return `${pr.value} reps`
-  return `${pr.value} kg`
-}
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+function formatDuration(minutes: number): string {
+  if (!minutes) return '0 min'
+  const hrs = Math.floor(minutes / 60)
+  const mins = minutes % 60
+  if (hrs > 0 && mins > 0) return `${hrs}h ${mins}m`
+  if (hrs > 0) return `${hrs}h`
+  return `${mins} min`
 }
 
 function openExerciseDetail(exercise: Exercise) {
@@ -283,9 +301,20 @@ function openWorkoutDetail(workout: Workout) {
   showWorkoutDetail.value = true
 }
 
+function handlePRExerciseClick(exerciseId: number) {
+  const exercise = exerciseStore.exercises.find((e) => e.id === exerciseId)
+  if (exercise) {
+    openExerciseDetail(exercise)
+  }
+}
+
 onMounted(async () => {
+  // Fetch all data in parallel for maximum speed
   await Promise.all([
     statisticsStore.fetchOverview(),
+    statisticsStore.fetchWeeklyTrends(),
+    statisticsStore.fetchComparison(),
+    statisticsStore.fetchActivityHeatmap(),
     exerciseStore.setExercises(),
     workoutStore.setWorkouts(),
   ])
@@ -293,7 +322,49 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.statistics-page {
+  padding-bottom: 80px;
+}
+
+.stats-tabs :deep(.v-tab) {
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+  font-size: 13px;
+}
+
 .cursor-pointer {
   cursor: pointer;
+}
+
+.exercise-card {
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.exercise-card:active {
+  transform: scale(0.985);
+}
+
+.stat-card-mini {
+  transition: border-color 0.2s ease;
+}
+
+.stat-card-mini:hover {
+  border-color: rgba(171, 255, 26, 0.2) !important;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

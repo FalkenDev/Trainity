@@ -14,7 +14,11 @@
         <template #activator="{ props: menuProps }">
           <v-icon v-bind="menuProps">mdi-menu</v-icon>
         </template>
-        <v-list class="bg-cardBg mt-2 mr-2" width="160" style="border: 1px solid #474747">
+        <v-list
+          class="bg-cardBg mt-2 mr-2"
+          width="160"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
+        >
           <v-list-item @click="confirmDelete">
             <v-list-item-title class="text-error">{{
               $t('sessionDetail.deleteSession')
@@ -58,7 +62,12 @@
       <div class="d-flex w-100 ga-3" style="align-items: stretch">
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          :style="{
+            border: '1px solid rgb(var(--v-theme-borderColor))',
+            boxShadow: 'none',
+            flex: '1 1 0',
+            minWidth: '0',
+          }"
         >
           <v-icon color="primary" size="24">mdi-timer-outline</v-icon>
           <div class="text-body-1 text-textPrimary mt-2">{{ durationDisplay }}</div>
@@ -67,7 +76,12 @@
 
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          :style="{
+            border: '1px solid rgb(var(--v-theme-borderColor))',
+            boxShadow: 'none',
+            flex: '1 1 0',
+            minWidth: '0',
+          }"
         >
           <v-icon color="primary" size="24">{{
             type === 'workout' ? 'mdi-weight-kilogram' : 'mdi-fire'
@@ -78,7 +92,12 @@
 
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          :style="{
+            border: '1px solid rgb(var(--v-theme-borderColor))',
+            boxShadow: 'none',
+            flex: '1 1 0',
+            minWidth: '0',
+          }"
         >
           <v-icon color="primary" size="24">{{
             type === 'workout' ? 'mdi-dumbbell' : 'mdi-map-marker-distance'
@@ -95,7 +114,11 @@
       >
         <v-card
           class="pa-4 rounded-lg bg-cardBg d-flex align-center ga-3"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0"
+          :style="{
+            border: '1px solid rgb(var(--v-theme-borderColor))',
+            boxShadow: 'none',
+            flex: '1 1 0',
+          }"
         >
           <v-icon color="primary" size="24">mdi-fire</v-icon>
           <div>
@@ -122,7 +145,7 @@
               v-for="(ex, idx) in workoutSession.exercises"
               :key="ex.exerciseId"
               class="bg-cardBg rounded-lg pa-3 cursor-pointer"
-              style="border: 1px solid #474747; box-shadow: none"
+              :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
               @click="openExercise(ex)"
             >
               <div class="d-flex align-center ga-3 mb-3">
@@ -190,7 +213,12 @@
             <v-card
               v-if="activityLog.distance"
               class="bg-cardBg rounded-lg pa-3 d-flex align-center ga-3"
-              style="border: 1px solid #474747; box-shadow: none; min-width: 140px; flex: 1 1 0"
+              :style="{
+                border: '1px solid rgb(var(--v-theme-borderColor))',
+                boxShadow: 'none',
+                minWidth: '140px',
+                flex: '1 1 0',
+              }"
             >
               <v-icon color="primary" size="20">mdi-map-marker-distance</v-icon>
               <div>
@@ -204,7 +232,12 @@
             <v-card
               v-if="activityLog.pace"
               class="bg-cardBg rounded-lg pa-3 d-flex align-center ga-3"
-              style="border: 1px solid #474747; box-shadow: none; min-width: 140px; flex: 1 1 0"
+              :style="{
+                border: '1px solid rgb(var(--v-theme-borderColor))',
+                boxShadow: 'none',
+                minWidth: '140px',
+                flex: '1 1 0',
+              }"
             >
               <v-icon color="primary" size="20">mdi-speedometer</v-icon>
               <div>
@@ -216,7 +249,12 @@
             <v-card
               v-if="activityLog.calories"
               class="bg-cardBg rounded-lg pa-3 d-flex align-center ga-3"
-              style="border: 1px solid #474747; box-shadow: none; min-width: 140px; flex: 1 1 0"
+              :style="{
+                border: '1px solid rgb(var(--v-theme-borderColor))',
+                boxShadow: 'none',
+                minWidth: '140px',
+                flex: '1 1 0',
+              }"
             >
               <v-icon color="primary" size="20">mdi-fire</v-icon>
               <div>
@@ -230,7 +268,12 @@
             <v-card
               v-if="activityLog.elevationGain"
               class="bg-cardBg rounded-lg pa-3 d-flex align-center ga-3"
-              style="border: 1px solid #474747; box-shadow: none; min-width: 140px; flex: 1 1 0"
+              :style="{
+                border: '1px solid rgb(var(--v-theme-borderColor))',
+                boxShadow: 'none',
+                minWidth: '140px',
+                flex: '1 1 0',
+              }"
             >
               <v-icon color="primary" size="20">mdi-terrain</v-icon>
               <div>
@@ -260,7 +303,10 @@
 
     <!-- Delete confirm dialog -->
     <v-dialog v-model="deleteDialog" max-width="360">
-      <v-card class="bg-cardBg rounded-lg pa-4" style="border: 1px solid #474747">
+      <v-card
+        class="bg-cardBg rounded-lg pa-4"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
+      >
         <v-card-title class="text-body-1 font-weight-bold pa-0 mb-3">
           {{ $t('sessionDetail.deleteSession') }}
         </v-card-title>

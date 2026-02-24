@@ -9,6 +9,9 @@ import type {
   OverviewStatistics,
   ProgressMetric,
   ProgressPeriod,
+  WeeklyTrend,
+  ComparisonStats,
+  HeatmapDay,
 } from '@/interfaces/Statistics.interface'
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1'
@@ -68,6 +71,25 @@ export const fetchWorkoutHistory = async (
 export const fetchWorkoutQuickStats = async (workoutId: number): Promise<WorkoutQuickStats> => {
   const data = await fetchWrapper<WorkoutQuickStats>(
     `${apiUrl}/statistics/workouts/${workoutId}/quick`
+  )
+  return data
+}
+
+export const fetchWeeklyTrends = async (weeks = 12): Promise<WeeklyTrend[]> => {
+  const data = await fetchWrapper<WeeklyTrend[]>(
+    `${apiUrl}/statistics/weekly-trends?weeks=${weeks}`
+  )
+  return data
+}
+
+export const fetchComparison = async (): Promise<ComparisonStats> => {
+  const data = await fetchWrapper<ComparisonStats>(`${apiUrl}/statistics/comparison`)
+  return data
+}
+
+export const fetchActivityHeatmap = async (weeks = 12): Promise<HeatmapDay[]> => {
+  const data = await fetchWrapper<HeatmapDay[]>(
+    `${apiUrl}/statistics/activity-heatmap?weeks=${weeks}`
   )
   return data
 }

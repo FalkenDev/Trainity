@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsDateString,
   IsEmail,
   IsIn,
   IsNumber,
@@ -62,4 +63,16 @@ export class UpdateUserDto {
   @ValidateIf((_, value) => value !== null)
   @IsNumber()
   goalTimeframe?: number | null;
+
+  @IsOptional()
+  @IsNumber()
+  weight?: number;
+
+  @IsOptional()
+  @IsNumber()
+  height?: number;
+
+  @IsOptional()
+  @IsDateString()
+  dateOfBirth?: string;
 }

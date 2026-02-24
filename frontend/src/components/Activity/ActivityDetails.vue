@@ -13,7 +13,7 @@
         <template #activator="{ props: menuProps }">
           <v-icon v-bind="menuProps">mdi-dots-vertical</v-icon>
         </template>
-        <v-list class="bg-cardBg mt-2 mr-2" width="140" style="border: 1px solid #474747">
+        <v-list class="bg-cardBg mt-2 mr-2" width="140" style="border: 1px solid rgb(var(--v-theme-borderColor))">
           <v-list-item @click="isEditOpen = true">
             <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
           </v-list-item>
@@ -42,7 +42,7 @@
       <div class="d-flex w-100 ga-3" style="align-items: stretch">
         <v-card
           class="text-center pa-3 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1 1 0; min-width: 0"
         >
           <p class="text-h6 font-weight-bold text-primary">{{ sessionCount }}</p>
           <p class="text-caption text-textSecondary">{{ $t('activity.sessionsCount') }}</p>
@@ -50,7 +50,7 @@
 
         <v-card
           class="text-center pa-3 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1 1 0; min-width: 0"
         >
           <p class="text-h6 font-weight-bold text-primary">{{ avgDurationLabel }}</p>
           <p class="text-caption text-textSecondary">{{ $t('activity.avgDuration') }}</p>
@@ -59,7 +59,7 @@
         <v-card
           v-if="activity.trackCalories"
           class="text-center pa-3 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1 1 0; min-width: 0"
         >
           <p class="text-h6 font-weight-bold text-primary">{{ totalCaloriesLabel }}</p>
           <p class="text-caption text-textSecondary">{{ $t('activity.totalCalories') }}</p>
@@ -97,7 +97,7 @@
             :key="item"
             variant="outlined"
             size="small"
-            style="border-color: #474747"
+            style="border-color: rgb(var(--v-theme-borderColor))"
           >
             {{ item }}
           </v-chip>
@@ -109,7 +109,7 @@
         <h2 class="text-h6">{{ $t('activity.yourStats') }}</h2>
         <v-card
           class="bg-cardBg rounded-lg mt-2"
-          style="border: 1px solid #474747; box-shadow: none"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
         >
           <v-list class="bg-transparent pa-0">
             <v-list-item class="px-4 py-3">
@@ -118,7 +118,7 @@
                 <span class="text-body-1 font-weight-bold">{{ totalTimeLabel }}</span>
               </div>
             </v-list-item>
-            <v-divider style="border-color: #474747" />
+            <v-divider style="border-color: rgb(var(--v-theme-borderColor))" />
             <v-list-item v-if="activity.trackDistance" class="px-4 py-3">
               <div class="d-flex justify-space-between align-center w-100">
                 <span class="text-body-2 text-textSecondary">{{
@@ -127,7 +127,7 @@
                 <span class="text-body-1 font-weight-bold">{{ totalDistanceLabel }}</span>
               </div>
             </v-list-item>
-            <v-divider v-if="activity.trackDistance" style="border-color: #474747" />
+            <v-divider v-if="activity.trackDistance" style="border-color: rgb(var(--v-theme-borderColor))" />
             <v-list-item v-if="activity.trackCalories" class="px-4 py-3">
               <div class="d-flex justify-space-between align-center w-100">
                 <span class="text-body-2 text-textSecondary">{{
@@ -151,7 +151,7 @@
             v-for="log in recentLogs"
             :key="log.id"
             class="bg-cardBg rounded-lg cursor-pointer"
-            style="border: 1px solid #474747; box-shadow: none"
+            style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
             @click="openEditLog(log)"
           >
             <div class="px-4 py-3 d-flex justify-space-between align-center">

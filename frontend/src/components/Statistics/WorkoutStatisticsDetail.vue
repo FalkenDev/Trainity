@@ -22,7 +22,7 @@
             v-for="card in summaryCards"
             :key="card.label"
             class="flex-grow-1 bg-cardBg pa-3 rounded-lg"
-            style="border: 1px solid #474747; box-shadow: none; min-width: 140px"
+            style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; min-width: 140px"
           >
             <p class="text-caption text-textSecondary">{{ card.label }}</p>
             <p class="text-body-1 font-weight-bold text-primary">{{ card.value }}</p>
@@ -36,7 +36,7 @@
           </p>
           <v-card
             class="bg-cardBg pa-3 rounded-lg"
-            style="border: 1px solid #474747; box-shadow: none"
+            style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
           >
             <Line :data="chartData" :options="chartOptions" style="max-height: 200px" />
           </v-card>
@@ -70,7 +70,7 @@
               v-for="(session, idx) in statisticsStore.workoutHistory.sessions"
               :key="idx"
               class="bg-cardBg pa-3 rounded-lg mb-2"
-              style="border: 1px solid #474747; box-shadow: none"
+              style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
             >
               <div class="d-flex align-center justify-space-between">
                 <div>
@@ -195,22 +195,32 @@ const chartData = computed(() => ({
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  interaction: {
+    intersect: false,
+    mode: 'index' as const,
+  },
   plugins: {
     legend: { display: false },
     tooltip: {
       backgroundColor: '#1E1E1E',
       titleColor: '#fff',
       bodyColor: '#ABFF1A',
+      borderColor: 'rgba(171, 255, 26, 0.3)',
+      borderWidth: 1,
+      cornerRadius: 8,
+      padding: 10,
     },
   },
   scales: {
     x: {
       ticks: { color: '#888', maxTicksLimit: 6, font: { size: 10 } },
       grid: { display: false },
+      border: { display: false },
     },
     y: {
       ticks: { color: '#888', font: { size: 10 } },
-      grid: { color: 'rgba(255,255,255,0.05)' },
+      grid: { color: 'rgba(255,255,255,0.04)' },
+      border: { display: false },
     },
   },
 }))

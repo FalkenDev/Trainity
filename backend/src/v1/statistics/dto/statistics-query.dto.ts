@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsNumberString } from 'class-validator';
 
 export class ExerciseProgressQueryDto {
   @IsEnum(['estimated_1rm', 'max_weight', 'total_volume', 'max_reps'])
@@ -17,4 +17,16 @@ export class PaginationQueryDto {
   @IsOptional()
   @IsString()
   limit?: string = '20';
+}
+
+export class WeeklyTrendsQueryDto {
+  @IsOptional()
+  @IsNumberString()
+  weeks?: string = '12';
+}
+
+export class HeatmapQueryDto {
+  @IsOptional()
+  @IsNumberString()
+  weeks?: string = '12';
 }

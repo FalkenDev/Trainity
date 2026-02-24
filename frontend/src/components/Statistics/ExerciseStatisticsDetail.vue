@@ -40,7 +40,7 @@
               v-for="record in recordCards"
               :key="record.label"
               class="flex-grow-1 bg-cardBg pa-3 rounded-lg"
-              style="border: 1px solid #474747; box-shadow: none; min-width: 140px"
+              style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; min-width: 140px"
             >
               <div class="d-flex align-center ga-1 mb-1">
                 <v-icon size="14" color="amber">mdi-trophy</v-icon>
@@ -90,7 +90,7 @@
 
           <v-card
             class="bg-cardBg pa-3 rounded-lg"
-            style="border: 1px solid #474747; box-shadow: none"
+            style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
           >
             <Line :data="chartData" :options="chartOptions" style="max-height: 200px" />
           </v-card>
@@ -124,7 +124,7 @@
               v-for="(entry, idx) in statisticsStore.exerciseHistory.entries"
               :key="idx"
               class="bg-cardBg pa-3 rounded-lg mb-2"
-              style="border: 1px solid #474747; box-shadow: none"
+              style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; transition: border-color 0.2s ease"
               @click="toggleExpanded(idx)"
             >
               <div class="d-flex align-center justify-space-between">
@@ -330,22 +330,33 @@ const chartData = computed(() => {
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  interaction: {
+    intersect: false,
+    mode: 'index' as const,
+  },
   plugins: {
     legend: { display: false },
     tooltip: {
       backgroundColor: '#1E1E1E',
       titleColor: '#fff',
       bodyColor: '#ABFF1A',
+      borderColor: 'rgba(171, 255, 26, 0.3)',
+      borderWidth: 1,
+      cornerRadius: 8,
+      padding: 10,
+      displayColors: false,
     },
   },
   scales: {
     x: {
       ticks: { color: '#888', maxTicksLimit: 6, font: { size: 10 } },
       grid: { display: false },
+      border: { display: false },
     },
     y: {
       ticks: { color: '#888', font: { size: 10 } },
-      grid: { color: 'rgba(255,255,255,0.05)' },
+      grid: { color: 'rgba(255,255,255,0.04)' },
+      border: { display: false },
     },
   },
 }))

@@ -1,7 +1,7 @@
 <template>
   <v-card
     class="px-5 py-4 bg-cardBg d-flex ga-2 flex-column rounded-lg"
-    style="border: 1px solid #474747; box-shadow: none"
+    :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
   >
     <div class="d-flex justify-space-between align-center">
       <h1 class="text-h6">{{ $t('progress.week') }} {{ currentWeek }}</h1>

@@ -1,9 +1,10 @@
 <template>
   <div
-    class="w-100 fill-height bg-background overflow-y-auto pb-5"
+    class="w-100 fill-height bg-background overflow-y-auto"
     style="
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
-      min-height: 100vh;
+      min-height: 100dvh;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     "
   >
     <div class="d-flex justify-space-between mx-5 py-5">
@@ -13,7 +14,7 @@
           <template #activator="{ props: menuProps }">
             <v-icon v-bind="menuProps">mdi-menu</v-icon>
           </template>
-          <v-list class="bg-cardBg mt-2 mr-2" width="100" style="border: 1px solid #474747">
+          <v-list class="bg-cardBg mt-2 mr-2" width="100" style="border: 1px solid rgb(var(--v-theme-borderColor))">
             <v-list-item @click="isEditOpen = true">
               <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
             </v-list-item>
@@ -42,7 +43,7 @@
       <div v-if="primaryMuscleName" class="d-flex ga-3">
         <v-card
           class="w-100 text-center pa-4 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
         >
           <v-icon color="primary" size="24">mdi-target</v-icon>
           <h1 class="text-body-1 text-textPrimary mt-2">{{ primaryMuscleName }}</h1>
@@ -67,7 +68,7 @@
             :style="
               mg.id === exercise.primaryMuscleGroup?.id
                 ? 'border: 1px solid #abff1a'
-                : 'border: 1px solid #474747'
+                : 'border: 1px solid rgb(var(--v-theme-borderColor))'
             "
           >
             {{ mg.name }}
@@ -90,7 +91,7 @@
             :key="m.id"
             class="rounded-lg flex-shrink-0"
             style="
-              border: 1px solid #474747;
+              border: 1px solid rgb(var(--v-theme-borderColor));
               box-shadow: none;
               width: 120px;
               height: 160px;
@@ -129,7 +130,7 @@
         <h1 class="text-h6">{{ $t('exerciseDetails.proTips') }}</h1>
         <v-card
           class="bg-cardBg pa-3 rounded-lg my-2 py-4 d-flex flex-column ga-4"
-          style="border: 1px solid #474747; box-shadow: none"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
         >
           <div v-for="(tip, i) in exercise.proTips" :key="i" class="d-flex align-center ga-3">
             <v-icon color="primary" size="20">mdi-lightbulb-on-outline</v-icon>
@@ -143,7 +144,7 @@
         <h1 class="text-h6">{{ $t('exerciseDetails.mistakes') }}</h1>
         <v-card
           class="bg-cardBg pa-3 rounded-lg my-2 py-4 d-flex flex-column ga-4"
-          style="border: 1px solid #474747; box-shadow: none"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
         >
           <div v-for="(mistake, i) in exercise.mistakes" :key="i" class="d-flex align-center ga-3">
             <v-icon color="error" size="20">mdi-close</v-icon>
@@ -161,7 +162,7 @@
 
   <!-- Delete Confirmation Dialog -->
   <v-dialog v-model="isDeleteDialogOpen" max-width="360">
-    <v-card class="bg-cardBg rounded-lg" style="border: 1px solid #474747">
+    <v-card class="bg-cardBg rounded-lg" style="border: 1px solid rgb(var(--v-theme-borderColor))">
       <v-card-title class="text-h6 pt-5 px-5">{{ $t('exerciseForm.deleteTitle') }}</v-card-title>
       <v-card-text class="text-textSecondary px-5">{{
         $t('exerciseForm.deleteConfirm')

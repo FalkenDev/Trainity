@@ -102,7 +102,7 @@
             v-for="(session, idx) in workoutQuickStats.recentSessions"
             :key="idx"
             class="bg-cardBg pa-2 px-3 rounded-lg mb-1"
-            style="border: 1px solid #474747; box-shadow: none"
+            :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
           >
             <div class="d-flex align-center justify-space-between">
               <span class="text-caption">{{ formatDate(session.date) }}</span>

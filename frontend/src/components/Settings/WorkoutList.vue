@@ -39,7 +39,7 @@
             location="bottom end"
             activator="parent"
           >
-            <v-card class="bg-cardBg pa-3" style="border: 1px solid #474747; min-width: 220px">
+            <v-card class="bg-cardBg pa-3" style="border: 1px solid rgb(var(--v-theme-borderColor)); min-width: 220px">
               <div class="d-flex justify-space-between align-center mb-2">
                 <p class="text-body-2 font-weight-bold">{{ $t('common.filter') }}</p>
                 <v-btn variant="text" size="small" color="textSecondary" @click="clearAllFilters">
@@ -72,7 +72,7 @@
       <v-list-item
         v-for="workout in filteredWorkouts"
         :key="workout.id"
-        class="border-t-sm border-b-sm py-2 bg-cardBg rounded-lg mx-5"
+        class="border-sm py-2 bg-cardBg rounded-lg mx-5"
         two-line
         @click="$router.push(`/workout/${workout.id}`)"
       >
@@ -105,7 +105,7 @@
           outlined
           block
           color="cardBg"
-          style="border: 1px solid #474747; box-shadow: none; border-style: dashed"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; border-style: dashed"
           class="text-primary rounded-lg"
           height="50"
           @click="isCreateWorkoutOpen = true"

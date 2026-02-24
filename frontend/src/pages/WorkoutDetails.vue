@@ -15,7 +15,11 @@
           <template #activator="{ props: menuProps }">
             <v-icon v-bind="menuProps">mdi-menu</v-icon>
           </template>
-          <v-list class="bg-cardBg mt-2 mr-2" width="140" style="border: 1px solid #474747">
+          <v-list
+            class="bg-cardBg mt-2 mr-2"
+            width="140"
+            :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
+          >
             <v-list-item @click="isWeightAndRepsOpen = true">
               <v-list-item-title>{{ $t('workout.weightAndReps') }}</v-list-item-title>
             </v-list-item>
@@ -51,7 +55,12 @@
       <div class="d-flex w-100 ga-3" style="align-items: stretch">
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          :style="{
+            border: '1px solid rgb(var(--v-theme-borderColor))',
+            boxShadow: 'none',
+            flex: '1 1 0',
+            minWidth: '0',
+          }"
         >
           <v-icon color="primary" size="24" aria-hidden="true">mdi-timer-outline</v-icon>
           <div class="text-body-1 text-textPrimary mt-2">{{ workout?.time || 0 }} min</div>
@@ -60,7 +69,12 @@
 
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          :style="{
+            border: '1px solid rgb(var(--v-theme-borderColor))',
+            boxShadow: 'none',
+            flex: '1 1 0',
+            minWidth: '0',
+          }"
         >
           <v-icon color="primary" size="24" aria-hidden="true">mdi-dumbbell</v-icon>
           <div class="text-body-1 text-textPrimary mt-2">
@@ -71,7 +85,12 @@
 
         <v-card
           class="text-center pa-4 rounded-lg bg-cardBg"
-          style="border: 1px solid #474747; box-shadow: none; flex: 1 1 0; min-width: 0"
+          :style="{
+            border: '1px solid rgb(var(--v-theme-borderColor))',
+            boxShadow: 'none',
+            flex: '1 1 0',
+            minWidth: '0',
+          }"
         >
           <v-icon color="primary" size="24" aria-hidden="true">mdi-arm-flex</v-icon>
           <div class="text-body-1 text-textPrimary mt-2">{{ totalSets }}</div>
@@ -93,7 +112,11 @@
             v-for="(mg, idx) in targetMuscleNames"
             :key="mg"
             :color="idx === 0 ? 'primary' : 'textSecondary'"
-            :style="idx === 0 ? 'border: 1px solid #abff1a' : 'border: 1px solid #474747'"
+            :style="
+              idx === 0
+                ? 'border: 1px solid rgb(var(--v-theme-primary))'
+                : 'border: 1px solid rgb(var(--v-theme-borderColor))'
+            "
           >
             {{ mg }}
           </v-chip>
@@ -107,8 +130,9 @@
           <v-card
             v-for="(exercise, idx) in sortedExercises"
             :key="exercise.id"
-            class="bg-cardBg rounded-lg d-flex align-center pa-3"
-            style="border: 1px solid #474747; box-shadow: none"
+            class="bg-cardBg rounded-lg d-flex align-center pa-3 cursor-pointer"
+            :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
+            @click="openExerciseDetails(exercise)"
           >
             <v-avatar color="avatarBg" size="40" class="rounded-lg mr-3 flex-shrink-0">
               <p class="text-primary">{{ idx + 1 }}</p>
@@ -118,7 +142,10 @@
               <p class="text-body-1 font-weight-bold text-textPrimary text-truncate">
                 {{ displayName(exercise.exercise) }}
               </p>
-              <p v-if="exercise.exercise.description" class="text-body-2 text-textSecondary text-truncate mb-1">
+              <p
+                v-if="exercise.exercise.description"
+                class="text-body-2 text-textSecondary text-truncate mb-1"
+              >
                 {{ displayDesc(exercise.exercise) }}
               </p>
               <p class="text-body-2 text-textSecondary">
@@ -174,6 +201,16 @@
       @close="isWeightAndRepsOpen = false"
     />
   </v-dialog>
+
+  <v-dialog v-model="isExerciseDetailsOpen" fullscreen>
+    <ExerciseDetails
+      v-if="isExerciseDetailsOpen && selectedExerciseForDetails"
+      :selected-exercise="selectedExerciseForDetails"
+      :is-view-exercise="true"
+      :hide-menu="true"
+      @close="isExerciseDetailsOpen = false"
+    />
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -182,9 +219,12 @@ import { dublicateWorkout } from '@/services/workout.service'
 import { startWorkoutSession } from '@/services/workoutSession.service'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import type { Workout, Exercise } from '@/interfaces/Workout.interface'
+import type { Exercise as ExerciseCatalog } from '@/interfaces/Exercise.interface'
 import { toast } from 'vuetify-sonner'
 import EditWorkout from '@/components/Workout/EditWorkout.vue'
 import WeightAndRepsSettings from '@/components/Workout/WeightAndRepsSettings.vue'
+import ExerciseDetails from '@/components/Exercise/ExerciseDetails.vue'
+import { fetchExerciseById } from '@/services/exercise.service'
 import { useI18n } from 'vue-i18n'
 import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
 import router from '@/router'
@@ -196,6 +236,8 @@ const workoutSessionStore = useWorkoutSessionStore()
 
 const isEditWorkoutOpen = ref(false)
 const isWeightAndRepsOpen = ref(false)
+const isExerciseDetailsOpen = ref(false)
+const selectedExerciseForDetails = ref<ExerciseCatalog | null>(null)
 
 const workout = computed<Workout | null>(() => workoutStore.currentWorkout)
 
@@ -204,8 +246,8 @@ const sortedExercises = computed(() => {
   return [...workout.value.exercises].sort((a, b) => a.order - b.order)
 })
 
-const totalSets = computed(() =>
-  workout.value?.exercises?.reduce((sum, ex) => sum + (ex.sets || 0), 0) ?? 0
+const totalSets = computed(
+  () => workout.value?.exercises?.reduce((sum, ex) => sum + (ex.sets || 0), 0) ?? 0
 )
 
 // --- Target muscles from the workout's targetMuscleGroups ---
@@ -232,6 +274,18 @@ const displayName = (exercise: NonNullable<Exercise['exercise']>) =>
 
 const displayDesc = (exercise: NonNullable<Exercise['exercise']>) =>
   displayExerciseDescription({ t }, exercise, '')
+
+const openExerciseDetails = async (workoutExercise: Exercise) => {
+  try {
+    const exercise = await fetchExerciseById(workoutExercise.exercise.id)
+    if (exercise) {
+      selectedExerciseForDetails.value = exercise
+      isExerciseDetailsOpen.value = true
+    }
+  } catch (error) {
+    console.error('Error fetching exercise details:', error)
+  }
+}
 
 const onEditWorkoutClose = async () => {
   isEditWorkoutOpen.value = false

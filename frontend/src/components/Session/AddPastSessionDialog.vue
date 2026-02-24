@@ -23,7 +23,7 @@
 
       <div class="pa-5" style="flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch">
         <!-- Date display -->
-        <v-card class="bg-cardBg rounded-lg pa-4 mb-5" style="border: 1px solid #474747">
+        <v-card class="bg-cardBg rounded-lg pa-4 mb-5" style="border: 1px solid rgb(var(--v-theme-borderColor))">
           <div class="d-flex align-center ga-3">
             <v-icon color="primary">mdi-calendar</v-icon>
             <div>
@@ -65,7 +65,7 @@
             <v-list
               v-if="workoutList.length > 0"
               class="bg-cardBg rounded-lg"
-              style="border: 1px solid #474747"
+              style="border: 1px solid rgb(var(--v-theme-borderColor))"
             >
               <v-list-item
                 v-for="w in workoutList"
@@ -118,7 +118,7 @@
               v-for="ex in selectedWorkout.exercises"
               :key="ex.id"
               class="bg-cardBg rounded-lg pa-4 mb-3"
-              style="border: 1px solid #474747; overflow: visible"
+              style="border: 1px solid rgb(var(--v-theme-borderColor)); overflow: visible"
             >
               <p class="text-body-1 font-weight-bold mb-3">{{ ex.exercise?.name }}</p>
 
@@ -199,7 +199,7 @@
             <v-list
               v-if="activityList.length > 0"
               class="bg-cardBg rounded-lg"
-              style="border: 1px solid #474747"
+              style="border: 1px solid rgb(var(--v-theme-borderColor))"
             >
               <v-list-item
                 v-for="a in activityList"

@@ -39,7 +39,7 @@
       </div>
 
       <!-- Type + Duration -->
-      <div class="d-flex w-100 ga-5">
+      <div class="d-flex w-100 ga-5 align-end">
         <div class="w-100">
           <v-label class="text-body-2 font-weight-bold text-textPrimary mb-1">
             {{ $t('editWorkout.trainingType') }}
@@ -120,7 +120,7 @@
           <template #item="{ element: exercise, index }">
             <v-card
               class="d-flex bg-cardBg pa-3 rounded-lg ga-3"
-              style="border: 1px solid #474747; box-shadow: none"
+              style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
             >
               <div class="drag-handle d-flex align-center" style="cursor: grab">
                 <v-icon size="32" color="textSecondary">mdi-drag</v-icon>
@@ -462,7 +462,7 @@ const saveWorkout = async () => {
 }
 
 :deep(.v-field) {
-  background-color: #15181e !important;
+  background-color: rgb(var(--v-theme-cardBg)) !important;
   border-radius: 12px !important;
 }
 

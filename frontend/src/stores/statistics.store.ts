@@ -11,11 +11,23 @@ import type {
   WorkoutQuickStats,
   ProgressMetric,
   ProgressPeriod,
+  WeeklyTrend,
+  ComparisonStats,
+  HeatmapDay,
 } from '@/interfaces/Statistics.interface'
 
 export const useStatisticsStore = defineStore('statisticsStore', () => {
   const overview = ref<OverviewStatistics | null>(null)
   const isLoadingOverview = ref(false)
+
+  const weeklyTrends = ref<WeeklyTrend[]>([])
+  const isLoadingTrends = ref(false)
+
+  const comparison = ref<ComparisonStats | null>(null)
+  const isLoadingComparison = ref(false)
+
+  const heatmap = ref<HeatmapDay[]>([])
+  const isLoadingHeatmap = ref(false)
 
   const exerciseHistory = ref<ExerciseHistoryResponse | null>(null)
   const exerciseRecords = ref<ExerciseRecords | null>(null)
@@ -35,6 +47,39 @@ export const useStatisticsStore = defineStore('statisticsStore', () => {
       console.error('Error fetching overview:', error)
     } finally {
       isLoadingOverview.value = false
+    }
+  }
+
+  async function fetchWeeklyTrends(weeks = 12) {
+    try {
+      isLoadingTrends.value = true
+      weeklyTrends.value = await statisticsService.fetchWeeklyTrends(weeks)
+    } catch (error) {
+      console.error('Error fetching weekly trends:', error)
+    } finally {
+      isLoadingTrends.value = false
+    }
+  }
+
+  async function fetchComparison() {
+    try {
+      isLoadingComparison.value = true
+      comparison.value = await statisticsService.fetchComparison()
+    } catch (error) {
+      console.error('Error fetching comparison:', error)
+    } finally {
+      isLoadingComparison.value = false
+    }
+  }
+
+  async function fetchActivityHeatmap(weeks = 12) {
+    try {
+      isLoadingHeatmap.value = true
+      heatmap.value = await statisticsService.fetchActivityHeatmap(weeks)
+    } catch (error) {
+      console.error('Error fetching heatmap:', error)
+    } finally {
+      isLoadingHeatmap.value = false
     }
   }
 
@@ -166,6 +211,12 @@ export const useStatisticsStore = defineStore('statisticsStore', () => {
   return {
     overview,
     isLoadingOverview,
+    weeklyTrends,
+    isLoadingTrends,
+    comparison,
+    isLoadingComparison,
+    heatmap,
+    isLoadingHeatmap,
     exerciseHistory,
     exerciseRecords,
     exerciseProgress,
@@ -175,6 +226,9 @@ export const useStatisticsStore = defineStore('statisticsStore', () => {
     workoutQuickStats,
     isLoadingWorkout,
     fetchOverview,
+    fetchWeeklyTrends,
+    fetchComparison,
+    fetchActivityHeatmap,
     fetchExerciseHistory,
     loadMoreExerciseHistory,
     fetchExerciseRecords,
