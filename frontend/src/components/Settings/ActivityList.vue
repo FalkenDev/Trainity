@@ -58,7 +58,11 @@
           outlined
           block
           color="cardBg"
-          style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; border-style: dashed"
+          style="
+            border: 1px solid rgb(var(--v-theme-borderColor));
+            box-shadow: none;
+            border-style: dashed;
+          "
           class="text-primary rounded-lg"
           height="50"
           @click="openCreateDialog"
@@ -84,7 +88,10 @@
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="isDeleteDialogOpen" max-width="400">
-      <v-card class="bg-cardBg rounded-lg" style="border: 1px solid rgb(var(--v-theme-borderColor))">
+      <v-card
+        class="bg-cardBg rounded-lg"
+        style="border: 1px solid rgb(var(--v-theme-borderColor))"
+      >
         <v-card-title>{{ $t('activity.deleteActivity') }}</v-card-title>
         <v-card-text>Are you sure you want to delete "{{ activityToDelete?.name }}"?</v-card-text>
         <v-card-actions>

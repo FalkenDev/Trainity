@@ -36,7 +36,11 @@
             v-for="stat in secondaryStats"
             :key="stat.label"
             class="flex-grow-1 bg-cardBg pa-3 rounded-lg stat-card-mini"
-            style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; min-width: 100px"
+            style="
+              border: 1px solid rgb(var(--v-theme-borderColor));
+              box-shadow: none;
+              min-width: 100px;
+            "
           >
             <div class="d-flex align-center ga-2 mb-1">
               <v-icon :color="stat.color" size="14">{{ stat.icon }}</v-icon>
@@ -245,9 +249,9 @@ const filteredExercises = computed(() => {
   const search = exerciseSearch.value.toLowerCase()
   if (!search) return exerciseStore.exercises
   return exerciseStore.exercises.filter(
-    (e) =>
+    e =>
       e.name.toLowerCase().includes(search) ||
-      e.muscleGroups?.some((mg) => mg.name.toLowerCase().includes(search))
+      e.muscleGroups?.some(mg => mg.name.toLowerCase().includes(search))
   )
 })
 
@@ -302,7 +306,7 @@ function openWorkoutDetail(workout: Workout) {
 }
 
 function handlePRExerciseClick(exerciseId: number) {
-  const exercise = exerciseStore.exercises.find((e) => e.id === exerciseId)
+  const exercise = exerciseStore.exercises.find(e => e.id === exerciseId)
   if (exercise) {
     openExerciseDetail(exercise)
   }
@@ -338,7 +342,9 @@ onMounted(async () => {
 }
 
 .exercise-card {
-  transition: border-color 0.2s ease, transform 0.15s ease;
+  transition:
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .exercise-card:active {

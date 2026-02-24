@@ -25,7 +25,9 @@
         class="bg-cardBg pa-4 rounded-lg"
         style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
       >
-        <v-icon size="32" class="mb-2" style="opacity: 0.4" color="amber">mdi-trophy-outline</v-icon>
+        <v-icon size="32" class="mb-2" style="opacity: 0.4" color="amber"
+          >mdi-trophy-outline</v-icon
+        >
         <p class="text-caption text-textSecondary">{{ $t('statistics.prTimeline.empty') }}</p>
       </v-card>
     </div>
@@ -137,7 +139,9 @@ function formatRelativeDate(dateStr: string): string {
 
 .pr-card {
   cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.15s ease;
+  transition:
+    border-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .pr-card:hover {

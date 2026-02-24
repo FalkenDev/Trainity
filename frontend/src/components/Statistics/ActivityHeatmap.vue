@@ -9,7 +9,10 @@
       style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none"
     >
       <!-- Month labels -->
-      <div class="heatmap-months mb-1" :style="{ marginLeft: '34px', gridTemplateColumns: `repeat(${weekCount}, 1fr)` }">
+      <div
+        class="heatmap-months mb-1"
+        :style="{ marginLeft: '34px', gridTemplateColumns: `repeat(${weekCount}, 1fr)` }"
+      >
         <span
           v-for="month in monthLabels"
           :key="month.label + month.col"
@@ -29,10 +32,7 @@
         </div>
 
         <!-- Grid -->
-        <div
-          class="heatmap-grid"
-          :style="{ gridTemplateColumns: `repeat(${weekCount}, 1fr)` }"
-        >
+        <div class="heatmap-grid" :style="{ gridTemplateColumns: `repeat(${weekCount}, 1fr)` }">
           <div
             v-for="(cell, idx) in heatmapCells"
             :key="idx"
@@ -47,14 +47,18 @@
 
       <!-- Legend -->
       <div class="d-flex align-center justify-end ga-1 mt-3">
-        <span class="text-caption text-textSecondary mr-1">{{ $t('statistics.heatmap.less') }}</span>
+        <span class="text-caption text-textSecondary mr-1">{{
+          $t('statistics.heatmap.less')
+        }}</span>
         <div
           v-for="(color, idx) in legendColors"
           :key="idx"
           class="heatmap-legend-cell"
           :style="{ backgroundColor: color }"
         />
-        <span class="text-caption text-textSecondary ml-1">{{ $t('statistics.heatmap.more') }}</span>
+        <span class="text-caption text-textSecondary ml-1">{{
+          $t('statistics.heatmap.more')
+        }}</span>
       </div>
     </v-card>
 
@@ -66,7 +70,10 @@
     >
       <span class="font-weight-bold">{{ tooltip.date }}</span>
       <span class="text-caption">
-        {{ tooltip.count }} {{ tooltip.count === 1 ? $t('statistics.heatmap.workout') : $t('statistics.heatmap.workouts') }}
+        {{ tooltip.count }}
+        {{
+          tooltip.count === 1 ? $t('statistics.heatmap.workout') : $t('statistics.heatmap.workouts')
+        }}
       </span>
     </div>
   </div>
@@ -132,7 +139,7 @@ const heatmapCells = computed(() => {
 
   // Find the Monday of the earliest week
   const startDate = new Date(today)
-  startDate.setDate(startDate.getDate() - (props.weeks * 7) + 1)
+  startDate.setDate(startDate.getDate() - props.weeks * 7 + 1)
   // Adjust to Monday
   const dayOfWeek = startDate.getDay()
   const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
@@ -158,7 +165,20 @@ const heatmapCells = computed(() => {
 
 const monthLabels = computed(() => {
   const labels: { label: string; col: number }[] = []
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ]
   let lastMonth = -1
 
   for (let weekIdx = 0; weekIdx < weekCount.value; weekIdx++) {
@@ -179,7 +199,11 @@ const monthLabels = computed(() => {
 function showTooltip(event: MouseEvent, cell: HeatmapCell) {
   if (!cell.inRange) return
   const d = new Date(cell.date)
-  tooltip.date = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+  tooltip.date = d.toLocaleDateString(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  })
   tooltip.count = cell.count
   tooltip.x = event.clientX
   tooltip.y = event.clientY - 60
@@ -216,9 +240,15 @@ function hideTooltip() {
   font-size: 11px;
 }
 
-.heatmap-day-labels span:nth-child(1) { grid-row: 1; }
-.heatmap-day-labels span:nth-child(2) { grid-row: 3; }
-.heatmap-day-labels span:nth-child(3) { grid-row: 5; }
+.heatmap-day-labels span:nth-child(1) {
+  grid-row: 1;
+}
+.heatmap-day-labels span:nth-child(2) {
+  grid-row: 3;
+}
+.heatmap-day-labels span:nth-child(3) {
+  grid-row: 5;
+}
 
 .heatmap-grid {
   display: grid;
@@ -234,7 +264,9 @@ function hideTooltip() {
   min-width: 0;
   min-height: 0;
   cursor: default;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .heatmap-cell:not(.heatmap-cell-empty):hover {
