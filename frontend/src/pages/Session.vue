@@ -61,9 +61,7 @@
     <v-dialog v-model="isViewExerciseDetailsOpen" fullscreen>
       <EditExercise
         v-if="isViewExerciseDetailsOpen && viewExerciseDetails"
-        :selected-exercise="viewExerciseDetails"
-        :is-view-exercise="true"
-        :hide-menu="true"
+        :exercise="viewExerciseDetails"
         @close="onCloseExerciseDetails"
       />
     </v-dialog>
@@ -82,10 +80,11 @@ import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface'
 
 import { fetchExerciseById } from '@/services/exercise.service'
 import { abandonWorkoutSession, finishWorkoutSession } from '@/services/workoutSession.service'
+import type { Exercise as ExerciseDetails } from '@/interfaces/Exercise.interface'
 
 const isAddExerciseOpen = ref(false)
 const isViewExerciseDetailsOpen = ref(false)
-const viewExerciseDetails = ref<Exercise | null>(null)
+const viewExerciseDetails = ref<ExerciseDetails | null>(null)
 const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const workoutSessionStore = useWorkoutSessionStore()
@@ -245,7 +244,21 @@ const onMoveToTop = (exerciseId: number) => {
 const onViewExerciseDetails = (exerciseId: number) => {
   const exercise = processedExercises.value.find(e => e.exerciseId === exerciseId)
   if (exercise) {
-    viewExerciseDetails.value = exercise
+    const ex = exercise.exercise
+    viewExerciseDetails.value = {
+      id: ex.id,
+      name: ex.name,
+      i18nKey: ex.i18nKey,
+      isNameCustom: ex.isNameCustom,
+      description: ex.description,
+      image: ex.img,
+      muscleGroups: ex.muscleGroups,
+      primaryMuscleGroup: ex.primaryMuscleGroup,
+      createdBy: ex.createdBy,
+      createdAt: ex.createdAt,
+      updatedAt: ex.updatedAt,
+      deletedAt: ex.deletedAt,
+    } as ExerciseDetails
     isViewExerciseDetailsOpen.value = true
   }
 }

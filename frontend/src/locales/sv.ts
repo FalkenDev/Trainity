@@ -335,7 +335,7 @@ export default {
     deleteActivityLogConfirm: 'Är du säker på att du vill ta bort detta pass?',
     editSession: 'Redigera pass',
     logUpdated: 'Passet uppdaterades!',
-    failedToUpdate: 'Kunde inte uppdatera pass',
+    failedToUpdateLog: 'Kunde inte uppdatera pass',
   },
   exercise: {
     created: 'Övningen skapades!',

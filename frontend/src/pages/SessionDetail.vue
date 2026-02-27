@@ -345,8 +345,8 @@ const router = useRouter()
 const workoutSessionStore = useWorkoutSessionStore()
 const activityStore = useActivityStore()
 
-const type = computed(() => route.params.type as 'workout' | 'activity')
-const id = computed(() => Number(route.params.id))
+const type = computed(() => (route.params as Record<string, string>).type as 'workout' | 'activity')
+const id = computed(() => Number((route.params as Record<string, string>).id))
 
 const deleteDialog = ref(false)
 const isDeleting = ref(false)

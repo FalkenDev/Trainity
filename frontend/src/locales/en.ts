@@ -340,7 +340,7 @@ export default {
     deleteActivityLogConfirm: 'Are you sure you want to delete this session?',
     editSession: 'Edit Session',
     logUpdated: 'Session updated!',
-    failedToUpdate: 'Failed to update session',
+    failedToUpdateLog: 'Failed to update session',
   },
   exercise: {
     createExercise: 'Create exercise',

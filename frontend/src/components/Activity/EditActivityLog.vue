@@ -167,7 +167,7 @@ async function saveLog() {
     emit('saved')
     emit('close')
   } catch (error: unknown) {
-    toast.error((error as Error).message || t('activity.failedToUpdate'), {
+    toast.error((error as Error).message || t('activity.failedToUpdateLog'), {
       progressBar: true,
       duration: 1000,
     })
