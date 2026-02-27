@@ -23,7 +23,7 @@ export function useCountUp(
       duration: options.duration ?? 1.5,
       prefix: options.prefix ?? '',
       suffix: options.suffix ?? '',
-      decimals: options.decimals ?? 0,
+      decimalPlaces: options.decimals ?? 0,
       separator: options.separator ?? ',',
       formattingFn: options.formattingFn,
       useEasing: true,
