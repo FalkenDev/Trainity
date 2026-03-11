@@ -38,13 +38,15 @@ services:
     develop:
       watch:
         - action: sync
-          path: ../backend
+          path: ./backend
           target: /app
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL}
     container_name: trainity_frontend
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
