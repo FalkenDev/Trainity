@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17
     container_name: trainity_postgres
     restart: unless-stopped
     ports:
@@ -11,6 +9,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/17/main
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
@@ -40,6 +39,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      target: production
+      args:
+        VITE_API_URL: ${VITE_API_URL}
     container_name: trainity_frontend
     restart: unless-stopped
     depends_on:
@@ -50,4 +52,4 @@ services:
       - .env
 
 volumes:
-  postgres_data
+  postgres_data:

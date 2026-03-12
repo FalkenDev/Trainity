@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import { Injectable } from '@nestjs/common';
 import * as sharp from 'sharp';
 import * as fs from 'fs/promises';
@@ -9,6 +24,11 @@ export class UploadService {
   private readonly uploadsDir = path.join(process.cwd(), 'uploads');
   private readonly exercisesDir = path.join(this.uploadsDir, 'exercises');
   private readonly avatarsDir = path.join(this.uploadsDir, 'avatars');
+  private readonly mediaDir = path.join(this.exercisesDir, 'media');
+  private readonly progressPhotosDir = path.join(
+    this.uploadsDir,
+    'progress-photos',
+  );
 
   constructor() {
     this.ensureDirectoriesExist();
@@ -19,6 +39,8 @@ export class UploadService {
       await fs.mkdir(this.uploadsDir, { recursive: true });
       await fs.mkdir(this.exercisesDir, { recursive: true });
       await fs.mkdir(this.avatarsDir, { recursive: true });
+      await fs.mkdir(this.mediaDir, { recursive: true });
+      await fs.mkdir(this.progressPhotosDir, { recursive: true });
     } catch (error) {
       console.error('Error creating upload directories:', error);
     }
@@ -65,6 +87,33 @@ export class UploadService {
   }
 
   /**
+   * Process exercise media (image or video).
+   * Images are converted to WebP; videos are stored as-is.
+   */
+  async processExerciseMedia(
+    file: Express.Multer.File,
+  ): Promise<{ url: string; type: 'image' | 'video' }> {
+    const isVideo = file.mimetype === 'video/mp4';
+
+    if (isVideo) {
+      const filename = `${randomBytes(16).toString('hex')}.mp4`;
+      const filepath = path.join(this.mediaDir, filename);
+      await fs.writeFile(filepath, file.buffer);
+      return { url: `/uploads/exercises/media/${filename}`, type: 'video' };
+    }
+
+    // Image processing
+    const filename = `${randomBytes(16).toString('hex')}.webp`;
+    const filepath = path.join(this.mediaDir, filename);
+    await sharp(file.buffer)
+      .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
+      .toFile(filepath);
+
+    return { url: `/uploads/exercises/media/${filename}`, type: 'image' };
+  }
+
+  /**
    * Delete an image file from the filesystem
    */
   async deleteImage(imageUrl: string): Promise<void> {
@@ -80,7 +129,26 @@ export class UploadService {
   }
 
   /**
-   * Validate uploaded file
+   * Process and optimize a progress photo
+   * Max 1080px wide, preserves portrait aspect ratio
+   */
+  async processProgressPhoto(file: Express.Multer.File): Promise<string> {
+    const filename = `${randomBytes(16).toString('hex')}.webp`;
+    const filepath = path.join(this.progressPhotosDir, filename);
+
+    await sharp(file.buffer)
+      .resize(1080, 1920, {
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 85 })
+      .toFile(filepath);
+
+    return `/uploads/progress-photos/${filename}`;
+  }
+
+  /**
+   * Validate uploaded file (images only)
    */
   validateImageFile(file: Express.Multer.File): {
     valid: boolean;
@@ -107,6 +175,40 @@ export class UploadService {
 
     if (file.size > maxSize) {
       return { valid: false, error: 'File too large. Maximum size is 10MB' };
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Validate uploaded media file (images + video)
+   */
+  validateMediaFile(file: Express.Multer.File): {
+    valid: boolean;
+    error?: string;
+  } {
+    const maxSize = 50 * 1024 * 1024; // 50MB for video
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/jpg',
+      'video/mp4',
+    ];
+
+    if (!file) {
+      return { valid: false, error: 'No file provided' };
+    }
+
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      return {
+        valid: false,
+        error: 'Invalid file type. Only JPEG, PNG, WebP, and MP4 are allowed',
+      };
+    }
+
+    if (file.size > maxSize) {
+      return { valid: false, error: 'File too large. Maximum size is 50MB' };
     }
 
     return { valid: true };

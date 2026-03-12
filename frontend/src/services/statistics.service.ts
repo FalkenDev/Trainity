@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
+import { fetchWrapper } from '@/utils/fetchWrapper'
+import type {
+  ExerciseHistoryResponse,
+  ExerciseRecords,
+  ExerciseProgressPoint,
+  ExerciseQuickStats,
+  WorkoutHistoryResponse,
+  WorkoutQuickStats,
+  OverviewStatistics,
+  ProgressMetric,
+  ProgressPeriod,
+  WeeklyTrend,
+  ComparisonStats,
+  HeatmapDay,
+} from '@/interfaces/Statistics.interface'
+
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1'
+
+export const fetchOverviewStatistics = async (): Promise<OverviewStatistics> => {
+  const data = await fetchWrapper<OverviewStatistics>(`${apiUrl}/statistics/overview`)
+  return data
+}
+
+export const fetchExerciseHistory = async (
+  exerciseId: number,
+  page = 1,
+  limit = 20
+): Promise<ExerciseHistoryResponse> => {
+  const data = await fetchWrapper<ExerciseHistoryResponse>(
+    `${apiUrl}/statistics/exercises/${exerciseId}/history?page=${page}&limit=${limit}`
+  )
+  return data
+}
+
+export const fetchExerciseRecords = async (exerciseId: number): Promise<ExerciseRecords> => {
+  const data = await fetchWrapper<ExerciseRecords>(
+    `${apiUrl}/statistics/exercises/${exerciseId}/records`
+  )
+  return data
+}
+
+export const fetchExerciseProgress = async (
+  exerciseId: number,
+  metric: ProgressMetric = 'estimated_1rm',
+  period: ProgressPeriod = 'all'
+): Promise<ExerciseProgressPoint[]> => {
+  const data = await fetchWrapper<ExerciseProgressPoint[]>(
+    `${apiUrl}/statistics/exercises/${exerciseId}/progress?metric=${metric}&period=${period}`
+  )
+  return data
+}
+
+export const fetchExerciseQuickStats = async (exerciseId: number): Promise<ExerciseQuickStats> => {
+  const data = await fetchWrapper<ExerciseQuickStats>(
+    `${apiUrl}/statistics/exercises/${exerciseId}/quick`
+  )
+  return data
+}
+
+export const fetchWorkoutHistory = async (
+  workoutId: number,
+  page = 1,
+  limit = 20
+): Promise<WorkoutHistoryResponse> => {
+  const data = await fetchWrapper<WorkoutHistoryResponse>(
+    `${apiUrl}/statistics/workouts/${workoutId}/history?page=${page}&limit=${limit}`
+  )
+  return data
+}
+
+export const fetchWorkoutQuickStats = async (workoutId: number): Promise<WorkoutQuickStats> => {
+  const data = await fetchWrapper<WorkoutQuickStats>(
+    `${apiUrl}/statistics/workouts/${workoutId}/quick`
+  )
+  return data
+}
+
+export const fetchWeeklyTrends = async (weeks = 12): Promise<WeeklyTrend[]> => {
+  const data = await fetchWrapper<WeeklyTrend[]>(
+    `${apiUrl}/statistics/weekly-trends?weeks=${weeks}`
+  )
+  return data
+}
+
+export const fetchComparison = async (): Promise<ComparisonStats> => {
+  const data = await fetchWrapper<ComparisonStats>(`${apiUrl}/statistics/comparison`)
+  return data
+}
+
+export const fetchActivityHeatmap = async (weeks = 12): Promise<HeatmapDay[]> => {
+  const data = await fetchWrapper<HeatmapDay[]>(
+    `${apiUrl}/statistics/activity-heatmap?weeks=${weeks}`
+  )
+  return data
+}

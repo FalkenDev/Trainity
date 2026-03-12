@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import {
   Controller,
   Get,
@@ -26,6 +41,7 @@ import {
 } from '@nestjs/swagger';
 import { UserWithoutPasswordDto } from '../auth/dto/UserWithoutPassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { UpdateUserPreferencesDto } from './dto/UpdateUserPreferences.dto';
 import { UploadService } from '../upload/upload.service';
 
 @ApiTags('users')
@@ -145,5 +161,18 @@ export class UserController {
       +req.user.id,
       body.weeklyWorkoutGoal,
     );
+  }
+
+  @Put('preferences')
+  @ApiOperation({ summary: 'Update user preferences and onboarding data' })
+  @ApiOkResponse({ type: UserWithoutPasswordDto })
+  updatePreferences(
+    @Req() req: RequestWithUser,
+    @Body() dto: UpdateUserPreferencesDto,
+  ) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    return this.userService.updateUserPreferences(+req.user.id, dto);
   }
 }

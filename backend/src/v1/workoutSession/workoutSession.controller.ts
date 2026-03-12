@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import {
   Controller,
   Get,
@@ -24,6 +39,7 @@ import { JwtAuthGuard } from '../guards/jwtAuth.guard';
 import { RequestWithUser } from '../types/requestWithUser.type';
 import { CreateWorkoutSessionDto } from './dto/createWorkoutSession.dto';
 import { AddExerciseToSessionDto } from './dto/addExerciseToSession.dto';
+import { LogPastWorkoutSessionDto } from './dto/logPastWorkoutSession.dto';
 import { WorkoutSession } from './workoutSession.entity';
 import { UpdateWorkoutSessionDto } from './dto/updateWorkoutSession.dto';
 
@@ -57,14 +73,31 @@ export class WorkoutSessionController {
     return this.sessionService.createSession(
       dto.workoutId,
       this.getUserId(req),
+      dto.scheduledSessionId,
     );
   }
 
   @Post('empty')
   @ApiOperation({ summary: 'Create an empty workout session' })
   @ApiCreatedResponse({ type: WorkoutSession })
-  createEmpty(@Req() req: RequestWithUser): Promise<WorkoutSession> {
-    return this.sessionService.createEmptySession(this.getUserId(req));
+  createEmpty(
+    @Req() req: RequestWithUser,
+    @Body() body: { scheduledSessionId?: number },
+  ): Promise<WorkoutSession> {
+    return this.sessionService.createEmptySession(
+      this.getUserId(req),
+      body?.scheduledSessionId,
+    );
+  }
+
+  @Post('log-past')
+  @ApiOperation({ summary: 'Log a past workout session' })
+  @ApiCreatedResponse({ type: WorkoutSession })
+  logPast(
+    @Req() req: RequestWithUser,
+    @Body() dto: LogPastWorkoutSessionDto,
+  ): Promise<WorkoutSession> {
+    return this.sessionService.logPastSession(this.getUserId(req), dto);
   }
 
   @Get(':id')

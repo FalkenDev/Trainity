@@ -1,9 +1,27 @@
+<!--
+  - Copyright (c) 2026 FalkenDev
+  -
+  - This file is part of Trainity.
+  -
+  - Trainity is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of
+  - the License, or (at your option) any later version.
+  -
+  - You should have received a copy of the GNU Affero General Public
+  - License along with Trainity. If not, see
+  - <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
   <div>
     <div class="d-flex flex-row justify-space-between align-center pa-3">
-      <h1 class="text-h5">
-        {{ resolvedExercise ? displayName(resolvedExercise) : $t('common.loading') }}
-      </h1>
+      <div class="d-flex align-center ga-2">
+        <slot name="prepend" />
+        <h1 class="text-h5">
+          {{ resolvedExercise ? displayName(resolvedExercise) : $t('common.loading') }}
+        </h1>
+      </div>
       <div class="d-flex flex-row ga-5 align-center">
         <v-chip
           v-if="allSetsDone"
@@ -36,8 +54,11 @@
             </v-icon>
           </template>
           <v-list>
-            <v-list-item disabled>
+            <v-list-item @click="$emit('view-details')">
               <v-list-item-title>{{ $t('session.exerciseDetails') }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="$emit('move-to-top')">
+              <v-list-item-title>{{ $t('session.moveToTop') }}</v-list-item-title>
             </v-list-item>
             <v-list-item @click="addSet">
               <v-list-item-title>{{ $t('session.addSet') }}</v-list-item-title>
@@ -213,6 +234,8 @@ const emit = defineEmits<{
   (e: 'update:rpe', value: number): void;
   (e: 'update:notes', value: string): void;
   (e: 'delete:exercise', payload: ExerciseProp['exercise']): void;
+  (e: 'move-to-top'): void;
+  (e: 'view-details'): void;
 }>();
 
 const resolvedExercise = computed(() => props.exercise.exercise);

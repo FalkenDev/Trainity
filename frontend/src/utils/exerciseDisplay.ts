@@ -1,40 +1,46 @@
-import type { Composer } from 'vue-i18n';
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
 
-import type { Exercise } from '@/interfaces/Exercise.interface';
-import type { GlobalExercise } from '@/interfaces/GlobalExercise.interface';
+import type { Composer } from 'vue-i18n'
 
-type Translator = Pick<Composer, 't'>;
+import type { Exercise } from '@/interfaces/Exercise.interface'
+
+type Translator = Pick<Composer, 't'>
 
 function translatedOrFallback(translator: Translator, key: string, fallback: string): string {
-  const translated = translator.t(key);
-  return translated === key ? fallback : translated;
+  const translated = translator.t(key)
+  return translated === key ? fallback : translated
 }
 
-export function displayExerciseName(translator: Translator, exercise: Pick<Exercise, 'name' | 'i18nKey' | 'isNameCustom'>): string {
-  if (exercise.isNameCustom && exercise.name) return exercise.name;
-  if (exercise.i18nKey) return translatedOrFallback(translator, `${exercise.i18nKey}.name`, exercise.name);
-  return exercise.name;
+export function displayExerciseName(
+  translator: Translator,
+  exercise: Pick<Exercise, 'name' | 'i18nKey' | 'isNameCustom'>
+): string {
+  if (exercise.isNameCustom && exercise.name) return exercise.name
+  if (exercise.i18nKey)
+    return translatedOrFallback(translator, `${exercise.i18nKey}.name`, exercise.name)
+  return exercise.name
 }
 
 export function displayExerciseDescription(
   translator: Translator,
   exercise: Pick<Exercise, 'description' | 'i18nKey'>,
-  fallback: string,
+  fallback: string
 ): string {
-  const current = (exercise.description ?? '').trim();
-  if (exercise.i18nKey) return translatedOrFallback(translator, `${exercise.i18nKey}.description`, current || fallback);
-  return current || fallback;
-}
-
-export function displayGlobalExerciseName(translator: Translator, exercise: Pick<GlobalExercise, 'i18nKey' | 'defaultName'>): string {
-  return translatedOrFallback(translator, `${exercise.i18nKey}.name`, exercise.defaultName);
-}
-
-export function displayGlobalExerciseDescription(
-  translator: Translator,
-  exercise: Pick<GlobalExercise, 'i18nKey' | 'defaultDescription'>,
-  fallback: string,
-): string {
-  const current = (exercise.defaultDescription ?? '').trim();
-  return translatedOrFallback(translator, `${exercise.i18nKey}.description`, current || fallback);
+  const current = (exercise.description ?? '').trim()
+  if (exercise.i18nKey)
+    return translatedOrFallback(translator, `${exercise.i18nKey}.description`, current || fallback)
+  return current || fallback
 }

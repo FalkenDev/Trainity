@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import {
   Injectable,
   NotFoundException,
@@ -12,6 +27,8 @@ import { WorkoutSessionSet } from './workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutStatus } from '../types/WorkoutStatus.type';
 import { UserService } from '../user/user.service';
+import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
+import { StatisticsService } from '../statistics/statistics.service';
 
 @Injectable()
 export class WorkoutSessionService {
@@ -28,6 +45,7 @@ export class WorkoutSessionService {
     private readonly setRepo: Repository<WorkoutSessionSet>,
     private readonly dataSource: DataSource,
     private readonly userService: UserService,
+    private readonly statisticsService: StatisticsService,
   ) {}
 
   async getAllSessions(userId: number): Promise<WorkoutSession[]> {
@@ -39,19 +57,33 @@ export class WorkoutSessionService {
       where: { id, user: { id: userId } },
       relations: [
         'workout',
+        'workout.exercises',
+        'workout.exercises.exercise',
         'exercises',
         'exercises.exercise',
         'exercises.sets',
       ],
+      withDeleted: true,
     });
 
     if (!session) throw new NotFoundException('Workout session not found');
+
+    // Sort session exercises by order
+    if (session.exercises) {
+      session.exercises.sort((a, b) => a.order - b.order);
+    }
+    // Sort workout exercises by order
+    if (session.workout?.exercises) {
+      session.workout.exercises.sort((a, b) => a.order - b.order);
+    }
+
     return session;
   }
 
   async createSession(
     workoutId: number,
     userId: number,
+    scheduledSessionId?: number,
   ): Promise<WorkoutSession> {
     const workout = await this.workoutRepo.findOne({
       where: { id: workoutId },
@@ -60,46 +92,184 @@ export class WorkoutSessionService {
 
     if (!workout) throw new NotFoundException('Workout not found');
 
-    const workoutSnapshot = {
-      title: workout.title,
-      description: workout.description,
-      time: workout.time,
-      exercises: workout.exercises.map((ex) => ({
-        exerciseId: ex.exercise.id,
-        order: ex.order,
-        sets: ex.sets,
-        reps: ex.reps,
-        weight: ex.weight,
-        pauseSeconds: ex.pauseSeconds,
-      })),
-    };
+    // Sort workout exercises by order
+    const sortedExercises = [...(workout.exercises || [])].sort(
+      (a, b) => a.order - b.order,
+    );
+
+    // Pre-populate session exercises from workout exercises
+    const sessionExercises = sortedExercises.map((we) =>
+      this.sessionExerciseRepo.create({
+        exercise: we.exercise,
+        order: we.order,
+        sets: [],
+      }),
+    );
 
     const session = this.sessionRepo.create({
       user: { id: userId },
       workout,
-      workoutSnapshot,
-      exercises: [],
+      exercises: sessionExercises,
       startedAt: new Date(),
+      scheduledSession: scheduledSessionId
+        ? ({ id: scheduledSessionId } as any)
+        : null,
     });
 
     return this.sessionRepo.save(session);
   }
 
-  async createEmptySession(userId: number): Promise<WorkoutSession> {
+  async createEmptySession(
+    userId: number,
+    scheduledSessionId?: number,
+  ): Promise<WorkoutSession> {
     const session = this.sessionRepo.create({
       user: { id: userId },
       workout: null,
-      workoutSnapshot: {
-        title: 'Empty Session',
-        description: '',
-        time: 0,
-        exercises: [],
-      },
       exercises: [],
       startedAt: new Date(),
+      scheduledSession: scheduledSessionId
+        ? ({ id: scheduledSessionId } as any)
+        : null,
     });
 
     return this.sessionRepo.save(session);
+  }
+
+  async logPastSession(
+    userId: number,
+    dto: {
+      workoutId?: number;
+      startedAt: string;
+      endedAt: string;
+      notes?: string;
+      scheduledSessionId?: number;
+      completedExercises?: {
+        exerciseId: number;
+        sets: { setNumber: number; weight: number; reps: number }[];
+      }[];
+    },
+  ): Promise<WorkoutSession> {
+    return this.dataSource.transaction(async (manager) => {
+      let workout: Workout | null = null;
+      if (dto.workoutId) {
+        workout = await manager.findOne(Workout, {
+          where: { id: dto.workoutId },
+          withDeleted: true,
+        });
+      }
+
+      const session = manager.create(WorkoutSession, {
+        user: { id: userId },
+        workout: workout || null,
+        exercises: [],
+        startedAt: new Date(dto.startedAt),
+        endedAt: new Date(dto.endedAt),
+        status: 'finished' as const,
+        totalWeight: 0,
+        exerciseStats: [],
+        notes: dto.notes || null,
+        scheduledSession: dto.scheduledSessionId
+          ? ({ id: dto.scheduledSessionId } as any)
+          : undefined,
+      } as any);
+
+      const saved = await manager.save(WorkoutSession, session);
+
+      // Save completed exercises & sets if provided
+      if (dto.completedExercises?.length) {
+        const sessionExercises: WorkoutSessionExercise[] = [];
+        const allSets: WorkoutSessionSet[] = [];
+
+        for (const ce of dto.completedExercises) {
+          const exercise = await manager.findOne(Exercise, {
+            where: { id: ce.exerciseId },
+            withDeleted: true,
+          });
+          if (!exercise)
+            throw new NotFoundException(`Exercise ${ce.exerciseId} not found`);
+
+          const sessionExercise = manager.create(WorkoutSessionExercise, {
+            session: saved,
+            exercise,
+            order: sessionExercises.length + 1,
+          });
+          sessionExercises.push(sessionExercise);
+        }
+
+        await manager.save(WorkoutSessionExercise, sessionExercises);
+
+        for (let i = 0; i < dto.completedExercises.length; i++) {
+          const ce = dto.completedExercises[i];
+          const sessionExercise = sessionExercises[i];
+          const sets = (ce.sets ?? []).map((s) =>
+            manager.create(WorkoutSessionSet, {
+              setNumber: s.setNumber,
+              weight: s.weight,
+              reps: s.reps,
+              sessionExercise,
+            }),
+          );
+          allSets.push(...sets);
+        }
+
+        if (allSets.length) {
+          await manager.save(WorkoutSessionSet, allSets);
+        }
+
+        // Compute totalWeight & exerciseStats
+        let totalWeight = 0;
+        const stats: { exerciseId: number; totalWeight: number }[] = [];
+        for (let i = 0; i < dto.completedExercises.length; i++) {
+          const ce = dto.completedExercises[i];
+          let exTotal = 0;
+          for (const s of ce.sets ?? []) {
+            exTotal += s.weight * s.reps;
+          }
+          stats.push({ exerciseId: ce.exerciseId, totalWeight: exTotal });
+          totalWeight += exTotal;
+        }
+
+        saved.totalWeight = totalWeight;
+        saved.exerciseStats = stats;
+        await manager.save(WorkoutSession, saved);
+      }
+
+      // Update streak
+      await this.userService.updateStreakOnWorkoutCompletion(userId);
+
+      // Compute and upsert personal records for logged past sessions
+      if (dto.completedExercises?.length) {
+        const completedForRecords = dto.completedExercises
+          .filter((ce) => ce.sets?.length)
+          .map((ce) => ({
+            exerciseId: ce.exerciseId,
+            sets: (ce.sets ?? []).map((s) => ({
+              weight: s.weight ?? 0,
+              reps: s.reps ?? 0,
+            })),
+          }));
+
+        if (completedForRecords.length) {
+          await this.statisticsService.computeAndUpsertRecords(
+            userId,
+            saved.id,
+            completedForRecords,
+          );
+        }
+      }
+
+      return manager.findOneOrFail(WorkoutSession, {
+        where: { id: saved.id },
+        relations: [
+          'exercises',
+          'exercises.sets',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+        ],
+        withDeleted: true,
+      });
+    });
   }
 
   async addExerciseToSession(
@@ -124,21 +294,21 @@ export class WorkoutSessionService {
     const exercise = await this.exerciseRepo.findOne({
       where: { id: exerciseId },
       relations: ['muscleGroups'],
+      withDeleted: true,
     });
 
     if (!exercise) throw new NotFoundException('Exercise not found');
 
-    const snapshot = {
-      name: exercise.name,
-      description: exercise.description,
-      img: undefined, // Optional image if you add it to Exercise
-      muscleGroups: exercise.muscleGroups?.map((mg) => mg.name),
-    };
+    // Assign order as next after current max
+    const maxOrder = session.exercises.reduce(
+      (max, e) => Math.max(max, e.order ?? 0),
+      0,
+    );
 
     const sessionExercise = this.sessionExerciseRepo.create({
       session,
       exercise,
-      exerciseSnapshot: snapshot,
+      order: maxOrder + 1,
       sets: sets.map((s) => this.setRepo.create(s)),
     });
 
@@ -190,16 +360,20 @@ export class WorkoutSessionService {
           if (!sessionExercise) {
             const exercise = await manager.findOne(Exercise, {
               where: { id: ce.exerciseId },
+              withDeleted: true,
             });
             if (!exercise) throw new NotFoundException('Exercise not found');
+
+            // Assign order as next after current max
+            const currentMax = (session.exercises ?? []).reduce(
+              (max, e) => Math.max(max, e.order ?? 0),
+              0,
+            );
 
             sessionExercise = manager.create(WorkoutSessionExercise, {
               session,
               exercise,
-              exerciseSnapshot: {
-                name: exercise.name,
-                description: exercise.description,
-              },
+              order: currentMax + 1,
               notes: ce.notes,
             });
 
@@ -283,10 +457,39 @@ export class WorkoutSessionService {
       // Update user's streak after finishing workout
       await this.userService.updateStreakOnWorkoutCompletion(userId);
 
-      return manager.findOneOrFail(WorkoutSession, {
+      // Compute and upsert personal records
+      const completedForRecords = (session.exercises ?? [])
+        .filter((ex) => ex.exercise?.id && ex.sets?.length)
+        .map((ex) => ({
+          exerciseId: ex.exercise.id,
+          sets: (ex.sets ?? []).map((s) => ({
+            weight: s.weight ?? 0,
+            reps: s.reps ?? 0,
+            rpe: s.rpe,
+          })),
+        }));
+
+      let newRecords: any[] = [];
+      if (completedForRecords.length) {
+        newRecords = await this.statisticsService.computeAndUpsertRecords(
+          userId,
+          session.id,
+          completedForRecords,
+        );
+      }
+
+      const result = await manager.findOneOrFail(WorkoutSession, {
         where: { id: session.id },
-        relations: ['exercises', 'exercises.sets', 'exercises.exercise'],
+        relations: [
+          'exercises',
+          'exercises.sets',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+        ],
+        withDeleted: true,
       });
+
+      return { ...result, newRecords } as any;
     });
   }
 

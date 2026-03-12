@@ -1,100 +1,122 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
+export type WorkoutType = 'strength' | 'cardio' | 'hiit' | 'flexibility' | 'endurance'
+
 export interface Workout {
-  id: number;
-  title: string;
-  time: number;
-  description?: string;
-  exercises: Exercise[];
-  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
-  createdAt: Date;
-  updatedAt: Date;
+  id: number
+  title: string
+  time: number
+  description?: string
+  type?: WorkoutType | null
+  exercises: Exercise[]
+  targetMuscleGroups?: MuscleGroup[]
+  defaultWeightAndReps: 'default' | 'latest'
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface Exercise {
-  id: number;
-  order: number;
-  sets: number;
-  reps: number;
-  weight: number;
-  pauseSeconds: number;
-  exerciseId: number;
+  id: number
+  order: number
+  sets: number
+  reps: number
+  weight: number
+  pauseSeconds: number
+  exerciseId: number
   exercise: {
-    id: number;
-    name: string;
-    i18nKey?: string;
-    isNameCustom?: boolean;
-    description?: string | null;
-    img: string;
-    muscleGroups: MuscleGroup[];
-    defaultSets: number;
-    defaultReps: number;
-    defaultPauseSeconds: number;
-    createdBy: string;
-    createdAt: string;
-    updatedAt: string;
-  };
+    id: number
+    name: string
+    i18nKey?: string
+    isNameCustom?: boolean
+    description?: string | null
+    img: string
+    muscleGroups: MuscleGroup[]
+    primaryMuscleGroup?: { id: number; name: string } | null
+    createdBy: string
+    createdAt: string
+    updatedAt: string
+    deletedAt?: string | null
+  }
 }
 
 export interface WorkoutSet {
-  set: number;
-  previous: string;
-  weight: number;
-  reps: number;
-  done: boolean;
+  set: number
+  previous: string
+  weight: number
+  reps: number
+  done: boolean
 }
 
 type FinishedSetPayload = {
-  setNumber: number;
-  weight: number;
-  reps: number;
-};
+  setNumber: number
+  weight: number
+  reps: number
+}
 
 export interface WorkoutExercisePayload {
-  exerciseId: number;
-  sets: [FinishedSetPayload, ...FinishedSetPayload[]];
+  exerciseId: number
+  sets: [FinishedSetPayload, ...FinishedSetPayload[]]
 }
 
 export interface CreateWorkoutExercise {
-  exerciseId: number;
-  order: number;
-  sets: number;
-  reps: number;
-  weight: number;
-  pauseSeconds: number;
+  exerciseId: number
+  order: number
+  sets: number
+  reps: number
+  weight: number
+  pauseSeconds: number
 }
 
 export interface CreateWorkout {
-  title: string;
-  time: number;
-  description?: string;
+  title: string
+  time: number
+  description?: string
+  type?: WorkoutType
+  targetMuscleGroupIds?: number[]
 }
 
 export interface UpdateWorkout {
-  title?: string;
-  time?: number;
-  description?: string;
-  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
+  title?: string
+  time?: number
+  description?: string
+  type?: WorkoutType | null
+  targetMuscleGroupIds?: number[]
+  defaultWeightAndReps?: 'default' | 'latest'
 }
 
 export interface AddExerciseToWorkout {
-  exerciseId: number;
-  order: number;
-  sets: number;
-  reps: number;
-  weight: number;
-  pauseSeconds: number;
+  exerciseId: number
+  order: number
+  sets: number
+  reps: number
+  weight: number
+  pauseSeconds: number
 }
 
 export interface UpdateWorkoutExercise {
-  sets?: number;
-  reps?: number;
-  weight?: number;
-  pauseSeconds?: number;
+  sets?: number
+  reps?: number
+  weight?: number
+  pauseSeconds?: number
 }
 
 export interface MuscleGroup {
-  id: number;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
+  id: number
+  name: string
+  description: string
+  createdAt: string
+  updatedAt: string
 }

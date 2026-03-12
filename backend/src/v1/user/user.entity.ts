@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import {
   Entity,
   Column,
@@ -43,6 +58,43 @@ export class User {
 
   @Column({ default: 0 })
   currentWeekWorkouts: number;
+
+  // Onboarding & Preferences
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  unitScale: string; // 'metric' or 'imperial'
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  weight: number;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  height: number;
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth: Date;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  gender: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  primaryGoal: string;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  targetWeight: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  goalTimeframe: number | null;
+
+  @Column({ default: false })
+  showWeightTracking: boolean;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  weightGoalType: string | null;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  startWeight: number; // in weeks
+
+  @Column({ default: false })
+  onboardingCompleted: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

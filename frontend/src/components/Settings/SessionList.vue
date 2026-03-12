@@ -1,310 +1,278 @@
+<!--
+  - Copyright (c) 2026 FalkenDev
+  -
+  - This file is part of Trainity.
+  -
+  - Trainity is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of
+  - the License, or (at your option) any later version.
+  -
+  - You should have received a copy of the GNU Affero General Public
+  - License along with Trainity. If not, see
+  - <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
-  <div class="d-flex flex-column fill-height bg-grey-darken-4">
-    <BackHeader
-      :title="$t('sessionList.title')"
-      show-menu
-      @close="emit('close')"
-    />
+  <div class="d-flex flex-column fill-height bg-background">
+    <BackHeader :title="$t('sessionList.title')" @close="emit('close')" />
 
-    <div class="content-scroll">
-      <v-row>
-        <v-col cols="12">
-          <v-card elevation="0">
-            <v-card-title class="d-flex ga-10 justify-space-between align-center">
-              <div class="text-h6 w-100">
-                <v-text-field
-                  v-model="searchQuery"
-                  variant="outlined"
-                  prepend-inner-icon="mdi-magnify"
-                  :label="$t('common.search')"
-                  clearable
-                  hide-details
-                  density="compact"
-                  width="100%"
-                />
-              </div>
-              <div class="text-caption text-medium-emphasis">
-                {{ sessions.length }} {{ $t('common.total') }}
-              </div>
-            </v-card-title>
+    <!-- Search -->
+    <div class="mx-5 mt-2 mb-4">
+      <v-text-field
+        v-model="searchQuery"
+        variant="outlined"
+        prepend-inner-icon="mdi-magnify"
+        :label="$t('common.search')"
+        clearable
+        hide-details
+        density="compact"
+      />
+    </div>
 
-            <v-divider />
+    <!-- List -->
+    <div class="flex-grow-1 overflow-y-auto pb-5 d-flex ga-3 flex-column">
+      <template v-if="sessions.length > 0">
+        <div
+          v-for="session in sessions"
+          :key="`${session.type}-${session.data.id}`"
+          class="bg-cardBg rounded-lg mx-5 py-3 px-4 cursor-pointer"
+          style="border: 1px solid rgb(var(--v-theme-borderColor))"
+          @click="openDetail(session)"
+        >
+          <div class="d-flex align-center ga-4">
+            <v-avatar color="avatarBg" size="50" tile class="rounded-lg flex-shrink-0">
+              <v-icon color="primary">{{ sessionIcon(session) }}</v-icon>
+            </v-avatar>
 
-            <v-card-text
-              v-if="sessions.length > 0"
-              class="pa-0"
-            >
-              <v-expansion-panels multiple>
-                <v-expansion-panel
-                  v-for="session in sessions"
-                  :key="session.id"
+            <div class="flex-grow-1" style="min-width: 0">
+              <div class="d-flex align-center ga-1 mb-1 flex-wrap">
+                <v-chip
+                  :color="session.type === 'workout' ? 'primary' : 'secondary'"
+                  size="x-small"
+                  variant="tonal"
                 >
-                  <v-expansion-panel-title>
-                    <div class="d-flex flex-wrap align-center w-100 ga-2">
-                      <div class="mr-4">
-                        <div class="text-subtitle-1 font-weight-medium">
-                          {{ title(session) }}
-                        </div>
-                        <div class="text-caption text-medium-emphasis">
-                          {{ $t('sessionList.started') }}: {{ formatDateTime(session.startedAt) }}
-                          <span v-if="session.endedAt">
-                            • {{ $t('sessionList.ended') }}: {{ formatDateTime(session.endedAt) }}
-                          </span>
-                          • {{ $t('sessionList.duration') }}:
-                          {{
-                            durationMinutes(
-                              session.startedAt,
-                              session.endedAt || undefined
-                            )
-                          }}
-                        </div>
-                      </div>
+                  {{
+                    session.type === 'workout'
+                      ? $t('sessionList.workoutSession')
+                      : $t('sessionList.activityLog')
+                  }}
+                </v-chip>
+                <v-chip
+                  v-if="session.type === 'workout'"
+                  :color="statusColor((session.data as WorkoutSession).status)"
+                  size="x-small"
+                  variant="flat"
+                  class="text-uppercase"
+                >
+                  {{ statusLabel((session.data as WorkoutSession).status) }}
+                </v-chip>
+              </div>
 
-                      <div class="d-flex ga-2 flex-wrap">
-                        <v-chip
-                          :color="statusColor(session.status)"
-                          size="small"
-                          variant="flat"
-                          class="text-uppercase"
-                        >
-                          {{ statusLabel(session.status) }}
-                        </v-chip>
+              <p class="text-body-1 font-weight-bold text-textPrimary text-truncate">
+                {{ title(session) }}
+              </p>
 
-                        <v-chip
-                          size="small"
-                          variant="outlined"
-                        >
-                          {{ $t('sessionList.totalWeight') }}: {{ session.totalWeight }} {{ $t('units.kgShort') }}
-                        </v-chip>
-                      </div>
-                    </div>
-                  </v-expansion-panel-title>
-
-                  <v-expansion-panel-text>
-                    <v-row class="mb-2">
-                      <v-col
-                        cols="12"
-                        md="8"
-                      >
-                        <div class="text-body-2">
-                          {{
-                            session.workoutSnapshot?.description ||
-                              $t('common.noDescription')
-                          }}
-                        </div>
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        md="4"
-                        class="d-flex justify-end"
-                      >
-                        <div class="text-caption text-medium-emphasis">
-                          {{ $t('common.createdAt') }}: {{ formatDateTime(session.createdAt) }} •
-                          {{ $t('common.updatedAt') }}: {{ formatDateTime(session.updatedAt) }}
-                        </div>
-                      </v-col>
-                    </v-row>
-
-                    <v-divider class="my-2" />
-
-                    <div class="text-subtitle-2 mb-2">
-                      {{ $t('sessionList.exercises') }}
-                    </div>
-                    <v-row>
-                      <v-col
-                        v-for="ex in session.exercises"
-                        :key="ex.exerciseId"
-                        cols="12"
-                      >
-                        <v-card
-                          variant="text"
-                          class="pa-2"
-                        >
-                          <div class="d-flex justify-space-between align-start">
-                            <div>
-                              <div class="text-subtitle-2">
-                                {{ ex.exerciseSnapshot?.name || $t('sessionList.exerciseFallback') }}
-                              </div>
-                              <div class="text-caption text-medium-emphasis">
-                                {{ ex.exerciseSnapshot?.description || '' }}
-                              </div>
-                            </div>
-
-                            <div class="text-caption text-medium-emphasis">
-                              {{ $t('sessionList.sets') }}: {{ ex.sets?.length || 0 }}
-                            </div>
-                          </div>
-
-                          <v-table
-                            density="comfortable"
-                            class="mt-2"
-                          >
-                            <thead>
-                              <tr>
-                                <th class="text-left">
-                                  {{ $t('table.set') }}
-                                </th>
-                                <th class="text-left">
-                                  {{ $t('sessionList.weightKg') }}
-                                </th>
-                                <th class="text-left">
-                                  {{ $t('table.reps') }}
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr
-                                v-for="s in ex.sets"
-                                :key="s.setNumber"
-                              >
-                                <td>#{{ s.setNumber }}</td>
-                                <td>{{ s.weight }}</td>
-                                <td>{{ s.reps }}</td>
-                              </tr>
-                              <tr v-if="!ex.sets || ex.sets.length === 0">
-                                <td
-                                  colspan="5"
-                                  class="text-medium-emphasis"
-                                >
-                                  {{ $t('sessionList.noSetsRecorded') }}
-                                </td>
-                              </tr>
-                            </tbody>
-                          </v-table>
-                        </v-card>
-                      </v-col>
-                    </v-row>
-
-                    <v-divider class="my-2" />
-
-                    <div class="d-flex align-center justify-space-between mt-4">
-                      <div class="text-caption">
-                        {{ $t('sessionList.sessionNotes') }}: {{ session.notes || '—' }}
-                      </div>
-                      <v-btn
-                        color="error"
-                        variant="text"
-                        size="small"
-                        prepend-icon="mdi-delete"
-                        @click="handleDelete(session.id)"
-                      >
-                        {{ $t('common.delete') }}
-                      </v-btn>
-                    </div>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
-              </v-expansion-panels>
-            </v-card-text>
-            <div
-              v-else
-              class="py-10"
-            >
-              <p class="text-center text-subtitle text-medium-emphasis">
-                {{ $t('sessionList.noSessionsFound') }}
+              <p class="text-caption text-textSecondary">
+                <template v-if="session.type === 'workout'">
+                  {{ formatDate((session.data as WorkoutSession).startedAt) }}
+                  &nbsp;·&nbsp;
+                  {{
+                    durationMinutes(
+                      (session.data as WorkoutSession).startedAt,
+                      (session.data as WorkoutSession).endedAt || undefined
+                    )
+                  }}
+                  &nbsp;·&nbsp;
+                  {{ (session.data as WorkoutSession).totalWeight }} kg
+                </template>
+                <template v-else>
+                  {{ formatDate((session.data as ActivityLog).date) }}
+                  &nbsp;·&nbsp;
+                  {{ (session.data as ActivityLog).duration }} {{ $t('units.minShort') }}
+                  <template v-if="(session.data as ActivityLog).distance">
+                    &nbsp;·&nbsp;{{ (session.data as ActivityLog).distance }} {{ $t('units.km') }}
+                  </template>
+                </template>
               </p>
             </div>
-          </v-card>
-        </v-col>
-      </v-row>
+
+            <v-icon color="grey-lighten-1" class="flex-shrink-0">mdi-chevron-right</v-icon>
+          </div>
+        </div>
+      </template>
+
+      <!-- Empty state -->
+      <div
+        v-if="sessions.length === 0"
+        class="d-flex flex-column align-center justify-center flex-grow-1 py-16"
+      >
+        <v-icon size="56" color="textSecondary" class="mb-4">mdi-history</v-icon>
+        <p class="text-subtitle-1 font-weight-bold text-textPrimary mb-1">
+          {{ $t('sessionList.noSessionsFound') }}
+        </p>
+        <p class="text-body-2 text-textSecondary text-center">
+          {{ $t('statistics.noHistory') }}
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useWorkoutSessionStore } from '@/stores/workoutSession.store';
-import type { WorkoutSession } from '@/interfaces/workoutSession.interface';
-import { useI18n } from 'vue-i18n';
+import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
+import { useActivityStore } from '@/stores/activity.store'
+import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
+import type { ActivityLog } from '@/interfaces/Activity.interface'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
-const { t } = useI18n({ useScope: 'global' });
+const { t } = useI18n({ useScope: 'global' })
+const router = useRouter()
 
-const searchQuery = ref('');
-const store = useWorkoutSessionStore();
-const sessions = computed<WorkoutSession[]>(() => {
-  return ((store.workoutSessions as WorkoutSession[]) || [])
+const searchQuery = ref('')
+const workoutSessionStore = useWorkoutSessionStore()
+const activityStore = useActivityStore()
+
+type UnifiedSession =
+  | { type: 'workout'; data: WorkoutSession }
+  | { type: 'activity'; data: ActivityLog }
+
+const sessions = computed<UnifiedSession[]>(() => {
+  const workoutSessions: UnifiedSession[] = (
+    (workoutSessionStore.workoutSessions as WorkoutSession[]) || []
+  ).map(session => ({ type: 'workout' as const, data: session }))
+
+  const activityLogs: UnifiedSession[] = ((activityStore.activityLogs as ActivityLog[]) || []).map(
+    log => ({ type: 'activity' as const, data: log })
+  )
+
+  const combined = [...workoutSessions, ...activityLogs]
+
+  return combined
     .filter(session => {
-      if (!searchQuery.value) return true; // Show all if no search query
+      if (!searchQuery.value) return true
 
-      const query = searchQuery.value.toLowerCase().trim();
-      
-      if (session.workoutSnapshot?.title?.toLowerCase().includes(query)) return true;
-      
-      if (session.notes?.toLowerCase().includes(query)) return true;
-      
-      if (session.exercises?.some(ex => 
-        ex.exerciseSnapshot?.name?.toLowerCase().includes(query) ||
-        ex.exerciseSnapshot?.description?.toLowerCase().includes(query)
-      )) return true;
-      
-      return false;
+      const query = searchQuery.value.toLowerCase().trim()
+
+      if (session.type === 'workout') {
+        const ws = session.data as WorkoutSession
+        if (ws.workout?.title?.toLowerCase().includes(query)) return true
+        if (ws.notes?.toLowerCase().includes(query)) return true
+        if (
+          ws.exercises?.some(
+            ex =>
+              ex.exercise?.name?.toLowerCase().includes(query) ||
+              ex.exercise?.description?.toLowerCase().includes(query)
+          )
+        )
+          return true
+      } else {
+        const al = session.data as ActivityLog
+        if (al.activity?.name?.toLowerCase().includes(query)) return true
+        if (al.notes?.toLowerCase().includes(query)) return true
+      }
+
+      return false
     })
     .sort((a, b) => {
-      const dateA = new Date(a.startedAt).getTime();
-      const dateB = new Date(b.startedAt).getTime();
-      return dateB - dateA;
-    });
-});
+      const dateA =
+        a.type === 'workout'
+          ? new Date((a.data as WorkoutSession).startedAt).getTime()
+          : new Date((a.data as ActivityLog).date).getTime()
+      const dateB =
+        b.type === 'workout'
+          ? new Date((b.data as WorkoutSession).startedAt).getTime()
+          : new Date((b.data as ActivityLog).date).getTime()
+      return dateB - dateA
+    })
+})
 
 const emit = defineEmits<{
-  (e: 'close'): void;
-}>();
+  (e: 'close'): void
+}>()
 
-function formatDateTime(iso?: string) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  return d.toLocaleString();
+function sessionIcon(session: UnifiedSession) {
+  if (session.type === 'activity') {
+    const icon = (session.data as ActivityLog).activity?.icon
+    const iconMap: Record<string, string> = {
+      running: 'mdi-run',
+      walking: 'mdi-walk',
+      cycling: 'mdi-bike',
+      swimming: 'mdi-swim',
+      hiking: 'mdi-hiking',
+      rowing: 'mdi-rowing',
+      yoga: 'mdi-yoga',
+      boxing: 'mdi-boxing-glove',
+      skiing: 'mdi-ski',
+      skating: 'mdi-skate',
+    }
+    return icon ? (iconMap[icon] ?? 'mdi-run-fast') : 'mdi-run-fast'
+  }
+  return 'mdi-dumbbell'
+}
+
+function formatDate(iso?: string) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 function durationMinutes(start?: string, end?: string) {
-  if (!start) return '';
-  const s = new Date(start).getTime();
-  const e = end ? new Date(end).getTime() : Date.now();
-  const mins = Math.max(0, Math.round((e - s) / 60000));
-  return `${mins} ${t('units.minShort')}`;
+  if (!start) return ''
+  const s = new Date(start).getTime()
+  const e = end ? new Date(end).getTime() : Date.now()
+  const mins = Math.max(0, Math.round((e - s) / 60000))
+  return `${mins} ${t('units.minShort')}`
+}
+
+function openDetail(session: UnifiedSession) {
+  router.push(`/session-history/${session.type}/${session.data.id}`)
 }
 
 function statusLabel(status: WorkoutSession['status']) {
-  const key = `session.status.${status}` as const;
-  return t(key);
+  const key = `session.status.${status}` as const
+  return t(key)
 }
 
 function statusColor(status: WorkoutSession['status']) {
   switch (status) {
     case 'finished':
-      return 'success';
+      return 'success'
     case 'in_progress':
-      return 'warning';
+      return 'warning'
     case 'abandoned':
-      return 'error';
+      return 'error'
     default:
-      return 'default';
+      return 'default'
   }
 }
 
-function title(session: WorkoutSession) {
-  return session.workoutSnapshot?.title || `Session #${session.id}`;
-}
-
-async function handleDelete(sessionId: number) {
-  if (
-    confirm(
-      t('sessionList.deleteConfirm'),
+function title(session: UnifiedSession) {
+  if (session.type === 'workout') {
+    return (
+      (session.data as WorkoutSession).workout?.title ||
+      `Session #${(session.data as WorkoutSession).id}`
     )
-  ) {
-    await store.deleteSession(sessionId);
+  } else {
+    return (
+      (session.data as ActivityLog).activity?.name ||
+      `Activity #${(session.data as ActivityLog).id}`
+    )
   }
 }
 
 onMounted(() => {
-  store.setWorkoutSessions(true);
-});
-
+  workoutSessionStore.setWorkoutSessions(true)
+  activityStore.fetchActivityLogs(true)
+})
 </script>
 
 <style scoped>
-.content-scroll {
-  height: calc(100vh - 56px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>
