@@ -40,6 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      target: production
     container_name: trainity_frontend
     restart: unless-stopped
     depends_on:
@@ -49,5 +50,4 @@ services:
     env_file:
       - .env
 
-volumes:
-  postgres_data
+volumes: postgres_data

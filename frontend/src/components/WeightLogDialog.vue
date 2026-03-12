@@ -103,7 +103,11 @@
                 <div class="d-flex ga-3 mb-5">
                   <v-card
                     class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-                    style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1"
+                    style="
+                      border: 1px solid rgb(var(--v-theme-borderColor));
+                      box-shadow: none;
+                      flex: 1;
+                    "
                   >
                     <p class="text-caption text-textSecondary text-uppercase mb-1">
                       {{ $t('weightLog.current') }}
@@ -115,7 +119,11 @@
                   </v-card>
                   <v-card
                     class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-                    style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1"
+                    style="
+                      border: 1px solid rgb(var(--v-theme-borderColor));
+                      box-shadow: none;
+                      flex: 1;
+                    "
                   >
                     <p class="text-caption text-textSecondary text-uppercase mb-1">
                       {{ $t('weightLog.sinceStart') }}
@@ -127,7 +135,11 @@
                   </v-card>
                   <v-card
                     class="flex-grow-1 bg-cardBg py-3 d-flex flex-column align-center rounded-lg"
-                    style="border: 1px solid rgb(var(--v-theme-borderColor)); box-shadow: none; flex: 1"
+                    style="
+                      border: 1px solid rgb(var(--v-theme-borderColor));
+                      box-shadow: none;
+                      flex: 1;
+                    "
                   >
                     <p class="text-caption text-textSecondary text-uppercase mb-1">
                       {{ $t('weightLog.sinceLast') }}
@@ -495,8 +507,8 @@ const goalTypeItems = computed(() => [
 ])
 
 // Convert display weight to kg for storage
-const toKg = (val: number) => (isImperial.value ? val / 2.20462 : val)
-const fromKg = (val: number) => (isImperial.value ? val * 2.20462 : val)
+const toKg = (val: number) => (isImperial.value ? Number(val) / 2.20462 : Number(val))
+const fromKg = (val: number) => (isImperial.value ? Number(val) * 2.20462 : Number(val))
 
 const formatWeight = (val?: number) => {
   if (val === undefined || val === null) return '—'

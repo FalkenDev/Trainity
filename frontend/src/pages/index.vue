@@ -50,17 +50,6 @@
         </template>
         <span class="text-caption">Progress</span>
       </v-btn>
-      <v-btn
-        class="flex-grow-1 bg-cardBg rounded-lg"
-        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
-        size="small"
-        @click="$router.push('/statistics')"
-      >
-        <template #prepend>
-          <v-icon color="red-darken-1">mdi-chart-box</v-icon>
-        </template>
-        <span class="text-caption">Statistics</span>
-      </v-btn>
     </div>
     <ProgressBar />
 

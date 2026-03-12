@@ -45,9 +45,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+      target: development
       args:
         VITE_API_URL: ${VITE_API_URL}
     container_name: trainity_frontend
+    command: npm run dev -- --host
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     volumes:
