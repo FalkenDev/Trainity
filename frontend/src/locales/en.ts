@@ -996,4 +996,10 @@ export default {
       endurance: 'Endurance',
     },
   },
+  pwa: {
+    updateAvailable: 'A new version is available',
+    update: 'Update',
+    dismiss: 'Dismiss',
+    offlineReady: 'App ready for offline use',
+  },
 } as const
