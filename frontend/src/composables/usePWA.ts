@@ -18,11 +18,7 @@ import { useRegisterSW } from 'virtual:pwa-register/vue'
 const UPDATE_INTERVAL_MS = 60 * 60 * 1000 // Check for updates every 60 minutes
 
 export function usePWA() {
-  const {
-    offlineReady,
-    needRefresh,
-    updateServiceWorker,
-  } = useRegisterSW({
+  const { offlineReady, needRefresh, updateServiceWorker } = useRegisterSW({
     onRegisteredSW(swUrl, registration) {
       if (!registration) return
 
