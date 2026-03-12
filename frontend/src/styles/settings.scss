@@ -8,3 +8,14 @@
 // @use 'vuetify/settings' with (
 //   $color-pack: false
 // );
+
+// PWA Safe Area — shifts app content below the status bar / notch
+.v-application {
+  padding-top: env(safe-area-inset-top, 0px) !important;
+}
+
+// Grow the bottom nav bar so icons clear the home indicator
+.v-bottom-navigation {
+  height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+}
