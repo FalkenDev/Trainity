@@ -19,7 +19,9 @@
     <PWAUpdatePrompt />
     <v-main
       :style="{
-        paddingBottom: showResumeBar ? '101px' : '',
+        paddingBottom: showResumeBar
+          ? 'calc(101px + env(safe-area-inset-bottom, 0px))'
+          : 'env(safe-area-inset-bottom, 0px)',
       }"
     >
       <router-view :key="$route.name" />
@@ -94,7 +96,7 @@ const routeToSelectedWorkoutSession = () => {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 56px;
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   z-index: 1100;
   width: 100%;
 }
