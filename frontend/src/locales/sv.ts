@@ -988,4 +988,10 @@ export default {
       endurance: 'Uthållighet',
     },
   },
+  pwa: {
+    updateAvailable: 'En ny version är tillgänglig',
+    update: 'Uppdatera',
+    dismiss: 'Avvisa',
+    offlineReady: 'Appen är redo för offlineanvändning',
+  },
 } as const
