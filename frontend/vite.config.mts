@@ -25,7 +25,7 @@ export default defineConfig({
         'vue',
         VueRouterAutoImports,
         {
-          'pinia': ['defineStore', 'storeToRefs'],
+          pinia: ['defineStore', 'storeToRefs'],
         },
       ],
       dts: 'src/auto-imports.d.ts',
@@ -158,26 +158,18 @@ export default defineConfig({
   },
   define: {
     'process.env': {},
-    '__APP_VERSION__': JSON.stringify(process.env.npm_package_version || '0.0.0'),
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '0.0.0'),
   },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-    extensions: [
-      '.js',
-      '.json',
-      '.jsx',
-      '.mjs',
-      '.ts',
-      '.tsx',
-      '.vue',
-    ],
+    extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
   },
   server: {
     host: true, // bind to 0.0.0.0 so external devices can connect
     allowedHosts: process.env.VITE_ALLOWED_HOSTS
-      ? process.env.VITE_ALLOWED_HOSTS.split(',').map((h) => h.trim())
+      ? process.env.VITE_ALLOWED_HOSTS.split(',').map(h => h.trim())
       : undefined,
     port: 3000,
   },

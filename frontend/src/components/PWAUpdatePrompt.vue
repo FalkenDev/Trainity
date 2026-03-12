@@ -46,7 +46,7 @@ const { t } = useI18n()
 
 const showUpdateSnackbar = computed(() => needRefresh.value)
 
-watch(offlineReady, (ready) => {
+watch(offlineReady, ready => {
   if (ready) {
     toast(t('pwa.offlineReady'), { cardProps: { color: 'cardBg' } })
   }
