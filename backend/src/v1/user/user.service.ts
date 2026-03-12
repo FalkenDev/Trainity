@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import {
   BadRequestException,
   Injectable,
@@ -9,8 +24,10 @@ import { User } from './user.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { UserWithoutPasswordDto } from '../auth/dto/UserWithoutPassword.dto';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
+import { UpdateUserPreferencesDto } from './dto/UpdateUserPreferences.dto';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
+import { ActivityLog } from '../activityLog/activityLog.entity';
 import { UploadService } from '../upload/upload.service';
 import * as bcrypt from 'bcrypt';
 
@@ -28,6 +45,9 @@ export class UserService {
 
     @InjectRepository(WorkoutSession)
     private readonly sessionRepo: Repository<WorkoutSession>,
+
+    @InjectRepository(ActivityLog)
+    private readonly activityLogRepo: Repository<ActivityLog>,
 
     private readonly uploadService: UploadService,
   ) {}
@@ -106,7 +126,11 @@ export class UserService {
 
     // Destructure to exclude sensitive fields before saving
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { currentPassword, newPassword, email, ...safeDto } = dto;
+    const { currentPassword, newPassword, email, dateOfBirth, ...safeDto } =
+      dto;
+    if (dateOfBirth !== undefined) {
+      user.dateOfBirth = new Date(dateOfBirth);
+    }
     Object.assign(user, safeDto);
     const updated = await this.userRepo.save(user);
 
@@ -176,6 +200,7 @@ export class UserService {
 
   /**
    * Check if we're in a new week and reset/update streak accordingly
+   * Counts both workout sessions and activity logs
    */
   private async checkAndResetWeeklyProgress(
     user: User,
@@ -211,8 +236,19 @@ export class UserService {
           (7 * 24 * 60 * 60 * 1000),
       );
 
+      // Count total sessions with activities (sessions OR logs) in the previous week
+      const lastWeekSunday = new Date(currentWeekMonday);
+      lastWeekSunday.setDate(lastWeekSunday.getDate() - 1);
+      lastWeekSunday.setHours(23, 59, 59, 999);
+
+      const workoutDays = await this.countTotalSessionsWithActivity(
+        user.id,
+        lastWeekMonday,
+        lastWeekSunday,
+      );
+
       // Check if user met their goal in the previous week
-      if (user.currentWeekWorkouts < user.weeklyWorkoutGoal) {
+      if (workoutDays < user.weeklyWorkoutGoal) {
         // Didn't meet goal, reset streak to 0
         user.currentStreak = 0;
       } else if (weeksPassed > 1) {
@@ -225,6 +261,72 @@ export class UserService {
       // Reset weekly workout count for the new week
       user.currentWeekWorkouts = 0;
     }
+  }
+
+  /**
+   * Count total sessions with either workout sessions or activity logs in a date range
+   */
+  private async countTotalSessionsWithActivity(
+    userId: number,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<number> {
+    // Get all workout sessions
+    const sessions = await this.sessionRepo.find({
+      where: {
+        user: { id: userId },
+      },
+      select: ['startedAt'],
+    });
+
+    // Get all activity logs
+    const activityLogs = await this.activityLogRepo.find({
+      where: {
+        user: { id: userId },
+      },
+      select: ['date'],
+    });
+
+    let count = 0;
+
+    sessions.forEach((session) => {
+      const date = new Date(session.startedAt);
+      if (date >= startDate && date <= endDate) {
+        count++;
+      }
+    });
+
+    activityLogs.forEach((log) => {
+      const date = new Date(log.date);
+      if (date >= startDate && date <= endDate) {
+        count++;
+      }
+    });
+
+    return count;
+  }
+
+  /**
+   * Update streak and weekly workout count when an activity log is created
+   * Should be called after logging an activity
+   */
+  async updateStreakOnActivityLog(userId: number): Promise<void> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) return;
+
+    const now = new Date();
+
+    // Check if we need to reset for a new week
+    await this.checkAndResetWeeklyProgress(user, now);
+
+    // Increment current week workouts
+    user.currentWeekWorkouts += 1;
+
+    // Increment streak by 1 for every activity
+    user.currentStreak += 1;
+
+    user.lastStreakCheckDate = now;
+    await this.userRepo.save(user);
   }
 
   /**
@@ -244,6 +346,28 @@ export class UserService {
     // Check if we need to update streak for new week
     const now = new Date();
     await this.checkAndResetWeeklyProgress(user, now);
+
+    // Recalculate current week workouts based on actual activity
+    const getMondayOfWeek = (date: Date): Date => {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    };
+
+    const currentWeekMonday = getMondayOfWeek(now);
+    const currentWeekSunday = new Date(currentWeekMonday);
+    currentWeekSunday.setDate(currentWeekSunday.getDate() + 6);
+    currentWeekSunday.setHours(23, 59, 59, 999);
+
+    user.currentWeekWorkouts = await this.countTotalSessionsWithActivity(
+      userId,
+      currentWeekMonday,
+      currentWeekSunday,
+    );
+
     await this.userRepo.save(user);
 
     const progressPercentage =
@@ -283,6 +407,49 @@ export class UserService {
     user.weeklyWorkoutGoal = weeklyWorkoutGoal;
     const updated = await this.userRepo.save(user);
 
+    return new UserWithoutPasswordDto(updated);
+  }
+
+  /**
+   * Update user preferences (onboarding data)
+   */
+  async updateUserPreferences(
+    userId: number,
+    dto: UpdateUserPreferencesDto,
+  ): Promise<UserWithoutPasswordDto> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update all provided fields
+    if (dto.unitScale !== undefined) user.unitScale = dto.unitScale;
+    if (dto.weight !== undefined) user.weight = dto.weight;
+    if (dto.height !== undefined) user.height = dto.height;
+    if (dto.dateOfBirth !== undefined)
+      user.dateOfBirth = new Date(dto.dateOfBirth);
+    if (dto.gender !== undefined) user.gender = dto.gender;
+    if (dto.primaryGoal !== undefined) user.primaryGoal = dto.primaryGoal;
+    if (dto.weeklyWorkoutGoal !== undefined) {
+      if (dto.weeklyWorkoutGoal < 1 || dto.weeklyWorkoutGoal > 7) {
+        throw new BadRequestException(
+          'Weekly workout goal must be between 1 and 7',
+        );
+      }
+      user.weeklyWorkoutGoal = dto.weeklyWorkoutGoal;
+    }
+    if (dto.targetWeight !== undefined) user.targetWeight = dto.targetWeight;
+    if (dto.goalTimeframe !== undefined) user.goalTimeframe = dto.goalTimeframe;
+    if (dto.showRpe !== undefined) user.showRpe = dto.showRpe;
+    if (dto.onboardingCompleted !== undefined)
+      user.onboardingCompleted = dto.onboardingCompleted;
+    if (dto.showWeightTracking !== undefined)
+      user.showWeightTracking = dto.showWeightTracking;
+    if (dto.weightGoalType !== undefined)
+      user.weightGoalType = dto.weightGoalType;
+    if (dto.startWeight !== undefined) user.startWeight = dto.startWeight;
+
+    const updated = await this.userRepo.save(user);
     return new UserWithoutPasswordDto(updated);
   }
 }

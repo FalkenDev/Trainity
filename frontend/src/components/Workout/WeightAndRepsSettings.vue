@@ -1,23 +1,36 @@
+<!--
+  - Copyright (c) 2026 FalkenDev
+  -
+  - This file is part of Trainity.
+  -
+  - Trainity is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of
+  - the License, or (at your option) any later version.
+  -
+  - You should have received a copy of the GNU Affero General Public
+  - License along with Trainity. If not, see
+  - <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
-  <div class="bg-grey-darken-4 h-100 w-100">
-    <ExitHeader
+  <div class="bg-background h-100 w-100">
+    <BackHeader
       :title="$t('weightAndReps.title')"
-      show-menu
       @close="$emit('close')"
     />
-    <v-list>
+    <v-list class="bg-background">
       <v-list-item
         v-for="option in options"
         :key="option.value"
-        :disabled="defaultWeightAndReps !== option.value /* TODO: DISABLE until use latest and exercise functions is added*/"
-        class="border-t-sm border-b-sm py-2"
+        :disabled="option.value === 'latest'"
+        class="py-2 mx-3 my-2 rounded-lg bg-cardBg"
+        style="border: 1px solid rgb(var(--v-theme-borderColor))"
         two-line
-        @click="
-          editWeightAndReps(option.value as 'default' | 'latest' | 'exercise')
-        "
+        @click="editWeightAndReps(option.value as 'default' | 'latest')"
       >
         <div class="d-flex w-100 align-center ga-4">
-          <div class="d-flex flex-column">
+          <div class="d-flex flex-column flex-grow-1">
             <v-list-item-title class="text-body-1 font-weight-bold">
               {{ $t(option.label) }}
             </v-list-item-title>
@@ -58,18 +71,12 @@ const options = [
   },
   {
     label: "weightAndReps.options.latest.label",
-    description:
-      "weightAndReps.options.latest.description",
+    description: "weightAndReps.options.latest.description",
     value: "latest",
-  },
-  {
-    label: "weightAndReps.options.exercise.label",
-    description: "weightAndReps.options.exercise.description",
-    value: "exercise",
   },
 ];
 
-const editWeightAndReps = async (value: "default" | "latest" | "exercise") => {
+const editWeightAndReps = async (value: "default" | "latest") => {
   try {
     if (!props.workoutId) {
       console.error("Workout ID is not defined");

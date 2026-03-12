@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 /**
  * plugins/vuetify.ts
  *
@@ -12,101 +27,122 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
-export default createVuetify( {
+export default createVuetify({
   theme: {
     defaultTheme: 'dark',
     themes: {
       dark: {
         dark: true,
         colors: {
+          primary: '#ABFF1A',
+          secondary: '#424242',
+          accent: '#82B1FF',
+          error: '#FF0000',
+          textPrimary: '#FFFFFF',
+          textSecondary: '#A1A1A1',
+          cardBg: '#15181E',
+          background: '#0C0E12',
+          iconBackground: '#304d00ff',
+          borderColor: '#474747',
+          weekDayBg: '#242424',
+          avatarBg: '#3d462d',
         },
       },
       light: {
         dark: false,
         colors: {
+          primary: '#4CAF50',
+          secondary: '#607D8B',
+          accent: '#2196F3',
+          error: '#E53935',
+          textPrimary: '#212121',
+          textSecondary: '#757575',
+          cardBg: '#FFFFFF',
+          background: '#EAEDED',
+          iconBackground: '#E8F5E9',
+          borderColor: '#D5D8DC',
+          weekDayBg: '#F5F5F5',
+          avatarBg: '#C8E6C9',
         },
-      }
+      },
     },
   },
   defaults: {
     VBtn: {
       density: 'compact',
-      height: '40px'
+      height: '40px',
     },
     VBtnToggle: {
-      density: 'compact'
+      density: 'compact',
     },
     VAlert: {
-      density: 'compact'
+      density: 'compact',
     },
     VBanner: {
-      density: 'compact'
+      density: 'compact',
     },
-    VTextField: {
-      density: 'compact'
-    },
+    VTextField: {},
     VTextarea: {
-      density: 'compact'
+      density: 'compact',
     },
     VSelect: {
-      density: 'compact'
+      density: 'compact',
     },
     VAutocomplete: {
-      density: 'compact'
+      density: 'compact',
     },
     VCombobox: {
       density: 'compact',
-      delimiters: [',']
+      delimiters: [','],
     },
     VFileInput: {
-      density: 'compact'
+      density: 'compact',
     },
     VCheckbox: {
-      density: 'compact'
+      density: 'compact',
     },
     VRadio: {
-      density: 'compact'
+      density: 'compact',
     },
     VRadioGroup: {
-      density: 'compact'
+      density: 'compact',
     },
     VSwitch: {
-      density: 'compact'
+      density: 'compact',
     },
     VSlider: {
-      density: 'compact'
+      density: 'compact',
     },
     VRangeSlider: {
-      density: 'compact'
+      density: 'compact',
     },
     VToolbar: {
-      density: 'compact'
+      density: 'compact',
     },
     VTabs: {
-      density: 'compact'
+      density: 'compact',
     },
     VBreadcrumbs: {
-      density: 'compact'
+      density: 'compact',
     },
     VPagination: {
-      density: 'compact'
+      density: 'compact',
     },
     VDataTable: {
-      density: 'compact'
+      density: 'compact',
     },
     VDataTableServer: {
-      density: 'compact'
+      density: 'compact',
     },
     VTimeline: {
-      density: 'compact'
+      density: 'compact',
     },
-    VTimelineItem: {
-    },
+    VTimelineItem: {},
     VAvatar: {
-      density: 'compact'
+      density: 'compact',
     },
     VRating: {
-      density: 'compact'
-    }
+      density: 'compact',
+    },
   },
-} )
+})

@@ -1,7 +1,23 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Exercise } from './exercise.entity';
+import { ExerciseMedia } from './exerciseMedia.entity';
 import { CreateExerciseDto } from './dto/createExercise.dto';
 import { UpdateExerciseDto } from './dto/updateExercise.dto';
 import { ExerciseResponseDto } from './dto/exerciseResponse.dto';
@@ -13,6 +29,8 @@ export class ExerciseService {
   constructor(
     @InjectRepository(Exercise)
     private readonly exerciseRepo: Repository<Exercise>,
+    @InjectRepository(ExerciseMedia)
+    private readonly mediaRepo: Repository<ExerciseMedia>,
     private readonly muscleGroupService: MuscleGroupService,
     private readonly uploadService: UploadService,
   ) {}
@@ -23,14 +41,24 @@ export class ExerciseService {
       name: exercise.name,
       i18nKey: exercise.i18nKey,
       isNameCustom: exercise.isNameCustom,
-      isCustomized: exercise.isCustomized,
-      globalExerciseId: exercise.globalExercise?.id,
       description: exercise.description,
       image: exercise.image,
+      exerciseType: exercise.exerciseType,
       createdAt: exercise.createdAt,
-      defaultPauseSeconds: exercise.defaultPauseSeconds,
-      defaultReps: exercise.defaultReps,
-      defaultSets: exercise.defaultSets,
+      deletedAt: exercise.deletedAt,
+      equipment: exercise.equipment || [],
+      instructions: exercise.instructions || [],
+      proTips: exercise.proTips || [],
+      mistakes: exercise.mistakes || [],
+      primaryMuscleGroup: exercise.primaryMuscleGroup
+        ? {
+            id: exercise.primaryMuscleGroup.id,
+            name: exercise.primaryMuscleGroup.name,
+            description: exercise.primaryMuscleGroup.description,
+            createdAt: exercise.primaryMuscleGroup.createdAt,
+            updatedAt: exercise.primaryMuscleGroup.updatedAt,
+          }
+        : undefined,
       muscleGroups:
         exercise.muscleGroups?.map((mg) => ({
           id: mg.id,
@@ -39,6 +67,15 @@ export class ExerciseService {
           createdAt: mg.createdAt,
           updatedAt: mg.updatedAt,
         })) || [],
+      media:
+        exercise.media
+          ?.sort((a, b) => a.order - b.order)
+          .map((m) => ({
+            id: m.id,
+            type: m.type,
+            url: m.url,
+            order: m.order,
+          })) || [],
     };
   }
 
@@ -49,7 +86,7 @@ export class ExerciseService {
   async findAll(userId: number): Promise<ExerciseResponseDto[]> {
     const exercises = await this.exerciseRepo.find({
       where: { createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
     });
 
     return this.toResponseList(exercises);
@@ -58,7 +95,8 @@ export class ExerciseService {
   async findOne(id: number, userId: number): Promise<ExerciseResponseDto> {
     const exercise = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
+      withDeleted: true,
     });
 
     if (!exercise) {
@@ -72,13 +110,27 @@ export class ExerciseService {
     dto: CreateExerciseDto,
     userId: number,
   ): Promise<ExerciseResponseDto> {
+    const { muscleGroupIds, primaryMuscleGroupId, ...exerciseData } = dto;
+
     const exercise = this.exerciseRepo.create({
-      ...dto,
+      ...exerciseData,
       createdBy: { id: userId } as any,
     });
 
+    if (muscleGroupIds && muscleGroupIds.length > 0) {
+      exercise.muscleGroups =
+        await this.muscleGroupService.findByIds(muscleGroupIds);
+    }
+
+    if (primaryMuscleGroupId) {
+      exercise.primaryMuscleGroup =
+        await this.muscleGroupService.findOne(primaryMuscleGroupId);
+    }
+
     const saved = await this.exerciseRepo.save(exercise);
-    return this.toResponseDto(saved);
+
+    // Re-fetch with all relations
+    return this.findOne(saved.id, userId);
   }
 
   async update(
@@ -86,58 +138,22 @@ export class ExerciseService {
     dto: UpdateExerciseDto,
     userId: number,
   ): Promise<ExerciseResponseDto> {
-    const { muscleGroupIds, ...exerciseData } = dto;
+    const { muscleGroupIds, primaryMuscleGroupId, ...exerciseData } = dto;
 
     const existing = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
     });
 
     if (!existing) {
       throw new NotFoundException('Exercise not found');
     }
 
-    if (existing.globalExercise) {
-      const changedScalar =
-        (typeof exerciseData.name === 'string' &&
-          exerciseData.name !== existing.name) ||
-        (typeof exerciseData.description === 'string' &&
-          exerciseData.description !== existing.description) ||
-        (typeof exerciseData.image === 'string' &&
-          exerciseData.image !== existing.image) ||
-        (typeof exerciseData.defaultSets === 'number' &&
-          exerciseData.defaultSets !== existing.defaultSets) ||
-        (typeof exerciseData.defaultReps === 'number' &&
-          exerciseData.defaultReps !== existing.defaultReps) ||
-        (typeof exerciseData.defaultPauseSeconds === 'number' &&
-          exerciseData.defaultPauseSeconds !== existing.defaultPauseSeconds);
-
-      let changedMuscleGroups = false;
-      if (muscleGroupIds) {
-        const currentIds = new Set(
-          (existing.muscleGroups ?? []).map((mg) => mg.id),
-        );
-        const nextIds = new Set(muscleGroupIds);
-        if (currentIds.size !== nextIds.size) {
-          changedMuscleGroups = true;
-        } else {
-          for (const id of nextIds) {
-            if (!currentIds.has(id)) {
-              changedMuscleGroups = true;
-              break;
-            }
-          }
-        }
-      }
-
-      if (changedScalar || changedMuscleGroups) {
-        existing.isCustomized = true;
-      }
-    }
-
+    // If the user changes the name on an exercise that has an i18n key,
+    // mark it as custom so we stop using the translation.
     if (
       typeof exerciseData.name === 'string' &&
-      existing.globalExercise &&
+      existing.i18nKey &&
       exerciseData.name.trim() !== '' &&
       exerciseData.name !== existing.name
     ) {
@@ -147,11 +163,19 @@ export class ExerciseService {
     Object.assign(existing, exerciseData);
 
     // Check if muscleGroupIds were provided in the DTO
-    if (muscleGroupIds) {
-      // Use the service to find the entities
-      const newMuscleGroups =
+    if (muscleGroupIds !== undefined) {
+      existing.muscleGroups =
         await this.muscleGroupService.findByIds(muscleGroupIds);
-      existing.muscleGroups = newMuscleGroups;
+    }
+
+    // Handle primaryMuscleGroupId
+    if (primaryMuscleGroupId !== undefined) {
+      if (primaryMuscleGroupId === null) {
+        existing.primaryMuscleGroup = undefined;
+      } else {
+        existing.primaryMuscleGroup =
+          await this.muscleGroupService.findOne(primaryMuscleGroupId);
+      }
     }
 
     const updated = await this.exerciseRepo.save(existing);
@@ -167,7 +191,7 @@ export class ExerciseService {
       throw new NotFoundException('Exercise not found');
     }
 
-    await this.exerciseRepo.remove(exercise);
+    await this.exerciseRepo.softRemove(exercise);
     return { message: 'Exercise deleted' };
   }
 
@@ -178,7 +202,7 @@ export class ExerciseService {
   ): Promise<ExerciseResponseDto> {
     const exercise = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'globalExercise'],
+      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
     });
 
     if (!exercise) {
@@ -192,11 +216,93 @@ export class ExerciseService {
 
     // Update image URL
     exercise.image = imageUrl;
-    if (exercise.globalExercise) {
-      exercise.isCustomized = true;
-    }
     const updated = await this.exerciseRepo.save(exercise);
 
     return this.toResponseDto(updated);
+  }
+
+  // --- Media management ---
+
+  async addMedia(
+    exerciseId: number,
+    userId: number,
+    mediaUrl: string,
+    mediaType: string,
+  ): Promise<ExerciseResponseDto> {
+    const exercise = await this.exerciseRepo.findOne({
+      where: { id: exerciseId, createdBy: { id: userId } },
+      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
+    });
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise not found');
+    }
+
+    const maxOrder = exercise.media?.length
+      ? Math.max(...exercise.media.map((m) => m.order))
+      : -1;
+
+    const media = this.mediaRepo.create({
+      type: mediaType as any,
+      url: mediaUrl,
+      order: maxOrder + 1,
+      exercise,
+    });
+
+    await this.mediaRepo.save(media);
+
+    return this.findOne(exerciseId, userId);
+  }
+
+  async removeMedia(
+    exerciseId: number,
+    mediaId: number,
+    userId: number,
+  ): Promise<ExerciseResponseDto> {
+    const exercise = await this.exerciseRepo.findOne({
+      where: { id: exerciseId, createdBy: { id: userId } },
+    });
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise not found');
+    }
+
+    const media = await this.mediaRepo.findOne({
+      where: { id: mediaId, exercise: { id: exerciseId } },
+    });
+
+    if (!media) {
+      throw new NotFoundException('Media not found');
+    }
+
+    // Delete the file from disk
+    await this.uploadService.deleteImage(media.url);
+
+    await this.mediaRepo.remove(media);
+
+    return this.findOne(exerciseId, userId);
+  }
+
+  async reorderMedia(
+    exerciseId: number,
+    mediaIds: number[],
+    userId: number,
+  ): Promise<ExerciseResponseDto> {
+    const exercise = await this.exerciseRepo.findOne({
+      where: { id: exerciseId, createdBy: { id: userId } },
+    });
+
+    if (!exercise) {
+      throw new NotFoundException('Exercise not found');
+    }
+
+    for (let i = 0; i < mediaIds.length; i++) {
+      await this.mediaRepo.update(
+        { id: mediaIds[i], exercise: { id: exerciseId } },
+        { order: i },
+      );
+    }
+
+    return this.findOne(exerciseId, userId);
   }
 }

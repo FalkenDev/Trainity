@@ -1,109 +1,63 @@
-# 🏋️ Trainity
+<p align="center">
+  <!-- <img src="frontend/src/assets/logo.svg" width="120" alt="Trainity Logo" /> -->
+</p>
 
-> **Status: 🚧 In Development - Implementation & Design Phase**
+<h1 align="center">Trainity</h1>
 
-A powerful, self-hosted fitness tracking web application that gives you complete control over your workout data. Create personalized gym routines, track detailed statistics, and monitor your progress—all without subscription fees or privacy concerns.
+  <p align="center">A self-hosted fitness tracking web application built with NestJS and Vue 3.</p>
+    <p align="center">
+<a href="LICENSE" target="_blank"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue.svg" alt="License" /></a>
+<a href="https://nestjs.com/" target="_blank"><img src="https://img.shields.io/badge/backend-NestJS-E0234E.svg" alt="Backend" /></a>
+<a href="https://vuejs.org/" target="_blank"><img src="https://img.shields.io/badge/frontend-Vue.js-4FC08D.svg" alt="Frontend" /></a>
+<a href="https://www.postgresql.org/" target="_blank"><img src="https://img.shields.io/badge/database-PostgreSQL-336791.svg" alt="Database" /></a>
+</p>
 
-## 🎯 Why Choose Trainity?
+---
 
-**💰 Free Forever** - No monthly subscriptions, no hidden costs  
-**🔒 Your Data, Your Control** - Self-hosted means your workout data stays with you  
-**🌐 Web-Based** - Access from any device with a browser  
-**📊 Comprehensive Tracking** - All the features of premium apps, none of the cost  
-**📱 Mobile-First, Desktop-Ready** – Designed for seamless use on your phone, but also works great on PC for easier workout planning
+## Overview
 
-Perfect for fitness enthusiasts who want professional-grade workout tracking without paying monthly fees or worrying about data privacy.
+Trainity is a full-stack workout application designed for users who want full ownership of their data without subscription fees or connectivity requirements. It offers a complete suite of tools to plan routines, log sessions in real-time, and visualize progress over time. The platform is designed to be mobile-first for gym usage while providing a robust desktop interface for planning and analysis.
 
-## ✨ Features
+## Features
 
-### 🔄 Currently in Development
+- **Workout Management**: Create and organize custom workout routines with specific exercises, sets, and targets.
+- **Session Tracking**: Log workouts in real-time with an interface optimized for mobile devices.
+- **Exercise Library**: Manage a database of exercises with support for custom images and muscle group categorization.
+- **Progress Analytics**: View detailed statistics including volume, frequency, and personal records per exercise.
+- **Body Metrics**: Track weight logs and upload progress photos to monitor physical changes.
+- **Privacy Focused**: Complete data ownership with no third-party tracking or external dependencies.
 
-- **📝 Exercise Library** - Create and manage custom exercises
-- **🏃 Workout Builder** - Design personalized workout routines
-- **⏱️ Session Tracking** - Log real-time workout sessions with sets, reps, and weights
-- **📖 Training Journal** - Maintain detailed workout history
-- **📈 Statistics & Analytics** - Visualize progress with comprehensive stats
-
-### 🚀 Planned Features
-
-- **🤖 AI-Powered Recommendations** - Smart workout suggestions based on your progress
-- **📱 Mobile Application** - Native mobile app for on-the-go tracking
-- **⌚ Wearable Integration** - Connect fitness watches and heart rate monitors
-- **🖥️ Enhanced Desktop Interface** - Streamlined PC experience for workout planning
-- **📤 Data Export/Import** - Backup and migrate your fitness data
-- **📊 Advanced Analytics** - Detailed progress reports and trend analysis
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-- **Vue 3** - Progressive JavaScript framework
-- **Vite** - Fast build tool and dev server
-- **Vuetify 3** - Material Design component library
-- **TypeScript** - Type-safe JavaScript
+## Technology Stack
 
 ### Backend
 
-- **Node.js** - JavaScript runtime
-- **Express** - Web application framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
+- **Framework**: NestJS (v11)
+- **Database**: PostgreSQL 17
+- **ORM**: TypeORM
+- **Authentication**: Passport.js (JWT & Local Strategies)
+- **Validation**: class-validator & class-transformer
+- **Media**: Sharp (Image processing) & Multer (File uploads)
+- **Documentation**: Swagger/OpenAPI
 
-## 🚀 Getting Started
+### Frontend
 
-## ⚙️ Configuration
+- **Framework**: Vue 3 (Composition API)
+- **Build Tool**: Vite
+- **UI Library**: Vuetify 3
+- **State Management**: Pinia (with persistence)
+- **Visualization**: Chart.js & Vue-Chartjs
+- **Routing**: Vue Router
 
-Trainity is configured via the root `.env` file (used by `docker compose` and the backend `ConfigModule`).
-
-- Copy `.env.example` to `.env` and edit values as needed.
-- `DEFAULT_SHOW_RPE` controls the default for **newly registered users** (existing users keep their saved preference).
+## Getting Started
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- MongoDB instance
-- Git
+- **Docker** & **Docker Compose** (Recommended)
+- OR
+- **Node.js** v18+
+- **PostgreSQL** v15+
 
-### Installation
-
-#### Local
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/FalkenDev/Trainity.git
-   cd Trainity
-   ```
-
-2. **Setup Backend**
-
-   ```bash
-   cd backend
-   npm install
-   # Configure your MongoDB connection in .env file in backend
-   npm run dev
-   ```
-
-3. **Setup Frontend**
-
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-3. **Seed**
-   ```bash
-   cd /backend
-   npm run seed
-   ```
-
-4. **Access the application**
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:1337`
-
-
-#### Docker
+### Installation (Docker - Recommended)
 
 1. **Clone the repository**
 
@@ -112,55 +66,96 @@ Trainity is configured via the root `.env` file (used by `docker compose` and th
    cd Trainity
    ```
 
-2. **Docker**
+2. **Start the application**
 
    ```bash
-   docker compose up --build -d
+   docker compose up -d --build
    ```
 
-3. **Seed**
+   The database migrations will run automatically on startup.
+
+3. **Seed initial data** (optional)
+   Population of default exercises and muscle groups:
+
    ```bash
    docker exec -it trainity_backend npm run seed
    ```
 
 4. **Access the application**
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:1337`
+   - **Frontend**: http://localhost:3000
+   - **API Documentation**: http://localhost:1337/api
+   - **Backend API**: http://localhost:1337
 
-### 🐳 Docker Support
+### Installation (Manual)
 
-We are now supporting docker setup
+1. **Clone the repository**
 
-## 📸 Preview
+   ```bash
+   git clone https://github.com/FalkenDev/Trainity.git
+   cd Trainity
+   ```
 
-_Screenshots and demo will be available as development progresses_
+2. **Configure Environment**
+   Copy the example environment file and configure your database credentials:
 
-## 👨‍💻 Developer
+   ```bash
+   cp .env.example .env
+   ```
 
-**Kasper Falk** ([@FalkenDev](https://github.com/FalkenDev))
+3. **Backend Setup**
 
-_Currently a solo project focused on creating the best free, self-hosted fitness tracking solution._
+   ```bash
+   cd backend
+   npm install
 
-## 📄 License
+   # Ensure PostgreSQL is running and update .env with credentials
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+   npm run build
+   npm run start:prod
+   ```
 
-## 🤝 Support the Project
+4. **Frontend Setup**
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   npm run preview
+   ```
 
-If you find Trainity useful or interesting:
+## Development
 
-- ⭐ **Star this repository** to show your support
-- 👀 **Watch** for updates on development progress
-- 🐛 **Report issues** to help improve the application
+### Project Structure
 
-## 📞 Contact
+```
+Trainity/
+├── backend/          # NestJS API application
+│   ├── src/          # Source code
+│   └── test/         # E2E tests
+├── frontend/         # Vue 3 application
+│   └── src/          # Source code
+├── docker-compose.yml # Development orchestration
+└── Dockerfile.*      # Container definitions
+```
 
-Have questions or suggestions? Feel free to open an issue or reach out!
+### Running in Development Mode
 
----
+To start both services with hot-reload enabled:
 
-**🎯 Mission**: To provide a completely free, privacy-focused alternative to expensive fitness tracking subscriptions while offering the same professional features and insights.
+```bash
+docker compose -f docker-compose.yml up
+```
 
----
+- Backend changes will trigger a transparent restart.
+- Frontend changes will be reflected instantly via Vite HMR.
 
-_Trainity - Train your way, track your progress, own your data._
+## Contributing
+
+Contributions are welcome. Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a Pull Request.
+
+By contributing to Trainity, you agree to our [Contributor License Agreement (CLA)](CLA.md).
+
+## License
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**. See the [LICENSE](LICENSE) file for details.
+
+This software is provided "as is", without warranty of any kind.

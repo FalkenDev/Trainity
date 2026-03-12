@@ -1,27 +1,29 @@
+<!--
+  - Copyright (c) 2026 FalkenDev
+  -
+  - This file is part of Trainity.
+  -
+  - Trainity is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of
+  - the License, or (at your option) any later version.
+  -
+  - You should have received a copy of the GNU Affero General Public
+  - License along with Trainity. If not, see
+  - <https://www.gnu.org/licenses/>.
+  -->
+
 <template>
-  <v-card class="pa-5" style="border-radius: 10px">
-    <div class="d-flex justify-space-between align-center mb-4">
-      <div>
-        <h1 class="text-h6">{{ $t('progress.week') }} {{ currentWeek }}</h1>
-        <p v-if="streakInfo" class="text-body-2 text-grey-lighten-1">
-          {{
-            $t('progress.weekProgress', {
-              current: streakInfo.currentWeekWorkouts,
-              goal: streakInfo.weeklyWorkoutGoal,
-            })
-          }}
-        </p>
-      </div>
-      <div class="text-center d-flex align-center">
-        <v-icon size="32" color="orange"> mdi-fire </v-icon>
-        <p class="text-h5 pa-0 font-weight-bold mr-1">
-          {{ streakInfo?.currentStreak || 0 }}
-        </p>
-      </div>
+  <v-card
+    class="px-5 py-4 bg-cardBg d-flex ga-2 flex-column rounded-lg"
+    :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
+  >
+    <div class="d-flex justify-space-between align-center">
+      <h1 class="text-h6">{{ $t('progress.week') }} {{ currentWeek }}</h1>
     </div>
-    <div class="d-flex justify-space-between align-center my-5">
+    <div class="d-flex justify-space-between align-center">
       <div v-for="(day, index) in weekdays" :key="day">
-        <v-avatar :color="getDayColor(index)" size="40">
+        <v-avatar :color="getDayColor(index)" size="40" :style="getScheduledStyle(index)">
           <span class="text-body-2">{{ day }}</span>
         </v-avatar>
       </div>
@@ -31,20 +33,20 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
-import { getStreakInfo } from '@/services/user.service'
+import { useActivityStore } from '@/stores/activity.store'
+import { useScheduledSessionStore } from '@/stores/scheduledSession.store'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
-import type { StreakInfo } from '@/interfaces/User.interface'
 
 const { tm } = useI18n({ useScope: 'global' })
 const workoutSessionStore = useWorkoutSessionStore()
-const streakInfo = ref<StreakInfo | null>(null)
+const activityStore = useActivityStore()
+const scheduledSessionStore = useScheduledSessionStore()
 
 const weekdays = computed(() => {
   const v = tm('progress.weekdaysShort')
   return Array.isArray(v) ? (v as string[]) : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 })
 
-// Get current week number (ISO week)
 const currentWeek = computed(() => {
   const now = new Date()
   const startOfYear = new Date(now.getFullYear(), 0, 1)
@@ -52,12 +54,10 @@ const currentWeek = computed(() => {
   return Math.ceil((days + startOfYear.getDay() + 1) / 7)
 })
 
-// Get the start and end of the current week (Monday to Sunday)
 const currentWeekRange = computed(() => {
   const now = new Date()
   const dayOfWeek = now.getDay()
   const monday = new Date(now)
-  // Adjust for Monday as start of week (0 = Sunday, 1 = Monday, etc.)
   const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
   monday.setDate(now.getDate() + diff)
   monday.setHours(0, 0, 0, 0)
@@ -69,9 +69,9 @@ const currentWeekRange = computed(() => {
   return { start: monday, end: sunday }
 })
 
-// Get completed sessions for the current week
 const completedDaysThisWeek = computed(() => {
   const sessions = workoutSessionStore.workoutSessions as WorkoutSession[]
+  const activityLogs = activityStore.activityLogs || []
   const { start, end } = currentWeekRange.value
 
   const completedDays = new Set<number>()
@@ -80,27 +80,31 @@ const completedDaysThisWeek = computed(() => {
     if (session.status === 'finished' && session.endedAt) {
       const sessionDate = new Date(session.endedAt)
       if (sessionDate >= start && sessionDate <= end) {
-        // Get day of week (0 = Sunday, 1 = Monday, etc.)
         let dayOfWeek = sessionDate.getDay()
-        // Convert to Monday = 0, Sunday = 6
         dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1
         completedDays.add(dayOfWeek)
       }
     }
   })
 
+  activityLogs.forEach(log => {
+    const logDate = new Date(log.date)
+    if (logDate >= start && logDate <= end) {
+      let dayOfWeek = logDate.getDay()
+      dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+      completedDays.add(dayOfWeek)
+    }
+  })
+
   return completedDays
 })
 
-// Get today's day index (Monday = 0, Sunday = 6)
 const todayIndex = computed(() => {
   const now = new Date()
   const dayOfWeek = now.getDay()
-  // Convert to Monday = 0, Sunday = 6
   return dayOfWeek === 0 ? 6 : dayOfWeek - 1
 })
 
-// Get color for each day based on workout completion
 function getDayColor(dayIndex: number): string {
   if (completedDaysThisWeek.value.has(dayIndex)) {
     return 'success'
@@ -111,26 +115,44 @@ function getDayColor(dayIndex: number): string {
   return 'grey-darken-3'
 }
 
-// Load streak info
-const loadStreakInfo = async () => {
-  try {
-    streakInfo.value = await getStreakInfo()
-  } catch (error) {
-    console.error('Failed to load streak info:', error)
-  }
-}
+// Scheduled days this week (days that have a scheduled session but no completed session)
+const scheduledDaysThisWeek = computed(() => {
+  const scheduled = new Set<number>()
+  const rangeCache = scheduledSessionStore.rangeCache
 
-// Load streak info on mount and when sessions change
-onMounted(() => {
-  loadStreakInfo()
+  if (!rangeCache || rangeCache.length === 0) return scheduled
+
+  const { start, end } = currentWeekRange.value
+
+  rangeCache.forEach(session => {
+    if (session.isCompleted) return
+    const sessionDate = new Date(session.resolvedDate + 'T12:00:00')
+    if (sessionDate >= start && sessionDate <= end) {
+      let dayOfWeek = sessionDate.getDay()
+      dayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+      scheduled.add(dayOfWeek)
+    }
+  })
+
+  return scheduled
 })
 
-// Watch for changes in workout sessions
-watch(
-  () => workoutSessionStore.workoutSessions,
-  () => {
-    loadStreakInfo()
-  },
-  { deep: true }
-)
+function getScheduledStyle(dayIndex: number): Record<string, string> {
+  if (scheduledDaysThisWeek.value.has(dayIndex) && !completedDaysThisWeek.value.has(dayIndex)) {
+    return { border: '2px solid #2196F3' }
+  }
+  return {}
+}
+
+// Fetch scheduled sessions for the current week on mount
+onMounted(async () => {
+  const { start, end } = currentWeekRange.value
+  const toStr = (d: Date) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+  await scheduledSessionStore.fetchForRange(toStr(start), toStr(end))
+})
 </script>

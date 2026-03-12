@@ -1,7 +1,22 @@
-import type { CreateUser, User, StreakInfo } from '@/interfaces/User.interface';
-import { fetchWrapper } from '@/utils/fetchWrapper';
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1';
+import type { CreateUser, User, StreakInfo } from '@/interfaces/User.interface'
+import { fetchWrapper } from '@/utils/fetchWrapper'
+
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1'
 
 export const createUser = async (user: CreateUser) => {
   try {
@@ -9,13 +24,13 @@ export const createUser = async (user: CreateUser) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(user),
-    });
-    return data;
+    })
+    return data
   } catch (error) {
-    console.error('Error creating user:', error);
-    throw new Error('Failed to create user');
+    console.error('Error creating user:', error)
+    throw new Error('Failed to create user')
   }
-};
+}
 
 export const updateUser = async (userData: Partial<User>) => {
   try {
@@ -23,60 +38,60 @@ export const updateUser = async (userData: Partial<User>) => {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
-    });
-    return data;
+    })
+    return data
   } catch (error) {
-    console.error('Error updating user:', error);
-    throw new Error('Failed to update user');
+    console.error('Error updating user:', error)
+    throw new Error('Failed to update user')
   }
-};
+}
 
 export const deleteUser = async () => {
   try {
     await fetchWrapper<void>(`${apiUrl}/users`, {
       method: 'DELETE',
-    });
-    return true; // deletion succeeded (204/200)
+    })
+    return true // deletion succeeded (204/200)
   } catch (error) {
-    console.error('Error deleting user:', error);
-    throw new Error('Failed to delete user');
+    console.error('Error deleting user:', error)
+    throw new Error('Failed to delete user')
   }
-};
+}
 
 export const uploadAvatar = async (file: File) => {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
+    const formData = new FormData()
+    formData.append('file', file)
 
     const data = await fetchWrapper(`${apiUrl}/users/avatar`, {
       method: 'POST',
       body: formData,
-    });
-    return data;
+    })
+    return data
   } catch (error) {
-    console.error('Error uploading avatar:', error);
-    throw new Error('Failed to upload avatar');
+    console.error('Error uploading avatar:', error)
+    throw new Error('Failed to upload avatar')
   }
-};
+}
 
 export const getCurrentUser = async () => {
   try {
-    const data = await fetchWrapper<User>(`${apiUrl}/users`);
-    return data;
+    const data = await fetchWrapper<User>(`${apiUrl}/users`)
+    return data
   } catch (error) {
-    console.error('Error fetching current user:', error);
-    throw new Error('Failed to fetch current user');
+    console.error('Error fetching current user:', error)
+    throw new Error('Failed to fetch current user')
   }
-};
+}
 export const getStreakInfo = async () => {
   try {
-    const data = await fetchWrapper<StreakInfo>(`${apiUrl}/users/streak`);
-    return data;
+    const data = await fetchWrapper<StreakInfo>(`${apiUrl}/users/streak`)
+    return data
   } catch (error) {
-    console.error('Error fetching streak info:', error);
-    throw new Error('Failed to fetch streak info');
+    console.error('Error fetching streak info:', error)
+    throw new Error('Failed to fetch streak info')
   }
-};
+}
 
 export const updateWeeklyWorkoutGoal = async (weeklyWorkoutGoal: number) => {
   try {
@@ -84,10 +99,24 @@ export const updateWeeklyWorkoutGoal = async (weeklyWorkoutGoal: number) => {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ weeklyWorkoutGoal }),
-    });
-    return data;
+    })
+    return data
   } catch (error) {
-    console.error('Error updating weekly workout goal:', error);
-    throw new Error('Failed to update weekly workout goal');
+    console.error('Error updating weekly workout goal:', error)
+    throw new Error('Failed to update weekly workout goal')
   }
-};
+}
+
+export const updateUserPreferences = async (preferences: Partial<User>) => {
+  try {
+    const data = await fetchWrapper<User>(`${apiUrl}/users/preferences`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(preferences),
+    })
+    return data
+  } catch (error) {
+    console.error('Error updating user preferences:', error)
+    throw new Error('Failed to update user preferences')
+  }
+}

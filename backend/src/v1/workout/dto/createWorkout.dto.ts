@@ -1,5 +1,26 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateWorkoutDto {
   @ApiProperty({ example: 'Push Day A' })
@@ -20,7 +41,26 @@ export class CreateWorkoutDto {
   @IsNumber()
   time?: number;
 
-  @ApiProperty({ example: true, required: false })
+  @ApiProperty({
+    example: 'strength',
+    required: false,
+    enum: ['strength', 'cardio', 'hiit', 'flexibility', 'endurance'],
+  })
   @IsOptional()
-  defaultWeightAndReps: 'default' | 'latest' | 'exercise';
+  @IsEnum(['strength', 'cardio', 'hiit', 'flexibility', 'endurance'])
+  type?: 'strength' | 'cardio' | 'hiit' | 'flexibility' | 'endurance';
+
+  @ApiProperty({ example: 'default', required: false })
+  @IsOptional()
+  defaultWeightAndReps?: 'default' | 'latest';
+
+  @ApiProperty({
+    example: [1, 2],
+    required: false,
+    description: 'Array of muscle group IDs to set as workout target muscles',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  targetMuscleGroupIds?: number[];
 }

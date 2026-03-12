@@ -1,13 +1,33 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../pages/index.vue';
-import { useAuthStore } from '@/stores/auth.store';
-import Login from '@/pages/Login.vue';
-import Register from '@/pages/Register.vue';
-import WorkoutDetails from '@/pages/WorkoutDetails.vue';
-import Session from '@/pages/Session.vue';
-import Calendar from '@/pages/Calendar.vue';
-import Settings from '@/pages/Settings.vue';
-import AddWorkout from '@/pages/AddWorkout.vue';
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '../pages/index.vue'
+import { useAuthStore } from '@/stores/auth.store'
+import Login from '@/pages/Login.vue'
+import Register from '@/pages/Register.vue'
+import Onboarding from '@/pages/Onboarding.vue'
+import WorkoutDetails from '@/pages/WorkoutDetails.vue'
+import Session from '@/pages/Session.vue'
+import SessionSummary from '@/pages/SessionSummary.vue'
+import Calendar from '@/pages/Calendar.vue'
+import Settings from '@/pages/Settings.vue'
+import AddWorkout from '@/pages/AddWorkout.vue'
+import LogActivity from '@/pages/LogActivity.vue'
+import Statistics from '@/pages/Statistics.vue'
+import SessionDetail from '@/pages/SessionDetail.vue'
 
 const routes = [
   {
@@ -27,15 +47,27 @@ const routes = [
     component: Register,
   },
   {
+    path: '/onboarding',
+    name: 'Onboarding',
+    component: Onboarding,
+    meta: { requiresAuth: true, hideBottomNav: true },
+  },
+  {
     path: '/statistics',
     name: 'Statistics',
-    component: Home,
+    component: Statistics,
     meta: { requiresAuth: true },
   },
   {
     path: '/workout',
     name: 'Workout',
     component: AddWorkout,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/log-activity',
+    name: 'LogActivity',
+    component: LogActivity,
     meta: { requiresAuth: true },
   },
   {
@@ -49,6 +81,18 @@ const routes = [
     name: 'SessionDetails',
     component: Session,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/session-summary',
+    name: 'SessionSummary',
+    component: SessionSummary,
+    meta: { requiresAuth: true, hideBottomNav: true },
+  },
+  {
+    path: '/session-history/:type/:id',
+    name: 'SessionDetail',
+    component: SessionDetail,
+    meta: { requiresAuth: true, hideBottomNav: true },
   },
   {
     path: '/calendar',
@@ -66,47 +110,55 @@ const routes = [
     path: '/:pathMatch(.*)*', // 404
     redirect: () => '/',
   },
-];
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-});
+})
 
 router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore(); // Get store instance inside the guard
-  const isAuthenticated = authStore.isAuthenticated;
+  const authStore = useAuthStore() // Get store instance inside the guard
+  const isAuthenticated = authStore.isAuthenticated
 
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiresGuest = to.matched.some(record => record.meta.requiresGuest)
 
   if (requiresAuth && !isAuthenticated) {
     next({
       path: '/login',
       query: { redirect: to.fullPath },
-    });
+    })
   } else if (requiresGuest && isAuthenticated) {
-    next('/dashboard');
+    next('/dashboard')
+  } else if (
+    isAuthenticated &&
+    to.path !== '/onboarding' &&
+    authStore.user &&
+    !authStore.user.onboardingCompleted
+  ) {
+    // Redirect to onboarding if not completed (except when already on onboarding page)
+    next('/onboarding')
   } else {
-    next();
+    next()
   }
-});
+})
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
     if (!localStorage.getItem('vuetify:dynamic-reload')) {
-      localStorage.setItem('vuetify:dynamic-reload', 'true');
-      location.assign(to.fullPath);
+      localStorage.setItem('vuetify:dynamic-reload', 'true')
+      location.assign(to.fullPath)
     } else {
-      console.error('Dynamic import error, reloading page did not fix it', err);
+      console.error('Dynamic import error, reloading page did not fix it', err)
     }
   } else {
-    console.error(err);
+    console.error(err)
   }
-});
+})
 
 router.isReady().then(() => {
-  localStorage.removeItem('vuetify:dynamic-reload');
-});
+  localStorage.removeItem('vuetify:dynamic-reload')
+})
 
-export default router;
+export default router

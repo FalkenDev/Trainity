@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,6 +25,7 @@ import {
 import { User } from '../user/user.entity';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSessionExercise } from './workoutSessionExercise.entity';
+import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
 
 @Entity()
 export class WorkoutSession {
@@ -22,8 +38,8 @@ export class WorkoutSession {
   @ManyToOne(() => Workout, { onDelete: 'SET NULL', nullable: true })
   workout: Workout | null;
 
-  @Column({ type: 'jsonb', nullable: true })
-  workoutSnapshot: any;
+  @ManyToOne(() => ScheduledSession, { onDelete: 'SET NULL', nullable: true })
+  scheduledSession: ScheduledSession | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   startedAt: Date;
@@ -52,6 +68,9 @@ export class WorkoutSession {
 
   @Column({ nullable: true })
   notes: string;
+
+  @Column({ type: 'int', nullable: true })
+  caloriesBurned: number | null;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 // services/workout.service.ts
 import type {
   CreateWorkout,
@@ -139,5 +154,25 @@ export const dublicateWorkout = async (id: number) => {
   } catch (error) {
     console.error('Error duplicating workout:', error);
     throw new Error('Failed to duplicate workout');
+  }
+};
+
+export const reorderExercises = async (
+  workoutId: number,
+  exercises: Array<{ workoutExerciseId: number; order: number }>,
+) => {
+  try {
+    const data = await fetchWrapper<Workout>(
+      `${apiUrl}/workouts/${workoutId}/exercises/reorder`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exercises }),
+      },
+    );
+    return data;
+  } catch (error) {
+    console.error('Error reordering exercises:', error);
+    throw new Error('Failed to reorder exercises');
   }
 };

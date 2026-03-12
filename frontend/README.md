@@ -1,81 +1,83 @@
-# Vuetify (Default)
+<p align="center">
+  <img src="public/logo.svg" width="120" alt="Trainity Logo" />
+  <h1 align="center">Trainity Frontend</h1>
+</p>
 
-This is the official scaffolding tool for Vuetify, designed to give you a head start in building your new Vuetify application. It sets up a base template with all the necessary configurations and standard directory structure, enabling you to begin development without the hassle of setting up the project from scratch.
+<p align="center">The mobile-first accessible web interface for <a href="../README.md">Trainity</a>.</p>
 
-## ❗️ Important Links
+<p align="center">
+<a href="https://vuejs.org/" target="_blank"><img src="https://img.shields.io/badge/vue-3.x-green.svg" alt="Vue 3" /></a>
+<a href="https://vuetifyjs.com/" target="_blank"><img src="https://img.shields.io/badge/vuetify-3.x-1867C0.svg" alt="Vuetify 3" /></a>
+<a href="https://vitejs.dev/" target="_blank"><img src="https://img.shields.io/badge/vite-5.x-646CFF.svg" alt="Vite" /></a>
+<a href="https://pinia.vuejs.org/" target="_blank"><img src="https://img.shields.io/badge/pinia-2.x-yellow.svg" alt="Pinia" /></a>
+</p>
 
-- 📄 [Docs](https://vuetifyjs.com/)
-- 🚨 [Issues](https://issues.vuetifyjs.com/)
-- 🏬 [Store](https://store.vuetifyjs.com/)
-- 🎮 [Playground](https://play.vuetifyjs.com/)
-- 💬 [Discord](https://community.vuetifyjs.com)
+## Overview
 
-## 💿 Install
+The Trainity frontend is a Single Page Application (SPA) built with **Vue 3** and **Vite**. It utilizes **Vuetify 3** for a Material Design-compliant interface that works seamlessly across desktop and mobile devices.
 
-Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
+## Technology Stack
 
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
+- **Framework**: [Vue 3](https://vuejs.org/) (Composition API, Script Setup)
+- **UI Component Library**: [Vuetify 3](https://vuetifyjs.com/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **State Management**: [Pinia](https://pinia.vuejs.org/) (w/ Persistence)
+- **Routing**: [Vue Router](https://router.vuejs.org/)
+- **Internationalization**: [Vue I18n](https://kazupon.github.io/vue-i18n/)
+- **Charts**: [Chart.js](https://www.chartjs.org/) & vue-chartjs
+- **Notifications**: [Vue Sonner](https://vue-sonner.vercel.app/)
+- **Linter/Formatter**: ESLint 9 + Prettier
 
-After completing the installation, your environment is ready for Vuetify development.
+## Prerequisites
 
-## ✨ Features
+- **Node.js** v20+
+- **npm** or **yarn**
 
-- 🖼️ **Optimized Front-End Stack**: Leverage the latest Vue 3 and Vuetify 3 for a modern, reactive UI development experience. [Vue 3](https://v3.vuejs.org/) | [Vuetify 3](https://vuetifyjs.com/en/)
-- 🗃️ **State Management**: Integrated with [Pinia](https://pinia.vuejs.org/), the intuitive, modular state management solution for Vue.
-- 🚦 **Routing and Layouts**: Utilizes Vue Router for SPA navigation and vite-plugin-vue-layouts-next for organizing Vue file layouts. [Vue Router](https://router.vuejs.org/) | [vite-plugin-vue-layouts-next](https://github.com/loicduong/vite-plugin-vue-layouts-next)
-- 💻 **Enhanced Development Experience**: Benefit from TypeScript's static type checking and the ESLint plugin suite for Vue, ensuring code quality and consistency. [TypeScript](https://www.typescriptlang.org/) | [ESLint Plugin Vue](https://eslint.vuejs.org/)
-- ⚡ **Next-Gen Tooling**: Powered by Vite, experience fast cold starts and instant HMR (Hot Module Replacement). [Vite](https://vitejs.dev/)
-- 🧩 **Automated Component Importing**: Streamline your workflow with unplugin-vue-components, automatically importing components as you use them. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
-- 🛠️ **Strongly-Typed Vue**: Use vue-tsc for type-checking your Vue components, and enjoy a robust development experience. [vue-tsc](https://github.com/johnsoncodehk/volar/tree/master/packages/vue-tsc)
-
-These features are curated to provide a seamless development experience from setup to deployment, ensuring that your Vuetify application is both powerful and maintainable.
-
-## 💡 Usage
-
-This section covers how to start the development server and build your project for production.
-
-### Starting the Development Server
-
-To start the development server with hot-reload, run the following command. The server will be accessible at [http://localhost:3000](http://localhost:3000):
+## Installation
 
 ```bash
-yarn dev
+$ npm install
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+## Running Development Server
 
-> Add NODE_OPTIONS='--no-warnings' to suppress the JSON import warnings that happen as part of the Vuetify import mapping. If you are on Node [v21.3.0](https://nodejs.org/en/blog/release/v21.3.0) or higher, you can change this to NODE_OPTIONS='--disable-warning=5401'. If you don't mind the warning, you can remove this from your package.json dev script.
-
-### Building for Production
-
-To build your project for production, use:
+To start the development server with Hot Module Replacement (HMR):
 
 ```bash
-yarn build
+$ npm run dev
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+The application will be available at [http://localhost:5173](http://localhost:5173) (or whichever port Vite assigns).
 
-Once the build process is completed, your application will be ready for deployment in a production environment.
+## Building for Production
 
-## 💪 Support Vuetify Development
+To build the application for production:
 
-This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
+```bash
+$ npm run build
+```
 
-- [Requesting Enterprise Support](https://support.vuetifyjs.com/)
-- [Sponsoring John on Github](https://github.com/users/johnleider/sponsorship)
-- [Sponsoring Kael on Github](https://github.com/users/kaelwd/sponsorship)
-- [Supporting the team on Open Collective](https://opencollective.com/vuetify)
-- [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
-- [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
-- [Making a one-time donation with Paypal](https://paypal.me/vuetify)
+To preview the production build locally:
 
-## 📑 License
-[MIT](http://opensource.org/licenses/MIT)
+```bash
+$ npm run preview
+```
 
-Copyright (c) 2016-present Vuetify, LLC
+## Linting and Formatting
+
+```bash
+# Run linter
+$ npm run lint
+
+# Run type check
+$ npm run type-check
+```
+
+## File Structure
+
+- `src/components`: Reusable UI components
+- `src/pages`: Application views/routes
+- `src/stores`: Pinia state stores
+- `src/services`: API service integraions
+- `src/locales`: I18n translation files
+- `src/interfaces`: TypeScript interfaces and types

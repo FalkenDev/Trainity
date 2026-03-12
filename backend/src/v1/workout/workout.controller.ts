@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 FalkenDev
+ *
+ * This file is part of Trainity.
+ *
+ * Trainity is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * You should have received a copy of the GNU Affero General Public
+ * License along with Trainity. If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+
 import {
   Controller,
   Get,
@@ -26,6 +41,7 @@ import { WorkoutResponseDto } from './dto/workoutResponse.dto';
 import { RequestWithUser } from '../types/requestWithUser.type';
 import { AddRemoveExercisesDto } from './dto/addRemoveExercises.dto';
 import { UpdateWorkoutExerciseDto } from './dto/updateWorkoutExercise.dto';
+import { ReorderExercisesDto } from './dto/reorderExercises.dto';
 
 @ApiTags('workouts')
 @ApiBearerAuth()
@@ -133,6 +149,21 @@ export class WorkoutController {
     return this.workoutService.removeExercisesFromWorkout(
       id,
       dto,
+      this.getUserId(req),
+    );
+  }
+
+  @Patch(':id/exercises/reorder')
+  @ApiOperation({ summary: 'Reorder exercises in a workout' })
+  @ApiOkResponse({ type: WorkoutResponseDto })
+  reorderExercises(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ReorderExercisesDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.workoutService.reorderExercises(
+      id,
+      dto.exercises,
       this.getUserId(req),
     );
   }
