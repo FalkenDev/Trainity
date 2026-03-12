@@ -45,6 +45,7 @@ declare module 'vue' {
     ProgressBar: typeof import('./components/ProgressBar.vue')['default']
     ProgressPhotosPanel: typeof import('./components/ProgressPhotosPanel.vue')['default']
     PRTimeline: typeof import('./components/Statistics/PRTimeline.vue')['default']
+    PWAUpdatePrompt: typeof import('./components/PWAUpdatePrompt.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScheduledSessionBottomSheet: typeof import('./components/Session/ScheduledSessionBottomSheet.vue')['default']
