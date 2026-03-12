@@ -121,7 +121,7 @@
 
       <!-- Danger Zone -->
       <div class="px-5 mb-6">
-        <h2 class="text-h6 text-error mb-3">{{ $t('settings.dangerZone') }}</h2>
+        <h2 class="text-h6 text-textPrimary mb-3">{{ $t('settings.dangerZone') }}</h2>
         <v-card
           class="bg-cardBg rounded-lg pa-4"
           :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"

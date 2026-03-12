@@ -25,27 +25,6 @@
         </h1>
         <p class="text-textSecondary text-subtitle-1">Member since Jan 2024</p>
       </div>
-
-      <div class="d-flex align-center w-100">
-        <div class="d-flex flex-column align-center flex-1-0-0 min-w-0">
-          <h1 class="text-h6">47</h1>
-          <p class="text-subtitle-2 text-textSecondary text-center">Workouts</p>
-        </div>
-
-        <v-divider vertical class="flex-grow-0" color="textSecondary" :thickness="2" />
-
-        <div class="d-flex flex-column align-center flex-1-0-0 min-w-0">
-          <h1 class="text-h6">{{ streakInfo?.currentStreak ?? '—' }}</h1>
-          <p class="text-subtitle-2 text-textSecondary text-center">Streak</p>
-        </div>
-
-        <v-divider vertical class="flex-grow-0" color="textSecondary" :thickness="2" />
-
-        <div class="d-flex flex-column align-center flex-1-0-0 min-w-0">
-          <h1 class="text-h6">47</h1>
-          <p class="text-subtitle-2 text-textSecondary text-center">Achievements</p>
-        </div>
-      </div>
     </v-card>
     <div class="d-flex flex-column ga-5">
       <div>
