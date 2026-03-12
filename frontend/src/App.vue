@@ -16,6 +16,7 @@
 <template>
   <v-app>
     <VSonner position="top-center" />
+    <PWAUpdatePrompt />
     <v-main
       :style="{
         paddingBottom: showResumeBar ? '101px' : '',
