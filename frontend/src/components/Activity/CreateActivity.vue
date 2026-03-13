@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useActivityStore } from '@/stores/activity.store'
 import { createActivity } from '@/services/activity.service'
 import type { ActivityIcon } from '@/interfaces/Activity.interface'
@@ -142,24 +142,24 @@ const activityStore = useActivityStore()
 const formRef = ref()
 const isSaving = ref(false)
 
-const iconOptions = [
-  { label: 'Running', value: 'running' as ActivityIcon },
-  { label: 'Walking', value: 'walking' as ActivityIcon },
-  { label: 'Cycling', value: 'cycling' as ActivityIcon },
-  { label: 'Football', value: 'football' as ActivityIcon },
-  { label: 'Swimming', value: 'swimming' as ActivityIcon },
-  { label: 'Kayaking', value: 'kayaking' as ActivityIcon },
-  { label: 'Hiking', value: 'hiking' as ActivityIcon },
-  { label: 'Yoga', value: 'yoga' as ActivityIcon },
-  { label: 'Boxing', value: 'boxing' as ActivityIcon },
-  { label: 'Tennis', value: 'tennis' as ActivityIcon },
-  { label: 'Basketball', value: 'basketball' as ActivityIcon },
-  { label: 'Volleyball', value: 'volleyball' as ActivityIcon },
-  { label: 'Skiing', value: 'skiing' as ActivityIcon },
-  { label: 'Skating', value: 'skating' as ActivityIcon },
-  { label: 'Rowing', value: 'rowing' as ActivityIcon },
-  { label: 'Other', value: 'other' as ActivityIcon },
-]
+const iconOptions = computed(() => [
+  { label: t('activity.icons.running'), value: 'running' as ActivityIcon },
+  { label: t('activity.icons.walking'), value: 'walking' as ActivityIcon },
+  { label: t('activity.icons.cycling'), value: 'cycling' as ActivityIcon },
+  { label: t('activity.icons.football'), value: 'football' as ActivityIcon },
+  { label: t('activity.icons.swimming'), value: 'swimming' as ActivityIcon },
+  { label: t('activity.icons.kayaking'), value: 'kayaking' as ActivityIcon },
+  { label: t('activity.icons.hiking'), value: 'hiking' as ActivityIcon },
+  { label: t('activity.icons.yoga'), value: 'yoga' as ActivityIcon },
+  { label: t('activity.icons.boxing'), value: 'boxing' as ActivityIcon },
+  { label: t('activity.icons.tennis'), value: 'tennis' as ActivityIcon },
+  { label: t('activity.icons.basketball'), value: 'basketball' as ActivityIcon },
+  { label: t('activity.icons.volleyball'), value: 'volleyball' as ActivityIcon },
+  { label: t('activity.icons.skiing'), value: 'skiing' as ActivityIcon },
+  { label: t('activity.icons.skating'), value: 'skating' as ActivityIcon },
+  { label: t('activity.icons.rowing'), value: 'rowing' as ActivityIcon },
+  { label: t('activity.icons.other'), value: 'other' as ActivityIcon },
+])
 
 function getIconName(icon: ActivityIcon): string {
   const iconMap: Record<ActivityIcon, string> = {

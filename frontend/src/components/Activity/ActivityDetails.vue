@@ -20,6 +20,7 @@
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100vh;
       padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+      padding-top: env(safe-area-inset-top, 0px);
     "
   >
     <!-- Header -->

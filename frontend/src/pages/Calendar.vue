@@ -17,8 +17,8 @@
   <div class="pa-5 d-flex flex-column ga-5">
     <!-- Month Navigation Header -->
     <div>
-      <h1>Calendar</h1>
-      <p>Track your workout history</p>
+      <h1>{{ $t('calendar.calendar') }}</h1>
+      <p>{{ $t('calendar.trackYourWorkoutHistory') }}</p>
     </div>
 
     <!-- Dynamic Stats Card -->

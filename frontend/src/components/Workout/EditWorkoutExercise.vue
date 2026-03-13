@@ -48,7 +48,7 @@
               color="green-lighten-1"
               label
             >
-              {{ group.name }}
+              {{ $t(group.name) }}
             </v-chip>
           </div>
         </div>

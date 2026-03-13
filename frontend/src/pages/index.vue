@@ -30,13 +30,13 @@
         <div class="d-flex align-center">
           <v-icon size="20" color="primary">mdi-fire</v-icon>
           <span class="text-body-2 text-primary font-weight-bold" style="margin-top: 1px">
-            {{ streakInfo.currentStreak }} Streak
+            {{ streakInfo.currentStreak }} {{ $t('home.streak') }}
           </span>
         </div>
       </div>
       <div>
         <p class="text-body-2 text-textPrimary">
-          You're on fire! Keep pushing to hit {{ streakInfo.currentStreak + 2 }} workouts.
+          {{ $t('home.streakMotivation', { count: streakInfo.currentStreak + 2 }) }}
         </p>
       </div>
     </v-card>
@@ -63,7 +63,7 @@
         <template #prepend>
           <v-icon color="green-darken-1">mdi-chart-line</v-icon>
         </template>
-        <span class="text-caption">Progress</span>
+        <span class="text-caption">{{ $t('home.progress') }}</span>
       </v-btn>
     </div>
     <ProgressBar />
@@ -115,7 +115,7 @@
       >
         <v-icon size="24" color="primary">mdi-fire</v-icon>
         <h2 class="text-h5 text-textPrimary mt-1">{{ streakInfo?.currentStreak || 0 }}</h2>
-        <p class="text-caption text-textSecondary text-uppercase">Streak</p>
+        <p class="text-caption text-textSecondary text-uppercase">{{ $t('home.streak') }}</p>
       </v-card>
       <v-card
         class="flex-grow-1 bg-cardBg justify-center align-center py-2 d-flex flex-column align-center rounded-lg"
@@ -129,7 +129,7 @@
         <h2 class="text-h5 text-textPrimary mt-1">
           {{ streakInfo?.currentWeekWorkouts || 0 }}/{{ streakInfo?.weeklyWorkoutGoal || 3 }}
         </h2>
-        <p class="text-caption text-textSecondary text-uppercase">Weekly goal</p>
+        <p class="text-caption text-textSecondary text-uppercase">{{ $t('home.weeklyGoal') }}</p>
       </v-card>
       <v-card
         class="flex-grow-1 bg-cardBg justify-center align-center py-2 d-flex flex-column align-center rounded-lg"
@@ -141,7 +141,7 @@
       >
         <v-icon size="24" color="primary">mdi-timer</v-icon>
         <h2 class="text-h5 text-textPrimary mt-1">{{ totalMinutesThisWeek }}</h2>
-        <p class="text-caption text-textSecondary text-uppercase">Minutes</p>
+        <p class="text-caption text-textSecondary text-uppercase">{{ $t('home.minutes') }}</p>
       </v-card>
     </div>
     <MyWorkouts />

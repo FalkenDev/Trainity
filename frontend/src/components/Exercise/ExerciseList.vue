@@ -87,7 +87,7 @@
                   size="small"
                   filter
                 >
-                  {{ mg.name }}
+                  {{ $t(mg.name) }}
                 </v-chip>
               </v-chip-group>
 
@@ -95,10 +95,10 @@
                 {{ $t('exerciseForm.exerciseTypeLabel') }}
               </p>
               <v-chip-group v-model="selectedTypes" multiple column selected-class="text-primary">
-                <v-chip value="compound" variant="outlined" size="small" filter>Compound</v-chip>
-                <v-chip value="isolation" variant="outlined" size="small" filter>Isolation</v-chip>
+                <v-chip value="compound" variant="outlined" size="small" filter>{{ $t('exercise.types.compound') }}</v-chip>
+                <v-chip value="isolation" variant="outlined" size="small" filter>{{ $t('exercise.types.isolation') }}</v-chip>
                 <v-chip value="bodyweight" variant="outlined" size="small" filter
-                  >Bodyweight</v-chip
+                  >{{ $t('exercise.types.bodyweight') }}</v-chip
                 >
               </v-chip-group>
             </v-card>
@@ -197,7 +197,7 @@ const emit = defineEmits<{
 }>()
 
 const muscleGroups = computed(() =>
-  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, id: g.id }))
+  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, translatedName: t(g.name), id: g.id }))
 )
 
 const activeFilterCount = computed(
@@ -212,8 +212,8 @@ const resetFilters = () => {
 const displayName = (exercise: Exercise) => displayExerciseName({ t }, exercise)
 
 const getPrimaryMuscle = (exercise: Exercise): string | null => {
-  if (exercise.primaryMuscleGroup) return exercise.primaryMuscleGroup.name
-  if (exercise.muscleGroups?.length) return exercise.muscleGroups[0].name
+  if (exercise.primaryMuscleGroup) return t(exercise.primaryMuscleGroup.name)
+  if (exercise.muscleGroups?.length) return t(exercise.muscleGroups[0].name)
   return null
 }
 

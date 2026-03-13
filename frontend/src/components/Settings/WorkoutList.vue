@@ -77,7 +77,7 @@
                   size="small"
                   filter
                 >
-                  {{ mg.name }}
+                  {{ $t(mg.name) }}
                 </v-chip>
               </v-chip-group>
             </v-card>
@@ -186,13 +186,13 @@ const allMuscleGroups = computed<MuscleGroup[]>(() => {
       }
     }
   }
-  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name))
+  return Array.from(map.values()).sort((a, b) => t(a.name).localeCompare(t(b.name)))
 })
 
 const filteredMuscleGroups = computed(() => {
   const q = mgSearch.value.trim().toLowerCase()
   if (!q) return allMuscleGroups.value
-  return allMuscleGroups.value.filter(m => m.name.toLowerCase().includes(q))
+  return allMuscleGroups.value.filter(m => t(m.name).toLowerCase().includes(q))
 })
 
 const activeMGs = computed(() =>
@@ -239,7 +239,8 @@ function topMuscleGroups(w: Workout, limit = 3) {
 
   w.exercises.forEach(it => {
     it.exercise.muscleGroups.forEach(m => {
-      counts.set(m.name, (counts.get(m.name) ?? 0) + 1)
+      const translated = t(m.name)
+      counts.set(translated, (counts.get(translated) ?? 0) + 1)
     })
   })
 
@@ -264,7 +265,8 @@ function getWorkoutType(workout: Workout): string {
 
   workout.exercises.forEach(ex => {
     ex.exercise.muscleGroups.forEach(mg => {
-      muscleGroupMap.set(mg.name, (muscleGroupMap.get(mg.name) ?? 0) + 1)
+      const translated = t(mg.name)
+      muscleGroupMap.set(translated, (muscleGroupMap.get(translated) ?? 0) + 1)
     })
   })
 

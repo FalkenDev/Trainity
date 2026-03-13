@@ -133,7 +133,7 @@
                 : 'border: 1px solid rgb(var(--v-theme-borderColor))'
             "
           >
-            {{ mg }}
+            {{ $t(mg) }}
           </v-chip>
         </div>
       </div>
@@ -173,7 +173,7 @@
             </div>
             <div v-if="exercise.exercise.primaryMuscleGroup" class="flex-shrink-0 ml-2">
               <v-chip size="x-small" variant="outlined" color="textSecondary">
-                {{ exercise.exercise.primaryMuscleGroup.name }}
+                {{ $t(exercise.exercise.primaryMuscleGroup.name) }}
               </v-chip>
             </div>
           </v-card>

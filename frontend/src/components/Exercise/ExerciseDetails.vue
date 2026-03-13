@@ -19,6 +19,7 @@
     style="
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100dvh;
+      padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     "
   >
@@ -29,7 +30,11 @@
           <template #activator="{ props: menuProps }">
             <v-icon v-bind="menuProps">mdi-menu</v-icon>
           </template>
-          <v-list class="bg-cardBg mt-2 mr-2" width="100" style="border: 1px solid rgb(var(--v-theme-borderColor))">
+          <v-list
+            class="bg-cardBg mt-2 mr-2"
+            width="100"
+            style="border: 1px solid rgb(var(--v-theme-borderColor))"
+          >
             <v-list-item @click="isEditOpen = true">
               <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
             </v-list-item>
@@ -86,7 +91,7 @@
                 : 'border: 1px solid rgb(var(--v-theme-borderColor))'
             "
           >
-            {{ mg.name }}
+            {{ $t(mg.name) }}
           </v-chip>
         </div>
       </div>
@@ -232,8 +237,8 @@ const exercise = computed(() => {
 })
 
 const primaryMuscleName = computed(() => {
-  if (exercise.value?.primaryMuscleGroup) return exercise.value.primaryMuscleGroup.name
-  if (exercise.value?.muscleGroups?.length) return exercise.value.muscleGroups[0].name
+  if (exercise.value?.primaryMuscleGroup) return t(exercise.value.primaryMuscleGroup.name)
+  if (exercise.value?.muscleGroups?.length) return t(exercise.value.muscleGroups[0].name)
   return null
 })
 

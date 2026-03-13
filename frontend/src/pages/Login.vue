@@ -23,7 +23,7 @@
         <v-icon size="38" color="black">mdi-dumbbell</v-icon>
       </div>
       <h1 class="text-h4 font-weight-bold text-center text-textPrimary mt-3">Trainity</h1>
-      <v-card-subtitle class="text-center mb-8"> Your fitness journey starts here </v-card-subtitle>
+      <v-card-subtitle class="text-center mb-8"> {{ $t('auth.fitnessJourneyStartsHere') }} </v-card-subtitle>
     </div>
 
     <v-form ref="form" class="flex-grow-1" @submit.prevent="handleLogin">

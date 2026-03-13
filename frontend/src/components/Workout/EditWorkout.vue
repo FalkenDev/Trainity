@@ -99,7 +99,7 @@
             class="cursor-pointer"
             @click="toggleTargetMuscle(mg.id)"
           >
-            {{ mg.name }}
+            {{ $t(mg.name) }}
           </v-chip>
           <p v-if="availableMuscleGroups.length === 0" class="text-body-2 text-textSecondary">
             {{ $t('editWorkout.addExercisesToSeeMuscles') }}
@@ -399,7 +399,7 @@ const findExerciseData = (exerciseId: number) => {
 
 const getExerciseName = (exerciseId: number) => {
   const data = findExerciseData(exerciseId)
-  if (!data) return `Exercise #${exerciseId}`
+  if (!data) return t('exercise.exerciseFallback', { id: exerciseId })
   return displayExerciseName({ t }, data)
 }
 

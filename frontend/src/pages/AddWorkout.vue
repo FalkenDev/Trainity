@@ -19,7 +19,7 @@
     <!-- TODO: When click on start new workout a list of workouts show and you can choose one, see details ect -->
     <div class="mx-5 d-flex flex-column ga-5">
       <div class="d-flex flex-column ga-4">
-        <h1 class="text-h6 text-textPrimary">Quick Start</h1>
+        <h1 class="text-h6 text-textPrimary">{{ $t('home.quickStart') }}</h1>
         <div class="d-flex ga-5">
           <v-card
             class="pa-2 rounded-lg d-flex flex-column flex-grow-1"
@@ -33,8 +33,8 @@
           >
             <v-icon size="30" color="primary">mdi-lightning-bolt</v-icon>
             <div class="text-subtitle-1 font-weight-medium text-textPrimary mt-2">
-              <h1 class="text-body-1">Empty Workout</h1>
-              <p class="text-caption text-textSecondary">Start fresh and add exercises</p>
+              <h1 class="text-body-1">{{ $t('home.emptyWorkout') }}</h1>
+              <p class="text-caption text-textSecondary">{{ $t('home.emptyWorkoutDescription') }}</p>
             </div>
           </v-card>
           <v-card
@@ -49,8 +49,8 @@
           >
             <v-icon size="30" color="success">mdi-notebook-edit</v-icon>
             <div class="text-subtitle-1 font-weight-medium text-textPrimary mt-2">
-              <h1 class="text-body-1">Log Activity</h1>
-              <p class="text-caption text-textSecondary">Running, sports & more</p>
+              <h1 class="text-body-1">{{ $t('home.logActivityTitle') }}</h1>
+              <p class="text-caption text-textSecondary">{{ $t('home.logActivityDescription') }}</p>
             </div>
           </v-card>
         </div>
