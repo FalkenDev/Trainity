@@ -14,7 +14,10 @@
   -->
 
 <template>
-  <div class="d-flex justify-space-between align-center px-5 py-3 border-b-sm">
+  <div
+    class="d-flex justify-space-between align-center px-5 pb-3 border-b-sm"
+    style="padding-top: calc(12px + env(safe-area-inset-top, 0px))"
+  >
     <div :style="showSave ? 'width: 73px' : 'width: 40px'">
       <v-btn
         color="transparent"

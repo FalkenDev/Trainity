@@ -17,13 +17,7 @@
   <v-app>
     <VSonner position="top-center" />
     <PWAUpdatePrompt />
-    <v-main
-      :style="{
-        paddingBottom: showResumeBar
-          ? 'calc(101px + env(safe-area-inset-bottom, 0px))'
-          : 'env(safe-area-inset-bottom, 0px)',
-      }"
-    >
+    <v-main :style="{ '--extra-pb': showResumeBar ? '45px' : '0px' }">
       <router-view :key="$route.name" />
     </v-main>
     <v-card
