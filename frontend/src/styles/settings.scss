@@ -14,6 +14,21 @@
   padding-top: env(safe-area-inset-top, 0px) !important;
 }
 
+// Fullscreen dialog toolbars (ScheduleSession, AddPastSession, EditSet, Timer)
+// need top padding for the notch / status bar on iOS
+.v-dialog--fullscreen .v-toolbar {
+  padding-top: env(safe-area-inset-top, 0px) !important;
+  height: calc(48px + env(safe-area-inset-top, 0px)) !important;
+}
+
+// v-main: extend Vuetify's auto layout padding (--v-layout-bottom = bottom-nav height)
+// with the iOS home indicator inset and any extra bar (resume bar = --extra-pb)
+.v-main {
+  padding-bottom: calc(
+    var(--v-layout-bottom, 0px) + env(safe-area-inset-bottom, 0px) + var(--extra-pb, 0px)
+  ) !important;
+}
+
 // Grow the bottom nav bar so icons clear the home indicator
 .v-bottom-navigation {
   height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
