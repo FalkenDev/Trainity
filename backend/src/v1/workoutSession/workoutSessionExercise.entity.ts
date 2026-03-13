@@ -34,7 +34,7 @@ export class WorkoutSessionExercise {
   })
   session: WorkoutSession;
 
-  @ManyToOne(() => Exercise, { nullable: true })
+  @ManyToOne(() => Exercise, { nullable: true, onDelete: 'SET NULL' })
   exercise: Exercise;
 
   @Column({ default: 0 })

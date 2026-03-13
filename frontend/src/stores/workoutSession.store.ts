@@ -159,7 +159,17 @@ export const useWorkoutSessionStore = defineStore(
       if (typeof sessionId === 'undefined') return
       if (liveSessions.value[sessionId]) return
 
-      const fromServer = Array.isArray(session.exercises) && session.exercises.length > 0
+      // Treat exercises as "from server" only when at least one exercise has
+      // recorded sets (i.e. a finished / resumed session).  A freshly-created
+      // session has exercises pre-populated but with empty sets arrays — in that
+      // case we must fall through to the workout-template branch so the UI gets
+      // the planned sets/reps/weight.
+      const fromServer =
+        Array.isArray(session.exercises) &&
+        session.exercises.length > 0 &&
+        (session.exercises as { sets?: unknown[] }[]).some(
+          ex => Array.isArray(ex.sets) && ex.sets.length > 0
+        )
       const exercises: Record<number, LiveExercise> = {}
 
       if (fromServer && session.exercises) {
@@ -204,7 +214,7 @@ export const useWorkoutSessionStore = defineStore(
           for (const base of sorted) {
             const exId = base.exerciseId ?? base.exercise?.id
             const sets: LiveSet[] = []
-            for (let i = 1; i <= (base.sets ?? 0); i++) {
+            for (let i = 1; i <= (base.sets || 1); i++) {
               sets.push({
                 set: i,
                 weight: base.weight ?? 0,

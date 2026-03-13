@@ -172,6 +172,9 @@ export default defineConfig({
       ? process.env.VITE_ALLOWED_HOSTS.split(',').map(h => h.trim())
       : undefined,
     port: 3000,
+    watch: {
+      usePolling: true,
+    },
   },
   css: {
     preprocessorOptions: {

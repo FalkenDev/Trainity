@@ -310,8 +310,10 @@ import ScheduleSessionDialog from '@/components/Session/ScheduleSessionDialog.vu
 import AddPastSessionDialog from '@/components/Session/AddPastSessionDialog.vue'
 import ScheduledSessionBottomSheet from '@/components/Session/ScheduledSessionBottomSheet.vue'
 
-const { t } = useI18n({ useScope: 'global' })
+const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
+
+const dateLocale = computed(() => (locale.value === 'sv' ? 'sv-SE' : 'en-US'))
 
 const currentDate = ref(new Date())
 const selectedDate = ref(toLocalDateString(new Date()))
@@ -352,11 +354,17 @@ interface CalendarDay {
 }
 
 const weekdays = computed(() => {
-  return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  const base = new Date(2024, 0, 1) // Monday
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(base)
+    d.setDate(base.getDate() + i)
+    return d.toLocaleDateString(dateLocale.value, { weekday: 'short' })
+  })
 })
 
 const monthName = computed(() => {
-  return currentDate.value.toLocaleDateString('en-US', { month: 'long' })
+  const name = currentDate.value.toLocaleDateString(dateLocale.value, { month: 'long' })
+  return name.charAt(0).toUpperCase() + name.slice(1)
 })
 
 const yearName = computed(() => {
@@ -375,7 +383,7 @@ const selectedDateLabel = computed(() => {
   if (isSelectedDateToday.value) return t('calendar.today')
 
   const d = new Date(selectedDate.value + 'T12:00:00')
-  return d.toLocaleDateString('en-US', {
+  return d.toLocaleDateString(dateLocale.value, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -734,19 +742,19 @@ async function onScheduleStarted() {
   justify-content: center;
   height: 100%;
   padding: 4px 2px;
+  position: relative;
 }
 
 .day-number {
   font-size: 15px;
   font-weight: 600;
-  margin-bottom: 2px;
   line-height: 1.2;
 }
 
 .activity-indicators {
   display: flex;
-  gap: 4px;
-  margin-top: auto;
+  position: absolute;
+  bottom: 8px;
 }
 
 .activity-dot {

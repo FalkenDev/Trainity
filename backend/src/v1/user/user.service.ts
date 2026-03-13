@@ -144,10 +144,10 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    // Delete related data
+    // Delete related data (sessions first to avoid FK violations from workout_session_exercise)
+    await this.sessionRepo.delete({ user: { id: userId } });
     await this.exerciseRepo.delete({ createdBy: { id: userId } });
     await this.workoutRepo.delete({ createdBy: { id: userId } });
-    await this.sessionRepo.delete({ user: { id: userId } });
 
     await this.userRepo.remove(user);
 
