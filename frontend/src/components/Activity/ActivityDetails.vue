@@ -16,10 +16,10 @@
 <template>
   <div
     class="w-100 fill-height bg-background overflow-y-auto"
-    style="padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px))"
     style="
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100vh;
+      padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
     "
   >
     <!-- Header -->
