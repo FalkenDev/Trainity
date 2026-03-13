@@ -60,7 +60,7 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const chartData = computed(() => ({
-  labels: props.muscleData.map(m => t(m.name)),
+  labels: props.muscleData.map(m => t(`muscleGroups.${m.name}`)),
   datasets: [
     {
       label: t('statistics.totalVolume'),

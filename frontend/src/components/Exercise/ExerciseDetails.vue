@@ -91,7 +91,7 @@
                 : 'border: 1px solid rgb(var(--v-theme-borderColor))'
             "
           >
-            {{ $t(mg.name) }}
+            {{ $t(`muscleGroups.${mg.name}`) }}
           </v-chip>
         </div>
       </div>
@@ -237,8 +237,10 @@ const exercise = computed(() => {
 })
 
 const primaryMuscleName = computed(() => {
-  if (exercise.value?.primaryMuscleGroup) return t(exercise.value.primaryMuscleGroup.name)
-  if (exercise.value?.muscleGroups?.length) return t(exercise.value.muscleGroups[0].name)
+  if (exercise.value?.primaryMuscleGroup)
+    return t(`muscleGroups.${exercise.value.primaryMuscleGroup.name}`)
+  if (exercise.value?.muscleGroups?.length)
+    return t(`muscleGroups.${exercise.value.muscleGroups[0].name}`)
   return null
 })
 

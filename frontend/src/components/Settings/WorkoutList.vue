@@ -77,7 +77,7 @@
                   size="small"
                   filter
                 >
-                  {{ $t(mg.name) }}
+                  {{ $t(`muscleGroups.${mg.name}`) }}
                 </v-chip>
               </v-chip-group>
             </v-card>
@@ -147,7 +147,7 @@ import type { MuscleGroup } from '@/interfaces/Exercise.interface'
 import type { Workout } from '@/interfaces/Workout.interface'
 import { useWorkoutStore } from '@/stores/workout.store'
 import { useI18n } from 'vue-i18n'
-import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
+// import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -186,18 +186,20 @@ const allMuscleGroups = computed<MuscleGroup[]>(() => {
       }
     }
   }
-  return Array.from(map.values()).sort((a, b) => t(a.name).localeCompare(t(b.name)))
+  return Array.from(map.values()).sort((a, b) =>
+    t(`muscleGroups.${a.name}`).localeCompare(t(`muscleGroups.${b.name}`))
+  )
 })
 
-const filteredMuscleGroups = computed(() => {
-  const q = mgSearch.value.trim().toLowerCase()
-  if (!q) return allMuscleGroups.value
-  return allMuscleGroups.value.filter(m => t(m.name).toLowerCase().includes(q))
-})
+// const filteredMuscleGroups = computed(() => {
+//   const q = mgSearch.value.trim().toLowerCase()
+//   if (!q) return allMuscleGroups.value
+//   return allMuscleGroups.value.filter(m => t(`muscleGroups.${m.name}`).toLowerCase().includes(q))
+// })
 
-const activeMGs = computed(() =>
-  allMuscleGroups.value.filter(m => selectedMGIds.value.includes(m.id))
-)
+// const activeMGs = computed(() =>
+//   allMuscleGroups.value.filter(m => selectedMGIds.value.includes(m.id))
+// )
 
 const filteredWorkouts = computed<Workout[]>(() => {
   let list = workouts.value
@@ -226,33 +228,33 @@ const filteredWorkouts = computed<Workout[]>(() => {
   })
 })
 
-function orderedItems(w: Workout) {
-  return w.exercises.slice().sort((a, b) => a.order - b.order)
-}
+// function orderedItems(w: Workout) {
+//   return w.exercises.slice().sort((a, b) => a.order - b.order)
+// }
 
-function totalSets(w: Workout) {
-  return w.exercises.reduce((sum, it) => sum + (it.sets || 0), 0)
-}
+// function totalSets(w: Workout) {
+//   return w.exercises.reduce((sum, it) => sum + (it.sets || 0), 0)
+// }
 
-function topMuscleGroups(w: Workout, limit = 3) {
-  const counts = new Map<string, number>()
+// function topMuscleGroups(w: Workout, limit = 3) {
+//   const counts = new Map<string, number>()
 
-  w.exercises.forEach(it => {
-    it.exercise.muscleGroups.forEach(m => {
-      const translated = t(m.name)
-      counts.set(translated, (counts.get(translated) ?? 0) + 1)
-    })
-  })
+//   w.exercises.forEach(it => {
+//     it.exercise.muscleGroups.forEach(m => {
+//       const translated = t(`muscleGroups.${m.name}`)
+//       counts.set(translated, (counts.get(translated) ?? 0) + 1)
+//     })
+//   })
 
-  const sorted = Array.from(counts.entries())
-    .sort((a, b) => b[1] - a[1]) // descending by frequency
-    .map(([name]) => name)
+//   const sorted = Array.from(counts.entries())
+//     .sort((a, b) => b[1] - a[1]) // descending by frequency
+//     .map(([name]) => name)
 
-  return {
-    list: sorted.slice(0, limit),
-    extra: sorted.length > limit ? sorted.length - limit : 0,
-  }
-}
+//   return {
+//     list: sorted.slice(0, limit),
+//     extra: sorted.length > limit ? sorted.length - limit : 0,
+//   }
+// }
 
 function getWorkoutType(workout: Workout): string {
   // Use the stored type if available
@@ -265,7 +267,7 @@ function getWorkoutType(workout: Workout): string {
 
   workout.exercises.forEach(ex => {
     ex.exercise.muscleGroups.forEach(mg => {
-      const translated = t(mg.name)
+      const translated = t(`muscleGroups.${mg.name}`)
       muscleGroupMap.set(translated, (muscleGroupMap.get(translated) ?? 0) + 1)
     })
   })
@@ -276,15 +278,15 @@ function getWorkoutType(workout: Workout): string {
   return sorted[0]?.[0] || t('editWorkout.types.strength')
 }
 
-function toggleMG(id: number) {
-  const idx = selectedMGIds.value.indexOf(id)
-  if (idx === -1) selectedMGIds.value.push(id)
-  else selectedMGIds.value.splice(idx, 1)
-}
+// function toggleMG(id: number) {
+//   const idx = selectedMGIds.value.indexOf(id)
+//   if (idx === -1) selectedMGIds.value.push(id)
+//   else selectedMGIds.value.splice(idx, 1)
+// }
 
-function removeMG(id: number) {
-  selectedMGIds.value = selectedMGIds.value.filter(x => x !== id)
-}
+// function removeMG(id: number) {
+//   selectedMGIds.value = selectedMGIds.value.filter(x => x !== id)
+// }
 
 function clearMG() {
   selectedMGIds.value = []

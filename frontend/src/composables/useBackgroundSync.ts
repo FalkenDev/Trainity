@@ -13,23 +13,21 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-export const muscleGroupsToSeed = [
-  { name: 'chest' },
-  { name: 'back' },
-  { name: 'shoulders' },
-  { name: 'biceps' },
-  { name: 'triceps' },
-  { name: 'legs' },
-  { name: 'abs' },
-  { name: 'forearms' },
-  { name: 'glutes' },
-  { name: 'hamstrings' },
-  { name: 'quads' },
-  { name: 'calves' },
-  { name: 'rearDelts' },
-  { name: 'core' },
-  { name: 'traps' },
-  { name: 'lowerBack' },
-  { name: 'upperChest' },
-  { name: 'hipFlexors' },
-];
+import { onMounted, onUnmounted } from 'vue'
+import { toast } from 'vue-sonner'
+
+export function useBackgroundSync() {
+  const handleMessage = (event: MessageEvent) => {
+    if (event.data?.type === 'BACKGROUND_SYNC_SUCCESS') {
+      toast.success('Workout synced!')
+    }
+  }
+
+  onMounted(() => {
+    navigator.serviceWorker?.addEventListener('message', handleMessage)
+  })
+
+  onUnmounted(() => {
+    navigator.serviceWorker?.removeEventListener('message', handleMessage)
+  })
+}

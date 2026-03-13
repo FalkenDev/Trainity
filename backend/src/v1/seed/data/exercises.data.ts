@@ -34,7 +34,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Bänkpress',
     defaultDescription:
       'Skivstångspress på plan bänk. Dra ihop skulderbladen, lätt brygga, fötter i golvet. Sänk till mitten av bröstet och pressa upp med armbågar ~45°.',
-    muscleGroups: ['Bröst', 'Axlar', 'Triceps'],
+    muscleGroups: ['chest', 'shoulders', 'triceps'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Skivstång', 'Plan bänk'],
     instructions: [
@@ -60,7 +60,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Hantelpress lutande',
     defaultDescription:
       'Pressa hantlar på en bänk med 30–45° lutning. Sänk kontrollerat till bröstlinjen, pressa upp och lätt inåt.',
-    muscleGroups: ['Bröst', 'Axlar', 'Triceps'],
+    muscleGroups: ['chest', 'shoulders', 'triceps'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Hantlar', 'Lutande bänk'],
     instructions: [
@@ -83,7 +83,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Sittande hantelpress (axlar)',
     defaultDescription:
       'Sittande vertikal press. Håll revbenen nere och underarmarna vertikala. Sänk till ungefär öronhöjd och pressa utan att rycka axlarna.',
-    muscleGroups: ['Axlar', 'Triceps', 'Bål'],
+    muscleGroups: ['shoulders', 'triceps', 'core'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Hantlar', 'Sittande bänk med ryggstöd'],
     instructions: [
@@ -106,7 +106,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Hantellyft åt sidan',
     defaultDescription:
       'Lyft hantlar lätt framåt och ut till axelhöjd. Mjuka armbågar, strikt kontroll och långsam excentrisk fas.',
-    muscleGroups: ['Axlar', 'Bakre axlar'],
+    muscleGroups: ['shoulders', 'rearDelts'],
     exerciseType: ExerciseType.ISOLATION,
     equipment: ['Hantlar'],
     instructions: [
@@ -129,7 +129,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Triceps pushdown (kabel)',
     defaultDescription:
       'Med rep eller stång, håll armbågarna stilla. Sträck ut helt och kontrollera tillbaka till ~90°.',
-    muscleGroups: ['Triceps'],
+    muscleGroups: ['triceps'],
     exerciseType: ExerciseType.ISOLATION,
     equipment: ['Kabelmaskin', 'Rak stång eller rep'],
     instructions: [
@@ -152,7 +152,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Kabel-flyes (bröst)',
     defaultDescription:
       'Från höga/mitten-trissor. Lätt framåtlutning, kramrörelse med mjuka armbågar. Spänn bröstet och återgå långsamt.',
-    muscleGroups: ['Bröst'],
+    muscleGroups: ['chest'],
     exerciseType: ExerciseType.ISOLATION,
     equipment: ['Kabelmaskin (dubbla trissor)'],
     instructions: [
@@ -177,7 +177,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Knäböj (skivstång)',
     defaultDescription:
       'Stång på övre ryggen, spänn bålen, knän följer tårna. Gå ned så djupt du kontrollerar och driv upp igen.',
-    muscleGroups: ['Framsida lår', 'Säte', 'Baksida lår', 'Bål'],
+    muscleGroups: ['quads', 'glutes', 'hamstrings', 'core'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Skivstång', 'Knäböjställning'],
     instructions: [
@@ -203,7 +203,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Hip thrust (skivstång)',
     defaultDescription:
       'Övre rygg på bänk, stång över höften. Tippa bäckenet bakåt, driv genom hälarna och lås ut med sätet.',
-    muscleGroups: ['Säte', 'Baksida lår'],
+    muscleGroups: ['glutes', 'hamstrings'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Skivstång', 'Bänk', 'Barbell pad'],
     instructions: [
@@ -227,7 +227,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Benpress',
     defaultDescription:
       'Fötter axelbrett på släden. Sänk djupt med kontroll utan att bäckenet tippar; pressa genom mellanfoten.',
-    muscleGroups: ['Framsida lår', 'Säte', 'Baksida lår'],
+    muscleGroups: ['quads', 'glutes', 'hamstrings'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Benpressmaskin'],
     instructions: [
@@ -251,7 +251,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Sittande lårcurl',
     defaultDescription:
       'Justera dynan ovanför hälarna. Curl till full knäflexion med höfterna stilla; kontrollera den excentriska fasen.',
-    muscleGroups: ['Baksida lår'],
+    muscleGroups: ['hamstrings'],
     exerciseType: ExerciseType.ISOLATION,
     equipment: ['Sittande lårcurlmaskin'],
     instructions: [
@@ -274,7 +274,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Benextension',
     defaultDescription:
       'Dyna ovanför anklarna. Sträck ut nästan till låsning med kontroll; 2–3 s excentriskt för knävänlig belastning.',
-    muscleGroups: ['Framsida lår'],
+    muscleGroups: ['quads'],
     exerciseType: ExerciseType.ISOLATION,
     equipment: ['Benextensionmaskin'],
     instructions: [
@@ -297,7 +297,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Vadpress (maskin/benpress)',
     defaultDescription:
       'Full rörelse i fotleden. Pausa i bottenläget; kraftig tåhävning i toppen. Ingen studs.',
-    muscleGroups: ['Vader'],
+    muscleGroups: ['calves'],
     exerciseType: ExerciseType.ISOLATION,
     equipment: ['Vadmaskin eller benpressmaskin'],
     instructions: [
@@ -322,7 +322,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Militärpress (stående)',
     defaultDescription:
       'Stå stabilt, spänn säte och bål. Pressa stången rakt upp; för huvudet fram genom armarna i toppläget.',
-    muscleGroups: ['Axlar', 'Triceps', 'Övre bröst', 'Bål'],
+    muscleGroups: ['shoulders', 'triceps', 'upperChest', 'core'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Skivstång'],
     instructions: [
@@ -346,7 +346,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Sittande rodd (kabel)',
     defaultDescription:
       'Neutral rygg, bröstet upp. Dra mot nedre revben med armbågar nära kroppen; spänn lats/mellanrygg, återgå långsamt.',
-    muscleGroups: ['Rygg', 'Bakre axlar', 'Biceps'],
+    muscleGroups: ['back', 'rearDelts', 'biceps'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Kabelmaskin', 'V-grepp eller brett handtag'],
     instructions: [
@@ -370,7 +370,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Bänkpress lutande (skivstång)',
     defaultDescription:
       'Skivstångspress på 30–45° lutning. Sänk till övre bröstet; pressa med armbågar ~45–60°.',
-    muscleGroups: ['Bröst', 'Axlar', 'Triceps'],
+    muscleGroups: ['chest', 'shoulders', 'triceps'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Skivstång', 'Lutande bänk'],
     instructions: [
@@ -393,7 +393,7 @@ export const exercisesToSeed: ExerciseSeedDef[] = [
     defaultName: 'Gående utfall',
     defaultDescription:
       'Ta ett steg fram och gå ned kontrollerat. Främre knät följer tårna; pressa upp genom främre hälen och växla.',
-    muscleGroups: ['Framsida lår', 'Säte', 'Baksida lår', 'Bål'],
+    muscleGroups: ['quads', 'glutes', 'hamstrings', 'core'],
     exerciseType: ExerciseType.COMPOUND,
     equipment: ['Hantlar (valfritt)', 'Skivstång (valfritt)'],
     instructions: [

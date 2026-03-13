@@ -74,9 +74,11 @@
     </v-dialog>
 
     <v-dialog v-model="isViewExerciseDetailsOpen" fullscreen>
-      <EditExercise
+      <ExerciseDetails
         v-if="isViewExerciseDetailsOpen && viewExerciseDetails"
-        :exercise="viewExerciseDetails"
+        :selected-exercise="viewExerciseDetails"
+        :is-view-exercise="true"
+        hide-menu
         @close="onCloseExerciseDetails"
       />
     </v-dialog>
@@ -95,11 +97,11 @@ import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface'
 
 import { fetchExerciseById } from '@/services/exercise.service'
 import { abandonWorkoutSession, finishWorkoutSession } from '@/services/workoutSession.service'
-import type { Exercise as ExerciseDetails } from '@/interfaces/Exercise.interface'
+import type { Exercise as ExerciseDetailType } from '@/interfaces/Exercise.interface'
 
 const isAddExerciseOpen = ref(false)
 const isViewExerciseDetailsOpen = ref(false)
-const viewExerciseDetails = ref<ExerciseDetails | null>(null)
+const viewExerciseDetails = ref<ExerciseDetailType | null>(null)
 const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const workoutSessionStore = useWorkoutSessionStore()
@@ -273,7 +275,7 @@ const onViewExerciseDetails = (exerciseId: number) => {
       createdAt: ex.createdAt,
       updatedAt: ex.updatedAt,
       deletedAt: ex.deletedAt,
-    } as ExerciseDetails
+    } as ExerciseDetailType
     isViewExerciseDetailsOpen.value = true
   }
 }

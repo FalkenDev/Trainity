@@ -87,7 +87,7 @@
                   size="small"
                   filter
                 >
-                  {{ $t(mg.name) }}
+                  {{ $t(`muscleGroups.${mg.name}`) }}
                 </v-chip>
               </v-chip-group>
 
@@ -212,8 +212,8 @@ const resetFilters = () => {
 const displayName = (exercise: Exercise) => displayExerciseName({ t }, exercise)
 
 const getPrimaryMuscle = (exercise: Exercise): string | null => {
-  if (exercise.primaryMuscleGroup) return t(exercise.primaryMuscleGroup.name)
-  if (exercise.muscleGroups?.length) return t(exercise.muscleGroups[0].name)
+  if (exercise.primaryMuscleGroup) return t(`muscleGroups.${exercise.primaryMuscleGroup.name}`)
+  if (exercise.muscleGroups?.length) return t(`muscleGroups.${exercise.muscleGroups[0].name}`)
   return null
 }
 
