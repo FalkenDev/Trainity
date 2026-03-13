@@ -196,6 +196,8 @@ export default {
     failedToDeleteAccount: 'Kunde inte radera konto',
     editPersonalInformation: 'Redigera personuppgifter',
     notSet: 'Ej angivet',
+    data: 'Data',
+    memberSince: 'Medlem sedan {date}',
   },
   auth: {
     loginFailed: 'Inloggningen misslyckades. Kontrollera dina uppgifter.',
@@ -365,6 +367,7 @@ export default {
     failedToCreate: 'Kunde inte skapa aktivitet',
     failedToUpdate: 'Kunde inte uppdatera aktivitet',
     failedToDelete: 'Kunde inte ta bort aktivitet',
+    deleteConfirm: 'Är du säker på att du vill ta bort "{name}"?',
     logCreated: 'Aktivitetslogg skapad!',
     logDeleted: 'Aktivitetslogg borttagen!',
     failedToCreateLog: 'Kunde inte skapa aktivitetslogg',
@@ -944,6 +947,7 @@ export default {
     selectForCompare: 'Tryck för att välja',
     compareSelected: '{count} valda',
     viewPhoto: 'Visa foto',
+    tapToSelectPhoto: 'Tryck för att välja ett foto',
   },
   statistics: {
     title: 'Statistik',

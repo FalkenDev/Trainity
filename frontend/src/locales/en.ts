@@ -198,6 +198,8 @@ export default {
     failedToDeleteAccount: 'Failed to delete account',
     editPersonalInformation: 'Edit Personal Information',
     notSet: 'Not set',
+    data: 'Data',
+    memberSince: 'Member since {date}',
   },
   auth: {
     gymAccess: 'Gym Access',
@@ -370,6 +372,7 @@ export default {
     failedToCreate: 'Failed to create activity',
     failedToUpdate: 'Failed to update activity',
     failedToDelete: 'Failed to delete activity',
+    deleteConfirm: 'Are you sure you want to delete "{name}"?',
     logCreated: 'Activity log created successfully!',
     logDeleted: 'Activity log deleted successfully!',
     failedToCreateLog: 'Failed to create activity log',
@@ -952,6 +955,7 @@ export default {
     selectForCompare: 'Tap to select',
     compareSelected: '{count} selected',
     viewPhoto: 'View photo',
+    tapToSelectPhoto: 'Tap to select a photo',
   },
   statistics: {
     title: 'Statistics',
