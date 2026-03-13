@@ -133,7 +133,7 @@
                 : 'border: 1px solid rgb(var(--v-theme-borderColor))'
             "
           >
-            {{ $t(mg) }}
+            {{ $t(`muscleGroups.${mg}`) }}
           </v-chip>
         </div>
       </div>
@@ -173,7 +173,7 @@
             </div>
             <div v-if="exercise.exercise.primaryMuscleGroup" class="flex-shrink-0 ml-2">
               <v-chip size="x-small" variant="outlined" color="textSecondary">
-                {{ $t(exercise.exercise.primaryMuscleGroup.name) }}
+                {{ $t(`muscleGroups.${exercise.exercise.primaryMuscleGroup.name}`) }}
               </v-chip>
             </div>
           </v-card>
@@ -347,7 +347,7 @@ const duplicate = async () => {
 
 .sticky-btn-wrapper {
   position: fixed;
-  bottom: 45px;
+  bottom: calc(50px + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
   z-index: 10;

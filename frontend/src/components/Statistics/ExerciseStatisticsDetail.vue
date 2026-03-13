@@ -38,7 +38,7 @@
                   size="x-small"
                   variant="tonal"
                 >
-                  {{ $t(mg.name) }}
+                  {{ $t(`muscleGroups.${mg.name}`) }}
                 </v-chip>
               </div>
             </div>

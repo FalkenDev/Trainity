@@ -79,7 +79,7 @@
                   size="small"
                   filter
                 >
-                  {{ $t(mg.name) }}
+                  {{ $t(`muscleGroups.${mg.name}`) }}
                 </v-chip>
               </v-chip-group>
 

@@ -101,7 +101,7 @@
                 color="primary"
                 variant="tonal"
               >
-                {{ $t(mg.name) }} ({{ mg.count }})
+                {{ $t(`muscleGroups.${mg.name}`) }} ({{ mg.count }})
               </v-chip>
             </div>
           </div>
@@ -174,7 +174,7 @@
                   size="x-small"
                   variant="tonal"
                 >
-                  {{ $t(mg.name) }}
+                  {{ $t(`muscleGroups.${mg.name}`) }}
                 </v-chip>
               </div>
             </div>

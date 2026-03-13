@@ -99,7 +99,7 @@
             class="cursor-pointer"
             @click="toggleTargetMuscle(mg.id)"
           >
-            {{ $t(mg.name) }}
+            {{ $t(`muscleGroups.${mg.name}`) }}
           </v-chip>
           <p v-if="availableMuscleGroups.length === 0" class="text-body-2 text-textSecondary">
             {{ $t('editWorkout.addExercisesToSeeMuscles') }}
