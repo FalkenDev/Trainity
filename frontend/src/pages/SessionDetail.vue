@@ -185,7 +185,7 @@
                     variant="outlined"
                     color="textSecondary"
                   >
-                    {{ ex.exercise.primaryMuscleGroup.name }}
+                    {{ $t(ex.exercise.primaryMuscleGroup.name) }}
                   </v-chip>
                   <v-icon color="grey-lighten-1" size="16">mdi-chevron-right</v-icon>
                 </div>
@@ -408,9 +408,9 @@ const sessionIcon = computed(() => {
 
 const sessionTitle = computed(() => {
   if (type.value === 'workout') {
-    return workoutSession.value?.workout?.title ?? `Session #${id.value}`
+    return workoutSession.value?.workout?.title ?? t('sessionDetail.sessionFallback', { id: id.value })
   }
-  return activityLog.value?.activity?.name ?? `Activity #${id.value}`
+  return activityLog.value?.activity?.name ?? t('sessionDetail.activityFallback', { id: id.value })
 })
 
 const sessionSubtitle = computed(() => {

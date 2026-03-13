@@ -38,7 +38,7 @@
                   size="x-small"
                   variant="tonal"
                 >
-                  {{ mg.name }}
+                  {{ $t(mg.name) }}
                 </v-chip>
               </div>
             </div>

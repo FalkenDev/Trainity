@@ -116,8 +116,8 @@ function formatRecordType(type: RecordType): string {
 }
 
 function formatRecordValue(pr: PersonalRecord): string {
-  if (pr.recordType === 'max_reps') return `${pr.value} reps`
-  return `${pr.value} kg`
+  if (pr.recordType === 'max_reps') return `${pr.value} ${t('units.repsShort')}`
+  return `${pr.value} ${t('units.kgShort')}`
 }
 
 function getRecordColor(type: RecordType): string {
@@ -139,8 +139,8 @@ function formatRelativeDate(dateStr: string): string {
 
   if (diffDays === 0) return t('statistics.prTimeline.today')
   if (diffDays === 1) return t('statistics.prTimeline.yesterday')
-  if (diffDays < 7) return `${diffDays}d ago`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`
+  if (diffDays < 7) return t('statistics.prTimeline.daysAgo', { count: diffDays })
+  if (diffDays < 30) return t('statistics.prTimeline.weeksAgo', { count: Math.floor(diffDays / 7) })
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 </script>

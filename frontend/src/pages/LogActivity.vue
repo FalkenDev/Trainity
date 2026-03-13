@@ -223,8 +223,8 @@ const formData = ref<CreateActivityLogDto>({
 const isSubmitting = ref(false)
 
 const rules = {
-  required: (v: string | number | null) => !!v || 'This field is required',
-  positive: (v: number) => v > 0 || 'Must be greater than 0',
+  required: (v: string | number | null) => !!v || t('common.fieldRequired'),
+  positive: (v: number) => v > 0 || t('common.mustBePositive'),
 }
 
 // Get tracked metric labels for an activity

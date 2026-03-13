@@ -79,7 +79,7 @@
                   size="small"
                   filter
                 >
-                  {{ mg.name }}
+                  {{ $t(mg.name) }}
                 </v-chip>
               </v-chip-group>
 
@@ -199,7 +199,7 @@ const openViewExercise = (exercise: Exercise) => {
 }
 
 const muscleGroups = computed(() =>
-  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, id: g.id }))
+  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, translatedName: t(g.name), id: g.id }))
 )
 
 const exercises = computed<Exercise[]>(() =>

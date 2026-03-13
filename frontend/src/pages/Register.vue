@@ -19,8 +19,8 @@
       <v-icon size="32">mdi-arrow-left</v-icon>
     </v-btn>
     <div class="my-5">
-      <h1 class="text-textPrimary">Register</h1>
-      <p class="text-textSecondary">Start your fitness transformation today</p>
+      <h1 class="text-textPrimary">{{ $t('auth.register') }}</h1>
+      <p class="text-textSecondary">{{ $t('auth.registerSubtitle') }}</p>
     </div>
 
     <v-form ref="form" @submit.prevent="handleCreateAccount">
@@ -85,20 +85,24 @@
             <v-icon color="primary" size="14">mdi-check</v-icon>
           </v-avatar>
           <h1 class="text-textSecondary text-body-2 align-center d-flex">
-            Personalized workout plans
+            {{ $t('auth.personalizedPlans') }}
           </h1>
         </div>
         <div class="d-flex align-cente">
           <v-avatar size="20" class="mr-2" color="iconBackground">
             <v-icon color="primary" size="14">mdi-check</v-icon>
           </v-avatar>
-          <h1 class="text-textSecondary text-body-2 align-center d-flex">Track your progress</h1>
+          <h1 class="text-textSecondary text-body-2 align-center d-flex">
+            {{ $t('auth.trackYourProgress') }}
+          </h1>
         </div>
         <div class="d-flex align-cente">
           <v-avatar size="20" class="mr-2" color="iconBackground">
             <v-icon color="primary" size="14">mdi-check</v-icon>
           </v-avatar>
-          <h1 class="text-textSecondary text-body-2 align-center d-flex">Join the community</h1>
+          <h1 class="text-textSecondary text-body-2 align-center d-flex">
+            {{ $t('auth.joinCommunity') }}
+          </h1>
         </div>
       </div>
 

@@ -177,7 +177,7 @@ const form = ref({
 })
 
 const muscleGroupItems = computed(() =>
-  muscleGroupStore.muscleGroups.map(g => ({ name: g.name, id: g.id }))
+  muscleGroupStore.muscleGroups.map(g => ({ name: t(g.name), id: g.id }))
 )
 
 const selectedMuscleGroupItems = computed(() =>

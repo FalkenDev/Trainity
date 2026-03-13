@@ -42,7 +42,7 @@
         @click="routeTo(workout.id)"
       >
         <div>
-          <h1 class="text-caption text-primary">STRENGTH</h1>
+          <h1 class="text-caption text-primary">{{ $t('myWorkouts.workoutType.strength') }}</h1>
           <h1 class="text-h6 font-weight-bold text-textPrimary">
             {{ workout.title }}
           </h1>

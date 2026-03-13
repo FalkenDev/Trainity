@@ -42,7 +42,7 @@
           <div class="d-flex align-center ga-3">
             <v-icon color="primary">mdi-calendar</v-icon>
             <div>
-              <p class="text-caption text-textSecondary">Date</p>
+              <p class="text-caption text-textSecondary">{{ $t('common.date') }}</p>
               <p class="text-body-1 font-weight-bold">{{ formattedDate }}</p>
             </div>
           </div>
@@ -107,7 +107,7 @@
             <v-text-field
               v-model="startTime"
               type="time"
-              label="Start time"
+              :label="$t('schedule.startTime')"
               variant="outlined"
               density="compact"
               hide-details
@@ -116,7 +116,7 @@
             <v-text-field
               v-model="endTime"
               type="time"
-              label="End time"
+              :label="$t('schedule.endTime')"
               variant="outlined"
               density="compact"
               hide-details

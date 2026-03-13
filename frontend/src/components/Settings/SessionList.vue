@@ -255,12 +255,12 @@ function title(session: UnifiedSession) {
   if (session.type === 'workout') {
     return (
       (session.data as WorkoutSession).workout?.title ||
-      `Session #${(session.data as WorkoutSession).id}`
+      t('sessionList.sessionFallback', { id: (session.data as WorkoutSession).id })
     )
   } else {
     return (
       (session.data as ActivityLog).activity?.name ||
-      `Activity #${(session.data as ActivityLog).id}`
+      t('sessionList.activityFallback', { id: (session.data as ActivityLog).id })
     )
   }
 }

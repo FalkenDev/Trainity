@@ -97,7 +97,7 @@
           >
             <p class="text-body-2 text-textSecondary">
               {{
-                sessionType === 'workout' ? 'No workouts created yet' : 'No activities created yet'
+                sessionType === 'workout' ? $t('schedule.noWorkoutsCreated') : $t('schedule.noActivitiesCreated')
               }}
             </p>
           </v-card>
@@ -185,6 +185,7 @@ import { useScheduledSessionStore } from '@/stores/scheduledSession.store'
 import type { ScheduledSessionType } from '@/interfaces/ScheduledSession.interface'
 import type { Workout } from '@/interfaces/Workout.interface'
 import type { Activity } from '@/interfaces/Activity.interface'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   modelValue: boolean
@@ -204,6 +205,7 @@ const dialogOpen = computed({
 const workoutStore = useWorkoutStore()
 const activityStore = useActivityStore()
 const scheduledSessionStore = useScheduledSessionStore()
+const { t } = useI18n()
 
 const sessionType = ref<ScheduledSessionType>('workout')
 const selectedItemId = ref<number | null>(null)
@@ -213,7 +215,7 @@ const selectedDays = ref<number[]>([])
 const notes = ref('')
 const isSubmitting = ref(false)
 
-const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const dayLabels = computed(() => t('schedule.dayLabels') as unknown as string[])
 
 interface ListItem {
   id: number

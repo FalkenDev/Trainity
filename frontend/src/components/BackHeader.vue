@@ -71,7 +71,6 @@ const routeTo = () => {
 
 const handleClick = () => {
   if (props.routeTo) {
-    console.log('Routing to:', props.routeTo)
     routeTo()
   } else {
     emit('close')

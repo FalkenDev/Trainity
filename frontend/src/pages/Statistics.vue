@@ -101,7 +101,7 @@
                 color="primary"
                 variant="tonal"
               >
-                {{ mg.name }} ({{ mg.count }})
+                {{ $t(mg.name) }} ({{ mg.count }})
               </v-chip>
             </div>
           </div>
@@ -174,7 +174,7 @@
                   size="x-small"
                   variant="tonal"
                 >
-                  {{ mg.name }}
+                  {{ $t(mg.name) }}
                 </v-chip>
               </div>
             </div>

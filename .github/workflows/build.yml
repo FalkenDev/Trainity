@@ -2,7 +2,7 @@ name: Build & Push
 
 on:
   push:
-    branches: [main, beta-update-2]
+    branches: [main]
 
 jobs:
   build-api:
