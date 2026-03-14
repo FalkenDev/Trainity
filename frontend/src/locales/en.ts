@@ -595,6 +595,61 @@ export default {
       name: 'Side-lying leg raise (obliques)',
       description: 'Lie on your side; lift using obliques, keep hips stacked, control tempo.',
     },
+    pull_ups: {
+      name: 'Pull-ups',
+      description:
+        'A classic bodyweight exercise that builds a wide and strong back. Lat pulldown can be used as a beginner alternative.',
+    },
+    plank: {
+      name: 'Plank',
+      description:
+        'A static core exercise that activates the entire trunk and improves stability and posture.',
+    },
+    bent_over_barbell_row: {
+      name: 'Bent-over Barbell Row',
+      description:
+        'A classic compound back exercise with a barbell. One of the best exercises for building back thickness.',
+    },
+    landmine_row: {
+      name: 'Landmine Row',
+      description:
+        'A compound rowing variation where one end of the barbell is fixed. More spine-friendly than traditional bent-over rows.',
+    },
+    single_arm_dumbbell_row: {
+      name: 'Single-arm Dumbbell Row',
+      description:
+        'A unilateral rowing exercise with a dumbbell offering great range of motion and helping to identify and correct muscle imbalances.',
+    },
+    shrugs: {
+      name: 'Shrugs',
+      description:
+        'An isolation exercise targeting the upper trapezius. Elevate shoulders straight up with load and squeeze at the top.',
+    },
+    romanian_deadlift: {
+      name: 'Romanian Deadlift',
+      description:
+        'A hip hinge movement focused on the hamstrings and glutes through a controlled stretch and contraction.',
+    },
+    russian_twists: {
+      name: 'Russian Twists',
+      description:
+        'A rotational core exercise targeting the obliques. Sit with knees bent, lean back, and rotate side to side.',
+    },
+    straight_arm_pulldown: {
+      name: 'Straight-arm Pulldown',
+      description:
+        'An isolation exercise targeting the lats with arms straight throughout. Excellent for lat mind-muscle connection.',
+    },
+    push_ups: {
+      name: 'Push-ups',
+      description:
+        'A fundamental bodyweight exercise training chest, triceps, and shoulders while requiring core stability.',
+    },
+    tbar_row: {
+      name: 'T-bar Row',
+      description:
+        'A compound back exercise with heavy loading. Excellent for building overall back thickness and strength.',
+    },
   },
   exerciseDetails: {
     primary: 'Primary',
