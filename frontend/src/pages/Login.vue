@@ -15,7 +15,7 @@
 
 <template>
   <div class="login-page d-flex flex-column fill-height pa-0 background-background px-5">
-    <div class="d-flex flex-column justify-center align-center mt-16">
+    <div class="d-flex flex-column justify-center align-center mt-8">
       <div
         class="bg-primary d-flex justify-center align-center rounded"
         style="width: 60px; height: 60px"
@@ -23,7 +23,7 @@
         <v-icon size="38" color="black">mdi-dumbbell</v-icon>
       </div>
       <h1 class="text-h4 font-weight-bold text-center text-textPrimary mt-3">Trainity</h1>
-      <v-card-subtitle class="text-center mb-8"> {{ $t('auth.fitnessJourneyStartsHere') }} </v-card-subtitle>
+      <v-card-subtitle class="text-center mb-4"> {{ $t('auth.fitnessJourneyStartsHere') }} </v-card-subtitle>
     </div>
 
     <v-form ref="form" class="flex-grow-1" @submit.prevent="handleLogin">
