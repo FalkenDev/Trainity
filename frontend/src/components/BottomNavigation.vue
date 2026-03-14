@@ -14,24 +14,28 @@
   -->
 
 <template>
-  <v-bottom-navigation bg-color="cardBg" class="d-flex justify-space-around">
-    <v-btn icon to="/">
+  <v-bottom-navigation
+    v-if="!route.meta.hideBottomNav"
+    bg-color="cardBg"
+    class="d-flex justify-space-around"
+  >
+    <v-btn icon to="/" :ripple="false">
       <v-icon :color="route.path === '/' ? 'primary' : ''">
         {{ route.path === '/' ? 'mdi-home' : 'mdi-home-outline' }}
       </v-icon>
     </v-btn>
-    <v-btn icon to="/calendar">
+    <v-btn icon to="/calendar" :ripple="false">
       <v-icon :color="route.path === '/calendar' ? 'primary' : ''">
         {{ route.path === '/calendar' ? 'mdi-calendar' : 'mdi-calendar-outline' }}
       </v-icon>
     </v-btn>
-    <v-btn icon to="/workout">
+    <v-btn icon to="/workout" :ripple="false">
       <v-icon color="primary" size="40">mdi-plus-circle</v-icon>
     </v-btn>
-    <v-btn icon to="/statistics">
+    <v-btn icon to="/statistics" :ripple="false">
       <v-icon :color="route.path === '/statistics' ? 'primary' : ''">mdi-chart-bar</v-icon>
     </v-btn>
-    <v-btn icon to="/settings">
+    <v-btn icon to="/settings" :ripple="false">
       <v-icon :color="route.path === '/settings' ? 'primary' : ''">
         {{ route.path === '/settings' ? 'mdi-account' : 'mdi-account-outline' }}
       </v-icon>
