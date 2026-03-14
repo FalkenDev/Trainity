@@ -72,6 +72,9 @@ export class UserWithoutPasswordDto {
   onboardingCompleted: boolean;
 
   @ApiProperty({ default: false })
+  emailVerified: boolean;
+
+  @ApiProperty({ default: false })
   showWeightTracking: boolean;
 
   @ApiProperty({ required: false })
@@ -99,6 +102,7 @@ export class UserWithoutPasswordDto {
     this.targetWeight = user.targetWeight ?? undefined;
     this.goalTimeframe = user.goalTimeframe ?? undefined;
     this.onboardingCompleted = user.onboardingCompleted ?? false;
+    this.emailVerified = user.emailVerified ?? false;
     this.showWeightTracking = user.showWeightTracking ?? false;
     this.weightGoalType = user.weightGoalType ?? undefined;
     this.startWeight = user.startWeight;

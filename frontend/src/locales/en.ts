@@ -230,6 +230,11 @@ export default {
     termsPlaceholder:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua…',
     termsReadCarefully: 'Please read carefully before agreeing.',
+    agreeToTerms: 'I agree to the Terms & Conditions',
+    agreeToPrivacy: 'I agree to the Privacy Policy',
+    privacyPolicyTitle: 'Privacy Policy',
+    mustAgreeToTerms: 'You must accept the Terms & Conditions to continue',
+    mustAgreeToPrivacy: 'You must accept the Privacy Policy to continue',
 
     fullNameRequired: 'Full name is required',
     emailRequired: 'Email is required',
@@ -247,6 +252,40 @@ export default {
     forgotPassword: 'Forgot password?',
     orContinueWith: 'or continue with',
     privacyPolicy: 'Privacy Policy',
+
+    // Email verification
+    verifyYourEmail: 'Verify your email',
+    verifyEmailSent: 'We sent a 6-digit code to',
+    verifyEmail: 'Verify email',
+    didntReceiveCode: "Didn't receive a code?",
+    resendCode: 'Resend code',
+    resendIn: 'Resend in {seconds}s',
+    emailVerifiedSuccess: 'Email verified! You can now log in.',
+    emailAlreadyVerified: 'Email is already verified.',
+    invalidVerificationCode: 'Invalid or expired code. Please try again.',
+    verificationCodeResent: 'A new code has been sent to your email.',
+    resendTooSoon: 'Please wait a moment before requesting another code.',
+    resendFailed: 'Failed to resend code. Please try again.',
+    emailNotVerifiedToast: 'Please verify your email before logging in.',
+
+    // Forgot / reset password
+    forgotPasswordTitle: 'Forgot password?',
+    forgotPasswordSubtitle: 'Enter your email and we\'ll send you a reset code.',
+    sendResetCode: 'Send reset code',
+    backToLogin: 'Back to login',
+    resetCodeSent: 'Reset code sent! Check your email.',
+    resetCodeFailed: 'Failed to send reset code. Please try again.',
+
+    resetPasswordTitle: 'Reset password',
+    resetPasswordSubtitle: 'Enter the code we sent to',
+    resetPassword: 'Reset password',
+    requestNewCode: 'Request a new code',
+    newPassword: 'New password',
+    passwordResetSuccess: 'Password reset successfully! You can now log in.',
+    invalidResetCode: 'Invalid or expired reset code.',
+    passwordResetFailed: 'Failed to reset password. Please try again.',
+
+    oauthFailed: 'Sign-in failed. Please try again.',
   },
   onboarding: {
     welcome: 'Welcome',

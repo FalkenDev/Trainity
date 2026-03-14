@@ -23,34 +23,28 @@
     "
   >
     <!-- Header -->
-    <div class="d-flex justify-space-between mx-5 py-5">
-      <v-icon class="cursor-pointer" @click="$router.back()">mdi-arrow-left</v-icon>
-      <div class="d-flex ga-4">
-        <v-menu>
-          <template #activator="{ props: menuProps }">
-            <v-icon v-bind="menuProps">mdi-menu</v-icon>
-          </template>
-          <v-list
-            class="bg-cardBg mt-2 mr-2"
-            width="140"
-            :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
-          >
-            <v-list-item @click="isWeightAndRepsOpen = true">
-              <v-list-item-title>{{ $t('workout.weightAndReps') }}</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="isEditWorkoutOpen = true">
-              <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="duplicate">
-              <v-list-item-title>{{ $t('workout.duplicate') }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </div>
-    </div>
+    <BackHeader :title="workout?.title || ''" show-menu @close="$router.back()">
+      <template #menuAppend>
+        <v-list
+          class="bg-cardBg"
+          width="140"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
+        >
+          <v-list-item @click="isWeightAndRepsOpen = true">
+            <v-list-item-title>{{ $t('workout.weightAndReps') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="isEditWorkoutOpen = true">
+            <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="duplicate">
+            <v-list-item-title>{{ $t('workout.duplicate') }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </template>
+    </BackHeader>
 
     <!-- Avatar -->
-    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 rounded-lg">
+    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 mt-4 rounded-lg">
       <v-icon color="primary" size="35">mdi-dumbbell</v-icon>
     </v-avatar>
 
@@ -243,6 +237,7 @@ import { fetchExerciseById } from '@/services/exercise.service'
 import { useI18n } from 'vue-i18n'
 import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
 import router from '@/router'
+import BackHeader from '@/components/BackHeader.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 

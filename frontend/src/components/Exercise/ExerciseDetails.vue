@@ -19,34 +19,27 @@
     style="
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100dvh;
-      padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     "
   >
-    <div class="d-flex justify-space-between mx-5 py-5">
-      <v-icon class="cursor-pointer" @click="emit('close')">mdi-arrow-left</v-icon>
-      <div v-if="!hideMenu" class="d-flex ga-4">
-        <v-menu>
-          <template #activator="{ props: menuProps }">
-            <v-icon v-bind="menuProps">mdi-menu</v-icon>
-          </template>
-          <v-list
-            class="bg-cardBg mt-2 mr-2"
-            width="100"
-            style="border: 1px solid rgb(var(--v-theme-borderColor))"
-          >
-            <v-list-item @click="isEditOpen = true">
-              <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="isDeleteDialogOpen = true">
-              <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </div>
-    </div>
+    <BackHeader :title="exercise.name" :show-menu="!hideMenu" @close="emit('close')">
+      <template #menuAppend>
+        <v-list
+          class="bg-cardBg"
+          width="100"
+          style="border: 1px solid rgb(var(--v-theme-borderColor))"
+        >
+          <v-list-item @click="isEditOpen = true">
+            <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="isDeleteDialogOpen = true">
+            <v-list-item-title>{{ $t('common.delete') }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </template>
+    </BackHeader>
 
-    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 rounded-lg">
+    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 mt-4 rounded-lg">
       <v-icon color="primary" size="35">mdi-dumbbell</v-icon>
     </v-avatar>
 
@@ -199,6 +192,7 @@
 </template>
 
 <script setup lang="ts">
+import BackHeader from '@/components/BackHeader.vue'
 import type { Exercise } from '@/interfaces/Exercise.interface'
 import { useExerciseStore } from '@/stores/exercise.store'
 import { deleteExercise } from '@/services/exercise.service'
