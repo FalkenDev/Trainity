@@ -34,3 +34,8 @@
   height: calc(56px + env(safe-area-inset-bottom, 0px)) !important;
   padding-bottom: env(safe-area-inset-bottom, 0px) !important;
 }
+
+// Remove Vuetify's square active-state overlay on bottom nav buttons (Instagram style)
+.v-bottom-navigation .v-btn--active .v-btn__overlay {
+  opacity: 0 !important;
+}

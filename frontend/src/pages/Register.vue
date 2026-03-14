@@ -79,7 +79,7 @@
         @click:append-inner="showConfirmPassword = !showConfirmPassword"
       />
 
-      <div class="d-flex flex-column ga-2 mt-4 mb-6">
+      <div class="d-flex flex-column ga-2 mt-4 mb-4">
         <div class="d-flex align-cente">
           <v-avatar size="20" class="mr-2" color="iconBackground">
             <v-icon color="primary" size="14">mdi-check</v-icon>
@@ -106,9 +106,46 @@
         </div>
       </div>
 
+      <!-- Consent checkboxes -->
+      <div class="mb-2">
+        <v-checkbox
+          v-model="termsAccepted"
+          color="primary"
+          density="compact"
+          hide-details="auto"
+          :rules="termsRules"
+        >
+          <template #label>
+            <span class="text-body-2">
+              {{ $t('auth.agreeToThe') }}
+              <a class="text-primary" @click.prevent.stop="showTermsDialog = true">{{
+                $t('auth.termsAndConditions')
+              }}</a>
+            </span>
+          </template>
+        </v-checkbox>
+
+        <v-checkbox
+          v-model="privacyAccepted"
+          color="primary"
+          density="compact"
+          hide-details="auto"
+          :rules="privacyRules"
+        >
+          <template #label>
+            <span class="text-body-2">
+              {{ $t('auth.agreeToThe') }}
+              <a class="text-primary" @click.prevent.stop="showPrivacyDialog = true">{{
+                $t('auth.privacyPolicy')
+              }}</a>
+            </span>
+          </template>
+        </v-checkbox>
+      </div>
+
       <v-btn
         block
-        class="mb-6 mt-2 text-white"
+        class="mb-6 mt-4 text-white"
         color="primary"
         :disabled="authStore.loading"
         :loading="authStore.loading"
@@ -120,38 +157,9 @@
       </v-btn>
     </v-form>
 
-    <div class="text-center">
-      <span class="text-grey-darken-1 text-body-2">
-        {{ $t('auth.bySigningUp') }}
-        <a href="#" class="text-primary" @click.prevent="showTermsDialog = true">{{
-          $t('auth.termsAndConditions')
-        }}</a>
-        {{ $t('common.and') }}
-        <a href="#" class="text-primary" @click.prevent="showTermsDialog = true">{{
-          $t('auth.privacyPolicy')
-        }}</a>
-      </span>
-    </div>
+    <TermsAndConditionsDialog v-model="showTermsDialog" />
+    <PrivacyPolicyDialog v-model="showPrivacyDialog" />
 
-    <v-dialog v-model="showTermsDialog" max-width="600px">
-      <v-card rounded="lg">
-        <v-card-title class="text-h5 primary--text">
-          {{ $t('auth.termsAndConditions') }}
-        </v-card-title>
-        <v-card-text>
-          <p class="mb-4">
-            {{ $t('auth.termsPlaceholder') }}
-          </p>
-          <p>{{ $t('auth.termsReadCarefully') }}</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" text @click="showTermsDialog = false">
-            {{ $t('common.close') }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
@@ -160,6 +168,8 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import type { VForm } from 'vuetify/components'
 import { useI18n } from 'vue-i18n'
+import TermsAndConditionsDialog from '@/components/legal/TermsAndConditionsDialog.vue'
+import PrivacyPolicyDialog from '@/components/legal/PrivacyPolicyDialog.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -173,6 +183,9 @@ const confirmPassword_new = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const showTermsDialog = ref(false)
+const showPrivacyDialog = ref(false)
+const termsAccepted = ref(false)
+const privacyAccepted = ref(false)
 
 const nameRules = [(v: string) => !!v || t('auth.fullNameRequired')]
 const emailRules = [
@@ -187,6 +200,8 @@ const confirmPasswordRules = computed(() => [
   (v: string) => !!v || t('auth.confirmPasswordRequired'),
   (v: string) => v === password_new.value || t('auth.passwordsDoNotMatch'),
 ])
+const termsRules = [(v: boolean) => !!v || t('auth.mustAgreeToTerms')]
+const privacyRules = [(v: boolean) => !!v || t('auth.mustAgreeToPrivacy')]
 
 const handleCreateAccount = async () => {
   if (!form.value) return
@@ -198,15 +213,13 @@ const handleCreateAccount = async () => {
   }
 
   if (valid) {
-    const success = await authStore.createAccount({
+    await authStore.createAccount({
       fullName: fullName.value,
       email: email.value,
       password: password_new.value,
     })
-    if (success) {
-      // Registration auto-logs in via the auth store, then redirect to onboarding
-      router.push('/onboarding')
-    }
+    // Navigation is handled inside authStore.createAccount
+    // (verify-email page when verification is required, or auto-login to onboarding)
   }
 }
 

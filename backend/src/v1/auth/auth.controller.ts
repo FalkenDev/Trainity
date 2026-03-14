@@ -13,11 +13,16 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-import { Controller, Post, Body, Res, Get, Req } from '@nestjs/common';
+import { Controller, Post, Body, Res, Get, Req, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import {
   ApiTags,
   ApiCreatedResponse,
@@ -36,7 +41,7 @@ export class AuthController {
   }
 
   @Post('register')
-  @ApiCreatedResponse({ description: 'User created successfully' })
+  @ApiCreatedResponse({ description: 'User created successfully. Verification email sent.' })
   @ApiBadRequestResponse({ description: 'User already exists' })
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
@@ -97,5 +102,115 @@ export class AuthController {
       });
       return { user };
     });
+  }
+
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Email verified successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid or expired verification code' })
+  async verifyEmail(
+    @Body() dto: VerifyEmailDto,
+    @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
+  ) {
+    const { token, user } = await this.authService.verifyEmail(dto.email, dto.code);
+
+    const isLocalhost =
+      req.hostname === 'localhost' ||
+      req.hostname === '127.0.0.1' ||
+      req.hostname === '::1';
+
+    const cookiePath = process.env.AUTH_COOKIE_PATH || '/';
+    let cookieDomain = process.env.AUTH_COOKIE_DOMAIN || undefined;
+    let cookieSecure = process.env.AUTH_COOKIE_SECURE === 'true';
+    let cookieSameSite: boolean | 'lax' | 'strict' | 'none' | undefined = 'lax';
+
+    if (isLocalhost) {
+      cookieDomain = undefined;
+      cookieSecure = false;
+      cookieSameSite = 'lax';
+    }
+
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: cookieSecure,
+      sameSite: cookieSameSite,
+      ...(cookieDomain ? { domain: cookieDomain } : {}),
+      ...(cookiePath ? { path: cookiePath } : {}),
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { user };
+  }
+
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Verification email sent' })
+  async resendVerification(@Body() dto: ResendVerificationDto) {
+    await this.authService.resendVerification(dto.email);
+    return { message: 'If the account exists and is unverified, a new code has been sent' };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Password reset email sent if account exists' })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.authService.forgotPassword(dto.email);
+    return { message: 'If an account with that email exists, a reset code has been sent' };
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ description: 'Password reset successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid or expired reset code' })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.authService.resetPassword(dto.email, dto.code, dto.newPassword);
+    return { message: 'Password reset successfully' };
+  }
+
+  @Get('github')
+  @UseGuards(AuthGuard('github'))
+  githubLogin() {
+    // Passport redirects to GitHub — no body needed
+  }
+
+  @Get('github/callback')
+  @UseGuards(AuthGuard('github'))
+  async githubCallback(
+    @Req() req: Request & { user: any },
+    @Res() res: Response,
+  ) {
+    const { token, user, isNew } = req.user;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+    const isLocalhost =
+      req.hostname === 'localhost' ||
+      req.hostname === '127.0.0.1' ||
+      req.hostname === '::1';
+
+    const cookiePath = process.env.AUTH_COOKIE_PATH || '/';
+    let cookieDomain = process.env.AUTH_COOKIE_DOMAIN || undefined;
+    let cookieSecure = process.env.AUTH_COOKIE_SECURE === 'true';
+    let cookieSameSite: boolean | 'lax' | 'strict' | 'none' | undefined = 'lax';
+
+    if (isLocalhost) {
+      cookieDomain = undefined;
+      cookieSecure = false;
+      cookieSameSite = 'lax';
+    }
+
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: cookieSecure,
+      sameSite: cookieSameSite,
+      ...(cookieDomain ? { domain: cookieDomain } : {}),
+      ...(cookiePath ? { path: cookiePath } : {}),
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Pass user data to frontend via a short-lived query param (base64 encoded)
+    const userParam = Buffer.from(JSON.stringify(user)).toString('base64url');
+    const redirect = isNew ? '/onboarding' : '/';
+    res.redirect(`${frontendUrl}/oauth-callback?user=${userParam}&redirect=${redirect}`);
   }
 }

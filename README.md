@@ -148,6 +148,77 @@ docker compose -f docker-compose.yml up
 - Backend changes will trigger a transparent restart.
 - Frontend changes will be reflected instantly via Vite HMR.
 
+## GitHub OAuth
+
+Trainity supports optional GitHub sign-in. Leave `GITHUB_CLIENT_ID` blank to disable it entirely — the app works fine without it.
+
+### Setup
+
+1. Go to [github.com/settings/developers](https://github.com/settings/developers) → **OAuth Apps** → **New OAuth App**
+2. Fill in:
+   - **Application name**: Trainity
+   - **Homepage URL**: `http://localhost:3000` (or your domain)
+   - **Authorization callback URL**: `http://localhost:1337/v1/auth/github/callback`
+3. Copy the **Client ID** and generate a **Client Secret**
+4. Add to your `.env`:
+
+```env
+GITHUB_CLIENT_ID=your_client_id
+GITHUB_CLIENT_SECRET=your_client_secret
+BACKEND_URL=http://localhost:1337   # must match what GitHub redirects to
+```
+
+5. Restart the backend
+
+If `GITHUB_CLIENT_ID` is not set, the GitHub button on the login page still appears but the strategy is not loaded — set it to enable the full flow.
+
+**Account linking:** If a GitHub email matches an existing password-based account, the accounts are automatically linked. The user can then sign in with either method.
+
+## Email Verification & Password Reset
+
+Trainity supports optional email-based verification and password reset using [Resend](https://resend.com).
+
+### Configuration
+
+Set these variables in your `.env` file:
+
+```env
+# Enable email verification (false by default — users can log in immediately after registration)
+REQUIRE_EMAIL_VERIFICATION=false
+
+# Resend API key — required only when REQUIRE_EMAIL_VERIFICATION=true
+RESEND_API_KEY=re_your_api_key_here
+
+# The "From" address for outgoing emails
+EMAIL_FROM=noreply@yourdomain.com
+
+# The public URL of your frontend (used in email links)
+FRONTEND_URL=https://yourdomain.com
+```
+
+### Setting up Resend
+
+1. Create a free account at [resend.com](https://resend.com).
+2. Go to **API Keys** and create a new key.
+3. Add a verified sending domain under **Domains** (required to send from your own domain).
+4. Set `RESEND_API_KEY` and `EMAIL_FROM` in your `.env`.
+5. Set `REQUIRE_EMAIL_VERIFICATION=true` to enforce verification.
+
+### How it works
+
+| `REQUIRE_EMAIL_VERIFICATION` | Behaviour |
+|---|---|
+| `false` (default) | Users are auto-verified on registration. No email is sent. Password reset still works if Resend is configured. |
+| `true` | Users receive a 6-digit code by email after registration and must verify before logging in. Login is blocked until verified. |
+
+**Password reset** (available regardless of the verification toggle):
+1. User clicks "Forgot password?" on the login page.
+2. They enter their email — a 6-digit reset code is sent.
+3. They enter the code + new password on the reset page.
+4. Codes expire after 15 minutes.
+
+> **Note:** If `REQUIRE_EMAIL_VERIFICATION=false` and no Resend credentials are set, password reset emails will fail silently. Configure Resend if you want password reset to work.
+
 ## Contributing
 
 Contributions are welcome. Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a Pull Request.

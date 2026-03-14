@@ -13,7 +13,8 @@
  * <https://www.gnu.org/licenses/>.
  */
 
-import { IsEmail, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { Equals } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
@@ -37,4 +38,9 @@ export class RegisterDto {
 
   @ApiProperty({ required: false })
   avatar?: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  @Equals(true, { message: 'You must accept the terms and conditions' })
+  termsAccepted: boolean;
 }

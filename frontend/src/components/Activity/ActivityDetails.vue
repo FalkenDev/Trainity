@@ -20,18 +20,13 @@
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100vh;
       padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
-      padding-top: env(safe-area-inset-top, 0px);
     "
   >
     <!-- Header -->
-    <div class="d-flex justify-space-between mx-5 py-5">
-      <v-icon class="cursor-pointer" @click="emit('close')">mdi-arrow-left</v-icon>
-      <v-menu>
-        <template #activator="{ props: menuProps }">
-          <v-icon v-bind="menuProps">mdi-dots-vertical</v-icon>
-        </template>
+    <BackHeader :title="activity.name" show-menu @close="emit('close')">
+      <template #menuAppend>
         <v-list
-          class="bg-cardBg mt-2 mr-2"
+          class="bg-cardBg"
           width="140"
           style="border: 1px solid rgb(var(--v-theme-borderColor))"
         >
@@ -44,11 +39,11 @@
             }}</v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu>
-    </div>
+      </template>
+    </BackHeader>
 
     <!-- Avatar -->
-    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 rounded-lg">
+    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 mt-4 rounded-lg">
       <v-icon color="primary" size="35">mdi-{{ iconName }}</v-icon>
     </v-avatar>
 
@@ -255,6 +250,7 @@ import { ref, computed } from 'vue'
 import { useActivityStore } from '@/stores/activity.store'
 import { deleteActivity as deleteActivityService } from '@/services/activity.service'
 import type { Activity, ActivityLog } from '@/interfaces/Activity.interface'
+import BackHeader from '@/components/BackHeader.vue'
 import EditActivity from './EditActivity.vue'
 import EditActivityLog from './EditActivityLog.vue'
 import AcceptDialog from '@/components/basicUI/AcceptDialog.vue'

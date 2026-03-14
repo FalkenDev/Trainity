@@ -32,8 +32,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ select: false })
+  @Column({ select: false, nullable: true })
   password: string;
+
+  @Column({ nullable: true, unique: true })
+  githubId: string;
 
   @Column({ length: 50, nullable: true })
   firstName: string;
@@ -95,6 +98,27 @@ export class User {
 
   @Column({ default: false })
   onboardingCompleted: boolean;
+
+  @Column({ default: false })
+  emailVerified: boolean;
+
+  @Column({ nullable: true, select: false })
+  emailVerificationToken: string;
+
+  @Column({ type: 'timestamp', nullable: true, select: false })
+  emailVerificationExpires: Date;
+
+  @Column({ nullable: true, select: false })
+  passwordResetToken: string;
+
+  @Column({ type: 'timestamp', nullable: true, select: false })
+  passwordResetExpires: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  termsAcceptedAt: Date;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  termsVersion: string;
 
   @CreateDateColumn()
   createdAt: Date;

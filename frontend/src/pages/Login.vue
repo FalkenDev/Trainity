@@ -90,7 +90,7 @@
           <span>Google</span>
         </v-btn>
 
-        <v-btn color="cardBg" class="border-sm flex-grow-1" variant="flat" disabled>
+        <v-btn color="cardBg" class="border-sm flex-grow-1" variant="flat" @click="loginWithGithub">
           <v-icon size="24" class="me-2">mdi-github</v-icon>
           <span>GitHub</span>
         </v-btn>
@@ -147,6 +147,11 @@ const handleLogin = async () => {
 
 const navigateToCreateAccount = () => {
   router.push('/register')
+}
+
+const loginWithGithub = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:1337/v1'
+  window.location.href = `${apiUrl}/auth/github`
 }
 </script>
 

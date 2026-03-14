@@ -230,6 +230,11 @@ export default {
     termsPlaceholder:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua…',
     termsReadCarefully: 'Läs noggrant innan du godkänner.',
+    agreeToTerms: 'Jag godkänner användarvillkoren',
+    agreeToPrivacy: 'Jag godkänner integritetspolicyn',
+    privacyPolicyTitle: 'Integritetspolicy',
+    mustAgreeToTerms: 'Du måste godkänna användarvillkoren för att fortsätta',
+    mustAgreeToPrivacy: 'Du måste godkänna integritetspolicyn för att fortsätta',
     fullNameRequired: 'Namn är obligatoriskt',
     emailRequired: 'E-post är obligatoriskt',
     emailValid: 'E-posten måste vara giltig',
@@ -242,6 +247,40 @@ export default {
     forgotPassword: 'Glömt lösenord?',
     orContinueWith: 'eller fortsätt med',
     privacyPolicy: 'Integritetspolicy',
+
+    // E-postverifiering
+    verifyYourEmail: 'Verifiera din e-post',
+    verifyEmailSent: 'Vi skickade en 6-siffrig kod till',
+    verifyEmail: 'Verifiera e-post',
+    didntReceiveCode: 'Fick du ingen kod?',
+    resendCode: 'Skicka igen',
+    resendIn: 'Skicka igen om {seconds}s',
+    emailVerifiedSuccess: 'E-posten är verifierad! Du kan nu logga in.',
+    emailAlreadyVerified: 'E-posten är redan verifierad.',
+    invalidVerificationCode: 'Ogiltig eller utgången kod. Försök igen.',
+    verificationCodeResent: 'En ny kod har skickats till din e-post.',
+    resendTooSoon: 'Vänta lite innan du begär en ny kod.',
+    resendFailed: 'Det gick inte att skicka koden. Försök igen.',
+    emailNotVerifiedToast: 'Verifiera din e-post innan du loggar in.',
+
+    // Glömt / återställ lösenord
+    forgotPasswordTitle: 'Glömt lösenord?',
+    forgotPasswordSubtitle: 'Ange din e-post så skickar vi en återställningskod.',
+    sendResetCode: 'Skicka återställningskod',
+    backToLogin: 'Tillbaka till inloggning',
+    resetCodeSent: 'Återställningskod skickad! Kolla din e-post.',
+    resetCodeFailed: 'Det gick inte att skicka koden. Försök igen.',
+
+    resetPasswordTitle: 'Återställ lösenord',
+    resetPasswordSubtitle: 'Ange koden vi skickade till',
+    resetPassword: 'Återställ lösenord',
+    requestNewCode: 'Begär en ny kod',
+    newPassword: 'Nytt lösenord',
+    passwordResetSuccess: 'Lösenordet återställt! Du kan nu logga in.',
+    invalidResetCode: 'Ogiltig eller utgången återställningskod.',
+    passwordResetFailed: 'Det gick inte att återställa lösenordet. Försök igen.',
+
+    oauthFailed: 'Inloggningen misslyckades. Försök igen.',
   },
   onboarding: {
     welcome: 'Välkommen',

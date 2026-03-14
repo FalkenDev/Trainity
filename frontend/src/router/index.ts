@@ -19,6 +19,10 @@ import { useAuthStore } from '@/stores/auth.store'
 import Login from '@/pages/Login.vue'
 import Register from '@/pages/Register.vue'
 import Onboarding from '@/pages/Onboarding.vue'
+import VerifyEmail from '@/pages/VerifyEmail.vue'
+import ForgotPassword from '@/pages/ForgotPassword.vue'
+import ResetPassword from '@/pages/ResetPassword.vue'
+import OAuthCallback from '@/pages/OAuthCallback.vue'
 import WorkoutDetails from '@/pages/WorkoutDetails.vue'
 import Session from '@/pages/Session.vue'
 import SessionSummary from '@/pages/SessionSummary.vue'
@@ -45,6 +49,26 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register,
+  },
+  {
+    path: '/verify-email',
+    name: 'VerifyEmail',
+    component: VerifyEmail,
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPassword,
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword,
+  },
+  {
+    path: '/oauth-callback',
+    name: 'OAuthCallback',
+    component: OAuthCallback,
   },
   {
     path: '/onboarding',

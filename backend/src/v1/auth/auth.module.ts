@@ -22,12 +22,26 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from '../user/user.module';
 import { ActivityModule } from '../activity/activity.module';
 import { ExerciseModule } from '../exercise/exercise.module';
+import { EmailModule } from '../email/email.module';
+import { GithubStrategy } from '../strategies/github.strategy';
+
+const githubStrategyProvider = {
+  provide: GithubStrategy,
+  useFactory: (configService: ConfigService, authService: AuthService) => {
+    const clientId = configService.get<string>('GITHUB_CLIENT_ID');
+    const clientSecret = configService.get<string>('GITHUB_CLIENT_SECRET');
+    if (!clientId || !clientSecret) return null; // skip if not configured
+    return new GithubStrategy(configService, authService);
+  },
+  inject: [ConfigService, AuthService],
+};
 
 @Module({
   imports: [
     UserModule,
     ActivityModule,
     ExerciseModule,
+    EmailModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     ConfigModule,
     JwtModule.registerAsync({
@@ -48,7 +62,7 @@ import { ExerciseModule } from '../exercise/exercise.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, githubStrategyProvider],
   exports: [JwtModule],
 })
 export class AuthModule {}
