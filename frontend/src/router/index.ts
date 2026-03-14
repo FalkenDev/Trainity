@@ -98,7 +98,7 @@ const routes = [
     path: '/workout/:workoutId',
     name: 'WorkoutDetails',
     component: WorkoutDetails,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, hideBottomNav: true },
   },
   {
     path: '/session/:sessionId',
