@@ -589,6 +589,61 @@ export default {
       description:
         'Ligg på sidan; lyft med sneda magmuskler, håll höfter staplade och kontrollera tempot.',
     },
+    pull_ups: {
+      name: 'Pull-ups',
+      description:
+        'En klassisk kroppsviktövning som bygger en bred och stark rygg. Latsdrag kan användas som nybörjaralternativ.',
+    },
+    plank: {
+      name: 'Plankan',
+      description:
+        'En statisk bålövning som aktiverar hela bålen och förbättrar stabilitet och hållning.',
+    },
+    bent_over_barbell_row: {
+      name: 'Framåtlutad rodd (skivstång)',
+      description:
+        'En klassisk sammansatt ryggövning med skivstång. En av de bästa övningarna för att bygga ryggtjocklek.',
+    },
+    landmine_row: {
+      name: 'Landmine-rodd',
+      description:
+        'En roddvariant där ena änden av skivstången är fixerad. Mer ryggvänlig än traditionell framåtlutad rodd.',
+    },
+    single_arm_dumbbell_row: {
+      name: 'Enarms hantelrodd',
+      description:
+        'En unilateral roddövning med hantel som erbjuder stort rörelseomfång och hjälper till att korrigera muskelimbalanser.',
+    },
+    shrugs: {
+      name: 'Axellyft (Shrugs)',
+      description:
+        'En isolationsövning för övre trapeziusmuskeln. Lyft axlarna rakt uppåt med belastning och kläm ihop i topposition.',
+    },
+    romanian_deadlift: {
+      name: 'Rumänsk marklyft',
+      description:
+        'En höftgångsrörelse fokuserad på baksida lår och säte genom en kontrollerad stretch och kontraktion.',
+    },
+    russian_twists: {
+      name: 'Ryska twists',
+      description:
+        'En roterande bålövning som aktiverar sneda magmuskler. Sitt med böjda knän, luta bakåt och rotera åt sidorna.',
+    },
+    straight_arm_pulldown: {
+      name: 'Raka-arms nedrag (kabel)',
+      description:
+        'En isolationsövning för lats med raka armar genom hela rörelsen. Utmärkt för att träna kontakten med latsmuskeln.',
+    },
+    push_ups: {
+      name: 'Armhävningar',
+      description:
+        'En grundläggande kroppsviktövning som tränar bröst, triceps och axlar med krav på bålstabilitet.',
+    },
+    tbar_row: {
+      name: 'T-stångsrodd',
+      description:
+        'En sammansatt ryggövning med tung belastning. Utmärkt för att bygga ryggtjocklek och styrka.',
+    },
   },
   exerciseDetails: {
     primary: 'Primär',
