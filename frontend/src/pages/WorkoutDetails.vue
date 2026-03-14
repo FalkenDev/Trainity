@@ -15,11 +15,17 @@
 
 <template>
   <div
-    class="w-100 fill-height bg-background overflow-y-auto"
+    class="w-100 fill-height bg-background"
+    :class="
+      isExerciseDetailsOpen || isEditWorkoutOpen || isWeightAndRepsOpen
+        ? 'overflow-hidden'
+        : 'overflow-y-auto'
+    "
     style="
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
-      min-height: 100vh;
-      padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+      height: 100dvh;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      overscroll-behavior: contain;
     "
   >
     <!-- Header -->
@@ -48,7 +54,7 @@
       <v-icon color="primary" size="35">mdi-dumbbell</v-icon>
     </v-avatar>
 
-    <div class="mx-5 d-flex flex-column ga-4">
+    <div class="mx-5 d-flex flex-column ga-4 mb-16">
       <!-- Title + Type badge -->
       <div class="pt-2">
         <div class="d-flex align-center ga-2">
@@ -342,7 +348,7 @@ const duplicate = async () => {
 
 .sticky-btn-wrapper {
   position: fixed;
-  bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+  bottom: env(safe-area-inset-bottom, 0px);
   left: 0;
   right: 0;
   z-index: 10;
