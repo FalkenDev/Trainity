@@ -16,6 +16,30 @@
   height: calc(48px + env(safe-area-inset-top, 0px)) !important;
 }
 
+// iPhone/PWA fullscreen dialogs: force true edge-to-edge coverage and prevent
+// the bottom black strip / page peeking through during drag.
+.v-overlay.v-dialog {
+  z-index: 1300 !important;
+}
+
+.v-dialog--fullscreen > .v-overlay__content {
+  margin: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  border-radius: 0 !important;
+  overscroll-behavior: contain;
+}
+
+.v-dialog--fullscreen .v-card {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  border-radius: 0 !important;
+}
+
 // v-main: shift content below the notch and extend Vuetify's auto layout padding
 // (--v-layout-bottom = bottom-nav height) with the iOS home indicator inset
 // and any extra bar (resume bar = --extra-pb).
