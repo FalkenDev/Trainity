@@ -14,7 +14,7 @@
   -->
 
 <template>
-  <div class="pa-5 d-flex flex-column ga-5">
+  <div class="pa-5 d-flex flex-column ga-5 bg-background" style="min-height: 100dvh">
     <HomeHeader :streak-info="streakInfo" />
     <v-card
       v-if="streakInfo && streakInfo.currentStreak > 0"

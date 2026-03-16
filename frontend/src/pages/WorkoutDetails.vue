@@ -54,7 +54,29 @@
       <v-icon color="primary" size="35">mdi-dumbbell</v-icon>
     </v-avatar>
 
-    <div class="mx-5 d-flex flex-column ga-4 mb-16">
+    <div v-if="isHydratingWorkout && !workout" class="mx-5 mt-3">
+      <v-card
+        class="bg-cardBg pa-4 rounded-lg"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
+      >
+        <div class="d-flex align-center ga-3">
+          <v-progress-circular indeterminate size="20" width="2" color="primary" />
+          <p class="text-body-2 text-textSecondary">{{ t('common.loading') }}</p>
+        </div>
+      </v-card>
+    </div>
+
+    <div v-else-if="hydrationError && !workout" class="mx-5 mt-3">
+      <v-card
+        class="bg-cardBg pa-4 rounded-lg"
+        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
+      >
+        <p class="text-body-2 text-textSecondary mb-3">{{ hydrationError }}</p>
+        <v-btn color="primary" variant="tonal" @click="loadWorkoutFromRoute"> Retry </v-btn>
+      </v-card>
+    </div>
+
+    <div v-else class="mx-5 d-flex flex-column ga-4 mb-16">
       <!-- Title + Type badge -->
       <div class="pt-2">
         <div class="d-flex align-center ga-2">
@@ -230,7 +252,7 @@
 
 <script setup lang="ts">
 import { useWorkoutStore } from '@/stores/workout.store'
-import { dublicateWorkout } from '@/services/workout.service'
+import { dublicateWorkout, getWorkoutById } from '@/services/workout.service'
 import { startWorkoutSession } from '@/services/workoutSession.service'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import type { Workout, Exercise } from '@/interfaces/Workout.interface'
@@ -243,12 +265,17 @@ import { fetchExerciseById } from '@/services/exercise.service'
 import { useI18n } from 'vue-i18n'
 import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
 import router from '@/router'
+import { useRoute } from 'vue-router'
 import BackHeader from '@/components/BackHeader.vue'
 
 const { t } = useI18n({ useScope: 'global' })
+const route = useRoute()
 
 const workoutStore = useWorkoutStore()
 const workoutSessionStore = useWorkoutSessionStore()
+
+const isHydratingWorkout = ref(false)
+const hydrationError = ref<string | null>(null)
 
 const isEditWorkoutOpen = ref(false)
 const isWeightAndRepsOpen = ref(false)
@@ -307,6 +334,46 @@ const onEditWorkoutClose = async () => {
   isEditWorkoutOpen.value = false
   await workoutStore.setWorkouts(true)
 }
+
+const getWorkoutIdFromRoute = () => {
+  const params = route.params as Record<string, string | string[] | undefined>
+  const rawId = params.workoutId
+  const parsed = Number(Array.isArray(rawId) ? rawId[0] : rawId)
+  if (!Number.isFinite(parsed)) {
+    return null
+  }
+  return parsed
+}
+
+const loadWorkoutFromRoute = async () => {
+  const workoutId = getWorkoutIdFromRoute()
+  hydrationError.value = null
+
+  if (workoutId === null) {
+    workoutStore.currentWorkout = null
+    hydrationError.value = 'Invalid workout id.'
+    return
+  }
+
+  isHydratingWorkout.value = true
+  try {
+    const inStore = await workoutStore.setCurrentWorkout(workoutId)
+    if (inStore) {
+      return
+    }
+
+    const workoutById = await getWorkoutById(workoutId)
+    workoutStore.currentWorkout = workoutById
+  } catch (error) {
+    console.error('Error loading workout details:', error)
+    workoutStore.currentWorkout = null
+    hydrationError.value = 'Unable to load workout details.'
+  } finally {
+    isHydratingWorkout.value = false
+  }
+}
+
+watch(() => route.fullPath, loadWorkoutFromRoute, { immediate: true })
 
 // --- Actions ---
 const startSession = async () => {
