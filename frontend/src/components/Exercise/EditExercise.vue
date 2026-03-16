@@ -52,10 +52,9 @@
       <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
         $t('exerciseForm.exerciseTypeLabel')
       }}</v-label>
-      <v-select
+      <SheetSelect
         v-model="form.exerciseType"
         :items="exerciseTypeItems"
-        variant="outlined"
         clearable
       />
 
@@ -63,28 +62,24 @@
       <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
         $t('exerciseForm.muscleGroupsLabel')
       }}</v-label>
-      <v-select
+      <SheetSelect
         v-model="form.muscleGroupIds"
         :items="muscleGroupItems"
         item-title="name"
         item-value="id"
-        variant="outlined"
         multiple
-        chips
         closable-chips
-        :menu-props="{ maxHeight: '250px' }"
       />
 
       <!-- Primary Muscle (from selected targets) -->
       <v-label class="text-body-2 font-weight-bold text-textPrimary mt-4 mb-2">{{
         $t('exerciseForm.primaryMuscleLabel')
       }}</v-label>
-      <v-select
+      <SheetSelect
         v-model="form.primaryMuscleGroupId"
         :items="selectedMuscleGroupItems"
         item-title="name"
         item-value="id"
-        variant="outlined"
         clearable
         :disabled="form.muscleGroupIds.length === 0"
       />

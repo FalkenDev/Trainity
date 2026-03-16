@@ -52,6 +52,7 @@ declare module 'vue' {
     ScheduledSessionBottomSheet: typeof import('./components/Session/ScheduledSessionBottomSheet.vue')['default']
     ScheduleSessionDialog: typeof import('./components/Session/ScheduleSessionDialog.vue')['default']
     SessionList: typeof import('./components/Settings/SessionList.vue')['default']
+    SheetSelect: typeof import('./components/basicUI/SheetSelect.vue')['default']
     StatisticsHeroCard: typeof import('./components/Statistics/StatisticsHeroCard.vue')['default']
     TermsAndConditionsDialog: typeof import('./components/legal/TermsAndConditionsDialog.vue')['default']
     TimerDialog: typeof import('./components/Session/TimerDialog.vue')['default']
