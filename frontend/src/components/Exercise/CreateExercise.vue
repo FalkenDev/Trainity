@@ -38,45 +38,40 @@
       />
 
       <!-- Exercise Type -->
-      <v-select
+      <SheetSelect
         v-model="form.exerciseType"
         :label="$t('exerciseForm.exerciseTypeLabel')"
         :items="exerciseTypeItems"
-        variant="outlined"
         clearable
-        class="mt-1"
+        class="mt-4"
       />
 
       <!-- Target Muscles (multi-select chips) -->
-      <v-select
+      <SheetSelect
         v-model="form.muscleGroupIds"
         :label="$t('exerciseForm.muscleGroupsLabel')"
         :items="muscleGroupItems"
         item-title="name"
         item-value="id"
-        variant="outlined"
         multiple
-        chips
         closable-chips
-        class="mt-1"
-        :menu-props="{ maxHeight: '250px' }"
+        class="mt-4"
       />
 
       <!-- Primary Muscle (from selected targets) -->
-      <v-select
+      <SheetSelect
         v-model="form.primaryMuscleGroupId"
         :label="$t('exerciseForm.primaryMuscleLabel')"
         :items="selectedMuscleGroupItems"
         item-title="name"
         item-value="id"
-        variant="outlined"
         clearable
-        class="mt-1"
+        class="mt-4"
         :disabled="form.muscleGroupIds.length === 0"
       />
 
       <!-- Equipment (chip input) -->
-      <div class="mt-1">
+      <div class="mt-4">
         <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.equipmentLabel') }}</p>
         <ChipTextInput
           v-model="form.equipment"
