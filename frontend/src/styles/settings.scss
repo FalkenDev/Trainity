@@ -86,3 +86,15 @@ body,
 .v-bottom-navigation .v-btn--active .v-btn__overlay {
   opacity: 0 !important;
 }
+
+// Hide bottom nav whenever a fullscreen dialog is open so it doesn't
+// peek through at the bottom of the dialog.
+body:has(.v-dialog--fullscreen) .v-bottom-navigation {
+  display: none !important;
+}
+
+// Remove v-main bottom padding when a fullscreen dialog is open so the
+// safe-area gap doesn't peek through on iOS rubber-band / overscroll.
+body:has(.v-dialog--fullscreen) .v-main {
+  padding-bottom: 0 !important;
+}
