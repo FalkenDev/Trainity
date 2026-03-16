@@ -15,7 +15,7 @@
 
 <template>
   <v-dialog v-model="dialogOpen" fullscreen :scrim="false" transition="dialog-bottom-transition">
-    <v-card class="bg-background d-flex flex-column" style="height: 100vh">
+    <v-card class="bg-background d-flex flex-column" style="height: 100dvh">
       <!-- Header -->
       <v-toolbar color="transparent" density="compact" style="flex: none">
         <v-btn icon @click="close">
@@ -38,7 +38,10 @@
 
       <div class="pa-5" style="flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch">
         <!-- Date display -->
-        <v-card class="bg-cardBg rounded-lg pa-4 mb-5" style="border: 1px solid rgb(var(--v-theme-borderColor))">
+        <v-card
+          class="bg-cardBg rounded-lg pa-4 mb-5"
+          style="border: 1px solid rgb(var(--v-theme-borderColor))"
+        >
           <div class="d-flex align-center ga-3">
             <v-icon color="primary">mdi-calendar</v-icon>
             <div>

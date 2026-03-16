@@ -119,6 +119,9 @@ export default createVuetify({
     VToolbar: {
       density: 'compact',
     },
+    VDialog: {
+      scrollStrategy: 'block',
+    },
     VTabs: {
       density: 'compact',
     },

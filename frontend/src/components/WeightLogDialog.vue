@@ -15,7 +15,7 @@
 
 <template>
   <v-dialog v-model="dialogOpen" fullscreen transition="slide-y-transition" persistent>
-    <v-card class="d-flex flex-column bg-background" style="height: 100vh; overflow: hidden">
+    <v-card class="d-flex flex-column bg-background" style="height: 100dvh; overflow: hidden">
       <BackHeader :title="$t('weightLog.title')" @close="close" />
 
       <!-- First-time setup: no startWeight set yet -->
