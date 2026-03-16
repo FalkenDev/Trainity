@@ -501,6 +501,8 @@ watch(dialogOpen, async open => {
     } else if (props.preselectedType === 'activity' && props.preselectedActivityId) {
       selectedActivityId.value = props.preselectedActivityId
     }
+  } else {
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')))
   }
 })
 
