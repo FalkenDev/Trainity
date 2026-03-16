@@ -92,7 +92,7 @@
         :key="workout.id"
         class="border-sm py-2 bg-cardBg rounded-lg mx-5"
         two-line
-        @click="$router.push(`/workout/${workout.id}`)"
+        @click="routeToWorkout(workout.id)"
       >
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-4">
@@ -146,12 +146,14 @@
 import type { MuscleGroup } from '@/interfaces/Exercise.interface'
 import type { Workout } from '@/interfaces/Workout.interface'
 import { useWorkoutStore } from '@/stores/workout.store'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 // import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
 
 const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ (e: 'close'): void }>()
+const router = useRouter()
 const workoutStore = useWorkoutStore()
 
 const workouts = computed<Workout[]>(() => {
@@ -296,6 +298,11 @@ function clearMG() {
 function clearAllFilters() {
   clearMG()
   search.value = ''
+}
+
+async function routeToWorkout(id: number) {
+  await workoutStore.setCurrentWorkout(id)
+  router.push(`/workout/${id}`)
 }
 </script>
 <style scoped>
