@@ -1,6 +1,6 @@
-# Contributing to Trainity
+# Contributing to Grindify
 
-Thank you for your interest in contributing to Trainity! 🎉
+Thank you for your interest in contributing to Grindify! 🎉
 We welcome all contributions — bug fixes, features, docs, and more.
 
 ---
@@ -22,7 +22,7 @@ in the same PR:
 ### 2. Check Existing Issues
 
 Before starting work, check if there's already an
-[open issue](https://github.com/FalkenDev/trainity/issues) for it.
+[open issue](https://github.com/FalkenDev/grindify/issues) for it.
 If not, open one first so we can discuss it.
 
 ---
@@ -37,8 +37,8 @@ If not, open one first so we can discuss it.
 ### Setup
 
 ```bash
-git clone https://github.com/FalkenDev/trainity.git
-cd trainity
+git clone https://github.com/FalkenDev/grindify.git
+cd grindify
 npm install
 npm run dev
 ```

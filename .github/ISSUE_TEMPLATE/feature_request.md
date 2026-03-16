@@ -54,6 +54,6 @@ Add any other context, mockups, or screenshots about the feature request here. Y
 Please go through this checklist before submitting your feature request.
 -->
 
-- [ ] I have searched the [existing issues](https://github.com/FalkenDev/Trainity/issues) and have not found a similar feature request.
+- [ ] I have searched the [existing issues](https://github.com/FalkenDev/Grindify/issues) and have not found a similar feature request.
 - [ ] I am willing to work on this feature myself. (Optional)
 - [ ] I have read and agree to the project's Code of Conduct.

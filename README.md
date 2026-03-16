@@ -1,8 +1,8 @@
 <p align="center">
-  <!-- <img src="frontend/src/assets/logo.svg" width="120" alt="Trainity Logo" /> -->
+  <!-- <img src="frontend/src/assets/logo.svg" width="120" alt="Grindify Logo" /> -->
 </p>
 
-<h1 align="center">Trainity</h1>
+<h1 align="center">Grindify</h1>
 
   <p align="center">A self-hosted fitness tracking web application built with NestJS and Vue 3.</p>
     <p align="center">
@@ -16,7 +16,7 @@
 
 ## Overview
 
-Trainity is a full-stack workout application designed for users who want full ownership of their data without subscription fees or connectivity requirements. It offers a complete suite of tools to plan routines, log sessions in real-time, and visualize progress over time. The platform is designed to be mobile-first for gym usage while providing a robust desktop interface for planning and analysis.
+Grindify is a full-stack workout application designed for users who want full ownership of their data without subscription fees or connectivity requirements. It offers a complete suite of tools to plan routines, log sessions in real-time, and visualize progress over time. The platform is designed to be mobile-first for gym usage while providing a robust desktop interface for planning and analysis.
 
 ## Features
 
@@ -62,8 +62,8 @@ Trainity is a full-stack workout application designed for users who want full ow
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/FalkenDev/Trainity.git
-   cd Trainity
+   git clone https://github.com/FalkenDev/Grindify.git
+   cd Grindify
    ```
 
 2. **Start the application**
@@ -78,7 +78,7 @@ Trainity is a full-stack workout application designed for users who want full ow
    Population of default exercises and muscle groups:
 
    ```bash
-   docker exec -it trainity_backend npm run seed
+   docker exec -it grindify_backend npm run seed
    ```
 
 4. **Access the application**
@@ -91,8 +91,8 @@ Trainity is a full-stack workout application designed for users who want full ow
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/FalkenDev/Trainity.git
-   cd Trainity
+   git clone https://github.com/FalkenDev/Grindify.git
+   cd Grindify
    ```
 
 2. **Configure Environment**
@@ -127,7 +127,7 @@ Trainity is a full-stack workout application designed for users who want full ow
 ### Project Structure
 
 ```
-Trainity/
+Grindify/
 ├── backend/          # NestJS API application
 │   ├── src/          # Source code
 │   └── test/         # E2E tests
@@ -150,13 +150,13 @@ docker compose -f docker-compose.yml up
 
 ## GitHub OAuth
 
-Trainity supports optional GitHub sign-in. Leave `GITHUB_CLIENT_ID` blank to disable it entirely — the app works fine without it.
+Grindify supports optional GitHub sign-in. Leave `GITHUB_CLIENT_ID` blank to disable it entirely — the app works fine without it.
 
 ### Setup
 
 1. Go to [github.com/settings/developers](https://github.com/settings/developers) → **OAuth Apps** → **New OAuth App**
 2. Fill in:
-   - **Application name**: Trainity
+   - **Application name**: Grindify
    - **Homepage URL**: `http://localhost:3000` (or your domain)
    - **Authorization callback URL**: `http://localhost:1337/v1/auth/github/callback`
 3. Copy the **Client ID** and generate a **Client Secret**
@@ -176,7 +176,7 @@ If `GITHUB_CLIENT_ID` is not set, the GitHub button on the login page still appe
 
 ## Email Verification & Password Reset
 
-Trainity supports optional email-based verification and password reset using [Resend](https://resend.com).
+Grindify supports optional email-based verification and password reset using [Resend](https://resend.com).
 
 ### Configuration
 
@@ -223,7 +223,7 @@ FRONTEND_URL=https://yourdomain.com
 
 Contributions are welcome. Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a Pull Request.
 
-By contributing to Trainity, you agree to our [Contributor License Agreement (CLA)](CLA.md).
+By contributing to Grindify, you agree to our [Contributor License Agreement (CLA)](CLA.md).
 
 ## License
 

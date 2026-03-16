@@ -1,6 +1,6 @@
 # Contributors
 
-Thank you to everyone who has contributed to Trainity! 🙌
+Thank you to everyone who has contributed to Grindify! 🙌
 
 By adding your name here, you agree to the
 [Contributor License Agreement](./CLA.md).

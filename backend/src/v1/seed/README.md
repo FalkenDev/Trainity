@@ -28,7 +28,7 @@ The seed script connects to your PostgreSQL database using the environment varia
   - `DATABASE_PORT` (default: `5432`)
   - `DATABASE_USER` (default: `user`)
   - `DATABASE_PASSWORD` (default: `password`)
-  - `DATABASE_NAME` (default: `trainitydb`)
+  - `DATABASE_NAME` (default: `grindifydb`)
 
 ## Usage
 

@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="public/logo.svg" width="120" alt="Trainity Logo" />
-  <h1 align="center">Trainity Frontend</h1>
+  <img src="public/logo.svg" width="120" alt="Grindify Logo" />
+  <h1 align="center">Grindify Frontend</h1>
 </p>
 
-<p align="center">The mobile-first accessible web interface for <a href="../README.md">Trainity</a>.</p>
+<p align="center">The mobile-first accessible web interface for <a href="../README.md">Grindify</a>.</p>
 
 <p align="center">
 <a href="https://vuejs.org/" target="_blank"><img src="https://img.shields.io/badge/vue-3.x-green.svg" alt="Vue 3" /></a>
@@ -14,7 +14,7 @@
 
 ## Overview
 
-The Trainity frontend is a Single Page Application (SPA) built with **Vue 3** and **Vite**. It utilizes **Vuetify 3** for a Material Design-compliant interface that works seamlessly across desktop and mobile devices.
+The Grindify frontend is a Single Page Application (SPA) built with **Vue 3** and **Vite**. It utilizes **Vuetify 3** for a Material Design-compliant interface that works seamlessly across desktop and mobile devices.
 
 ## Technology Stack
 

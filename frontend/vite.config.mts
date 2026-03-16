@@ -62,8 +62,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'icons/*.png'],
       manifest: {
-        name: 'Trainity',
-        short_name: 'Trainity',
+        name: 'Grindify',
+        short_name: 'Grindify',
         description: 'Your personal fitness training companion',
         theme_color: '#0C0E12',
         background_color: '#0C0E12',

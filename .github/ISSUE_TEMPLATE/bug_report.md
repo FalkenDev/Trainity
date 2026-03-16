@@ -65,7 +65,7 @@ Please complete the following information. This is crucial for us to reproduce t
 Please go through this checklist before submitting your bug report.
 -->
 
-- [ ] I have searched the [existing issues](https://github.com/FalkenDev/Trainity/issues) and have not found a similar bug report.
+- [ ] I have searched the [existing issues](https://github.com/FalkenDev/Grindify/issues) and have not found a similar bug report.
 - [ ] I have completed the "Your Environment" section above.
 - [ ] I have provided steps to reproduce the bug.
 - [ ] I have read and agree to the project's Code of Conduct.

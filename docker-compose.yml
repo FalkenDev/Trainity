@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:17
-    container_name: trainity_postgres
+    container_name: grindify_postgres
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     environment:
@@ -24,7 +24,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    container_name: trainity_backend
+    container_name: grindify_backend
     ports:
       - "${BACKEND_PORT:-1337}:1337"
     volumes:
@@ -48,7 +48,7 @@ services:
       target: development
       args:
         VITE_API_URL: ${VITE_API_URL}
-    container_name: trainity_frontend
+    container_name: grindify_frontend
     command: npm run dev -- --host
     ports:
       - "${FRONTEND_PORT:-3000}:3000"

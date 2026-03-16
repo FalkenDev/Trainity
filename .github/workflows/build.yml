@@ -32,7 +32,7 @@ jobs:
           file: Dockerfile.api
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/falkendev/trainity-api:latest
+          tags: ghcr.io/falkendev/grindify-api:latest
           cache-from: type=gha,scope=api
           cache-to: type=gha,mode=max,scope=api
 
@@ -60,8 +60,8 @@ jobs:
           file: Dockerfile.frontend
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/falkendev/trainity-frontend:latest
+          tags: ghcr.io/falkendev/grindify-frontend:latest
           build-args: |
-            VITE_API_URL=https://trainity.falkendev.com/api/v1
+            VITE_API_URL=https://grindify.falkendev.com/api/v1
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend

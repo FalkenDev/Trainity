@@ -1,15 +1,15 @@
 /*
  * Copyright (c) 2026 FalkenDev
  *
- * This file is part of Trainity.
+ * This file is part of Grindify.
  *
- * Trainity is free software: you can redistribute it and/or modify
+ * Grindify is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of
  * the License, or (at your option) any later version.
  *
  * You should have received a copy of the GNU Affero General Public
- * License along with Trainity. If not, see
+ * License along with Grindify. If not, see
  * <https://www.gnu.org/licenses/>.
  */
 
@@ -36,7 +36,7 @@ export const AppDataSource = new DataSource({
   port: +(process.env.DATABASE_PORT || 5432),
   username: process.env.DATABASE_USER || 'user',
   password: process.env.DATABASE_PASSWORD || 'password',
-  database: process.env.DATABASE_NAME || 'trainitydb',
+  database: process.env.DATABASE_NAME || 'grindifydb',
   synchronize: true,
   logging: ['error', 'warn'],
   entities: [
