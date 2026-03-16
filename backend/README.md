@@ -1,9 +1,9 @@
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-  <h1 align="center">Trainity API</h1>
+  <h1 align="center">Grindify API</h1>
 </p>
 
-<p align="center">The backend services for <a href="../README.md">Trainity</a>, built with NestJS.</p>
+<p align="center">The backend services for <a href="../README.md">Grindify</a>, built with NestJS.</p>
 <p align="center">
 <a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
 <a href="https://github.com/nestjs/nest/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
@@ -12,7 +12,7 @@
 
 ## Overview
 
-The Trainity API handles all business logic, data persistence, file management, and user authentication for the platform. It is architected as a modular monolith using **NestJS (v11)** and **TypeORM**, backed by a **PostgreSQL 17** database.
+The Grindify API handles all business logic, data persistence, file management, and user authentication for the platform. It is architected as a modular monolith using **NestJS (v11)** and **TypeORM**, backed by a **PostgreSQL 17** database.
 
 ## Technology Stack
 

@@ -1,15 +1,15 @@
 <!--
   - Copyright (c) 2026 FalkenDev
   -
-  - This file is part of Trainity.
+  - This file is part of Grindify.
   -
-  - Trainity is free software: you can redistribute it and/or modify
+  - Grindify is free software: you can redistribute it and/or modify
   - it under the terms of the GNU Affero General Public License as
   - published by the Free Software Foundation, either version 3 of
   - the License, or (at your option) any later version.
   -
   - You should have received a copy of the GNU Affero General Public
-  - License along with Trainity. If not, see
+  - License along with Grindify. If not, see
   - <https://www.gnu.org/licenses/>.
   -->
 
@@ -27,7 +27,7 @@
 
         <h3 class="text-h6 mb-2">1. Data Controller</h3>
         <p class="text-body-2 mb-4">
-          FalkenDev is the data controller for personal data processed through Trainity.
+          FalkenDev is the data controller for personal data processed through Grindify.
           Contact: <strong>{{ contactEmail }}</strong>
         </p>
 

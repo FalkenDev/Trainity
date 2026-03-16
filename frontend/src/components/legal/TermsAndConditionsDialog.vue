@@ -1,15 +1,15 @@
 <!--
   - Copyright (c) 2026 FalkenDev
   -
-  - This file is part of Trainity.
+  - This file is part of Grindify.
   -
-  - Trainity is free software: you can redistribute it and/or modify
+  - Grindify is free software: you can redistribute it and/or modify
   - it under the terms of the GNU Affero General Public License as
   - published by the Free Software Foundation, either version 3 of
   - the License, or (at your option) any later version.
   -
   - You should have received a copy of the GNU Affero General Public
-  - License along with Trainity. If not, see
+  - License along with Grindify. If not, see
   - <https://www.gnu.org/licenses/>.
   -->
 
@@ -27,13 +27,13 @@
 
         <h3 class="text-h6 mb-2">1. Acceptance of Terms</h3>
         <p class="text-body-2 mb-4">
-          By creating an account and using Trainity ("the Service"), you agree to be bound by these
+          By creating an account and using Grindify ("the Service"), you agree to be bound by these
           Terms & Conditions. If you do not agree, you may not use the Service.
         </p>
 
         <h3 class="text-h6 mb-2">2. Description of Service</h3>
         <p class="text-body-2 mb-4">
-          Trainity is a fitness tracking application that allows you to plan workouts, log exercise
+          Grindify is a fitness tracking application that allows you to plan workouts, log exercise
           sessions, track progress, and set fitness goals. The Service is provided by FalkenDev
           ("we", "us", "our").
         </p>
@@ -68,13 +68,13 @@
         <p class="text-body-2 mb-4">
           The Service, including its design, software, and content (excluding user-provided data),
           is owned by FalkenDev and protected under applicable copyright and intellectual property
-          laws. Trainity is open-source software licensed under the GNU Affero General Public
+          laws. Grindify is open-source software licensed under the GNU Affero General Public
           License v3 (AGPL-3.0).
         </p>
 
         <h3 class="text-h6 mb-2">7. Disclaimers & Limitation of Liability</h3>
         <p class="text-body-2 mb-4">
-          The Service is provided "as is" without warranties of any kind. Trainity is not a
+          The Service is provided "as is" without warranties of any kind. Grindify is not a
           medical service. Content within the app does not constitute medical advice. Always
           consult a qualified healthcare professional before starting any fitness programme.
           To the extent permitted by applicable law, FalkenDev shall not be liable for any

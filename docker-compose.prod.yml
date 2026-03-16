@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:17
-    container_name: trainity_postgres
+    container_name: grindify_postgres
     restart: unless-stopped
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
@@ -25,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    container_name: trainity_backend
+    container_name: grindify_backend
     restart: unless-stopped
     depends_on:
       postgres:
@@ -42,7 +42,7 @@ services:
       target: production
       args:
         VITE_API_URL: ${VITE_API_URL}
-    container_name: trainity_frontend
+    container_name: grindify_frontend
     restart: unless-stopped
     depends_on:
       - backend
