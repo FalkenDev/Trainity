@@ -88,13 +88,27 @@ export const useWorkoutStore = defineStore(
     }
 
     const setCurrentWorkout = async (workoutId: number) => {
+      if (!Number.isFinite(workoutId)) {
+        currentWorkout.value = null
+        return false
+      }
+
+      const existingWorkout = workouts.value.find(w => w.id === workoutId)
+      if (existingWorkout) {
+        currentWorkout.value = existingWorkout
+        return true
+      }
+
       await setWorkouts(true)
       const workout = workouts.value.find(w => w.id === workoutId)
       if (workout) {
         currentWorkout.value = workout
-      } else {
-        console.warn(`Workout with ID ${workoutId} not found.`)
+        return true
       }
+
+      currentWorkout.value = null
+      console.warn(`Workout with ID ${workoutId} not found.`)
+      return false
     }
 
     const resetStore = async () => {

@@ -951,6 +951,8 @@ watch(dialogOpen, async open => {
         goalSettingsDurationUnit.value = 'weeks'
       }
     }
+  } else {
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')))
   }
 })
 </script>
