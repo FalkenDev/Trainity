@@ -150,13 +150,32 @@
             v-model="selectedDays"
             multiple
             color="primary"
-            variant="outlined"
-            class="d-flex flex-wrap ga-1"
+            variant="tonal"
+            class="d-flex ga-2 w-100"
           >
-            <v-btn v-for="(day, idx) in dayLabels" :key="idx" :value="idx" size="small">
+            <v-btn
+              v-for="(day, idx) in dayLabels"
+              :key="idx"
+              :value="idx"
+              size="small"
+              rounded="pill"
+              class="flex-1-1"
+            >
               {{ day }}
             </v-btn>
           </v-btn-toggle>
+          <div class="mt-3">
+            <p class="text-caption text-uppercase font-weight-bold text-textSecondary mb-2">
+              {{ $t('schedule.recurringEndDate') }}
+            </p>
+            <v-text-field
+              v-model="recurringEndDate"
+              type="date"
+              variant="outlined"
+              density="compact"
+              class="bg-cardBg rounded-lg"
+            />
+          </div>
         </div>
 
         <!-- Notes -->
@@ -205,17 +224,18 @@ const dialogOpen = computed({
 const workoutStore = useWorkoutStore()
 const activityStore = useActivityStore()
 const scheduledSessionStore = useScheduledSessionStore()
-const { t } = useI18n()
+const { t, tm } = useI18n()
 
 const sessionType = ref<ScheduledSessionType>('workout')
 const selectedItemId = ref<number | null>(null)
 const scheduleMode = ref<'one-time' | 'recurring'>('one-time')
 const selectedDateDisplay = ref('')
 const selectedDays = ref<number[]>([])
+const recurringEndDate = ref('')
 const notes = ref('')
 const isSubmitting = ref(false)
 
-const dayLabels = computed(() => t('schedule.dayLabels') as unknown as string[])
+const dayLabels = computed(() => tm('schedule.dayLabels') as string[])
 
 interface ListItem {
   id: number
@@ -251,6 +271,7 @@ watch(dialogOpen, async open => {
     scheduleMode.value = 'one-time'
     selectedDateDisplay.value = props.preselectedDate || ''
     selectedDays.value = []
+    recurringEndDate.value = ''
     notes.value = ''
 
     await Promise.all([workoutStore.setWorkouts(), activityStore.fetchActivities()])
@@ -285,6 +306,7 @@ async function submit() {
             : { activityId: selectedItemId.value! }),
           isRecurring: true,
           dayOfWeek,
+          recurringEndDate: recurringEndDate.value || undefined,
           notes: notes.value || undefined,
         })
       )

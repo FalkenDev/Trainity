@@ -942,6 +942,7 @@ export default {
     noWorkoutsCreated: 'Inga träningspass skapade ännu',
     noActivitiesCreated: 'Inga aktiviteter skapade ännu',
     dayLabels: ['Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön'],
+    recurringEndDate: 'Slutdatum (valfritt)',
     startTime: 'Starttid',
     endTime: 'Sluttid',
   },

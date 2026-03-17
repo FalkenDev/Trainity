@@ -1,3 +1,5 @@
+name: grindify
+
 services:
   postgres:
     image: postgres:17
@@ -30,6 +32,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - uploads_data:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,3 +70,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
