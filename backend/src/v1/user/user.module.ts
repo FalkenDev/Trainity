@@ -22,6 +22,9 @@ import { UserController } from './user.controller';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { ActivityLog } from '../activityLog/activityLog.entity';
+import { WeightLog } from '../weightLog/weightLog.entity';
+import { ProgressPhoto } from '../progressPhoto/progressPhoto.entity';
+import { ExerciseRecord } from '../statistics/exerciseRecord.entity';
 import { UploadModule } from '../upload/upload.module';
 
 @Module({
@@ -32,6 +35,9 @@ import { UploadModule } from '../upload/upload.module';
       Workout,
       WorkoutSession,
       ActivityLog,
+      WeightLog,
+      ProgressPhoto,
+      ExerciseRecord,
     ]),
     UploadModule,
   ],

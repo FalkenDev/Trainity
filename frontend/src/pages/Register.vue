@@ -141,6 +141,11 @@
             </span>
           </template>
         </v-checkbox>
+
+        <p class="text-caption text-textSecondary mt-2">
+          {{ $t('settings.minAgeNotice') }}
+          <a class="text-primary" @click.prevent="showImprintDialog = true">{{ $t('settings.imprint') }}</a>
+        </p>
       </div>
 
       <v-btn
@@ -159,6 +164,7 @@
 
     <TermsAndConditionsDialog v-model="showTermsDialog" />
     <PrivacyPolicyDialog v-model="showPrivacyDialog" />
+    <ImprintDialog v-model="showImprintDialog" />
 
   </div>
 </template>
@@ -170,6 +176,7 @@ import type { VForm } from 'vuetify/components'
 import { useI18n } from 'vue-i18n'
 import TermsAndConditionsDialog from '@/components/legal/TermsAndConditionsDialog.vue'
 import PrivacyPolicyDialog from '@/components/legal/PrivacyPolicyDialog.vue'
+import ImprintDialog from '@/components/legal/ImprintDialog.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -184,6 +191,7 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const showTermsDialog = ref(false)
 const showPrivacyDialog = ref(false)
+const showImprintDialog = ref(false)
 const termsAccepted = ref(false)
 const privacyAccepted = ref(false)
 
