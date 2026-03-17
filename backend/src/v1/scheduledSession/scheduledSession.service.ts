@@ -108,6 +108,9 @@ export class ScheduledSessionService {
       dayOfWeek: dto.dayOfWeek ?? null,
       isRecurring: dto.isRecurring,
       notes: dto.notes || null,
+      recurringEndDate: (dto.isRecurring && dto.recurringEndDate)
+        ? new Date(dto.recurringEndDate)
+        : null,
     });
 
     return this.scheduledRepo.save(scheduled);
@@ -136,7 +139,13 @@ export class ScheduledSessionService {
     // Filter: one-time matching this date OR recurring matching this dayOfWeek (not in exceptions)
     const matching = allScheduled.filter((s) => {
       if (s.isRecurring) {
-        return s.dayOfWeek === dayOfWeek && !s.exceptionDates.includes(dateStr);
+        if (s.dayOfWeek !== dayOfWeek) return false;
+        if (s.exceptionDates.includes(dateStr)) return false;
+        if (s.recurringEndDate) {
+          const endStr = this.toDateString(s.recurringEndDate);
+          if (endStr && dateStr > endStr) return false;
+        }
+        return true;
       } else {
         const sDate = this.toDateString(s.scheduledDate);
         return sDate === dateStr;
@@ -169,8 +178,14 @@ export class ScheduledSessionService {
         let matches = false;
 
         if (s.isRecurring) {
-          matches =
-            s.dayOfWeek === dayOfWeek && !s.exceptionDates.includes(dateStr);
+          if (s.dayOfWeek !== dayOfWeek) { matches = false; }
+          else if (s.exceptionDates.includes(dateStr)) { matches = false; }
+          else if (s.recurringEndDate) {
+            const endStr = this.toDateString(s.recurringEndDate);
+            matches = !endStr || dateStr <= endStr;
+          } else {
+            matches = true;
+          }
         } else {
           const sDate = this.toDateString(s.scheduledDate);
           matches = sDate === dateStr;
@@ -223,6 +238,15 @@ export class ScheduledSessionService {
     if (dto.dayOfWeek !== undefined) scheduled.dayOfWeek = dto.dayOfWeek;
     if (dto.isRecurring !== undefined) scheduled.isRecurring = dto.isRecurring;
     if (dto.notes !== undefined) scheduled.notes = dto.notes || null;
+    if (dto.recurringEndDate !== undefined) {
+      scheduled.recurringEndDate = dto.recurringEndDate
+        ? new Date(dto.recurringEndDate)
+        : null;
+    }
+    // If isRecurring is being set to false, clear recurringEndDate
+    if (dto.isRecurring === false) {
+      scheduled.recurringEndDate = null;
+    }
 
     return this.scheduledRepo.save(scheduled);
   }
