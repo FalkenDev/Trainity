@@ -82,12 +82,12 @@
       </v-divider>
 
       <div class="d-flex flex-row ga-5 w-100 justify-center mt-4">
-        <v-btn color="cardBg" class="border-sm flex-grow-1" variant="flat" @click="loginWithGoogle">
+        <v-btn type="button" color="cardBg" class="border-sm flex-grow-1" variant="flat" @click="loginWithGoogle">
           <v-icon size="24" class="me-2">mdi-google</v-icon>
           <span>Google</span>
         </v-btn>
 
-        <v-btn color="cardBg" class="border-sm flex-grow-1" variant="flat" @click="loginWithGithub">
+        <v-btn type="button" color="cardBg" class="border-sm flex-grow-1" variant="flat" @click="loginWithGithub">
           <v-icon size="24" class="me-2">mdi-github</v-icon>
           <span>GitHub</span>
         </v-btn>
