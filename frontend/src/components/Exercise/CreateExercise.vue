@@ -155,15 +155,15 @@ const newMediaItems = ref<MediaItem[]>([])
 const { t } = useI18n({ useScope: 'global' })
 
 const exerciseTypeItems = [
-  { title: 'Compound', value: 'compound' as ExerciseType },
-  { title: 'Isolation', value: 'isolation' as ExerciseType },
-  { title: 'Bodyweight', value: 'bodyweight' as ExerciseType },
+  { value: 'compound' as ExerciseType },
+  { value: 'isolation' as ExerciseType },
+  { value: 'bodyweight' as ExerciseType },
 ]
 
 const form = ref({
   name: '',
   description: '',
-  exerciseType: null as ExerciseType | null,
+  exerciseType: null as ExerciseType | null | undefined,
   muscleGroupIds: [] as number[],
   primaryMuscleGroupId: null as number | null,
   equipment: [] as string[],
@@ -203,7 +203,7 @@ const resetForm = () => {
   form.value = {
     name: '',
     description: '',
-    exerciseType: null,
+    exerciseType: null as ExerciseType | null | undefined,
     muscleGroupIds: [],
     primaryMuscleGroupId: null,
     equipment: [],
