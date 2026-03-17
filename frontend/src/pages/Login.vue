@@ -82,7 +82,7 @@
       </v-divider>
 
       <div class="d-flex flex-row ga-5 w-100 justify-center mt-4">
-        <v-btn color="cardBg" class="border-sm flex-grow-1" variant="flat" disabled>
+        <v-btn color="cardBg" class="border-sm flex-grow-1" variant="flat" @click="loginWithGoogle">
           <v-icon size="24" class="me-2">mdi-google</v-icon>
           <span>Google</span>
         </v-btn>
@@ -163,6 +163,11 @@ const navigateToCreateAccount = () => {
 const loginWithGithub = () => {
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:1337/v1'
   window.location.href = `${apiUrl}/auth/github`
+}
+
+const loginWithGoogle = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:1337/v1'
+  window.location.href = `${apiUrl}/auth/google`
 }
 </script>
 
