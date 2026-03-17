@@ -69,6 +69,7 @@
         :label="$t('exerciseForm.muscleGroupsLabel')"
         :items="muscleGroupItems.map(g => ({ title: g.name, value: g.id }))"
         multiple
+        class="mt-4"
       />
 
       <!-- Primary Muscle -->
@@ -250,7 +251,8 @@ watch(
     } else if (form.value.primaryMuscleGroupId && !ids.includes(form.value.primaryMuscleGroupId)) {
       form.value.primaryMuscleGroupId = null
     }
-  }
+  },
+  { immediate: true }
 )
 
 const removeExistingMedia = async (mediaId: number) => {
