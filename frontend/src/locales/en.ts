@@ -939,6 +939,7 @@ export default {
     noWorkoutsCreated: 'No workouts created yet',
     noActivitiesCreated: 'No activities created yet',
     dayLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    recurringEndDate: 'End date (optional)',
     startTime: 'Start time',
     endTime: 'End time',
   },
