@@ -24,6 +24,7 @@ import { ActivityModule } from '../activity/activity.module';
 import { ExerciseModule } from '../exercise/exercise.module';
 import { EmailModule } from '../email/email.module';
 import { GithubStrategy } from '../strategies/github.strategy';
+import { GoogleStrategy } from '../strategies/google.strategy';
 
 const githubStrategyProvider = {
   provide: GithubStrategy,
@@ -32,6 +33,17 @@ const githubStrategyProvider = {
     const clientSecret = configService.get<string>('GITHUB_CLIENT_SECRET');
     if (!clientId || !clientSecret) return null; // skip if not configured
     return new GithubStrategy(configService, authService);
+  },
+  inject: [ConfigService, AuthService],
+};
+
+const googleStrategyProvider = {
+  provide: GoogleStrategy,
+  useFactory: (configService: ConfigService, authService: AuthService) => {
+    const clientId = configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = configService.get<string>('GOOGLE_CLIENT_SECRET');
+    if (!clientId || !clientSecret) return null; // skip if not configured
+    return new GoogleStrategy(configService, authService);
   },
   inject: [ConfigService, AuthService],
 };
@@ -62,7 +74,7 @@ const githubStrategyProvider = {
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, githubStrategyProvider],
+  providers: [AuthService, githubStrategyProvider, googleStrategyProvider],
   exports: [JwtModule],
 })
 export class AuthModule {}

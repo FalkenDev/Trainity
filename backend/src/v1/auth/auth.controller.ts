@@ -213,4 +213,50 @@ export class AuthController {
     const redirect = isNew ? '/onboarding' : '/';
     res.redirect(`${frontendUrl}/oauth-callback?user=${userParam}&redirect=${redirect}`);
   }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {
+    // Passport redirects to Google — no body needed
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleCallback(
+    @Req() req: Request & { user: any },
+    @Res() res: Response,
+  ) {
+    const { token, user, isNew } = req.user;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+    const isLocalhost =
+      req.hostname === 'localhost' ||
+      req.hostname === '127.0.0.1' ||
+      req.hostname === '::1';
+
+    const cookiePath = process.env.AUTH_COOKIE_PATH || '/';
+    let cookieDomain = process.env.AUTH_COOKIE_DOMAIN || undefined;
+    let cookieSecure = process.env.AUTH_COOKIE_SECURE === 'true';
+    let cookieSameSite: boolean | 'lax' | 'strict' | 'none' | undefined = 'lax';
+
+    if (isLocalhost) {
+      cookieDomain = undefined;
+      cookieSecure = false;
+      cookieSameSite = 'lax';
+    }
+
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: cookieSecure,
+      sameSite: cookieSameSite,
+      ...(cookieDomain ? { domain: cookieDomain } : {}),
+      ...(cookiePath ? { path: cookiePath } : {}),
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Pass user data to frontend via a short-lived query param (base64 encoded)
+    const userParam = Buffer.from(JSON.stringify(user)).toString('base64url');
+    const redirect = isNew ? '/onboarding' : '/';
+    res.redirect(`${frontendUrl}/oauth-callback?user=${userParam}&redirect=${redirect}`);
+  }
 }
