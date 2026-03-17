@@ -35,6 +35,7 @@ declare module 'vue' {
     ExerciseList: typeof import('./components/Exercise/ExerciseList.vue')['default']
     ExerciseStatisticsDetail: typeof import('./components/Statistics/ExerciseStatisticsDetail.vue')['default']
     ExitHeader: typeof import('./components/basicUI/ExitHeader.vue')['default']
+    FullscreenListSelect: typeof import('./components/basicUI/FullscreenListSelect.vue')['default']
     GoalsDialog: typeof import('./components/Settings/GoalsDialog.vue')['default']
     HomeHeader: typeof import('./components/HomeHeader.vue')['default']
     ImageUpload: typeof import('./components/basicUI/ImageUpload.vue')['default']

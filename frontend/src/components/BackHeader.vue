@@ -33,19 +33,22 @@
     <h1 class="text-h5">
       {{ title }}
     </h1>
-    <v-btn v-if="showSave" color="primary" density="compact" variant="flat" @click="$emit('save')">
-      {{ $t('common.save') }}
-    </v-btn>
-    <v-btn v-if="showMenu" color="grey-darken-4" density="compact" icon size="40" variant="flat">
-      <v-icon>mdi-menu</v-icon>
-      <v-menu activator="parent">
-        <!-- A slot to use in other pages -->
-        <template v-if="$slots.menuAppend">
-          <slot name="menuAppend" />
-        </template>
-      </v-menu>
-    </v-btn>
-    <div v-if="!showSave && !showMenu" style="width: 40px" />
+    <slot v-if="$slots.right" name="right" />
+    <template v-else>
+      <v-btn v-if="showSave" color="primary" density="compact" variant="flat" @click="$emit('save')">
+        {{ $t('common.save') }}
+      </v-btn>
+      <v-btn v-else-if="showMenu" color="grey-darken-4" density="compact" icon size="40" variant="flat">
+        <v-icon>mdi-menu</v-icon>
+        <v-menu activator="parent">
+          <!-- A slot to use in other pages -->
+          <template v-if="$slots.menuAppend">
+            <slot name="menuAppend" />
+          </template>
+        </v-menu>
+      </v-btn>
+      <div v-else style="width: 40px" />
+    </template>
   </div>
 </template>
 <script lang="ts" setup>
