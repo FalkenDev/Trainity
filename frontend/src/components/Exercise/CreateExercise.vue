@@ -58,7 +58,7 @@
         :label="$t('exerciseForm.muscleGroupsLabel')"
         :items="muscleGroupItems.map(g => ({ title: g.name, value: g.id }))"
         multiple
-        class="mt-4"
+        class="mt-6"
       />
 
       <!-- Primary Muscle -->
@@ -67,7 +67,7 @@
         :label="$t('exerciseForm.primaryMuscleLabel')"
         :items="selectedMuscleGroupItems.map(g => ({ title: g.name, value: g.id }))"
         clearable
-        class="mt-4"
+        class="mt-6"
         :disabled="form.muscleGroupIds.length === 0"
       />
 

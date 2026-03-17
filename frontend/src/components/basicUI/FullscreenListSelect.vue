@@ -13,25 +13,17 @@
   - <https://www.gnu.org/licenses/>.
   -->
 <template>
-  <!-- Activator field -->
   <div
+    v-bind="$attrs"
     class="fullscreen-list-select"
     :class="{ 'fullscreen-list-select--disabled': disabled }"
     @click="!disabled && (isOpen = true)"
   >
-    <v-text-field
-      :model-value="displayText"
-      :label="label"
-      variant="outlined"
-      readonly
-      :disabled="disabled"
-      append-inner-icon="mdi-menu-down"
-      hide-details="auto"
-      class="pointer-field"
-    >
-      <!-- Chips for multi mode -->
-      <template v-if="multiple && selectedItems.length" #prepend-inner>
-        <div class="d-flex flex-wrap ga-1 my-1">
+    <!-- Multi mode: label above + chip container -->
+    <template v-if="multiple">
+      <p class="text-body-2 text-medium-emphasis mb-2">{{ label }}</p>
+      <div class="chip-activator">
+        <div class="d-flex flex-wrap ga-1 flex-grow-1">
           <v-chip
             v-for="item in selectedItems"
             :key="String(item.value)"
@@ -40,70 +32,86 @@
             {{ item.title }}
           </v-chip>
         </div>
-      </template>
-    </v-text-field>
-  </div>
+        <v-icon class="chip-activator__icon" size="20">mdi-menu-down</v-icon>
+      </div>
+    </template>
 
-  <!-- Full-screen dialog -->
-  <v-dialog v-model="isOpen" fullscreen>
-    <v-card class="d-flex flex-column bg-background" style="height: 100%">
-      <!-- Header -->
-      <v-toolbar color="background" class="flex-shrink-0">
-        <v-btn icon @click="isOpen = false">
-          <v-icon>mdi-arrow-left</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ label }}</v-toolbar-title>
-        <v-spacer />
-        <v-btn
-          v-if="clearable && hasSelection"
-          variant="text"
-          color="error"
-          @click="clearSelection"
-        >
-          {{ $t('common.clear') }}
-        </v-btn>
-        <v-btn
-          v-if="multiple"
-          variant="text"
-          color="primary"
-          @click="isOpen = false"
-        >
-          {{ $t('common.done') }}
-        </v-btn>
-      </v-toolbar>
+    <!-- Single mode: text field -->
+    <v-text-field
+      v-else
+      :model-value="displayText"
+      :label="label"
+      variant="outlined"
+      readonly
+      :disabled="disabled"
+      append-inner-icon="mdi-menu-down"
+      hide-details="auto"
+      class="pointer-field"
+    />
 
-      <v-divider />
-
-      <!-- List -->
-      <!-- Note: do NOT add pa-0 or pt-0/px-0 via Vuetify helper classes as pa-0 uses !important
-           and will override the pb-safe env() value. Use px-0 pt-0 instead if padding removal needed. -->
-      <v-list class="flex-grow-1 overflow-y-auto pb-safe px-0 pt-0">
-        <v-list-item
-          v-for="item in props.items"
-          :key="String(item.value)"
-          :title="item.title"
-          class="border-b-sm py-1"
-          @click="selectItem(item)"
-        >
-          <template #append>
-            <v-checkbox-btn
-              v-if="multiple"
-              :model-value="isItemSelected(item)"
-              color="primary"
-              hide-details
-              density="compact"
-            />
-            <v-icon v-else-if="isItemSelected(item)" color="primary">
-              mdi-check
-            </v-icon>
+    <!-- Full-screen dialog (inside root so inheritAttrs works) -->
+    <v-dialog v-model="isOpen" fullscreen>
+      <div class="d-flex flex-column fill-height bg-background">
+        <BackHeader :title="label" :show-menu="false" @close="isOpen = false">
+          <template v-if="multiple || (clearable && hasSelection)" #right>
+            <div class="d-flex align-center ga-1">
+              <v-btn
+                v-if="clearable && hasSelection"
+                variant="text"
+                color="error"
+                density="compact"
+                @click="clearSelection"
+              >
+                {{ $t('common.clear') }}
+              </v-btn>
+              <v-btn
+                v-if="multiple"
+                variant="flat"
+                color="primary"
+                density="compact"
+                @click="isOpen = false"
+              >
+                {{ $t('common.done') }}
+              </v-btn>
+            </div>
           </template>
-        </v-list-item>
-      </v-list>
-    </v-card>
-  </v-dialog>
+          <template v-else #right>
+            <div style="width: 40px" />
+          </template>
+        </BackHeader>
+
+        <!-- List -->
+        <!-- Note: do NOT add pa-0 or pt-0/px-0 via Vuetify helper classes as pa-0 uses !important
+             and will override the pb-safe env() value. Use px-0 pt-0 instead if padding removal needed. -->
+        <v-list class="flex-grow-1 overflow-y-auto pb-safe px-0 pt-0 bg-background">
+          <v-list-item
+            v-for="item in props.items"
+            :key="String(item.value)"
+            :title="item.title"
+            class="border-b-sm py-3"
+            @click="selectItem(item)"
+          >
+            <template #append>
+              <v-checkbox-btn
+                v-if="multiple"
+                :model-value="isItemSelected(item)"
+                color="primary"
+                hide-details
+                density="compact"
+              />
+              <v-icon v-else-if="isItemSelected(item)" color="primary">
+                mdi-check
+              </v-icon>
+            </template>
+          </v-list-item>
+        </v-list>
+      </div>
+    </v-dialog>
+  </div>
 </template>
 
 <script setup lang="ts" generic="T">
+defineOptions({ inheritAttrs: false })
 const props = withDefaults(
   defineProps<{
     modelValue: T
@@ -175,6 +183,23 @@ function clearSelection() {
 .fullscreen-list-select--disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.chip-activator {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid rgb(var(--v-theme-borderColor));
+  border-radius: 4px;
+  padding: 10px 12px;
+  min-height: 52px;
+  cursor: pointer;
+}
+
+.chip-activator__icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.6;
 }
 
 .pointer-field :deep(input) {
