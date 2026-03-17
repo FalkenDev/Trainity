@@ -26,6 +26,7 @@ export interface ScheduledSession {
   scheduledDate: string | null
   dayOfWeek: number | null // 0=Mon, ..., 6=Sun
   isRecurring: boolean
+  recurringEndDate: string | null
   exceptionDates: string[]
   notes: string | null
   createdAt: string
@@ -53,6 +54,7 @@ export interface CreateScheduledSessionDto {
   scheduledDate?: string // YYYY-MM-DD
   dayOfWeek?: number // 0-6
   isRecurring: boolean
+  recurringEndDate?: string
   notes?: string
 }
 
@@ -63,6 +65,7 @@ export interface UpdateScheduledSessionDto {
   scheduledDate?: string
   dayOfWeek?: number
   isRecurring?: boolean
+  recurringEndDate?: string
   notes?: string
 }
 
