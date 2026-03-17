@@ -150,10 +150,17 @@
             v-model="selectedDays"
             multiple
             color="primary"
-            variant="outlined"
-            class="d-flex flex-wrap ga-1"
+            variant="tonal"
+            class="d-flex ga-2 w-100"
           >
-            <v-btn v-for="(day, idx) in dayLabels" :key="idx" :value="idx" size="small">
+            <v-btn
+              v-for="(day, idx) in dayLabels"
+              :key="idx"
+              :value="idx"
+              size="small"
+              rounded="pill"
+              class="flex-1-1"
+            >
               {{ day }}
             </v-btn>
           </v-btn-toggle>
@@ -205,7 +212,7 @@ const dialogOpen = computed({
 const workoutStore = useWorkoutStore()
 const activityStore = useActivityStore()
 const scheduledSessionStore = useScheduledSessionStore()
-const { t } = useI18n()
+const { t, tm } = useI18n()
 
 const sessionType = ref<ScheduledSessionType>('workout')
 const selectedItemId = ref<number | null>(null)
@@ -215,7 +222,7 @@ const selectedDays = ref<number[]>([])
 const notes = ref('')
 const isSubmitting = ref(false)
 
-const dayLabels = computed(() => t('schedule.dayLabels') as unknown as string[])
+const dayLabels = computed(() => tm('schedule.dayLabels') as string[])
 
 interface ListItem {
   id: number
