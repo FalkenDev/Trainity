@@ -62,6 +62,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/falkendev/grindify-frontend:latest
           build-args: |
-            VITE_API_URL=https://app.grindify.io/api/v1
+            VITE_API_URL=${{ vars.VITE_API_URL }}
+            VITE_CONTACT_EMAIL=${{ vars.VITE_CONTACT_EMAIL }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
