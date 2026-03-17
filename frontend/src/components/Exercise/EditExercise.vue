@@ -52,35 +52,32 @@
       <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
         $t('exerciseForm.exerciseTypeLabel')
       }}</v-label>
-      <SheetSelect
-        v-model="form.exerciseType"
-        :items="exerciseTypeItems"
-        clearable
-      />
+      <v-chip-group v-model="form.exerciseType" selected-class="bg-primary" class="mb-2">
+        <v-chip
+          v-for="item in exerciseTypeItems"
+          :key="item.value"
+          :value="item.value"
+          variant="outlined"
+        >
+          {{ $t(`exercise.types.${item.value}`) }}
+        </v-chip>
+      </v-chip-group>
 
-      <!-- Target Muscles (multi-select chips) -->
-      <v-label class="text-body-2 font-weight-bold text-textPrimary mb-2">{{
-        $t('exerciseForm.muscleGroupsLabel')
-      }}</v-label>
-      <SheetSelect
+      <!-- Target Muscles -->
+      <FullscreenListSelect
         v-model="form.muscleGroupIds"
-        :items="muscleGroupItems"
-        item-title="name"
-        item-value="id"
+        :label="$t('exerciseForm.muscleGroupsLabel')"
+        :items="muscleGroupItems.map(g => ({ title: g.name, value: g.id }))"
         multiple
-        closable-chips
       />
 
-      <!-- Primary Muscle (from selected targets) -->
-      <v-label class="text-body-2 font-weight-bold text-textPrimary mt-4 mb-2">{{
-        $t('exerciseForm.primaryMuscleLabel')
-      }}</v-label>
-      <SheetSelect
+      <!-- Primary Muscle -->
+      <FullscreenListSelect
         v-model="form.primaryMuscleGroupId"
-        :items="selectedMuscleGroupItems"
-        item-title="name"
-        item-value="id"
+        :label="$t('exerciseForm.primaryMuscleLabel')"
+        :items="selectedMuscleGroupItems.map(g => ({ title: g.name, value: g.id }))"
         clearable
+        class="mt-4"
         :disabled="form.muscleGroupIds.length === 0"
       />
 
@@ -212,15 +209,15 @@ const isDeleteDialogOpen = ref(false)
 const newMediaItems = ref<MediaItem[]>([])
 
 const exerciseTypeItems = [
-  { title: 'Compound', value: 'compound' as ExerciseType },
-  { title: 'Isolation', value: 'isolation' as ExerciseType },
-  { title: 'Bodyweight', value: 'bodyweight' as ExerciseType },
+  { value: 'compound' as ExerciseType },
+  { value: 'isolation' as ExerciseType },
+  { value: 'bodyweight' as ExerciseType },
 ]
 
 const form = ref({
   name: props.exercise.name || '',
   description: props.exercise.description || '',
-  exerciseType: props.exercise.exerciseType || (null as ExerciseType | null),
+  exerciseType: props.exercise.exerciseType || (null as ExerciseType | null | undefined),
   muscleGroupIds: props.exercise.muscleGroups?.map(mg => mg.id) || ([] as number[]),
   primaryMuscleGroupId: props.exercise.primaryMuscleGroup?.id || (null as number | null),
   equipment: props.exercise.equipment || ([] as string[]),
@@ -237,11 +234,20 @@ const selectedMuscleGroupItems = computed(() =>
   muscleGroupItems.value.filter(g => form.value.muscleGroupIds.includes(g.id))
 )
 
-// Clear primary muscle group if it's no longer in the selected muscle groups
+// Normalize chip group deselect: v-chip-group emits undefined when deselected, but our type is ExerciseType | null
+watch(
+  () => form.value.exerciseType,
+  v => {
+    if (v === undefined) form.value.exerciseType = null
+  }
+)
+
 watch(
   () => form.value.muscleGroupIds,
   ids => {
-    if (form.value.primaryMuscleGroupId && !ids.includes(form.value.primaryMuscleGroupId)) {
+    if (ids.length === 1) {
+      form.value.primaryMuscleGroupId = ids[0]
+    } else if (form.value.primaryMuscleGroupId && !ids.includes(form.value.primaryMuscleGroupId)) {
       form.value.primaryMuscleGroupId = null
     }
   }
