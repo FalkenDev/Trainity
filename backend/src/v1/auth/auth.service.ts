@@ -304,6 +304,62 @@ export class AuthService {
     return { token, user: new UserWithoutPasswordDto(user), isNew };
   }
 
+  async findOrCreateGoogleUser(profile: {
+    googleId: string;
+    email?: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+  }): Promise<{ token: string; user: UserWithoutPasswordDto; isNew: boolean }> {
+    // 1. Try to find by googleId
+    let user = await this.userRepo.findOne({ where: { googleId: profile.googleId } });
+
+    if (!user && profile.email) {
+      // 2. Try to find by email — link Google to existing account
+      user = await this.userRepo.findOne({ where: { email: profile.email } });
+      if (user) {
+        await this.userRepo.update(user.id, { googleId: profile.googleId });
+        user.googleId = profile.googleId;
+      }
+    }
+
+    let isNew = false;
+    if (!user) {
+      // 3. Create new user
+      const defaultShowRpeRaw = this.configService.get<string>('DEFAULT_SHOW_RPE');
+      const defaultShowRpe =
+        defaultShowRpeRaw == null
+          ? true
+          : ['1', 'true', 'yes', 'on'].includes(defaultShowRpeRaw.toLowerCase());
+
+      user = this.userRepo.create({
+        googleId: profile.googleId,
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        avatar: profile.avatar,
+        showRpe: defaultShowRpe,
+        emailVerified: true, // Google already confirmed the email
+        termsAcceptedAt: new Date(),
+        termsVersion: '1.0',
+      });
+      user = await this.userRepo.save(user);
+
+      await this.seedDefaultActivities(user.id);
+      await this.exerciseSeedService.seedDefaultExercises(user.id);
+      isNew = true;
+    }
+
+    // Ensure email is marked verified for Google users
+    if (!user.emailVerified) {
+      await this.userRepo.update(user.id, { emailVerified: true });
+      user.emailVerified = true;
+    }
+
+    const token = this.jwtService.sign({ id: user.id, email: user.email });
+    return { token, user: new UserWithoutPasswordDto(user), isNew };
+  }
+
   async resetPassword(email: string, code: string, newPassword: string): Promise<void> {
     const user = await this.userRepo.findOne({
       where: { email },
