@@ -32,6 +32,9 @@ import AddWorkout from '@/pages/AddWorkout.vue'
 import LogActivity from '@/pages/LogActivity.vue'
 import Statistics from '@/pages/Statistics.vue'
 import SessionDetail from '@/pages/SessionDetail.vue'
+import PrivacyPage from '@/pages/PrivacyPage.vue'
+import TermsPage from '@/pages/TermsPage.vue'
+import LegalNoticePage from '@/pages/LegalNoticePage.vue'
 
 const routes = [
   {
@@ -129,6 +132,24 @@ const routes = [
     name: 'Settings',
     component: Settings,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/privacy',
+    name: 'Privacy',
+    component: PrivacyPage,
+    meta: { hideBottomNav: true },
+  },
+  {
+    path: '/terms',
+    name: 'Terms',
+    component: TermsPage,
+    meta: { hideBottomNav: true },
+  },
+  {
+    path: '/legal',
+    name: 'LegalNotice',
+    component: LegalNoticePage,
+    meta: { hideBottomNav: true },
   },
   {
     path: '/:pathMatch(.*)*', // 404

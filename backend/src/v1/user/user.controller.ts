@@ -21,12 +21,14 @@ import {
   Body,
   UseGuards,
   Req,
+  Res,
   UnauthorizedException,
   Post,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../guards/jwtAuth.guard';
@@ -174,5 +176,21 @@ export class UserController {
       throw new UnauthorizedException('User not authenticated');
     }
     return this.userService.updateUserPreferences(+req.user.id, dto);
+  }
+
+  @Get('export')
+  @ApiOperation({ summary: 'Export all user data (GDPR Art. 20 data portability)' })
+  @ApiOkResponse({ description: 'JSON file containing all personal data for the authenticated user' })
+  async exportData(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+  ): Promise<void> {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+    const data = await this.userService.exportUserData(+req.user.id);
+    res.setHeader('Content-Disposition', 'attachment; filename="grindify-data-export.json"');
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(data, null, 2));
   }
 }

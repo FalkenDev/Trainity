@@ -28,6 +28,9 @@ import { UpdateUserPreferencesDto } from './dto/UpdateUserPreferences.dto';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { ActivityLog } from '../activityLog/activityLog.entity';
+import { WeightLog } from '../weightLog/weightLog.entity';
+import { ProgressPhoto } from '../progressPhoto/progressPhoto.entity';
+import { ExerciseRecord } from '../statistics/exerciseRecord.entity';
 import { UploadService } from '../upload/upload.service';
 import * as bcrypt from 'bcrypt';
 
@@ -48,6 +51,15 @@ export class UserService {
 
     @InjectRepository(ActivityLog)
     private readonly activityLogRepo: Repository<ActivityLog>,
+
+    @InjectRepository(WeightLog)
+    private readonly weightLogRepo: Repository<WeightLog>,
+
+    @InjectRepository(ProgressPhoto)
+    private readonly progressPhotoRepo: Repository<ProgressPhoto>,
+
+    @InjectRepository(ExerciseRecord)
+    private readonly exerciseRecordRepo: Repository<ExerciseRecord>,
 
     private readonly uploadService: UploadService,
   ) {}
@@ -408,6 +420,56 @@ export class UserService {
     const updated = await this.userRepo.save(user);
 
     return new UserWithoutPasswordDto(updated);
+  }
+
+  /**
+   * Export all user data for GDPR Art. 20 data portability
+   */
+  async exportUserData(userId: number): Promise<object> {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const [exercises, workouts, sessions, activityLogs, weightLogs, progressPhotos, exerciseRecords] =
+      await Promise.all([
+        this.exerciseRepo.find({ where: { createdBy: { id: userId } }, relations: ['media'] }),
+        this.workoutRepo.find({ where: { createdBy: { id: userId } }, relations: ['exercises'] }),
+        this.sessionRepo.find({ where: { user: { id: userId } }, relations: ['exercises', 'exercises.sets'] }),
+        this.activityLogRepo.find({ where: { user: { id: userId } } }),
+        this.weightLogRepo.find({ where: { user: { id: userId } } }),
+        this.progressPhotoRepo.find({ where: { user: { id: userId } } }),
+        this.exerciseRecordRepo.find({ where: { user: { id: userId } }, relations: ['exercise'] }),
+      ]);
+
+    return {
+      exportedAt: new Date().toISOString(),
+      profile: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        avatar: user.avatar,
+        dateOfBirth: user.dateOfBirth,
+        gender: user.gender,
+        weight: user.weight,
+        height: user.height,
+        unitScale: user.unitScale,
+        primaryGoal: user.primaryGoal,
+        weeklyWorkoutGoal: user.weeklyWorkoutGoal,
+        currentStreak: user.currentStreak,
+        termsAcceptedAt: user.termsAcceptedAt,
+        termsVersion: user.termsVersion,
+        createdAt: user.createdAt,
+      },
+      exercises,
+      workouts,
+      workoutSessions: sessions,
+      activityLogs,
+      weightLogs,
+      progressPhotos,
+      exerciseRecords,
+    };
   }
 
   /**

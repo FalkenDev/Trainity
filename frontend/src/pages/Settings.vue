@@ -113,6 +113,54 @@
           </v-list-item>
         </v-list>
       </div>
+
+      <div>
+        <h1 class="text-h6 mb-3">{{ $t('settings.legal') }}</h1>
+        <v-list
+          class="bg-cardBg rounded-lg"
+          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
+        >
+          <v-list-item
+            class="px-5 border-b"
+            @click="isPrivacyPolicyOpen = true"
+          >
+            <v-list-item-title class="d-flex flex-row justify-space-between align-center">
+              <p>{{ $t('settings.privacyPolicy') }}</p>
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            class="px-5 border-b"
+            @click="isTermsOpen = true"
+          >
+            <v-list-item-title class="d-flex flex-row justify-space-between align-center">
+              <p>{{ $t('settings.termsAndConditions') }}</p>
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            class="px-5 border-b"
+            @click="isImprintOpen = true"
+          >
+            <v-list-item-title class="d-flex flex-row justify-space-between align-center">
+              <p>{{ $t('settings.imprint') }}</p>
+              <v-icon>mdi-chevron-right</v-icon>
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            class="px-5"
+            @click="exportUserData"
+          >
+            <v-list-item-title class="d-flex flex-row justify-space-between align-center">
+              <div>
+                <p>{{ $t('settings.exportData') }}</p>
+                <p class="text-caption text-textSecondary">{{ $t('settings.exportDataDescription') }}</p>
+              </div>
+              <v-icon>mdi-download</v-icon>
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </div>
     </div>
 
     <!-- Account Edit Dialog -->
@@ -158,6 +206,10 @@
         @updated="onUserUpdated"
       />
     </v-dialog>
+
+    <PrivacyPolicyDialog v-model="isPrivacyPolicyOpen" />
+    <TermsAndConditionsDialog v-model="isTermsOpen" />
+    <ImprintDialog v-model="isImprintOpen" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -169,6 +221,9 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { useTheme } from 'vuetify'
+import PrivacyPolicyDialog from '@/components/legal/PrivacyPolicyDialog.vue'
+import TermsAndConditionsDialog from '@/components/legal/TermsAndConditionsDialog.vue'
+import ImprintDialog from '@/components/legal/ImprintDialog.vue'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
@@ -192,6 +247,9 @@ const isAccountDialogOpen = ref(false)
 const isAppearanceOpen = ref(false)
 const isLanguageDialogOpen = ref(false)
 const isGoalsDialogOpen = ref(false)
+const isPrivacyPolicyOpen = ref(false)
+const isTermsOpen = ref(false)
+const isImprintOpen = ref(false)
 const currentUser = ref<User | null>(null)
 const weightTrackingEnabled = ref(false)
 const streakInfo = ref<StreakInfo | null>(null)
@@ -257,11 +315,34 @@ const setPreferenceDialogToOpen = async (type?: string) => {
     case 'language':
       isLanguageDialogOpen.value = true
       break
+    case 'contact':
+      window.location.href = `mailto:${import.meta.env.VITE_CONTACT_EMAIL ?? ''}`
+      break
     case 'logout':
       await authStore.logout()
       break
     default:
       return
+  }
+}
+
+const exportUserData = async () => {
+  try {
+    const response = await fetch(`${apiUrl}/users/export`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+    if (!response.ok) throw new Error('Export failed')
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'grindify-data-export.json'
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(t('settings.exportDataSuccess'), { progressBar: true, duration: 3000 })
+  } catch {
+    toast.error(t('settings.exportDataError'), { progressBar: true, duration: 3000 })
   }
 }
 
@@ -317,7 +398,7 @@ const preferencesList = [
   { titleKey: 'settings.goals', showArrow: true, disabled: false, type: 'goals' },
   { titleKey: 'settings.darkMode', showArrow: false, disabled: false, type: 'darkMode' },
   { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language' },
-  { titleKey: 'settings.helpAndSupport', showArrow: true, disabled: true },
+  { titleKey: 'settings.helpAndSupport', showArrow: true, disabled: false, type: 'contact' },
   { titleKey: 'settings.logout', showArrow: false, disabled: false, type: 'logout' },
 ]
 
