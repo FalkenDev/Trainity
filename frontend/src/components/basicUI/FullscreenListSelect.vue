@@ -79,7 +79,7 @@
            and will override the pb-safe env() value. Use px-0 pt-0 instead if padding removal needed. -->
       <v-list class="flex-grow-1 overflow-y-auto pb-safe px-0 pt-0">
         <v-list-item
-          v-for="item in normalizedItems"
+          v-for="item in props.items"
           :key="String(item.value)"
           :title="item.title"
           class="border-b-sm py-1"
@@ -92,7 +92,6 @@
               color="primary"
               hide-details
               density="compact"
-              @click.stop="selectItem(item)"
             />
             <v-icon v-else-if="isItemSelected(item)" color="primary">
               mdi-check
@@ -105,8 +104,6 @@
 </template>
 
 <script setup lang="ts" generic="T">
-type NormalizedItem = { title: string; value: unknown }
-
 const props = withDefaults(
   defineProps<{
     modelValue: T
@@ -130,22 +127,18 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 
-const normalizedItems = computed<NormalizedItem[]>(() =>
-  props.items.map(item => ({ title: item.title, value: item.value }))
-)
-
 const selectedValues = computed<unknown[]>(() => {
   if (props.multiple) return Array.isArray(props.modelValue) ? (props.modelValue as unknown[]) : []
   return props.modelValue != null ? [props.modelValue] : []
 })
 
 const selectedItems = computed(() =>
-  normalizedItems.value.filter(i => selectedValues.value.includes(i.value))
+  props.items.filter(i => selectedValues.value.includes(i.value))
 )
 
 const hasSelection = computed(() => selectedValues.value.length > 0)
 
-function isItemSelected(item: NormalizedItem): boolean {
+function isItemSelected(item: { title: string; value: unknown }): boolean {
   return selectedValues.value.includes(item.value)
 }
 
@@ -154,7 +147,7 @@ const displayText = computed(() => {
   return selectedItems.value[0]?.title ?? ''
 })
 
-function selectItem(item: NormalizedItem) {
+function selectItem(item: { title: string; value: unknown }) {
   if (props.multiple) {
     const current = Array.isArray(props.modelValue) ? (props.modelValue as unknown[]) : []
     const isSelected = current.includes(item.value)
@@ -173,6 +166,7 @@ function clearSelection() {
     emit('update:modelValue', [] as unknown as T)
   } else {
     emit('update:modelValue', null as T)
+    isOpen.value = false
   }
 }
 </script>
