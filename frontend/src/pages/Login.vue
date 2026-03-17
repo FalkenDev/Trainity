@@ -108,7 +108,21 @@
       >
         {{ $t('auth.signUp') }}
       </v-btn>
+      <div class="d-flex justify-center align-center flex-wrap ga-1 mt-2">
+        <v-btn size="x-small" variant="text" color="textSecondary" class="text-caption" @click="router.push('/privacy')">
+          {{ $t('settings.privacyPolicy') }}
+        </v-btn>
+        <span class="text-textSecondary text-caption">·</span>
+        <v-btn size="x-small" variant="text" color="textSecondary" class="text-caption" @click="router.push('/terms')">
+          {{ $t('settings.termsAndConditions') }}
+        </v-btn>
+        <span class="text-textSecondary text-caption">·</span>
+        <v-btn size="x-small" variant="text" color="textSecondary" class="text-caption" @click="router.push('/legal')">
+          {{ $t('settings.imprint') }}
+        </v-btn>
+      </div>
     </div>
+
   </div>
 </template>
 

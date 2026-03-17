@@ -38,6 +38,7 @@ declare module 'vue' {
     GoalsDialog: typeof import('./components/Settings/GoalsDialog.vue')['default']
     HomeHeader: typeof import('./components/HomeHeader.vue')['default']
     ImageUpload: typeof import('./components/basicUI/ImageUpload.vue')['default']
+    ImprintDialog: typeof import('./components/legal/ImprintDialog.vue')['default']
     LanguageDialog: typeof import('./components/Settings/LanguageDialog.vue')['default']
     MediaUpload: typeof import('./components/basicUI/MediaUpload.vue')['default']
     MuscleRadarChart: typeof import('./components/Statistics/MuscleRadarChart.vue')['default']
