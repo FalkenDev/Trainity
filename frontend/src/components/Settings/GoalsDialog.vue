@@ -109,13 +109,14 @@
         />
 
         <v-text-field
-          v-model.number="targetWeight"
+          :model-value="targetWeightStr"
           :label="$t('weightLog.targetWeight')"
           :suffix="wtWeightUnit"
-          type="number"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           variant="outlined"
           class="mb-4"
+          @update:model-value="targetWeightStr = normalizeDecimalStr($event)"
         />
 
         <div class="mb-4">
@@ -169,6 +170,7 @@ import type { User, StreakInfo } from '@/interfaces/User.interface'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth.store'
+import { parseDecimalInput, normalizeDecimalStr, formatDecimalDisplay } from '@/utils/decimalInput'
 
 const props = defineProps<{
   user: User | null
@@ -202,7 +204,7 @@ function fromKg(val: number | undefined | null): number | null {
 
 // Weight goal fields
 const weightGoalType = ref<string | null>(props.user?.weightGoalType ?? null)
-const targetWeight = ref<number | null>(fromKg(props.user?.targetWeight))
+const targetWeightStr = ref<string>(formatDecimalDisplay(fromKg(props.user?.targetWeight)))
 
 // Goal duration
 const goalDurationValue = ref<number | undefined>(undefined)
@@ -245,7 +247,7 @@ watch(
   u => {
     weeklyGoal.value = u?.weeklyWorkoutGoal ?? 3
     weightGoalType.value = u?.weightGoalType ?? null
-    targetWeight.value = fromKg(u?.targetWeight)
+    targetWeightStr.value = formatDecimalDisplay(fromKg(u?.targetWeight))
     initDuration(u?.goalTimeframe)
   }
 )
@@ -281,9 +283,10 @@ const saveWeightGoals = async () => {
   try {
     const prefs: Record<string, unknown> = {}
     prefs.weightGoalType = weightGoalType.value || null
+    const parsedTargetWeight = parseDecimalInput(targetWeightStr.value)
     prefs.targetWeight =
-      targetWeight.value && targetWeight.value > 0
-        ? Number(toKg(targetWeight.value).toFixed(2))
+      parsedTargetWeight > 0
+        ? Number(toKg(parsedTargetWeight).toFixed(2))
         : null
     if (goalDurationValue.value && goalDurationValue.value > 0) {
       prefs.goalTimeframe =

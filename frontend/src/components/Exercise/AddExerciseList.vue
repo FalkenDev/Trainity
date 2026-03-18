@@ -54,7 +54,10 @@
             location="bottom end"
             activator="parent"
           >
-            <v-card class="bg-cardBg pa-3" style="border: 1px solid rgb(var(--v-theme-borderColor)); min-width: 220px">
+            <v-card
+              class="bg-cardBg pa-3"
+              style="border: 1px solid rgb(var(--v-theme-borderColor)); min-width: 220px"
+            >
               <div class="d-flex justify-space-between align-center mb-2">
                 <p class="text-body-2 font-weight-bold">{{ $t('common.filter') }}</p>
                 <v-btn variant="text" size="small" color="textSecondary" @click="resetFilters">
@@ -87,11 +90,15 @@
                 {{ $t('exerciseForm.exerciseTypeLabel') }}
               </p>
               <v-chip-group v-model="selectedTypes" multiple column selected-class="text-primary">
-                <v-chip value="compound" variant="outlined" size="small" filter>Compound</v-chip>
-                <v-chip value="isolation" variant="outlined" size="small" filter>Isolation</v-chip>
-                <v-chip value="bodyweight" variant="outlined" size="small" filter
-                  >Bodyweight</v-chip
-                >
+                <v-chip value="compound" variant="outlined" size="small" filter>{{
+                  $t('exercise.types.compound')
+                }}</v-chip>
+                <v-chip value="isolation" variant="outlined" size="small" filter>{{
+                  $t('exercise.types.isolation')
+                }}</v-chip>
+                <v-chip value="bodyweight" variant="outlined" size="small" filter>{{
+                  $t('exercise.types.bodyweight')
+                }}</v-chip>
               </v-chip-group>
             </v-card>
           </v-menu>

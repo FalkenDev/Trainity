@@ -54,25 +54,27 @@
         />
 
         <v-text-field
-          v-model.number="weight"
+          :model-value="weightStr"
           :label="$t('settings.weight')"
           prepend-inner-icon="mdi-scale-bathroom"
           :suffix="weightUnit"
           variant="outlined"
-          type="number"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           class="mb-4"
+          @update:model-value="weightStr = normalizeDecimalStr($event)"
         />
 
         <v-text-field
-          v-model.number="height"
+          :model-value="heightStr"
           :label="$t('settings.height')"
           prepend-inner-icon="mdi-human-male-height"
           :suffix="heightUnit"
           variant="outlined"
-          type="number"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           class="mb-4"
+          @update:model-value="heightStr = normalizeDecimalStr($event)"
         />
       </v-form>
     </v-card-text>
@@ -86,6 +88,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
 import type { VForm } from 'vuetify/components'
+import { parseDecimalInput, normalizeDecimalStr, formatDecimalDisplay } from '@/utils/decimalInput'
 
 const props = defineProps<{
   user: User
@@ -121,8 +124,8 @@ const lastName = ref('')
 const fullName = ref('')
 const email = ref('')
 const dateOfBirth = ref('')
-const weight = ref<number | null>(null)
-const height = ref<number | null>(null)
+const weightStr = ref('')
+const heightStr = ref('')
 
 const emailRules = [
   (v: string) => !!v || t('auth.emailRequired'),
@@ -136,8 +139,8 @@ const initForm = () => {
   fullName.value = `${u.firstName || ''} ${u.lastName || ''}`.trim()
   email.value = u.email || ''
   dateOfBirth.value = u.dateOfBirth ? u.dateOfBirth.substring(0, 10) : ''
-  weight.value = fromKg(u.weight)
-  height.value = fromCm(u.height)
+  weightStr.value = formatDecimalDisplay(fromKg(u.weight))
+  heightStr.value = formatDecimalDisplay(fromCm(u.height))
 }
 
 watch(() => props.user, initForm, { immediate: true })
@@ -164,11 +167,13 @@ const save = async () => {
     if (dateOfBirth.value) {
       payload.dateOfBirth = dateOfBirth.value
     }
-    if (weight.value != null && weight.value > 0) {
-      payload.weight = Number(toKg(weight.value).toFixed(2))
+    const parsedWeight = parseDecimalInput(weightStr.value)
+    if (parsedWeight > 0) {
+      payload.weight = Number(toKg(parsedWeight).toFixed(2))
     }
-    if (height.value != null && height.value > 0) {
-      payload.height = Number(toCm(height.value).toFixed(2))
+    const parsedHeight = parseDecimalInput(heightStr.value)
+    if (parsedHeight > 0) {
+      payload.height = Number(toCm(parsedHeight).toFixed(2))
     }
 
     const updated = (await updateUser(payload as Partial<User>)) as User

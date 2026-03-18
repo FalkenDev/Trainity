@@ -133,8 +133,6 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 
-/* ── helpers ─────────────────────────────────────── */
-
 function isObject(v: unknown): v is Record<string, unknown> {
   return v !== null && typeof v === 'object'
 }
@@ -148,8 +146,6 @@ const normalizedItems = computed<NormalizedItem[]>(() =>
         raw,
       }
     }
-    // primitive – { title: 'Foo', value: 'Foo' } for plain string arrays
-    // For items like { title: 'Compound', value: 'compound' } already handled above
     return { title: String(raw), value: raw, raw }
   })
 )
@@ -163,8 +159,6 @@ function getItemValue(item: unknown): unknown {
   if (isObject(item)) return (item as Record<string, unknown>)[props.itemValue]
   return item
 }
-
-/* ── selection state ─────────────────────────────── */
 
 const selectedValues = computed<unknown[]>(() => {
   if (props.multiple) return Array.isArray(props.modelValue) ? (props.modelValue as unknown[]) : []
@@ -181,14 +175,12 @@ function isItemSelected(item: NormalizedItem) {
   return selectedValues.value.includes(item.value)
 }
 
-/* Text shown in the activator field */
 const displayText = computed(() => {
-  if (props.multiple) return '' // chips handle display
+  if (props.multiple) return ''
   const sel = selectedItems.value[0]
   return sel ? sel.title : ''
 })
 
-/* v-list :selected binding (array of values) */
 const listSelected = computed(() => selectedValues.value as unknown[])
 
 function onListUpdate(vals: unknown[]) {

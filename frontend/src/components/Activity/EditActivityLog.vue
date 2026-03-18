@@ -44,12 +44,13 @@
           {{ $t('activity.duration') }}
         </v-label>
         <v-text-field
-          v-model.number="form.duration"
+          :model-value="durationStr"
           variant="outlined"
-          type="number"
-          min="1"
+          type="text"
+          inputmode="decimal"
           suffix="min"
-          :rules="[v => v > 0 || $t('common.error')]"
+          :rules="[v => parseDecimalInput(v) > 0 || $t('common.error')]"
+          @update:model-value="durationStr = normalizeDecimalStr($event)"
         />
       </div>
 
@@ -59,12 +60,12 @@
           {{ $t('activity.distance') }}
         </v-label>
         <v-text-field
-          v-model.number="form.distance"
+          :model-value="distanceStr"
           variant="outlined"
-          type="number"
-          min="0"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           suffix="km"
+          @update:model-value="distanceStr = normalizeDecimalStr($event)"
         />
       </div>
 
@@ -74,11 +75,12 @@
           {{ $t('activity.elevationGain') }}
         </v-label>
         <v-text-field
-          v-model.number="form.elevationGain"
+          :model-value="elevationGainStr"
           variant="outlined"
-          type="number"
-          min="0"
+          type="text"
+          inputmode="decimal"
           suffix="m"
+          @update:model-value="elevationGainStr = normalizeDecimalStr($event)"
         />
       </div>
 
@@ -88,11 +90,12 @@
           {{ $t('activity.calories') }}
         </v-label>
         <v-text-field
-          v-model.number="form.calories"
+          :model-value="caloriesStr"
           variant="outlined"
-          type="number"
-          min="0"
+          type="text"
+          inputmode="decimal"
           suffix="kcal"
+          @update:model-value="caloriesStr = normalizeDecimalStr($event)"
         />
       </div>
 
@@ -140,6 +143,7 @@ import type { ActivityLog } from '@/interfaces/Activity.interface'
 import AcceptDialog from '@/components/basicUI/AcceptDialog.vue'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
+import { parseDecimalInput, normalizeDecimalStr, formatDecimalDisplay } from '@/utils/decimalInput'
 
 const props = defineProps<{ log: ActivityLog }>()
 const emit = defineEmits<{ close: []; saved: [] }>()
@@ -163,9 +167,21 @@ const form = ref({
   notes: props.log.notes ?? '',
 })
 
+// String refs for decimal fields
+const durationStr = ref(String(props.log.duration ?? ''))
+const distanceStr = ref(formatDecimalDisplay(props.log.distance ?? undefined))
+const elevationGainStr = ref(formatDecimalDisplay(props.log.elevationGain ?? undefined))
+const caloriesStr = ref(formatDecimalDisplay(props.log.calories ?? undefined))
+
 async function saveLog() {
   const { valid } = await formRef.value.validate()
   if (!valid) return
+
+  // Parse string refs to numbers before saving
+  form.value.duration = parseDecimalInput(durationStr.value)
+  form.value.distance = distanceStr.value ? parseDecimalInput(distanceStr.value) : undefined
+  form.value.elevationGain = elevationGainStr.value ? parseDecimalInput(elevationGainStr.value) : undefined
+  form.value.calories = caloriesStr.value ? parseDecimalInput(caloriesStr.value) : undefined
 
   isSaving.value = true
   try {

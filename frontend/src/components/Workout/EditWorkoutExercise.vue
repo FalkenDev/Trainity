@@ -122,7 +122,8 @@
             <v-text-field
               v-model="editExercise.sets"
               :label="$t('exerciseForm.setsLabel')"
-              type="number"
+              type="text"
+              inputmode="numeric"
               variant="outlined"
               hide-details
               density="compact"
@@ -130,7 +131,8 @@
             <v-text-field
               v-model="editExercise.reps"
               :label="$t('exerciseForm.repsLabel')"
-              type="number"
+              type="text"
+              inputmode="numeric"
               variant="outlined"
               hide-details
               density="compact"
@@ -139,7 +141,8 @@
               v-if="isViewWorkoutExercise"
               v-model="editExercise.weight"
               :label="$t('workoutList.weightKg')"
-              type="number"
+              type="text"
+              inputmode="decimal"
               variant="outlined"
               hide-details
               density="compact"
@@ -147,7 +150,8 @@
             <v-text-field
               v-model="editExercise.pauseSeconds"
               :label="$t('workoutList.pauseSeconds')"
-              type="number"
+              type="text"
+              inputmode="numeric"
               variant="outlined"
               hide-details
               density="compact"
@@ -167,6 +171,7 @@ import { useWorkoutStore } from '@/stores/workout.store'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
 import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
+import { parseDecimalInput, parseIntInput } from '@/utils/decimalInput'
 
 const props = defineProps<{
   workoutId?: number
@@ -265,11 +270,11 @@ const getSanitizedExerciseDataForWorkout = () => {
   }
 
   const edited = {
-    sets: Number(editExercise.value.sets || 0),
-    reps: Number(editExercise.value.reps || 0),
-    pauseSeconds: Number(editExercise.value.pauseSeconds || 0),
+    sets: parseIntInput(editExercise.value.sets),
+    reps: parseIntInput(editExercise.value.reps),
+    pauseSeconds: parseIntInput(editExercise.value.pauseSeconds),
     order: Number(editExercise.value.order || 0),
-    weight: Number(editExercise.value.weight || 0),
+    weight: parseDecimalInput(editExercise.value.weight),
     exerciseId: Number(editExercise.value.exerciseId || 0),
   }
 

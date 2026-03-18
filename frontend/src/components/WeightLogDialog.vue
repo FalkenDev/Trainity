@@ -30,22 +30,24 @@
           </div>
 
           <v-text-field
-            v-model.number="setupWeight"
+            :model-value="setupWeightStr"
             :label="$t('weightLog.currentWeight')"
             :suffix="weightUnit"
-            type="number"
-            step="0.1"
+            type="text"
+            inputmode="decimal"
             variant="outlined"
             :rules="[rules.required, rules.positive]"
+            @update:model-value="setupWeightStr = normalizeDecimalStr($event)"
           />
 
           <v-text-field
-            v-model.number="setupTargetWeight"
+            :model-value="setupTargetWeightStr"
             :label="$t('weightLog.targetWeight') + ' (' + $t('common.optional') + ')'"
             :suffix="weightUnit"
-            type="number"
-            step="0.1"
+            type="text"
+            inputmode="decimal"
             variant="outlined"
+            @update:model-value="setupTargetWeightStr = normalizeDecimalStr($event)"
           />
 
           <v-select
@@ -92,7 +94,7 @@
             size="large"
             block
             :loading="isSavingSetup"
-            :disabled="!setupWeight || setupWeight <= 0"
+            :disabled="parseDecimalInput(setupWeightStr) <= 0"
             @click="saveFirstTimeSetup"
           >
             {{ $t('weightLog.startTracking') }}
@@ -381,14 +383,15 @@
           :rules="[rules.required]"
         />
         <v-text-field
-          v-model.number="entryForm.weight"
+          :model-value="entryWeightStr"
           :label="$t('weightLog.weight')"
           :suffix="weightUnit"
-          type="number"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           variant="outlined"
           class="mb-3"
           :rules="[rules.required, rules.positive]"
+          @update:model-value="entryWeightStr = normalizeDecimalStr($event)"
         />
         <v-textarea
           v-model="entryForm.notes"
@@ -403,7 +406,7 @@
         <v-btn
           color="primary"
           :loading="isSavingEntry"
-          :disabled="!entryForm.weight || entryForm.weight <= 0"
+          :disabled="parseDecimalInput(entryWeightStr) <= 0"
           @click="saveEntry"
         >
           {{ $t('common.save') }}
@@ -432,6 +435,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
+import { parseDecimalInput, normalizeDecimalStr, formatDecimalDisplay } from '@/utils/decimalInput'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -502,6 +506,11 @@ const showFirstTimeSetup = computed(() => {
 
 const setupWeight = ref<number | null>(null)
 const setupTargetWeight = ref<number | null>(null)
+
+// String refs for decimal fields
+const setupWeightStr = ref('')
+const setupTargetWeightStr = ref('')
+const entryWeightStr = ref('')
 const setupGoalType = ref<string | null>(null)
 const setupGoalDurationValue = ref<number | undefined>(undefined)
 const setupGoalDurationUnit = ref<'weeks' | 'months'>('weeks')
@@ -760,21 +769,26 @@ const openAddDialog = () => {
     weight: null,
     notes: '',
   }
+  entryWeightStr.value = ''
   entryDialogOpen.value = true
 }
 
 const openEditDialog = (entry: WeightLog) => {
   editingEntry.value = entry
+  const displayWeight = Number(fromKg(Number(entry.weight)).toFixed(1))
   entryForm.value = {
     date: entry.date.split('T')[0],
-    weight: Number(fromKg(Number(entry.weight)).toFixed(1)),
+    weight: displayWeight,
     notes: entry.notes || '',
   }
+  entryWeightStr.value = formatDecimalDisplay(displayWeight)
   entryDialogOpen.value = true
 }
 
 const saveEntry = async () => {
-  if (!entryForm.value.weight || entryForm.value.weight <= 0) return
+  const parsedWeight = parseDecimalInput(entryWeightStr.value)
+  if (parsedWeight <= 0) return
+  entryForm.value.weight = parsedWeight
   isSavingEntry.value = true
 
   try {
@@ -838,6 +852,8 @@ const doDelete = async () => {
 
 // First-time setup save
 const saveFirstTimeSetup = async () => {
+  setupWeight.value = parseDecimalInput(setupWeightStr.value) || null
+  setupTargetWeight.value = parseDecimalInput(setupTargetWeightStr.value) || null
   if (!setupWeight.value || setupWeight.value <= 0) return
   isSavingSetup.value = true
 
