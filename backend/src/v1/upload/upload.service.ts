@@ -56,6 +56,7 @@ export class UploadService {
 
     // Optimize for mobile: max 800px width, high compression
     await sharp(file.buffer)
+      .rotate()
       .resize(800, 800, {
         fit: 'inside',
         withoutEnlargement: true,
@@ -76,6 +77,7 @@ export class UploadService {
 
     // Avatar optimized: 400x400px, circular crop friendly
     await sharp(file.buffer)
+      .rotate()
       .resize(400, 400, {
         fit: 'cover',
         position: 'center',
@@ -106,6 +108,7 @@ export class UploadService {
     const filename = `${randomBytes(16).toString('hex')}.webp`;
     const filepath = path.join(this.mediaDir, filename);
     await sharp(file.buffer)
+      .rotate()
       .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
       .webp({ quality: 85 })
       .toFile(filepath);
@@ -137,6 +140,7 @@ export class UploadService {
     const filepath = path.join(this.progressPhotosDir, filename);
 
     await sharp(file.buffer)
+      .rotate()
       .resize(1080, 1920, {
         fit: 'inside',
         withoutEnlargement: true,

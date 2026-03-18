@@ -149,52 +149,48 @@ const handleFileSelect = async (event: Event) => {
 };
 
 const compressImage = async (file: File): Promise<File> => {
+  // createImageBitmap with imageOrientation: 'from-image' correctly applies
+  // EXIF rotation data, which ctx.drawImage() would otherwise ignore.
+  const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let width = bmp.width;
+  let height = bmp.height;
+  const maxDimension = 1200;
+
+  if (width > maxDimension || height > maxDimension) {
+    if (width > height) {
+      height = (height / width) * maxDimension;
+      width = maxDimension;
+    } else {
+      width = (width / height) * maxDimension;
+      height = maxDimension;
+    }
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx?.drawImage(bmp, 0, 0, width, height);
+  bmp.close();
+
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width = img.width;
-        let height = img.height;
-        const maxDimension = 1200;
-        
-        if (width > maxDimension || height > maxDimension) {
-          if (width > height) {
-            height = (height / width) * maxDimension;
-            width = maxDimension;
-          } else {
-            width = (width / height) * maxDimension;
-            height = maxDimension;
-          }
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(new File([blob], file.name, {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          }));
+        } else {
+          resolve(file);
         }
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        ctx?.drawImage(img, 0, 0, width, height);
-        
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              const compressedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
-                lastModified: Date.now(),
-              });
-              resolve(compressedFile);
-            } else {
-              resolve(file);
-            }
-          },
-          'image/jpeg',
-          0.85
-        );
-      };
-      img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+      },
+      'image/jpeg',
+      0.85
+    );
   });
 };
 
