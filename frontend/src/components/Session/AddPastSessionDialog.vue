@@ -159,21 +159,25 @@
               >
                 <span class="text-body-2 font-weight-bold" style="width: 40px">{{ s.set }}</span>
                 <v-text-field
-                  v-model.number="s.weight"
-                  type="number"
+                  :model-value="s.weight"
+                  type="text"
+                  inputmode="decimal"
                   variant="outlined"
                   density="compact"
                   hide-details
                   class="flex-grow-1"
+                  @update:model-value="s.weight = normalizeDecimalStr($event)"
                   @change="onWeightChange(ex.id, idx, s.weight)"
                 />
                 <v-text-field
-                  v-model.number="s.reps"
-                  type="number"
+                  :model-value="String(s.reps)"
+                  type="text"
+                  inputmode="numeric"
                   variant="outlined"
                   density="compact"
                   hide-details
                   class="flex-grow-1"
+                  @update:model-value="s.reps = parseIntInput($event)"
                 />
                 <v-checkbox
                   v-model="s.done"
@@ -241,14 +245,16 @@
 
           <!-- Duration (always shown) -->
           <v-text-field
-            v-model.number="activityDuration"
-            type="number"
+            :model-value="activityDurationStr"
+            type="text"
+            inputmode="decimal"
             :label="$t('schedule.duration')"
             variant="outlined"
             density="compact"
             hide-details
             class="bg-cardBg rounded-lg mb-5"
             suffix="min"
+            @update:model-value="activityDurationStr = normalizeDecimalStr($event)"
           />
 
           <!-- Conditional tracking fields based on selected activity -->
@@ -256,15 +262,16 @@
             <!-- Distance -->
             <v-text-field
               v-if="selectedActivity.trackDistance"
-              v-model.number="activityDistance"
-              type="number"
-              step="0.1"
+              :model-value="activityDistanceStr"
+              type="text"
+              inputmode="decimal"
               :label="$t('schedule.distance')"
               variant="outlined"
               density="compact"
               hide-details
               class="bg-cardBg rounded-lg mb-4"
               suffix="km"
+              @update:model-value="activityDistanceStr = normalizeDecimalStr($event)"
             />
 
             <!-- Calculated Pace (read-only) -->
@@ -283,40 +290,46 @@
             <!-- Elevation Gain -->
             <v-text-field
               v-if="selectedActivity.trackElevation"
-              v-model.number="activityElevationGain"
-              type="number"
+              :model-value="activityElevationGainStr"
+              type="text"
+              inputmode="decimal"
               :label="$t('schedule.elevationGain')"
               variant="outlined"
               density="compact"
               hide-details
               class="bg-cardBg rounded-lg mb-4"
               suffix="m"
+              @update:model-value="activityElevationGainStr = normalizeDecimalStr($event)"
             />
 
             <!-- Max Elevation -->
             <v-text-field
               v-if="selectedActivity.trackElevation"
-              v-model.number="activityMaxElevation"
-              type="number"
+              :model-value="activityMaxElevationStr"
+              type="text"
+              inputmode="decimal"
               :label="$t('schedule.maxElevation')"
               variant="outlined"
               density="compact"
               hide-details
               class="bg-cardBg rounded-lg mb-4"
               suffix="m"
+              @update:model-value="activityMaxElevationStr = normalizeDecimalStr($event)"
             />
 
             <!-- Calories -->
             <v-text-field
               v-if="selectedActivity.trackCalories"
-              v-model.number="activityCalories"
-              type="number"
+              :model-value="activityCaloriesStr"
+              type="text"
+              inputmode="decimal"
               :label="$t('schedule.calories')"
               variant="outlined"
               density="compact"
               hide-details
               class="bg-cardBg rounded-lg mb-4"
               suffix="kcal"
+              @update:model-value="activityCaloriesStr = normalizeDecimalStr($event)"
             />
           </template>
         </template>
@@ -373,10 +386,11 @@ import { logPastWorkoutSession } from '@/services/workoutSession.service'
 import { createActivityLog } from '@/services/activityLog.service'
 import type { Activity } from '@/interfaces/Activity.interface'
 import type { Workout } from '@/interfaces/Workout.interface'
+import { parseDecimalInput, parseIntInput, normalizeDecimalStr } from '@/utils/decimalInput'
 
 interface InlineSet {
   set: number
-  weight: number
+  weight: string  // stored as string to allow decimal input like "90." mid-typing
   reps: number
   done: boolean
 }
@@ -438,6 +452,13 @@ const activityElevationGain = ref<number | undefined>(undefined)
 const activityMaxElevation = ref<number | undefined>(undefined)
 const activityCalories = ref<number | undefined>(undefined)
 
+// String refs for activity decimal fields
+const activityDurationStr = ref('30')
+const activityDistanceStr = ref('')
+const activityElevationGainStr = ref('')
+const activityMaxElevationStr = ref('')
+const activityCaloriesStr = ref('')
+
 // --- computeds ---
 const formattedDate = computed(() => {
   const d = new Date(props.date + 'T12:00:00')
@@ -461,8 +482,10 @@ const selectedActivity = computed<Activity | undefined>(() =>
 )
 
 const calculatedPace = computed(() => {
-  if (!activityDuration.value || !activityDistance.value) return null
-  const paceMinutes = activityDuration.value / activityDistance.value
+  const dur = parseDecimalInput(activityDurationStr.value)
+  const dist = parseDecimalInput(activityDistanceStr.value)
+  if (!dur || !dist) return null
+  const paceMinutes = dur / dist
   const minutes = Math.floor(paceMinutes)
   const seconds = Math.round((paceMinutes - minutes) * 60)
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
@@ -472,7 +495,7 @@ const canSubmit = computed(() => {
   if (sessionType.value === 'workout') {
     return !!selectedWorkoutId.value && !!startTime.value && !!endTime.value
   } else {
-    return !!selectedActivityId.value && activityDuration.value > 0
+    return !!selectedActivityId.value && parseDecimalInput(activityDurationStr.value) > 0
   }
 })
 
@@ -489,6 +512,11 @@ watch(dialogOpen, async open => {
     activityElevationGain.value = undefined
     activityMaxElevation.value = undefined
     activityCalories.value = undefined
+    activityDurationStr.value = '30'
+    activityDistanceStr.value = ''
+    activityElevationGainStr.value = ''
+    activityMaxElevationStr.value = ''
+    activityCaloriesStr.value = ''
     notesText.value = ''
     // Clear exerciseSets
     Object.keys(exerciseSets).forEach(k => delete exerciseSets[Number(k)])
@@ -523,7 +551,7 @@ watch(selectedWorkoutId, () => {
     for (let i = 1; i <= ex.sets; i++) {
       sets.push({
         set: i,
-        weight: ex.weight,
+        weight: String(ex.weight),
         reps: ex.reps,
         done: true,
       })
@@ -550,7 +578,7 @@ function addSet(exId: number) {
   const lastSet = sets[sets.length - 1]
   sets.push({
     set: sets.length + 1,
-    weight: lastSet?.weight ?? 0,
+    weight: lastSet?.weight ?? '0',
     reps: lastSet?.reps ?? 0,
     done: true,
   })
@@ -565,14 +593,14 @@ function removeSet(exId: number, idx: number) {
   })
 }
 
-function onWeightChange(exId: number, idx: number, newWeight: number) {
+function onWeightChange(exId: number, idx: number, newWeightStr: string) {
   const sets = exerciseSets[exId]
   if (!sets) return
   const subsequentSets = sets.slice(idx + 1)
   if (subsequentSets.length > 0) {
     pendingExId.value = exId
     pendingSetIndex.value = idx
-    pendingWeight.value = newWeight
+    pendingWeight.value = parseDecimalInput(newWeightStr)
     pendingReps.value = sets[idx].reps
     showPropagateDialog.value = true
   }
@@ -583,7 +611,7 @@ function confirmPropagate(shouldPropagate: boolean) {
     const sets = exerciseSets[pendingExId.value]
     if (sets) {
       for (let i = pendingSetIndex.value + 1; i < sets.length; i++) {
-        sets[i].weight = pendingWeight.value
+        sets[i].weight = String(pendingWeight.value)
         sets[i].reps = pendingReps.value
       }
     }
@@ -618,7 +646,7 @@ async function submit() {
               exerciseId: ex.exercise.id,
               sets: doneSets.map(s => ({
                 setNumber: s.set,
-                weight: s.weight,
+                weight: parseDecimalInput(s.weight),
                 reps: s.reps,
               })),
             })
@@ -638,11 +666,11 @@ async function submit() {
       await createActivityLog({
         activityId: selectedActivityId.value!,
         date: props.date,
-        duration: activityDuration.value,
-        distance: activityDistance.value || undefined,
-        elevationGain: activityElevationGain.value || undefined,
-        maxElevation: activityMaxElevation.value || undefined,
-        calories: activityCalories.value || undefined,
+        duration: parseDecimalInput(activityDurationStr.value),
+        distance: activityDistanceStr.value ? parseDecimalInput(activityDistanceStr.value) : undefined,
+        elevationGain: activityElevationGainStr.value ? parseDecimalInput(activityElevationGainStr.value) : undefined,
+        maxElevation: activityMaxElevationStr.value ? parseDecimalInput(activityMaxElevationStr.value) : undefined,
+        calories: activityCaloriesStr.value ? parseDecimalInput(activityCaloriesStr.value) : undefined,
         notes: notesText.value || undefined,
         scheduledSessionId: props.preselectedScheduledSessionId ?? undefined,
       })

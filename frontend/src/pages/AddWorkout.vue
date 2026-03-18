@@ -16,7 +16,6 @@
 <template>
   <div>
     <ExitHeader :title="$t('workout.workoutTitle')" :show-menu="false" />
-    <!-- TODO: When click on start new workout a list of workouts show and you can choose one, see details ect -->
     <div class="mx-5 d-flex flex-column ga-5">
       <div class="d-flex flex-column ga-4">
         <h1 class="text-h6 text-textPrimary">{{ $t('home.quickStart') }}</h1>
@@ -34,7 +33,9 @@
             <v-icon size="30" color="primary">mdi-lightning-bolt</v-icon>
             <div class="text-subtitle-1 font-weight-medium text-textPrimary mt-2">
               <h1 class="text-body-1">{{ $t('home.emptyWorkout') }}</h1>
-              <p class="text-caption text-textSecondary">{{ $t('home.emptyWorkoutDescription') }}</p>
+              <p class="text-caption text-textSecondary">
+                {{ $t('home.emptyWorkoutDescription') }}
+              </p>
             </div>
           </v-card>
           <v-card

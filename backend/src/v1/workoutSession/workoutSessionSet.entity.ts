@@ -29,7 +29,7 @@ export class WorkoutSessionSet {
   @Column()
   setNumber: number;
 
-  @Column({ nullable: true })
+  @Column({ type: 'decimal', precision: 6, scale: 2, nullable: true })
   weight: number;
 
   @Column({ nullable: true })

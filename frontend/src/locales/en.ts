@@ -280,7 +280,7 @@ export default {
 
     // Forgot / reset password
     forgotPasswordTitle: 'Forgot password?',
-    forgotPasswordSubtitle: 'Enter your email and we\'ll send you a reset code.',
+    forgotPasswordSubtitle: "Enter your email and we'll send you a reset code.",
     sendResetCode: 'Send reset code',
     backToLogin: 'Back to login',
     resetCodeSent: 'Reset code sent! Check your email.',
@@ -337,6 +337,7 @@ export default {
     errorSaving: 'Error saving preferences',
     primaryGoalRequired: 'Primary goal is required',
     dateOfBirthRequired: 'Date of birth is required',
+    mustBeAtLeast16: 'You must be at least 16 years old',
     genderRequired: 'Gender is required',
   },
   errors: {

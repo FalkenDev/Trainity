@@ -332,6 +332,7 @@ export default {
     errorSaving: 'Fel vid sparande av inställningar',
     primaryGoalRequired: 'Primärt mål krävs',
     dateOfBirthRequired: 'Födelsedatum krävs',
+    mustBeAtLeast16: 'Du måste vara minst 16 år gammal',
     genderRequired: 'Kön krävs',
   },
   errors: {

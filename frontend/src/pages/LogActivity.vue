@@ -93,13 +93,15 @@
 
             <!-- Duration (required) -->
             <v-text-field
-              v-model.number="formData.duration"
+              :model-value="durationStr"
               :label="$t('activity.duration')"
               :rules="[rules.required, rules.positive]"
-              type="number"
+              type="text"
+              inputmode="decimal"
               suffix="min"
               variant="outlined"
               class="mb-4"
+              @update:model-value="durationStr = normalizeDecimalStr($event)"
             />
 
             <!-- Conditional fields based on selected activity -->
@@ -107,13 +109,14 @@
               <!-- Distance -->
               <v-text-field
                 v-if="selectedActivity.trackDistance"
-                v-model.number="formData.distance"
+                :model-value="distanceStr"
                 :label="$t('activity.distance')"
-                type="number"
-                step="0.1"
+                type="text"
+                inputmode="decimal"
                 suffix="km"
                 variant="outlined"
                 class="mb-4"
+                @update:model-value="distanceStr = normalizeDecimalStr($event)"
               />
 
               <!-- Calculated Pace (read-only) -->
@@ -130,34 +133,40 @@
               <!-- Elevation Gain -->
               <v-text-field
                 v-if="selectedActivity.trackElevation"
-                v-model.number="formData.elevationGain"
+                :model-value="elevationGainStr"
                 :label="$t('activity.elevationGain')"
-                type="number"
+                type="text"
+                inputmode="decimal"
                 suffix="m"
                 variant="outlined"
                 class="mb-4"
+                @update:model-value="elevationGainStr = normalizeDecimalStr($event)"
               />
 
               <!-- Max Elevation -->
               <v-text-field
                 v-if="selectedActivity.trackElevation"
-                v-model.number="formData.maxElevation"
+                :model-value="maxElevationStr"
                 :label="$t('activity.maxElevation')"
-                type="number"
+                type="text"
+                inputmode="decimal"
                 suffix="m"
                 variant="outlined"
                 class="mb-4"
+                @update:model-value="maxElevationStr = normalizeDecimalStr($event)"
               />
 
               <!-- Calories -->
               <v-text-field
                 v-if="selectedActivity.trackCalories"
-                v-model.number="formData.calories"
+                :model-value="caloriesStr"
                 :label="$t('activity.calories')"
-                type="number"
+                type="text"
+                inputmode="decimal"
                 suffix="kcal"
                 variant="outlined"
                 class="mb-4"
+                @update:model-value="caloriesStr = normalizeDecimalStr($event)"
               />
             </template>
 
@@ -195,6 +204,7 @@ import type { Activity, ActivityIcon, CreateActivityLogDto } from '@/interfaces/
 import CreateActivity from '@/components/Activity/CreateActivity.vue'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
+import { parseDecimalInput, normalizeDecimalStr } from '@/utils/decimalInput'
 
 const router = useRouter()
 const route = useRoute()
@@ -221,6 +231,13 @@ const formData = ref<CreateActivityLogDto>({
 })
 
 const isSubmitting = ref(false)
+
+// String refs for decimal fields
+const durationStr = ref('')
+const distanceStr = ref('')
+const elevationGainStr = ref('')
+const maxElevationStr = ref('')
+const caloriesStr = ref('')
 
 const rules = {
   required: (v: string | number | null) => !!v || t('common.fieldRequired'),
@@ -275,6 +292,11 @@ function openLogDialog(activity: Activity) {
       ? Number(route.query.scheduledSessionId)
       : undefined,
   }
+  durationStr.value = ''
+  distanceStr.value = ''
+  elevationGainStr.value = ''
+  maxElevationStr.value = ''
+  caloriesStr.value = ''
   isLogDialogOpen.value = true
 }
 
@@ -283,12 +305,12 @@ function closeLogDialog() {
   selectedActivity.value = null
 }
 
-// Calculate pace from duration and distance
+// Calculate pace from duration and distance string refs
 const calculatedPace = computed(() => {
-  if (!formData.value.duration || !formData.value.distance) {
-    return null
-  }
-  const paceMinutes = formData.value.duration / formData.value.distance
+  const dur = parseDecimalInput(durationStr.value)
+  const dist = parseDecimalInput(distanceStr.value)
+  if (!dur || !dist) return null
+  const paceMinutes = dur / dist
   const minutes = Math.floor(paceMinutes)
   const seconds = Math.round((paceMinutes - minutes) * 60)
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
@@ -297,6 +319,13 @@ const calculatedPace = computed(() => {
 async function handleSubmit() {
   const { valid } = await formRef.value.validate()
   if (!valid) return
+
+  // Parse string refs to numbers before submitting
+  formData.value.duration = parseDecimalInput(durationStr.value)
+  formData.value.distance = distanceStr.value ? parseDecimalInput(distanceStr.value) : undefined
+  formData.value.elevationGain = elevationGainStr.value ? parseDecimalInput(elevationGainStr.value) : undefined
+  formData.value.maxElevation = maxElevationStr.value ? parseDecimalInput(maxElevationStr.value) : undefined
+  formData.value.calories = caloriesStr.value ? parseDecimalInput(caloriesStr.value) : undefined
 
   isSubmitting.value = true
   try {

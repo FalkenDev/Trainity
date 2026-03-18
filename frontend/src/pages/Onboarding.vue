@@ -42,32 +42,35 @@
         </div>
 
         <v-text-field
-          v-model.number="formData.weight"
+          :model-value="weightStr"
           class="mb-4"
           :label="`${$t('onboarding.weight')} (${$t('common.optional')})`"
           :suffix="formData.unitScale === 'metric' ? 'kg' : 'lbs'"
-          type="number"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           variant="outlined"
           hide-details
+          @update:model-value="weightStr = normalizeDecimalStr($event)"
         />
 
         <v-text-field
-          v-model.number="formData.height"
+          :model-value="heightStr"
           class="mb-4"
           :label="`${$t('onboarding.height')} (${$t('common.optional')})`"
           :suffix="formData.unitScale === 'metric' ? 'cm' : 'in'"
-          type="number"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           variant="outlined"
           hide-details
+          @update:model-value="heightStr = normalizeDecimalStr($event)"
         />
 
         <v-text-field
           v-model="formData.dateOfBirth"
           class="mb-4"
           :label="$t('onboarding.dateOfBirth')"
-          :rules="[v => !!v || t('onboarding.dateOfBirthRequired')]"
+          :rules="dobRules"
+          :max="sixteenYearsAgo"
           type="date"
           variant="outlined"
         />
@@ -130,14 +133,15 @@
         </div>
 
         <v-text-field
-          v-model.number="formData.targetWeight"
+          :model-value="targetWeightStr"
           class="mb-4"
           :label="`${$t('onboarding.targetWeight')} (${$t('common.optional')})`"
           :suffix="formData.unitScale === 'metric' ? 'kg' : 'lbs'"
-          type="number"
-          step="0.1"
+          type="text"
+          inputmode="decimal"
           variant="outlined"
           hide-details
+          @update:model-value="targetWeightStr = normalizeDecimalStr($event)"
         />
 
         <div class="mb-4">
@@ -218,6 +222,7 @@ import { updateUserPreferences } from '@/services/user.service'
 import { createWeightLog } from '@/services/weightLog.service'
 import { toast } from 'vuetify-sonner'
 import type { VForm } from 'vuetify/components'
+import { parseDecimalInput, normalizeDecimalStr } from '@/utils/decimalInput'
 
 const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
@@ -258,13 +263,19 @@ const goalOptions = computed(() => [
   { title: t('onboarding.noSpecificGoal'), value: 'no_specific_goal' },
 ])
 
-const timeframeOptions = computed(() => [
-  { title: t('onboarding.fourWeeks'), value: 4 },
-  { title: t('onboarding.eightWeeks'), value: 8 },
-  { title: t('onboarding.twelveWeeks'), value: 12 },
-  { title: t('onboarding.sixMonths'), value: 24 },
-  { title: t('onboarding.oneYear'), value: 52 },
-])
+const maxDate = new Date()
+maxDate.setFullYear(maxDate.getFullYear() - 16)
+const sixteenYearsAgo = maxDate.toISOString().split('T')[0]
+
+const dobRules = [
+  (v: string) => !!v || t('onboarding.dateOfBirthRequired'),
+  (v: string) => v <= sixteenYearsAgo || t('onboarding.mustBeAtLeast16'),
+]
+
+// String refs for decimal fields — allow both "." and "," as decimal separator
+const weightStr = ref('')
+const heightStr = ref('')
+const targetWeightStr = ref('')
 
 const goalDurationValue = ref<number | undefined>(undefined)
 const goalDurationUnit = ref<'weeks' | 'months'>('weeks')
@@ -306,6 +317,11 @@ const completeOnboarding = async () => {
 
   loading.value = true
   try {
+    // Parse decimal string fields
+    formData.value.weight = weightStr.value ? parseDecimalInput(weightStr.value) : undefined
+    formData.value.height = heightStr.value ? parseDecimalInput(heightStr.value) : undefined
+    formData.value.targetWeight = targetWeightStr.value ? parseDecimalInput(targetWeightStr.value) : undefined
+
     const preferences: Record<string, unknown> = {
       ...formData.value,
       onboardingCompleted: true,

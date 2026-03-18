@@ -41,26 +41,30 @@
           {{ $t('session.weightLabel') }}
         </p>
         <v-text-field
-          v-model.number="editableSet.weight"
-          type="number"
+          :model-value="weightStr"
+          type="text"
+          inputmode="decimal"
           variant="solo-filled"
           flat
           :suffix="$t('units.kgShort')"
           class="mb-4"
           autofocus
           single-line
+          @update:model-value="weightStr = normalizeDecimalStr($event)"
         />
 
         <p class="text-grey-lighten-1 mb-2">
           {{ $t('session.repetitionsLabel') }}
         </p>
         <v-text-field
-          v-model.number="editableSet.reps"
-          type="number"
+          :model-value="String(editableSet.reps)"
+          type="text"
+          inputmode="numeric"
           variant="solo-filled"
           flat
           :suffix="$t('units.repsShort')"
           single-line
+          @update:model-value="editableSet.reps = parseIntInput($event)"
         />
       </v-card-text>
 
@@ -83,6 +87,7 @@
 
 <script lang="ts" setup>
 import { type PropType } from 'vue';
+import { parseDecimalInput, parseIntInput, normalizeDecimalStr, formatDecimalDisplay } from '@/utils/decimalInput';
 
 // Define the structure for a workout set
 interface WorkoutSet {
@@ -107,17 +112,20 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'save', 'delete']);
 
 const editableSet = ref<WorkoutSet | null>(null);
+const weightStr = ref('');
 
 watch(
   () => props.set,
   (newSet) => {
     editableSet.value = newSet ? JSON.parse(JSON.stringify(newSet)) : null;
+    weightStr.value = formatDecimalDisplay(editableSet.value?.weight);
   },
   { immediate: true },
 );
 
 function onSave() {
   if (editableSet.value) {
+    editableSet.value.weight = parseDecimalInput(weightStr.value);
     emit('save', editableSet.value);
   }
   emit('update:modelValue', false);

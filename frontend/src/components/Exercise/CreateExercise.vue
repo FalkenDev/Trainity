@@ -39,7 +39,9 @@
 
       <!-- Exercise Type -->
       <div class="mt-4">
-        <p class="text-body-2 text-textSecondary mb-2">{{ $t('exerciseForm.exerciseTypeLabel') }}</p>
+        <p class="text-body-2 text-textSecondary mb-2">
+          {{ $t('exerciseForm.exerciseTypeLabel') }}
+        </p>
         <v-chip-group v-model="form.exerciseType" selected-class="bg-primary">
           <v-chip
             v-for="item in exerciseTypeItems"
