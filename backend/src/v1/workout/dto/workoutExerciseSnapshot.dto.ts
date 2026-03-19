@@ -34,8 +34,8 @@ export class ExerciseSnapshotDto {
   @ApiProperty({ required: false })
   description?: string;
 
-  @ApiProperty({ type: PrimaryMuscleGroupSnapshotDto, required: false })
-  primaryMuscleGroup?: PrimaryMuscleGroupSnapshotDto | null;
+  @ApiProperty({ type: [PrimaryMuscleGroupSnapshotDto] })
+  primaryMuscleGroups: PrimaryMuscleGroupSnapshotDto[];
 
   @ApiProperty({ type: [MuscleGroupResponseDto] })
   muscleGroups: MuscleGroupResponseDto[];

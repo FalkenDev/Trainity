@@ -20,7 +20,6 @@ import {
   IsArray,
   IsInt,
   IsEnum,
-  Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ExerciseType } from '../exercise.entity';
@@ -65,13 +64,15 @@ export class CreateExerciseDto {
   muscleGroupIds?: number[];
 
   @ApiProperty({
-    example: 1,
-    description: 'Primary muscle group ID',
+    example: [1, 2],
+    description: 'Primary muscle group IDs',
     required: false,
+    type: [Number],
   })
   @IsOptional()
-  @IsInt()
-  primaryMuscleGroupId?: number;
+  @IsArray()
+  @IsInt({ each: true })
+  primaryMuscleGroupIds?: number[];
 
   @ApiProperty({
     example: ['Barbell', 'Bench'],

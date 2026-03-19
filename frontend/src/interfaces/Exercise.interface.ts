@@ -31,7 +31,7 @@ export interface Exercise {
   image?: string | null
   exerciseType?: ExerciseType | null
   muscleGroups: MuscleGroup[]
-  primaryMuscleGroup?: MuscleGroup | null
+  primaryMuscleGroups?: MuscleGroup[]
   equipment?: string[]
   instructions?: string[]
   proTips?: string[]
@@ -49,7 +49,7 @@ export interface CreateExercise {
   image?: string | null
   exerciseType?: ExerciseType | null
   muscleGroupIds: number[]
-  primaryMuscleGroupId?: number | null
+  primaryMuscleGroupIds?: number[]
   equipment?: string[]
   instructions?: string[]
   proTips?: string[]
@@ -63,7 +63,7 @@ export interface UpdateExercise {
   image?: string | null
   exerciseType?: ExerciseType | null
   muscleGroupIds: number[]
-  primaryMuscleGroupId?: number | null
+  primaryMuscleGroupIds?: number[]
   equipment?: string[]
   instructions?: string[]
   proTips?: string[]

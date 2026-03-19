@@ -78,9 +78,9 @@
           <v-chip
             v-for="mg in exercise.muscleGroups"
             :key="mg.id"
-            :color="mg.id === exercise.primaryMuscleGroup?.id ? 'primary' : 'textSecondary'"
+            :color="exercise.primaryMuscleGroups?.some(pm => pm.id === mg.id) ? 'primary' : 'textSecondary'"
             :style="
-              mg.id === exercise.primaryMuscleGroup?.id
+              exercise.primaryMuscleGroups?.some(pm => pm.id === mg.id)
                 ? 'border: 1px solid #abff1a'
                 : 'border: 1px solid rgb(var(--v-theme-borderColor))'
             "
@@ -232,8 +232,8 @@ const exercise = computed(() => {
 })
 
 const primaryMuscleName = computed(() => {
-  if (exercise.value?.primaryMuscleGroup)
-    return t(`muscleGroups.${exercise.value.primaryMuscleGroup.name}`)
+  if (exercise.value?.primaryMuscleGroups?.length)
+    return exercise.value.primaryMuscleGroups.map(mg => t(`muscleGroups.${mg.name}`)).join(', ')
   if (exercise.value?.muscleGroups?.length)
     return t(`muscleGroups.${exercise.value.muscleGroups[0].name}`)
   return null

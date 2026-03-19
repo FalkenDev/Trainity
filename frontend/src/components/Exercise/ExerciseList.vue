@@ -212,7 +212,8 @@ const resetFilters = () => {
 const displayName = (exercise: Exercise) => displayExerciseName({ t }, exercise)
 
 const getPrimaryMuscle = (exercise: Exercise): string | null => {
-  if (exercise.primaryMuscleGroup) return t(`muscleGroups.${exercise.primaryMuscleGroup.name}`)
+  if (exercise.primaryMuscleGroups?.length)
+    return exercise.primaryMuscleGroups.map(mg => t(`muscleGroups.${mg.name}`)).join(', ')
   if (exercise.muscleGroups?.length) return t(`muscleGroups.${exercise.muscleGroups[0].name}`)
   return null
 }

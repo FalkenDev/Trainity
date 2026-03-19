@@ -77,8 +77,8 @@ export class ExerciseResponseDto {
   @ApiProperty({ required: false })
   deletedAt?: Date;
 
-  @ApiProperty({ type: MuscleGroupResponseDto, required: false })
-  primaryMuscleGroup?: MuscleGroupResponseDto;
+  @ApiProperty({ type: [MuscleGroupResponseDto] })
+  primaryMuscleGroups: MuscleGroupResponseDto[];
 
   @ApiProperty({ type: [MuscleGroupResponseDto] })
   muscleGroups: MuscleGroupResponseDto[];
