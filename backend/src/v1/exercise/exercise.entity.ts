@@ -79,8 +79,9 @@ export class Exercise {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   createdBy: User;
 
-  @ManyToOne(() => MuscleGroup, { nullable: true, eager: false })
-  primaryMuscleGroup?: MuscleGroup;
+  @ManyToMany(() => MuscleGroup)
+  @JoinTable()
+  primaryMuscleGroups: MuscleGroup[];
 
   @ManyToMany(() => MuscleGroup, (mg) => mg.exercises, { cascade: true })
   @JoinTable()

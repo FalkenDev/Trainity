@@ -193,9 +193,15 @@
                 </span>
               </p>
             </div>
-            <div v-if="exercise.exercise.primaryMuscleGroup" class="flex-shrink-0 ml-2">
-              <v-chip size="x-small" variant="outlined" color="textSecondary">
-                {{ $t(`muscleGroups.${exercise.exercise.primaryMuscleGroup.name}`) }}
+            <div v-if="exercise.exercise.primaryMuscleGroups?.length" class="flex-shrink-0 ml-2 d-flex ga-1 flex-wrap">
+              <v-chip
+                v-for="pm in exercise.exercise.primaryMuscleGroups"
+                :key="pm.id"
+                size="x-small"
+                variant="outlined"
+                color="textSecondary"
+              >
+                {{ $t(`muscleGroups.${pm.name}`) }}
               </v-chip>
             </div>
           </v-card>

@@ -50,15 +50,14 @@ export class ExerciseService {
       instructions: exercise.instructions || [],
       proTips: exercise.proTips || [],
       mistakes: exercise.mistakes || [],
-      primaryMuscleGroup: exercise.primaryMuscleGroup
-        ? {
-            id: exercise.primaryMuscleGroup.id,
-            name: exercise.primaryMuscleGroup.name,
-            description: exercise.primaryMuscleGroup.description,
-            createdAt: exercise.primaryMuscleGroup.createdAt,
-            updatedAt: exercise.primaryMuscleGroup.updatedAt,
-          }
-        : undefined,
+      primaryMuscleGroups:
+        exercise.primaryMuscleGroups?.map((mg) => ({
+          id: mg.id,
+          name: mg.name,
+          description: mg.description,
+          createdAt: mg.createdAt,
+          updatedAt: mg.updatedAt,
+        })) || [],
       muscleGroups:
         exercise.muscleGroups?.map((mg) => ({
           id: mg.id,
@@ -86,7 +85,7 @@ export class ExerciseService {
   async findAll(userId: number): Promise<ExerciseResponseDto[]> {
     const exercises = await this.exerciseRepo.find({
       where: { createdBy: { id: userId } },
-      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
+      relations: ['muscleGroups', 'primaryMuscleGroups', 'media'],
     });
 
     return this.toResponseList(exercises);
@@ -95,7 +94,7 @@ export class ExerciseService {
   async findOne(id: number, userId: number): Promise<ExerciseResponseDto> {
     const exercise = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
+      relations: ['muscleGroups', 'primaryMuscleGroups', 'media'],
       withDeleted: true,
     });
 
@@ -110,7 +109,7 @@ export class ExerciseService {
     dto: CreateExerciseDto,
     userId: number,
   ): Promise<ExerciseResponseDto> {
-    const { muscleGroupIds, primaryMuscleGroupId, ...exerciseData } = dto;
+    const { muscleGroupIds, primaryMuscleGroupIds, ...exerciseData } = dto;
 
     const exercise = this.exerciseRepo.create({
       ...exerciseData,
@@ -122,9 +121,11 @@ export class ExerciseService {
         await this.muscleGroupService.findByIds(muscleGroupIds);
     }
 
-    if (primaryMuscleGroupId) {
-      exercise.primaryMuscleGroup =
-        await this.muscleGroupService.findOne(primaryMuscleGroupId);
+    if (primaryMuscleGroupIds && primaryMuscleGroupIds.length > 0) {
+      exercise.primaryMuscleGroups =
+        await this.muscleGroupService.findByIds(primaryMuscleGroupIds);
+    } else {
+      exercise.primaryMuscleGroups = [];
     }
 
     const saved = await this.exerciseRepo.save(exercise);
@@ -138,11 +139,11 @@ export class ExerciseService {
     dto: UpdateExerciseDto,
     userId: number,
   ): Promise<ExerciseResponseDto> {
-    const { muscleGroupIds, primaryMuscleGroupId, ...exerciseData } = dto;
+    const { muscleGroupIds, primaryMuscleGroupIds, ...exerciseData } = dto;
 
     const existing = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
+      relations: ['muscleGroups', 'primaryMuscleGroups', 'media'],
     });
 
     if (!existing) {
@@ -168,14 +169,11 @@ export class ExerciseService {
         await this.muscleGroupService.findByIds(muscleGroupIds);
     }
 
-    // Handle primaryMuscleGroupId
-    if (primaryMuscleGroupId !== undefined) {
-      if (primaryMuscleGroupId === null) {
-        existing.primaryMuscleGroup = undefined;
-      } else {
-        existing.primaryMuscleGroup =
-          await this.muscleGroupService.findOne(primaryMuscleGroupId);
-      }
+    if (primaryMuscleGroupIds !== undefined) {
+      existing.primaryMuscleGroups =
+        primaryMuscleGroupIds.length > 0
+          ? await this.muscleGroupService.findByIds(primaryMuscleGroupIds)
+          : [];
     }
 
     const updated = await this.exerciseRepo.save(existing);
@@ -202,7 +200,7 @@ export class ExerciseService {
   ): Promise<ExerciseResponseDto> {
     const exercise = await this.exerciseRepo.findOne({
       where: { id, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
+      relations: ['muscleGroups', 'primaryMuscleGroups', 'media'],
     });
 
     if (!exercise) {
@@ -231,7 +229,7 @@ export class ExerciseService {
   ): Promise<ExerciseResponseDto> {
     const exercise = await this.exerciseRepo.findOne({
       where: { id: exerciseId, createdBy: { id: userId } },
-      relations: ['muscleGroups', 'primaryMuscleGroup', 'media'],
+      relations: ['muscleGroups', 'primaryMuscleGroups', 'media'],
     });
 
     if (!exercise) {

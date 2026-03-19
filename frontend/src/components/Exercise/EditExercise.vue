@@ -74,10 +74,10 @@
 
       <!-- Primary Muscle -->
       <FullscreenListSelect
-        v-model="form.primaryMuscleGroupId"
+        v-model="form.primaryMuscleGroupIds"
         :label="$t('exerciseForm.primaryMuscleLabel')"
         :items="selectedMuscleGroupItems.map(g => ({ title: g.name, value: g.id }))"
-        clearable
+        multiple
         class="mt-6"
         :disabled="form.muscleGroupIds.length === 0"
       />
@@ -223,7 +223,7 @@ const form = ref({
   description: props.exercise.description || '',
   exerciseType: props.exercise.exerciseType || (null as ExerciseType | null | undefined),
   muscleGroupIds: props.exercise.muscleGroups?.map(mg => mg.id) || ([] as number[]),
-  primaryMuscleGroupId: props.exercise.primaryMuscleGroup?.id || (null as number | null),
+  primaryMuscleGroupIds: props.exercise.primaryMuscleGroups?.map(mg => mg.id) || ([] as number[]),
   equipment: props.exercise.equipment || ([] as string[]),
   instructions: props.exercise.instructions || ([] as string[]),
   proTips: props.exercise.proTips || ([] as string[]),
@@ -249,11 +249,9 @@ watch(
 watch(
   () => form.value.muscleGroupIds,
   ids => {
-    if (ids.length === 1) {
-      form.value.primaryMuscleGroupId = ids[0]
-    } else if (form.value.primaryMuscleGroupId && !ids.includes(form.value.primaryMuscleGroupId)) {
-      form.value.primaryMuscleGroupId = null
-    }
+    form.value.primaryMuscleGroupIds = form.value.primaryMuscleGroupIds.filter(id =>
+      ids.includes(id)
+    )
   },
   { immediate: true }
 )
@@ -281,7 +279,7 @@ const saveExercise = async () => {
       description: form.value.description.trim() || undefined,
       exerciseType: form.value.exerciseType || undefined,
       muscleGroupIds: form.value.muscleGroupIds,
-      primaryMuscleGroupId: form.value.primaryMuscleGroupId || undefined,
+      primaryMuscleGroupIds: form.value.primaryMuscleGroupIds.length > 0 ? form.value.primaryMuscleGroupIds : undefined,
       equipment: form.value.equipment.length > 0 ? form.value.equipment : undefined,
       instructions:
         form.value.instructions.filter(s => s.trim() !== '').length > 0

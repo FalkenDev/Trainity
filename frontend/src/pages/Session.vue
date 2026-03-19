@@ -270,7 +270,7 @@ const onViewExerciseDetails = (exerciseId: number) => {
       description: ex.description,
       image: ex.img,
       muscleGroups: ex.muscleGroups,
-      primaryMuscleGroup: ex.primaryMuscleGroup,
+      primaryMuscleGroups: ex.primaryMuscleGroups,
       createdBy: ex.createdBy,
       createdAt: ex.createdAt,
       updatedAt: ex.updatedAt,

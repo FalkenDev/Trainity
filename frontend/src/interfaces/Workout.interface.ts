@@ -44,7 +44,7 @@ export interface Exercise {
     description?: string | null
     img: string
     muscleGroups: MuscleGroup[]
-    primaryMuscleGroup?: { id: number; name: string } | null
+    primaryMuscleGroups?: { id: number; name: string }[]
     createdBy: string
     createdAt: string
     updatedAt: string

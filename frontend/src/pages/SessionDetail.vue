@@ -179,14 +179,17 @@
                   </p>
                 </div>
                 <div class="d-flex align-center ga-1 flex-shrink-0">
-                  <v-chip
-                    v-if="ex.exercise?.primaryMuscleGroup"
-                    size="x-small"
-                    variant="outlined"
-                    color="textSecondary"
-                  >
-                    {{ $t(ex.exercise.primaryMuscleGroup.name) }}
-                  </v-chip>
+                  <template v-if="ex.exercise?.primaryMuscleGroups?.length">
+                    <v-chip
+                      v-for="pm in ex.exercise.primaryMuscleGroups"
+                      :key="pm.id"
+                      size="x-small"
+                      variant="outlined"
+                      color="textSecondary"
+                    >
+                      {{ $t(`muscleGroups.${pm.name}`) }}
+                    </v-chip>
+                  </template>
                   <v-icon color="grey-lighten-1" size="16">mdi-chevron-right</v-icon>
                 </div>
               </div>

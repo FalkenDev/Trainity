@@ -159,7 +159,7 @@ export class WorkoutService {
         'exercises',
         'exercises.exercise',
         'exercises.exercise.muscleGroups',
-        'exercises.exercise.primaryMuscleGroup',
+        'exercises.exercise.primaryMuscleGroups',
         'targetMuscleGroups',
         'createdBy',
       ],
@@ -176,7 +176,7 @@ export class WorkoutService {
         'exercises',
         'exercises.exercise',
         'exercises.exercise.muscleGroups',
-        'exercises.exercise.primaryMuscleGroup',
+        'exercises.exercise.primaryMuscleGroups',
         'targetMuscleGroups',
         'createdBy',
       ],
@@ -259,7 +259,7 @@ export class WorkoutService {
       relations: [
         'exercises',
         'exercises.exercise',
-        'exercises.exercise.primaryMuscleGroup',
+        'exercises.exercise.primaryMuscleGroups',
         'createdBy',
       ],
     });
@@ -313,7 +313,7 @@ export class WorkoutService {
           'exercises',
           'exercises.exercise',
           'exercises.exercise.muscleGroups',
-          'exercises.exercise.primaryMuscleGroup',
+          'exercises.exercise.primaryMuscleGroups',
           'targetMuscleGroups',
           'createdBy',
         ],
@@ -352,12 +352,11 @@ export class WorkoutService {
               id: e.exercise.id,
               name: e.exercise.name,
               description: e.exercise.description,
-              primaryMuscleGroup: e.exercise.primaryMuscleGroup
-                ? {
-                    id: e.exercise.primaryMuscleGroup.id,
-                    name: e.exercise.primaryMuscleGroup.name,
-                  }
-                : null,
+              primaryMuscleGroups:
+                e.exercise.primaryMuscleGroups?.map((mg) => ({
+                  id: mg.id,
+                  name: mg.name,
+                })) ?? [],
               deletedAt: e.exercise.deletedAt,
               muscleGroups:
                 e.exercise.muscleGroups?.map((mg) => ({
