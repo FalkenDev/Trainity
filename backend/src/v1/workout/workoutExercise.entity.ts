@@ -39,7 +39,7 @@ export class WorkoutExercise {
   @Column()
   reps: number;
 
-  @Column({ type: 'decimal', precision: 6, scale: 2 })
+  @Column({ type: 'numeric', precision: 6, scale: 2, default: 0 })
   weight: number;
 
   @Column()
