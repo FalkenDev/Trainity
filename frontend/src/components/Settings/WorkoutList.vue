@@ -86,13 +86,13 @@
       </v-text-field>
     </div>
 
-    <div class="flex-grow-1 overflow-y-auto pa-0 pb-5 bg-background d-flex ga-3 flex-column">
+    <div class="flex-grow-1 overflow-y-auto pa-0 pb-5 bg-background d-flex ga-3 flex-column" style="overscroll-behavior-y: contain">
       <v-list-item
         v-for="workout in filteredWorkouts"
         :key="workout.id"
         class="border-sm py-2 bg-cardBg rounded-lg mx-5"
         two-line
-        @click="routeToWorkout(workout.id)"
+        @click="openWorkoutDetails(workout.id)"
       >
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-4">
@@ -140,20 +140,27 @@
     <v-dialog v-model="isCreateWorkoutOpen" fullscreen>
       <CreateWorkout @close="isCreateWorkoutOpen = false" />
     </v-dialog>
+
+    <v-dialog v-model="isWorkoutDetailsOpen" fullscreen>
+      <WorkoutDetails
+        v-if="selectedWorkoutId !== null"
+        :workout-id="selectedWorkoutId"
+        @close="isWorkoutDetailsOpen = false"
+      />
+    </v-dialog>
   </div>
 </template>
 <script setup lang="ts">
 import type { MuscleGroup } from '@/interfaces/Exercise.interface'
 import type { Workout } from '@/interfaces/Workout.interface'
 import { useWorkoutStore } from '@/stores/workout.store'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import WorkoutDetails from '@/pages/WorkoutDetails.vue'
 // import { displayExerciseName, displayExerciseDescription } from '@/utils/exerciseDisplay'
 
 const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ (e: 'close'): void }>()
-const router = useRouter()
 const workoutStore = useWorkoutStore()
 
 const workouts = computed<Workout[]>(() => {
@@ -168,6 +175,8 @@ const mgSheet = ref(false)
 const mgSearch = ref('')
 const selectedMGIds = ref<number[]>([])
 const isCreateWorkoutOpen = ref(false)
+const isWorkoutDetailsOpen = ref(false)
+const selectedWorkoutId = ref<number | null>(null)
 
 const activeFilterCount = computed(
   () => selectedMGIds.value.length + (search.value.trim().length > 0 ? 1 : 0)
@@ -300,9 +309,9 @@ function clearAllFilters() {
   search.value = ''
 }
 
-async function routeToWorkout(id: number) {
-  await workoutStore.setCurrentWorkout(id)
-  router.push(`/workout/${id}`)
+function openWorkoutDetails(id: number) {
+  selectedWorkoutId.value = id
+  isWorkoutDetailsOpen.value = true
 }
 </script>
 <style scoped>

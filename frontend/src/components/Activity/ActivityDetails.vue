@@ -20,7 +20,7 @@
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100dvh;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-      overscroll-behavior: contain;
+      overscroll-behavior: none;
     "
   >
     <!-- Header -->

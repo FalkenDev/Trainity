@@ -20,11 +20,11 @@
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100dvh;
       padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-      overscroll-behavior: contain;
+      overscroll-behavior: none;
     "
   >
     <!-- Header -->
-    <BackHeader :title="sessionTitle" show-menu @close="$router.back()">
+    <BackHeader :title="sessionTitle" show-menu @close="isDialogMode ? emit('close') : $router.back()">
       <template #menuAppend>
         <v-list
           class="bg-cardBg"
@@ -354,6 +354,9 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ExerciseDetails from '@/components/Exercise/ExerciseDetails.vue'
 
+const props = defineProps<{ sessionType?: 'workout' | 'activity'; sessionId?: number }>()
+const emit = defineEmits<{ (e: 'close'): void }>()
+
 const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
@@ -361,8 +364,14 @@ const router = useRouter()
 const workoutSessionStore = useWorkoutSessionStore()
 const activityStore = useActivityStore()
 
-const type = computed(() => (route.params as Record<string, string>).type as 'workout' | 'activity')
-const id = computed(() => Number((route.params as Record<string, string>).id))
+const isDialogMode = computed(() => props.sessionId !== undefined)
+
+const type = computed(() =>
+  props.sessionType ?? ((route.params as Record<string, string>).type as 'workout' | 'activity')
+)
+const id = computed(() =>
+  props.sessionId ?? Number((route.params as Record<string, string>).id)
+)
 
 const deleteDialog = ref(false)
 const isDeleting = ref(false)
@@ -491,7 +500,11 @@ async function executeDelete() {
       await deleteActivityLog(id.value)
       await activityStore.fetchActivityLogs(true)
     }
-    router.back()
+    if (isDialogMode.value) {
+      emit('close')
+    } else {
+      router.back()
+    }
   } finally {
     isDeleting.value = false
     deleteDialog.value = false
@@ -505,6 +518,15 @@ onMounted(async () => {
     activityStore.fetchActivityLogs()
   }
 })
+
+watch(
+  () => props.sessionId,
+  async newId => {
+    if (newId !== undefined && props.sessionType === 'workout') {
+      localWorkoutSession.value = await getWorkoutSessionById(newId)
+    }
+  }
+)
 </script>
 
 <style scoped>

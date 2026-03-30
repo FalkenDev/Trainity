@@ -20,11 +20,11 @@
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
       min-height: 100dvh;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-      overscroll-behavior: contain;
+      overscroll-behavior: none;
     "
   >
     <!-- Header -->
-    <BackHeader :title="workout?.title || ''" show-menu @close="$router.back()">
+    <BackHeader :title="workout?.title || ''" show-menu @close="isDialogMode ? emit('close') : $router.back()">
       <template #menuAppend>
         <v-list
           class="bg-cardBg"
@@ -269,11 +269,16 @@ import router from '@/router'
 import { useRoute } from 'vue-router'
 import BackHeader from '@/components/BackHeader.vue'
 
+const props = defineProps<{ workoutId?: number }>()
+const emit = defineEmits<{ (e: 'close'): void }>()
+
 const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 
 const workoutStore = useWorkoutStore()
 const workoutSessionStore = useWorkoutSessionStore()
+
+const isDialogMode = computed(() => props.workoutId !== undefined)
 
 const isHydratingWorkout = ref(false)
 const hydrationError = ref<string | null>(null)
@@ -346,8 +351,9 @@ const getWorkoutIdFromRoute = () => {
   return parsed
 }
 
-const loadWorkoutFromRoute = async () => {
-  const workoutId = getWorkoutIdFromRoute()
+const effectiveWorkoutId = computed(() => props.workoutId ?? getWorkoutIdFromRoute())
+
+const loadWorkout = async (workoutId: number | null) => {
   hydrationError.value = null
 
   if (workoutId === null) {
@@ -374,7 +380,7 @@ const loadWorkoutFromRoute = async () => {
   }
 }
 
-watch(() => route.fullPath, loadWorkoutFromRoute, { immediate: true })
+watch(effectiveWorkoutId, loadWorkout, { immediate: true })
 
 // --- Actions ---
 const startSession = async () => {
@@ -399,9 +405,13 @@ const duplicate = async () => {
     const response = await dublicateWorkout(workout.value.id)
     if (response?.id) {
       await workoutStore.setWorkouts(true)
-      workoutStore.setCurrentWorkout(response.id)
       toast.success(t('workout.duplicated'), { progressBar: true, duration: 1000 })
-      router.push(`/workout/${response.id}`)
+      if (isDialogMode.value) {
+        emit('close')
+      } else {
+        workoutStore.setCurrentWorkout(response.id)
+        router.push(`/workout/${response.id}`)
+      }
     }
   } catch (error) {
     console.error('Error duplicating workout:', error)

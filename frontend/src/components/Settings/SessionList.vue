@@ -31,14 +31,14 @@
     </div>
 
     <!-- List -->
-    <div class="flex-grow-1 overflow-y-auto pb-5 d-flex ga-3 flex-column">
+    <div class="flex-grow-1 overflow-y-auto pb-5 d-flex ga-3 flex-column" style="overscroll-behavior-y: contain">
       <template v-if="sessions.length > 0">
         <div
           v-for="session in sessions"
           :key="`${session.type}-${session.data.id}`"
           class="bg-cardBg rounded-lg mx-5 py-3 px-4 cursor-pointer"
           style="border: 1px solid rgb(var(--v-theme-borderColor))"
-          @click="openDetail(session)"
+          @click="openSessionDetail(session)"
         >
           <div class="d-flex align-center ga-4">
             <v-avatar color="avatarBg" size="50" tile class="rounded-lg flex-shrink-0">
@@ -117,6 +117,15 @@
       </div>
     </div>
   </div>
+
+  <v-dialog v-model="isSessionDetailOpen" fullscreen>
+    <SessionDetail
+      v-if="selectedSession !== null"
+      :session-type="selectedSession.type"
+      :session-id="selectedSession.id"
+      @close="isSessionDetailOpen = false"
+    />
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -125,14 +134,15 @@ import { useActivityStore } from '@/stores/activity.store'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
 import type { ActivityLog } from '@/interfaces/Activity.interface'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import SessionDetail from '@/pages/SessionDetail.vue'
 
 const { t } = useI18n({ useScope: 'global' })
-const router = useRouter()
 
 const searchQuery = ref('')
 const workoutSessionStore = useWorkoutSessionStore()
 const activityStore = useActivityStore()
+const isSessionDetailOpen = ref(false)
+const selectedSession = ref<{ type: 'workout' | 'activity'; id: number } | null>(null)
 
 type UnifiedSession =
   | { type: 'workout'; data: WorkoutSession }
@@ -217,8 +227,9 @@ function durationMinutes(start?: string, end?: string) {
   return `${mins} ${t('units.minShort')}`
 }
 
-function openDetail(session: UnifiedSession) {
-  router.push(`/session-history/${session.type}/${session.data.id}`)
+function openSessionDetail(session: UnifiedSession) {
+  selectedSession.value = { type: session.type, id: session.data.id }
+  isSessionDetailOpen.value = true
 }
 
 function statusLabel(status: WorkoutSession['status']) {
