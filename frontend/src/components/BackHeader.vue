@@ -15,10 +15,10 @@
 
 <template>
   <div
-    class="d-flex justify-space-between align-center px-5 pb-3 border-b-sm"
-    style="padding-top: calc(12px + env(safe-area-inset-top, 0px))"
+    class="d-flex justify-space-between align-center px-5 pb-3 border-b-sm bg-background"
+    style="padding-top: calc(12px + env(safe-area-inset-top, 0px)); position: sticky; top: 0; z-index: 10;"
   >
-    <div :style="showSave ? 'width: 73px' : 'width: 40px'">
+    <div :style="showSave ? '' : 'width: 40px'">
       <v-btn
         color="transparent"
         density="compact"
@@ -35,10 +35,24 @@
     </h1>
     <slot v-if="$slots.right" name="right" />
     <template v-else>
-      <v-btn v-if="showSave" color="primary" density="compact" variant="flat" @click="$emit('save')">
+      <v-btn
+        v-if="showSave"
+        color="primary"
+        density="compact"
+        variant="flat"
+        size="small"
+        @click="$emit('save')"
+      >
         {{ $t('common.save') }}
       </v-btn>
-      <v-btn v-else-if="showMenu" color="grey-darken-4" density="compact" icon size="40" variant="flat">
+      <v-btn
+        v-else-if="showMenu"
+        color="grey-darken-4"
+        density="compact"
+        icon
+        size="40"
+        variant="flat"
+      >
         <v-icon>mdi-menu</v-icon>
         <v-menu activator="parent">
           <!-- A slot to use in other pages -->
