@@ -18,19 +18,16 @@
     class="w-100 fill-height bg-background overflow-y-auto"
     style="
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
-      min-height: 100vh;
+      min-height: 100dvh;
       padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+      overscroll-behavior: contain;
     "
   >
     <!-- Header -->
-    <div class="d-flex justify-space-between mx-5 py-5">
-      <v-icon class="cursor-pointer" @click="$router.back()">mdi-arrow-left</v-icon>
-      <v-menu>
-        <template #activator="{ props: menuProps }">
-          <v-icon v-bind="menuProps">mdi-menu</v-icon>
-        </template>
+    <BackHeader :title="sessionTitle" show-menu @close="$router.back()">
+      <template #menuAppend>
         <v-list
-          class="bg-cardBg mt-2 mr-2"
+          class="bg-cardBg"
           width="160"
           :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
         >
@@ -40,8 +37,8 @@
             }}</v-list-item-title>
           </v-list-item>
         </v-list>
-      </v-menu>
-    </div>
+      </template>
+    </BackHeader>
 
     <!-- Avatar -->
     <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 rounded-lg">
@@ -50,7 +47,7 @@
 
     <div class="mx-5 d-flex flex-column ga-4">
       <!-- Title + type/status badges -->
-      <div class="pt-2">
+      <div class="pt-4">
         <div class="d-flex align-center ga-2 flex-wrap">
           <p class="text-primary text-body-1 text-capitalize">
             {{
@@ -345,6 +342,7 @@
 </template>
 
 <script setup lang="ts">
+import BackHeader from '@/components/BackHeader.vue'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { useActivityStore } from '@/stores/activity.store'
 import { deleteActivityLog } from '@/services/activityLog.service'
@@ -392,19 +390,7 @@ const activityLog = computed<ActivityLog | null>(() => {
 const sessionIcon = computed(() => {
   if (type.value === 'activity') {
     const icon = activityLog.value?.activity?.icon
-    const iconMap: Record<string, string> = {
-      running: 'mdi-run',
-      walking: 'mdi-walk',
-      cycling: 'mdi-bike',
-      swimming: 'mdi-swim',
-      hiking: 'mdi-hiking',
-      rowing: 'mdi-rowing',
-      yoga: 'mdi-yoga',
-      boxing: 'mdi-boxing-glove',
-      skiing: 'mdi-ski',
-      skating: 'mdi-skate',
-    }
-    return icon ? (iconMap[icon] ?? 'mdi-run-fast') : 'mdi-run-fast'
+    return icon ? `mdi-${icon}` : 'mdi-run-fast'
   }
   return 'mdi-dumbbell'
 })

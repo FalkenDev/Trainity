@@ -45,12 +45,12 @@
 
     <!-- Avatar -->
     <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 mt-4 rounded-lg">
-      <v-icon color="primary" size="35">mdi-{{ iconName }}</v-icon>
+      <v-icon color="primary" size="35">mdi-{{ activity.icon }}</v-icon>
     </v-avatar>
 
     <div class="mx-5 d-flex flex-column ga-4">
       <!-- Label + Title -->
-      <div class="pt-2">
+      <div class="pt-4">
         <p class="text-primary text-body-1 text-capitalize">{{ $t('settings.activities') }}</p>
         <h1 class="text-h5 font-weight-bold">{{ activity.name }}</h1>
       </div>
@@ -263,35 +263,15 @@ const emit = defineEmits<{ close: [] }>()
 const { t } = useI18n()
 const activityStore = useActivityStore()
 
+const activity = computed(
+  () => activityStore.activities.find(a => a.id === props.activity.id) ?? props.activity
+)
+
 const isEditOpen = ref(false)
 const isEditLogOpen = ref(false)
 const isDeleteDialogOpen = ref(false)
 const selectedLog = ref<ActivityLog | null>(null)
 
-// Icon mapping
-function getIconName(icon: string): string {
-  const iconMap: Record<string, string> = {
-    running: 'run',
-    walking: 'walk',
-    cycling: 'bike',
-    football: 'soccer',
-    swimming: 'swim',
-    kayaking: 'kayaking',
-    hiking: 'hiking',
-    yoga: 'yoga',
-    boxing: 'boxing',
-    tennis: 'tennis',
-    basketball: 'basketball',
-    volleyball: 'volleyball',
-    skiing: 'skiing',
-    skating: 'skating',
-    rowing: 'rowing',
-    other: 'dots-horizontal',
-  }
-  return iconMap[icon] || 'dots-horizontal'
-}
-
-const iconName = computed(() => getIconName(props.activity.icon))
 
 // Logs for this activity
 const activityLogs = computed(() =>
@@ -334,10 +314,10 @@ const totalDistanceLabel = computed(() => {
 // Tracked metrics chips
 const trackedMetrics = computed(() => {
   const metrics: string[] = []
-  if (props.activity.trackDistance) metrics.push(t('activity.trackDistance'))
-  if (props.activity.trackPace) metrics.push(t('activity.trackPace'))
-  if (props.activity.trackElevation) metrics.push(t('activity.trackElevation'))
-  if (props.activity.trackCalories) metrics.push(t('activity.trackCalories'))
+  if (activity.value.trackDistance) metrics.push(t('activity.trackDistance'))
+  if (activity.value.trackPace) metrics.push(t('activity.trackPace'))
+  if (activity.value.trackElevation) metrics.push(t('activity.trackElevation'))
+  if (activity.value.trackCalories) metrics.push(t('activity.trackCalories'))
   return metrics
 })
 
@@ -355,9 +335,8 @@ function openEditLog(log: ActivityLog) {
   isEditLogOpen.value = true
 }
 
-async function onEditClose() {
+function onEditClose() {
   isEditOpen.value = false
-  await activityStore.fetchActivities(true)
 }
 
 async function deleteThisActivity() {

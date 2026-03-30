@@ -15,15 +15,10 @@
 
 <template>
   <div
-    class="w-100 fill-height bg-background"
-    :class="
-      isExerciseDetailsOpen || isEditWorkoutOpen || isWeightAndRepsOpen
-        ? 'overflow-hidden'
-        : 'overflow-y-auto'
-    "
+    class="w-100 fill-height bg-background overflow-y-auto"
     style="
       background: linear-gradient(135deg, rgba(171, 255, 26, 0.15) 0%, rgba(12, 14, 18, 0) 35%);
-      height: 100dvh;
+      min-height: 100dvh;
       padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
       overscroll-behavior: contain;
     "
@@ -76,9 +71,9 @@
       </v-card>
     </div>
 
-    <div v-else class="mx-5 d-flex flex-column ga-4 mb-16">
+    <div v-else class="mx-5 d-flex flex-column ga-4">
       <!-- Title + Type badge -->
-      <div class="pt-2">
+      <div class="pt-4">
         <div class="d-flex align-center ga-2">
           <p class="text-primary text-body-1 text-capitalize">{{ $t('workout.workoutTitle') }}</p>
           <v-chip v-if="workout?.type" size="x-small" color="primary" variant="outlined">
