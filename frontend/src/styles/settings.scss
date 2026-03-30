@@ -61,20 +61,20 @@ body,
   border-radius: 0 !important;
 }
 
-// v-main: shift content below the notch and extend Vuetify's auto layout padding
-// (--v-layout-bottom = bottom-nav height) with the iOS home indicator inset
-// and any extra bar (resume bar = --extra-pb).
-// NOTE: padding-top is applied here instead of .v-application so that the
-//       .v-overlay-container (used by v-select / v-menu) stays at the true
-//       viewport origin — preventing click targets from being offset by the
-//       safe-area amount and selecting the wrong item.
-.v-main {
-  padding-top: env(safe-area-inset-top, 0px) !important;
-  padding-bottom: calc(
-    var(--v-layout-bottom, 0px) + env(safe-area-inset-bottom, 0px) + var(--extra-pb, 0px)
-  ) !important;
-  background-color: rgb(var(--v-theme-background)) !important;
-}
+// // v-main: shift content below the notch and extend Vuetify's auto layout padding
+// // (--v-layout-bottom = bottom-nav height) with the iOS home indicator inset
+// // and any extra bar (resume bar = --extra-pb).
+// // NOTE: padding-top is applied here instead of .v-application so that the
+// //       .v-overlay-container (used by v-select / v-menu) stays at the true
+// //       viewport origin — preventing click targets from being offset by the
+// //       safe-area amount and selecting the wrong item.
+// .v-main {
+//   padding-top: env(safe-area-inset-top, 0px) !important;
+//   padding-bottom: calc(
+//     var(--v-layout-bottom, 0px) + env(safe-area-inset-bottom, 0px) + var(--extra-pb, 0px)
+//   ) !important;
+//   background-color: rgb(var(--v-theme-background)) !important;
+// }
 
 // Grow the bottom nav bar so icons clear the home indicator
 .v-bottom-navigation {
