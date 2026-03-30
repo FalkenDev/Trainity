@@ -53,7 +53,7 @@
         <div class="d-flex justify-space-between align-center w-100">
           <div class="d-flex align-center ga-4">
             <v-avatar color="avatarBg" size="50" tile class="rounded-lg">
-              <v-icon color="primary">mdi-{{ getIconName(activity.icon) }}</v-icon>
+              <v-icon color="primary">mdi-{{ activity.icon }}</v-icon>
             </v-avatar>
             <div class="d-flex flex-column">
               <v-list-item-title class="text-body-1 font-weight-bold">
@@ -127,7 +127,7 @@
 import { ref, computed } from 'vue'
 import { useActivityStore } from '@/stores/activity.store'
 import { deleteActivity as deleteActivityService } from '@/services/activity.service'
-import type { Activity, ActivityIcon } from '@/interfaces/Activity.interface'
+import type { Activity } from '@/interfaces/Activity.interface'
 import ActivityDetails from '@/components/Activity/ActivityDetails.vue'
 import CreateActivity from '@/components/Activity/CreateActivity.vue'
 import { toast } from 'vuetify-sonner'
@@ -159,27 +159,6 @@ const isDeleteDialogOpen = ref(false)
 const activityToDelete = ref<Activity | null>(null)
 const isDeleting = ref(false)
 
-function getIconName(icon: ActivityIcon): string {
-  const iconMap: Record<ActivityIcon, string> = {
-    running: 'run',
-    walking: 'walk',
-    cycling: 'bike',
-    football: 'soccer',
-    swimming: 'swim',
-    kayaking: 'kayaking',
-    hiking: 'hiking',
-    yoga: 'yoga',
-    boxing: 'boxing',
-    tennis: 'tennis',
-    basketball: 'basketball',
-    volleyball: 'volleyball',
-    skiing: 'skiing',
-    skating: 'skating',
-    rowing: 'rowing',
-    other: 'dots-horizontal',
-  }
-  return iconMap[icon] || 'dots-horizontal'
-}
 
 function openCreateDialog() {
   isCreateOpen.value = true

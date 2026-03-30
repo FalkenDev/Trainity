@@ -17,30 +17,20 @@
   <v-dialog v-model="dialogOpen" fullscreen :scrim="false" transition="dialog-bottom-transition">
     <v-card class="bg-background d-flex flex-column" style="height: 100dvh">
       <!-- Header -->
-      <v-toolbar color="transparent" density="compact" style="flex: none">
-        <v-btn icon @click="close">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title class="font-weight-bold">{{
-          $t('schedule.addPastTitle')
-        }}</v-toolbar-title>
-        <v-spacer />
-        <v-btn
-          variant="flat"
-          color="primary"
-          :disabled="!canSubmit"
-          :loading="isSubmitting"
-          @click="submit"
-        >
-          {{ $t('common.save') }}
-        </v-btn>
-      </v-toolbar>
+      <BackHeader
+        :title="$t('schedule.registerWorkout')"
+        :show-menu="false"
+        :show-save="true"
+        class="sticky-header"
+        @close="close"
+        @save="submit"
+      />
 
       <div class="pa-5" style="flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch">
         <!-- Date display -->
         <v-card
           class="bg-cardBg rounded-lg pa-4 mb-5"
-          style="border: 1px solid rgb(var(--v-theme-borderColor))"
+          style="border: 1px solid rgb(var(--v-theme-borderColor)); height: fit-content !important"
         >
           <div class="d-flex align-center ga-3">
             <v-icon color="primary">mdi-calendar</v-icon>
@@ -380,6 +370,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n'
 import { useWorkoutStore } from '@/stores/workout.store'
 import { useActivityStore } from '@/stores/activity.store'
 import { logPastWorkoutSession } from '@/services/workoutSession.service'
@@ -390,7 +381,7 @@ import { parseDecimalInput, parseIntInput, normalizeDecimalStr } from '@/utils/d
 
 interface InlineSet {
   set: number
-  weight: string  // stored as string to allow decimal input like "90." mid-typing
+  weight: string // stored as string to allow decimal input like "90." mid-typing
   reps: number
   done: boolean
 }
@@ -413,6 +404,8 @@ const dialogOpen = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val),
 })
+
+const { locale } = useI18n()
 
 const workoutStore = useWorkoutStore()
 const activityStore = useActivityStore()
@@ -462,7 +455,7 @@ const activityCaloriesStr = ref('')
 // --- computeds ---
 const formattedDate = computed(() => {
   const d = new Date(props.date + 'T12:00:00')
-  return d.toLocaleDateString('en-US', {
+  return d.toLocaleDateString(locale.value, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -667,10 +660,18 @@ async function submit() {
         activityId: selectedActivityId.value!,
         date: props.date,
         duration: parseDecimalInput(activityDurationStr.value),
-        distance: activityDistanceStr.value ? parseDecimalInput(activityDistanceStr.value) : undefined,
-        elevationGain: activityElevationGainStr.value ? parseDecimalInput(activityElevationGainStr.value) : undefined,
-        maxElevation: activityMaxElevationStr.value ? parseDecimalInput(activityMaxElevationStr.value) : undefined,
-        calories: activityCaloriesStr.value ? parseDecimalInput(activityCaloriesStr.value) : undefined,
+        distance: activityDistanceStr.value
+          ? parseDecimalInput(activityDistanceStr.value)
+          : undefined,
+        elevationGain: activityElevationGainStr.value
+          ? parseDecimalInput(activityElevationGainStr.value)
+          : undefined,
+        maxElevation: activityMaxElevationStr.value
+          ? parseDecimalInput(activityMaxElevationStr.value)
+          : undefined,
+        calories: activityCaloriesStr.value
+          ? parseDecimalInput(activityCaloriesStr.value)
+          : undefined,
         notes: notesText.value || undefined,
         scheduledSessionId: props.preselectedScheduledSessionId ?? undefined,
       })

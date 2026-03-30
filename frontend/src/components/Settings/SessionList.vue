@@ -195,19 +195,7 @@ const emit = defineEmits<{
 function sessionIcon(session: UnifiedSession) {
   if (session.type === 'activity') {
     const icon = (session.data as ActivityLog).activity?.icon
-    const iconMap: Record<string, string> = {
-      running: 'mdi-run',
-      walking: 'mdi-walk',
-      cycling: 'mdi-bike',
-      swimming: 'mdi-swim',
-      hiking: 'mdi-hiking',
-      rowing: 'mdi-rowing',
-      yoga: 'mdi-yoga',
-      boxing: 'mdi-boxing-glove',
-      skiing: 'mdi-ski',
-      skating: 'mdi-skate',
-    }
-    return icon ? (iconMap[icon] ?? 'mdi-run-fast') : 'mdi-run-fast'
+    return icon ? `mdi-${icon}` : 'mdi-run-fast'
   }
   return 'mdi-dumbbell'
 }

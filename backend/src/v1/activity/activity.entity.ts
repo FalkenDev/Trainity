@@ -26,22 +26,27 @@ import {
 import { User } from '../user/user.entity';
 
 export enum ActivityIcon {
-  RUNNING = 'running',
-  WALKING = 'walking',
-  CYCLING = 'cycling',
-  FOOTBALL = 'football',
-  SWIMMING = 'swimming',
+  RUNNING = 'run',
+  WALKING = 'walk',
+  CYCLING = 'bike',
+  FOOTBALL = 'soccer',
+  SWIMMING = 'swim',
   KAYAKING = 'kayaking',
   HIKING = 'hiking',
   YOGA = 'yoga',
-  BOXING = 'boxing',
+  BOXING = 'boxing-glove',
   TENNIS = 'tennis',
   BASKETBALL = 'basketball',
   VOLLEYBALL = 'volleyball',
-  SKIING = 'skiing',
-  SKATING = 'skating',
+  SKIING = 'ski',
+  SKATING = 'skate',
   ROWING = 'rowing',
-  OTHER = 'other',
+  WEIGHTLIFTING = 'weight-lifter',
+  GOLF = 'golf',
+  RUGBY = 'rugby',
+  HOCKEY = 'hockey-sticks',
+  DANCE = 'dance-ballroom',
+  OTHER = 'dots-horizontal',
 }
 
 @Entity()

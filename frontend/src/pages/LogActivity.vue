@@ -42,7 +42,7 @@
           @click="openLogDialog(activity)"
         >
           <v-avatar size="48" color="avatarBg" class="rounded-lg mb-2">
-            <v-icon color="primary" size="28">mdi-{{ getIconName(activity.icon) }}</v-icon>
+            <v-icon color="primary" size="28">mdi-{{ activity.icon }}</v-icon>
           </v-avatar>
           <span class="text-body-2 font-weight-medium text-center">{{ activity.name }}</span>
           <span
@@ -200,7 +200,7 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useActivityStore } from '@/stores/activity.store'
 import { createActivityLog } from '@/services/activityLog.service'
-import type { Activity, ActivityIcon, CreateActivityLogDto } from '@/interfaces/Activity.interface'
+import type { Activity, CreateActivityLogDto } from '@/interfaces/Activity.interface'
 import CreateActivity from '@/components/Activity/CreateActivity.vue'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
@@ -254,28 +254,6 @@ function getMetrics(activity: Activity): string[] {
   return metrics
 }
 
-// Icon mapping
-function getIconName(icon: ActivityIcon): string {
-  const iconMap: Record<ActivityIcon, string> = {
-    running: 'run',
-    walking: 'walk',
-    cycling: 'bike',
-    football: 'soccer',
-    swimming: 'swim',
-    kayaking: 'kayaking',
-    hiking: 'hiking',
-    yoga: 'yoga',
-    boxing: 'boxing',
-    tennis: 'tennis',
-    basketball: 'basketball',
-    volleyball: 'volleyball',
-    skiing: 'skiing',
-    skating: 'skating',
-    rowing: 'rowing',
-    other: 'dots-horizontal',
-  }
-  return iconMap[icon] || 'dots-horizontal'
-}
 
 function openLogDialog(activity: Activity) {
   selectedActivity.value = activity

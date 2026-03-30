@@ -31,17 +31,16 @@
           <v-icon size="32" color="primary">mdi-fire</v-icon>
         </v-avatar>
         <div>
-          <p class="text-subtitle-2 text-textSecondary">{{ $t('calendar.workoutsThisMonth') }}</p>
-          <h1 class="text-h6">{{ workoutsThisMonth }} {{ $t('progress.workouts') }}</h1>
+          <p class="text-caption text-textSecondary">{{ $t('calendar.workoutsThisMonth') }}</p>
+          <h1 class="text-subtitle-1">{{ workoutsThisMonth }} {{ $t('calendar.workout') }}</h1>
         </div>
       </div>
       <div>
-        <p class="text-subtitle-2 text-textSecondary">{{ $t('calendar.currentStreak') }}</p>
+        <p class="text-caption text-right text-textSecondary">{{ $t('calendar.currentStreak') }}</p>
         <div class="d-flex align-center ga-1">
-          <h1 class="text-h6 text-primary">
+          <h1 class="text-subtitle-1 text-primary text-right">
             {{ streakInfo?.currentStreak || 0 }} {{ $t('calendar.days') }}
           </h1>
-          <v-icon color="red" size="24">mdi-fire</v-icon>
         </div>
       </div>
     </v-card>
@@ -103,6 +102,21 @@
               </div>
             </div>
           </div>
+        </div>
+      </v-card-text>
+      <v-divider />
+      <v-card-text class="d-flex align-center ga-4">
+        <div class="d-flex align-center ga-2">
+          <div class="activity-dot workout"></div>
+          <span class="text-caption text-textSecondary">Gym</span>
+        </div>
+        <div class="d-flex align-center ga-2">
+          <div class="activity-dot activity"></div>
+          <span class="text-caption text-textSecondary">Activity</span>
+        </div>
+        <div class="d-flex align-center ga-2">
+          <div class="activity-dot scheduled"></div>
+          <span class="text-caption text-textSecondary">Scheduled</span>
         </div>
       </v-card-text>
     </v-card>
@@ -196,7 +210,14 @@
                 size="20"
                 :color="event.type === 'workout' ? 'green-lighten-1' : 'amber-lighten-1'"
               >
-                {{ event.type === 'workout' ? 'mdi-dumbbell' : 'mdi-run' }}
+                {{
+                  event.type === 'workout'
+                    ? 'mdi-dumbbell'
+                    : 'mdi-' +
+                      (event.rawData && 'activity' in event.rawData && event.rawData.activity?.icon
+                        ? event.rawData.activity.icon
+                        : 'run')
+                }}
               </v-icon>
             </v-avatar>
             <div class="flex-grow-1">

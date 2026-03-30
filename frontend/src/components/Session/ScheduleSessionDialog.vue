@@ -17,22 +17,14 @@
   <v-dialog v-model="dialogOpen" fullscreen :scrim="false" transition="dialog-bottom-transition">
     <v-card class="bg-background">
       <!-- Header -->
-      <v-toolbar color="transparent" density="compact">
-        <v-btn icon @click="close">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title class="font-weight-bold">{{ $t('schedule.title') }}</v-toolbar-title>
-        <v-spacer />
-        <v-btn
-          variant="flat"
-          color="primary"
-          :disabled="!canSubmit"
-          :loading="isSubmitting"
-          @click="submit"
-        >
-          {{ $t('common.save') }}
-        </v-btn>
-      </v-toolbar>
+      <BackHeader
+        :title="$t('schedule.title')"
+        :show-menu="false"
+        :show-save="true"
+        class="sticky-header"
+        @close="close"
+        @save="submit"
+      />
 
       <div class="pa-5 d-flex flex-column ga-5">
         <!-- Type toggle: Workout or Activity -->
@@ -81,7 +73,7 @@
             >
               <template #prepend>
                 <v-icon :color="selectedItemId === item.id ? 'primary' : undefined">
-                  {{ sessionType === 'workout' ? 'mdi-dumbbell' : 'mdi-run' }}
+                  {{ sessionType === 'workout' ? 'mdi-dumbbell' : 'mdi-' + item.icon }}
                 </v-icon>
               </template>
               <v-list-item-title class="font-weight-bold">{{ item.name }}</v-list-item-title>
@@ -93,11 +85,16 @@
           <v-card
             v-else
             class="bg-cardBg rounded-lg pa-4 d-flex align-center justify-center"
-            style="border: 1px solid rgb(var(--v-theme-borderColor))"
+            style="
+              border: 1px solid rgb(var(--v-theme-borderColor));
+              height: fit-content !important;
+            "
           >
             <p class="text-body-2 text-textSecondary">
               {{
-                sessionType === 'workout' ? $t('schedule.noWorkoutsCreated') : $t('schedule.noActivitiesCreated')
+                sessionType === 'workout'
+                  ? $t('schedule.noWorkoutsCreated')
+                  : $t('schedule.noActivitiesCreated')
               }}
             </p>
           </v-card>
@@ -137,6 +134,7 @@
             variant="outlined"
             density="compact"
             class="bg-cardBg rounded-lg"
+            hide-details
             @update:model-value="onDateInput"
           />
         </div>
@@ -174,6 +172,7 @@
               variant="outlined"
               density="compact"
               class="bg-cardBg rounded-lg"
+              hide-details
             />
           </div>
         </div>
@@ -190,6 +189,7 @@
             rows="2"
             class="bg-cardBg rounded-lg"
             :placeholder="$t('schedule.noNotes')"
+            hide-details
           />
         </div>
       </div>
@@ -224,7 +224,7 @@ const dialogOpen = computed({
 const workoutStore = useWorkoutStore()
 const activityStore = useActivityStore()
 const scheduledSessionStore = useScheduledSessionStore()
-const { t, tm } = useI18n()
+const { tm } = useI18n()
 
 const sessionType = ref<ScheduledSessionType>('workout')
 const selectedItemId = ref<number | null>(null)
@@ -252,6 +252,7 @@ const itemList = computed<ListItem[]>(() => {
     return ((activityStore.activities || []) as Activity[]).map(a => ({
       id: a.id,
       name: a.name,
+      icon: a.icon,
     }))
   }
 })

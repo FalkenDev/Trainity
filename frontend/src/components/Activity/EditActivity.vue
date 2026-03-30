@@ -66,14 +66,13 @@
           v-for="opt in iconOptions"
           :key="opt.value"
           :color="form.icon === opt.value ? 'primary' : 'cardBg'"
-          :variant="form.icon === opt.value ? 'flat' : 'outlined'"
-          size="small"
-          class="rounded-lg text-caption"
-          style="border-color: rgb(var(--v-theme-borderColor))"
+          variant="flat"
+          class="rounded-lg"
+          style="border-color: rgb(var(--v-theme-borderColor)); min-width: 44px; width: 44px; height: 44px; padding: 0"
+          :title="opt.label"
           @click="form.icon = opt.value"
         >
-          <v-icon size="16" class="mr-1">mdi-{{ getIconName(opt.value) }}</v-icon>
-          {{ opt.label }}
+          <v-icon size="20">mdi-{{ opt.value }}</v-icon>
         </v-btn>
       </div>
 
@@ -144,7 +143,8 @@ import {
   updateActivity,
   deleteActivity as deleteActivityService,
 } from '@/services/activity.service'
-import type { Activity, ActivityIcon } from '@/interfaces/Activity.interface'
+import { ActivityIcon } from '@/interfaces/Activity.interface'
+import type { Activity } from '@/interfaces/Activity.interface'
 import AcceptDialog from '@/components/basicUI/AcceptDialog.vue'
 import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
@@ -159,45 +159,29 @@ const isDeleting = ref(false)
 const isDeleteDialogOpen = ref(false)
 
 const iconOptions = computed(() => [
-  { label: t('activity.icons.running'), value: 'running' as ActivityIcon },
-  { label: t('activity.icons.walking'), value: 'walking' as ActivityIcon },
-  { label: t('activity.icons.cycling'), value: 'cycling' as ActivityIcon },
-  { label: t('activity.icons.football'), value: 'football' as ActivityIcon },
-  { label: t('activity.icons.swimming'), value: 'swimming' as ActivityIcon },
-  { label: t('activity.icons.kayaking'), value: 'kayaking' as ActivityIcon },
-  { label: t('activity.icons.hiking'), value: 'hiking' as ActivityIcon },
-  { label: t('activity.icons.yoga'), value: 'yoga' as ActivityIcon },
-  { label: t('activity.icons.boxing'), value: 'boxing' as ActivityIcon },
-  { label: t('activity.icons.tennis'), value: 'tennis' as ActivityIcon },
-  { label: t('activity.icons.basketball'), value: 'basketball' as ActivityIcon },
-  { label: t('activity.icons.volleyball'), value: 'volleyball' as ActivityIcon },
-  { label: t('activity.icons.skiing'), value: 'skiing' as ActivityIcon },
-  { label: t('activity.icons.skating'), value: 'skating' as ActivityIcon },
-  { label: t('activity.icons.rowing'), value: 'rowing' as ActivityIcon },
-  { label: t('activity.icons.other'), value: 'other' as ActivityIcon },
+  { label: t('activity.icons.running'), value: ActivityIcon.RUNNING },
+  { label: t('activity.icons.walking'), value: ActivityIcon.WALKING },
+  { label: t('activity.icons.cycling'), value: ActivityIcon.CYCLING },
+  { label: t('activity.icons.football'), value: ActivityIcon.FOOTBALL },
+  { label: t('activity.icons.swimming'), value: ActivityIcon.SWIMMING },
+  { label: t('activity.icons.kayaking'), value: ActivityIcon.KAYAKING },
+  { label: t('activity.icons.hiking'), value: ActivityIcon.HIKING },
+  { label: t('activity.icons.yoga'), value: ActivityIcon.YOGA },
+  { label: t('activity.icons.boxing'), value: ActivityIcon.BOXING },
+  { label: t('activity.icons.tennis'), value: ActivityIcon.TENNIS },
+  { label: t('activity.icons.basketball'), value: ActivityIcon.BASKETBALL },
+  { label: t('activity.icons.volleyball'), value: ActivityIcon.VOLLEYBALL },
+  { label: t('activity.icons.skiing'), value: ActivityIcon.SKIING },
+  { label: t('activity.icons.skating'), value: ActivityIcon.SKATING },
+  { label: t('activity.icons.rowing'), value: ActivityIcon.ROWING },
+  { label: t('activity.icons.weightlifting'), value: ActivityIcon.WEIGHTLIFTING },
+  { label: t('activity.icons.golf'), value: ActivityIcon.GOLF },
+  { label: t('activity.icons.rugby'), value: ActivityIcon.RUGBY },
+  { label: t('activity.icons.hockey'), value: ActivityIcon.HOCKEY },
+  { label: t('activity.icons.dance'), value: ActivityIcon.DANCE },
+  { label: t('activity.icons.other'), value: ActivityIcon.OTHER },
 ])
 
-function getIconName(icon: ActivityIcon): string {
-  const iconMap: Record<ActivityIcon, string> = {
-    running: 'run',
-    walking: 'walk',
-    cycling: 'bike',
-    football: 'soccer',
-    swimming: 'swim',
-    kayaking: 'kayaking',
-    hiking: 'hiking',
-    yoga: 'yoga',
-    boxing: 'boxing',
-    tennis: 'tennis',
-    basketball: 'basketball',
-    volleyball: 'volleyball',
-    skiing: 'skiing',
-    skating: 'skating',
-    rowing: 'rowing',
-    other: 'dots-horizontal',
-  }
-  return iconMap[icon] || 'dots-horizontal'
-}
 
 const form = ref({
   name: props.activity.name,
