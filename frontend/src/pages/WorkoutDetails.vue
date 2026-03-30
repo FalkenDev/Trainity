@@ -67,7 +67,7 @@
         :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
       >
         <p class="text-body-2 text-textSecondary mb-3">{{ hydrationError }}</p>
-        <v-btn color="primary" variant="tonal" @click="loadWorkoutFromRoute"> Retry </v-btn>
+        <v-btn color="primary" variant="tonal" @click="loadWorkout(effectiveWorkoutId)"> Retry </v-btn>
       </v-card>
     </div>
 
