@@ -14,35 +14,34 @@
   -->
 
 <template>
-  <v-dialog :model-value="modelValue" fullscreen @update:model-value="$emit('update:modelValue', $event)">
-    <v-card>
-      <v-toolbar color="surface" flat>
-        <v-btn icon @click="$emit('update:modelValue', false)">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ $t('settings.imprint') }}</v-toolbar-title>
-      </v-toolbar>
+  <v-dialog
+    :model-value="modelValue"
+    fullscreen
+    @update:model-value="$emit('update:modelValue', $event)"
+  >
+    <v-card class="bg-background">
+      <BackHeader :title="$t('settings.imprint')" @click="$emit('update:modelValue', false)" />
       <v-card-text class="pa-6">
         <p class="text-caption text-textSecondary mb-6">Last updated: March 2026</p>
 
         <h3 class="text-h6 mb-2">Service Operator</h3>
         <p class="text-body-2 mb-4">
-          <strong>{{ operatorName }}</strong><br />
+          <strong>{{ operatorName }}</strong
+          ><br />
           {{ operatorCity }}, {{ operatorCountry }}<br />
           Email: <strong>{{ contactEmail }}</strong>
         </p>
 
         <h3 class="text-h6 mb-2">About This Service</h3>
         <p class="text-body-2 mb-4">
-          Grindify is a personal fitness tracking application provided for personal and
-          beta use. The service is operated by an individual developer and is not a
-          commercial entity.
+          Grindify is a personal fitness tracking application provided for personal and beta use.
+          The service is operated by an individual developer and is not a commercial entity.
         </p>
 
         <h3 class="text-h6 mb-2">Supervisory Authority</h3>
         <p class="text-body-2 mb-4">
-          For privacy-related complaints, you may contact the Swedish data protection
-          supervisory authority:
+          For privacy-related complaints, you may contact the Swedish data protection supervisory
+          authority:
           <br /><br />
           <strong>Integritetsskyddsmyndigheten (IMY)</strong><br />
           Website: <strong>imy.se</strong><br />
@@ -52,18 +51,24 @@
 
         <h3 class="text-h6 mb-2">Open Source License</h3>
         <p class="text-body-2 mb-4">
-          Grindify is free software licensed under the GNU Affero General Public License
-          v3 (AGPL-3.0). Source code is available at the project repository.
+          Grindify is free software licensed under the GNU Affero General Public License v3
+          (AGPL-3.0). Source code is available at the project repository.
         </p>
 
         <h3 class="text-h6 mb-2">Contact</h3>
         <p class="text-body-2 mb-4">
-          For any inquiries, including GDPR data requests (access, erasure, portability),
-          contact: <strong>{{ contactEmail }}</strong>
+          For any inquiries, including GDPR data requests (access, erasure, portability), contact:
+          <strong>{{ contactEmail }}</strong>
         </p>
       </v-card-text>
       <v-card-actions class="pa-4">
-        <v-btn block color="primary" rounded="lg" size="large" @click="$emit('update:modelValue', false)">
+        <v-btn
+          block
+          color="primary"
+          rounded="lg"
+          size="large"
+          @click="$emit('update:modelValue', false)"
+        >
           {{ $t('common.close') }}
         </v-btn>
       </v-card-actions>

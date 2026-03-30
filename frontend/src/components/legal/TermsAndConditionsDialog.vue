@@ -14,14 +14,16 @@
   -->
 
 <template>
-  <v-dialog :model-value="modelValue" fullscreen @update:model-value="$emit('update:modelValue', $event)">
-    <v-card>
-      <v-toolbar color="surface" flat>
-        <v-btn icon @click="$emit('update:modelValue', false)">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ $t('auth.termsAndConditions') }}</v-toolbar-title>
-      </v-toolbar>
+  <v-dialog
+    :model-value="modelValue"
+    fullscreen
+    @update:model-value="$emit('update:modelValue', $event)"
+  >
+    <v-card class="bg-background">
+      <back-header
+        :title="$t('auth.termsAndConditions')"
+        @click="$emit('update:modelValue', false)"
+      />
       <v-card-text class="pa-6">
         <p class="text-caption text-textSecondary mb-6">Last updated: March 2026</p>
 
@@ -41,9 +43,9 @@
         <h3 class="text-h6 mb-2">3. Account Registration & Security</h3>
         <p class="text-body-2 mb-4">
           You must provide accurate and complete information when registering. You are responsible
-          for maintaining the confidentiality of your account credentials and for all activity
-          that occurs under your account. You must notify us immediately of any unauthorized use.
-          You must be at least 16 years old to use the Service.
+          for maintaining the confidentiality of your account credentials and for all activity that
+          occurs under your account. You must notify us immediately of any unauthorized use. You
+          must be at least 16 years old to use the Service.
         </p>
 
         <h3 class="text-h6 mb-2">4. User Data & Content</h3>
@@ -74,38 +76,37 @@
 
         <h3 class="text-h6 mb-2">7. Disclaimers & Limitation of Liability</h3>
         <p class="text-body-2 mb-4">
-          The Service is provided "as is" without warranties of any kind. Grindify is not a
-          medical service. Content within the app does not constitute medical advice. Always
-          consult a qualified healthcare professional before starting any fitness programme.
-          To the extent permitted by applicable law, FalkenDev shall not be liable for any
-          indirect, incidental, or consequential damages arising from your use of the Service.
+          The Service is provided "as is" without warranties of any kind. Grindify is not a medical
+          service. Content within the app does not constitute medical advice. Always consult a
+          qualified healthcare professional before starting any fitness programme. To the extent
+          permitted by applicable law, FalkenDev shall not be liable for any indirect, incidental,
+          or consequential damages arising from your use of the Service.
         </p>
 
         <h3 class="text-h6 mb-2">8. Service Availability</h3>
         <p class="text-body-2 mb-4">
-          We do not guarantee uninterrupted or error-free operation of the Service. We may
-          suspend, modify, or discontinue the Service at any time with reasonable notice where
-          possible.
+          We do not guarantee uninterrupted or error-free operation of the Service. We may suspend,
+          modify, or discontinue the Service at any time with reasonable notice where possible.
         </p>
 
         <h3 class="text-h6 mb-2">9. Termination</h3>
         <p class="text-body-2 mb-4">
-          You may delete your account at any time. We reserve the right to suspend or terminate
-          your access if you violate these Terms. Upon termination, your data will be deleted in
+          You may delete your account at any time. We reserve the right to suspend or terminate your
+          access if you violate these Terms. Upon termination, your data will be deleted in
           accordance with our Privacy Policy.
         </p>
 
         <h3 class="text-h6 mb-2">10. Changes to Terms</h3>
         <p class="text-body-2 mb-4">
-          We may update these Terms from time to time. We will notify you of material changes
-          via email or an in-app notification. Continued use of the Service after changes take
-          effect constitutes acceptance of the revised Terms.
+          We may update these Terms from time to time. We will notify you of material changes via
+          email or an in-app notification. Continued use of the Service after changes take effect
+          constitutes acceptance of the revised Terms.
         </p>
 
         <h3 class="text-h6 mb-2">11. Governing Law</h3>
         <p class="text-body-2 mb-4">
-          These Terms are governed by the laws of Sweden and the European Union. Any disputes
-          shall be subject to the exclusive jurisdiction of Swedish courts.
+          These Terms are governed by the laws of Sweden and the European Union. Any disputes shall
+          be subject to the exclusive jurisdiction of Swedish courts.
         </p>
 
         <h3 class="text-h6 mb-2">12. Contact</h3>
@@ -115,7 +116,13 @@
         </p>
       </v-card-text>
       <v-card-actions class="pa-4">
-        <v-btn block color="primary" rounded="lg" size="large" @click="$emit('update:modelValue', false)">
+        <v-btn
+          block
+          color="primary"
+          rounded="lg"
+          size="large"
+          @click="$emit('update:modelValue', false)"
+        >
           {{ $t('common.close') }}
         </v-btn>
       </v-card-actions>

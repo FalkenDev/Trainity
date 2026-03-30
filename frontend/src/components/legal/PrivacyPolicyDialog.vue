@@ -14,21 +14,23 @@
   -->
 
 <template>
-  <v-dialog :model-value="modelValue" fullscreen @update:model-value="$emit('update:modelValue', $event)">
-    <v-card>
-      <v-toolbar color="surface" flat>
-        <v-btn icon @click="$emit('update:modelValue', false)">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ $t('auth.privacyPolicyTitle') }}</v-toolbar-title>
-      </v-toolbar>
+  <v-dialog
+    :model-value="modelValue"
+    fullscreen
+    @update:model-value="$emit('update:modelValue', $event)"
+  >
+    <v-card class="bg-background">
+      <BackHeader
+        :title="$t('auth.privacyPolicyTitle')"
+        @click="$emit('update:modelValue', false)"
+      />
       <v-card-text class="pa-6">
         <p class="text-caption text-textSecondary mb-6">Last updated: March 2026</p>
 
         <h3 class="text-h6 mb-2">1. Data Controller</h3>
         <p class="text-body-2 mb-4">
-          FalkenDev is the data controller for personal data processed through Grindify.
-          Contact: <strong>{{ contactEmail }}</strong>
+          FalkenDev is the data controller for personal data processed through Grindify. Contact:
+          <strong>{{ contactEmail }}</strong>
         </p>
 
         <h3 class="text-h6 mb-2">2. Personal Data We Collect</h3>
@@ -41,7 +43,9 @@
             RPE, goals, and progress
           </li>
           <li><strong>Usage data:</strong> Login timestamps, app activity</li>
-          <li><strong>Consent records:</strong> Date and version of accepted Terms & Privacy Policy</li>
+          <li>
+            <strong>Consent records:</strong> Date and version of accepted Terms & Privacy Policy
+          </li>
         </ul>
 
         <h3 class="text-h6 mb-2">3. Legal Basis for Processing (GDPR)</h3>
@@ -52,8 +56,8 @@
             the Service you signed up for (account management, storing your workout data)
           </li>
           <li>
-            <strong>Art. 6(1)(a) — Consent:</strong> Processing based on your explicit agreement
-            at registration (e.g., optional health-related data such as body metrics)
+            <strong>Art. 6(1)(a) — Consent:</strong> Processing based on your explicit agreement at
+            registration (e.g., optional health-related data such as body metrics)
           </li>
           <li>
             <strong>Art. 6(1)(f) — Legitimate interests:</strong> Security, fraud prevention, and
@@ -73,9 +77,9 @@
 
         <h3 class="text-h6 mb-2">5. Data Retention</h3>
         <p class="text-body-2 mb-4">
-          We retain your personal data for as long as your account is active. When you delete
-          your account, all associated personal data is permanently deleted within 30 days,
-          except where retention is required by law.
+          We retain your personal data for as long as your account is active. When you delete your
+          account, all associated personal data is permanently deleted within 30 days, except where
+          retention is required by law.
         </p>
 
         <h3 class="text-h6 mb-2">6. Your Rights Under GDPR</h3>
@@ -84,20 +88,19 @@
           <li><strong>Right of access (Art. 15):</strong> Request a copy of your data</li>
           <li><strong>Right to rectification (Art. 16):</strong> Correct inaccurate data</li>
           <li>
-            <strong>Right to erasure (Art. 17):</strong> Request deletion of your data
-            ("right to be forgotten")
+            <strong>Right to erasure (Art. 17):</strong> Request deletion of your data ("right to be
+            forgotten")
           </li>
           <li>
-            <strong>Right to restriction (Art. 18):</strong> Request limited processing of
-            your data
+            <strong>Right to restriction (Art. 18):</strong> Request limited processing of your data
           </li>
           <li>
             <strong>Right to data portability (Art. 20):</strong> Receive your data in a
             machine-readable format
           </li>
           <li>
-            <strong>Right to object (Art. 21):</strong> Object to processing based on
-            legitimate interests
+            <strong>Right to object (Art. 21):</strong> Object to processing based on legitimate
+            interests
           </li>
           <li>
             <strong>Right to withdraw consent:</strong> Withdraw consent at any time without
@@ -105,15 +108,15 @@
           </li>
         </ul>
         <p class="text-body-2 mb-4">
-          To exercise your rights, contact us at <strong>{{ contactEmail }}</strong>.
-          We will respond within 30 days.
+          To exercise your rights, contact us at <strong>{{ contactEmail }}</strong
+          >. We will respond within 30 days.
         </p>
 
         <h3 class="text-h6 mb-2">7. Data Sharing</h3>
         <p class="text-body-2 mb-4">
           We do not sell, rent, or share your personal data with third parties for marketing
-          purposes. Data may be shared only with service providers necessary to operate the
-          Service (e.g., hosting), who are bound by data processing agreements under GDPR Art. 28.
+          purposes. Data may be shared only with service providers necessary to operate the Service
+          (e.g., hosting), who are bound by data processing agreements under GDPR Art. 28.
         </p>
 
         <h3 class="text-h6 mb-2">8. Right to Lodge a Complaint</h3>
@@ -133,7 +136,13 @@
         </p>
       </v-card-text>
       <v-card-actions class="pa-4">
-        <v-btn block color="primary" rounded="lg" size="large" @click="$emit('update:modelValue', false)">
+        <v-btn
+          block
+          color="primary"
+          rounded="lg"
+          size="large"
+          @click="$emit('update:modelValue', false)"
+        >
           {{ $t('common.close') }}
         </v-btn>
       </v-card-actions>
