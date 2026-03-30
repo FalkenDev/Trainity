@@ -240,6 +240,7 @@ const dayLabels = computed(() => tm('schedule.dayLabels') as string[])
 interface ListItem {
   id: number
   name: string
+  icon?: string
 }
 
 const itemList = computed<ListItem[]>(() => {
