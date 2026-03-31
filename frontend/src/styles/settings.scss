@@ -87,14 +87,18 @@ body,
   opacity: 0 !important;
 }
 
-// Hide bottom nav whenever a fullscreen dialog is open so it doesn't
-// peek through at the bottom of the dialog.
-body:has(.v-dialog--fullscreen) .v-bottom-navigation {
+// Hide bottom nav whenever any dialog is open.
+// `html.v-overlay-scroll-blocked` is added by Vuetify only while a dialog
+// with scrollStrategy="block" (the default) is actually active — it is
+// removed when the dialog closes, so this never fires on a dormant overlay
+// that is still mounted in the DOM.  This covers fullscreen AND non-fullscreen
+// dialogs, and works on iOS where :has()-on-body was unreliable.
+html.v-overlay-scroll-blocked .v-bottom-navigation {
   display: none !important;
 }
 
-// Remove v-main bottom padding when a fullscreen dialog is open so the
-// safe-area gap doesn't peek through on iOS rubber-band / overscroll.
-body:has(.v-dialog--fullscreen) .v-main {
+// Remove v-main bottom padding while any dialog is open so the safe-area
+// gap doesn't peek through on iOS rubber-band / overscroll.
+html.v-overlay-scroll-blocked .v-main {
   padding-bottom: 0 !important;
 }
