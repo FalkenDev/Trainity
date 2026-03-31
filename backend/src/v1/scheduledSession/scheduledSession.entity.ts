@@ -74,6 +74,9 @@ export class ScheduledSession {
   notes: string | null;
 
   @Column({ type: 'date', nullable: true })
+  recurringStartDate: Date | null;
+
+  @Column({ type: 'date', nullable: true })
   recurringEndDate: Date | null;
 
   @CreateDateColumn()

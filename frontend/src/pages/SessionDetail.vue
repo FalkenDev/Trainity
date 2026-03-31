@@ -24,7 +24,11 @@
     "
   >
     <!-- Header -->
-    <BackHeader :title="sessionTitle" show-menu @close="isDialogMode ? emit('close') : $router.back()">
+    <BackHeader
+      :title="sessionTitle"
+      show-menu
+      @close="isDialogMode ? emit('close') : $router.back()"
+    >
       <template #menuAppend>
         <v-list
           class="bg-cardBg"
@@ -41,7 +45,7 @@
     </BackHeader>
 
     <!-- Avatar -->
-    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 rounded-lg">
+    <v-avatar size="70" tile color="avatarBg" class="mx-5 mb-3 mt-4 rounded-lg">
       <v-icon color="primary" size="35">{{ sessionIcon }}</v-icon>
     </v-avatar>
 
@@ -366,12 +370,11 @@ const activityStore = useActivityStore()
 
 const isDialogMode = computed(() => props.sessionId !== undefined)
 
-const type = computed(() =>
-  props.sessionType ?? ((route.params as Record<string, string>).type as 'workout' | 'activity')
+const type = computed(
+  () =>
+    props.sessionType ?? ((route.params as Record<string, string>).type as 'workout' | 'activity')
 )
-const id = computed(() =>
-  props.sessionId ?? Number((route.params as Record<string, string>).id)
-)
+const id = computed(() => props.sessionId ?? Number((route.params as Record<string, string>).id))
 
 const deleteDialog = ref(false)
 const isDeleting = ref(false)
@@ -406,7 +409,9 @@ const sessionIcon = computed(() => {
 
 const sessionTitle = computed(() => {
   if (type.value === 'workout') {
-    return workoutSession.value?.workout?.title ?? t('sessionDetail.sessionFallback', { id: id.value })
+    return (
+      workoutSession.value?.workout?.title ?? t('sessionDetail.sessionFallback', { id: id.value })
+    )
   }
   return activityLog.value?.activity?.name ?? t('sessionDetail.activityFallback', { id: id.value })
 })

@@ -18,17 +18,13 @@
     <v-card class="bg-background">
       <div class="pa-5 d-flex flex-column ga-4">
         <!-- Header -->
-        <div class="d-flex align-center ga-3">
-          <v-btn icon variant="text" size="small" @click="dialogModel = false">
-            <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
-          <div>
-            <p class="text-body-1 font-weight-bold">{{ workout?.title }}</p>
-            <p class="text-caption text-textSecondary">
-              {{ workout?.exercises?.length ?? 0 }} {{ $t('statistics.exercises') }} ·
-              {{ workout?.time ?? 0 }} min
-            </p>
-          </div>
+        <BackHeader :title="workout?.title ?? ''" @back="dialogModel = false" />
+
+        <div class="mt-4">
+          <p class="text-caption text-textSecondary">
+            {{ workout?.exercises?.length ?? 0 }} {{ $t('statistics.exercises') }} ·
+            {{ workout?.time ?? 0 }} min
+          </p>
         </div>
 
         <!-- Summary Cards -->

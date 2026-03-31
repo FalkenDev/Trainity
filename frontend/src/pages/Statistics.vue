@@ -50,7 +50,7 @@
           <v-card
             v-for="stat in secondaryStats"
             :key="stat.label"
-            class="flex-grow-1 bg-cardBg pa-3 rounded-lg stat-card-mini"
+            class="flex-1-1-0 bg-cardBg pa-3 rounded-lg stat-card-mini"
             style="
               border: 1px solid rgb(var(--v-theme-borderColor));
               box-shadow: none;

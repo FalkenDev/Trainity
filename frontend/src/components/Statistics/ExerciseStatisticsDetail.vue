@@ -18,31 +18,27 @@
     <v-card class="bg-background">
       <div class="pa-5 d-flex flex-column ga-4">
         <!-- Header -->
-        <div class="d-flex align-center ga-3">
-          <v-btn icon variant="text" size="small" @click="dialogModel = false">
-            <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
-          <div class="d-flex align-center ga-3 flex-grow-1">
-            <v-avatar v-if="exercise?.image" size="40" rounded>
-              <v-img :src="getImageUrl(exercise.image)" />
-            </v-avatar>
-            <v-avatar v-else color="blue-grey-darken-3" size="40" rounded>
-              <v-icon size="20">mdi-dumbbell</v-icon>
-            </v-avatar>
-            <div>
-              <p class="text-body-1 font-weight-bold">{{ exercise?.name }}</p>
-              <div class="d-flex ga-1">
-                <v-chip
-                  v-for="mg in exercise?.muscleGroups?.slice(0, 3)"
-                  :key="mg.id"
-                  size="x-small"
-                  variant="tonal"
-                >
-                  {{ $t(`muscleGroups.${mg.name}`) }}
-                </v-chip>
-              </div>
-            </div>
-          </div>
+        <BackHeader
+          :title="exercise?.name ?? ''"
+          :subtitle="
+            exercise
+              ? `${exercise.muscleGroups?.map(mg => $t(`muscleGroups.${mg.name}`)).join(', ')}`
+              : ''
+          "
+          :image="exercise?.image ? getImageUrl(exercise.image) : undefined"
+          icon="mdi-dumbbell"
+          @back="dialogModel = false"
+        />
+
+        <div class="mt-4 mb-2 d-flex ga-2">
+          <v-chip
+            v-for="mg in exercise?.muscleGroups?.slice(0, 3)"
+            :key="mg.id"
+            size="x-small"
+            variant="tonal"
+          >
+            {{ $t(`muscleGroups.${mg.name}`) }}
+          </v-chip>
         </div>
 
         <!-- Personal Records -->

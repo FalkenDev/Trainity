@@ -909,6 +909,8 @@ export default {
     completedSessions: 'Genomförda pass',
     scheduledSessions: 'Schemalagda',
     workout: 'Pass',
+    activity: 'Aktivitet',
+    scheduled: 'Schemalagd',
   },
   schedule: {
     registerWorkout: 'Registrera träning',
@@ -1074,7 +1076,7 @@ export default {
     avgVolume: 'Snittvolym',
     totalSets: 'Totala set',
     avgSessionDuration: 'Snittlängd',
-    currentStreak: 'Nuvarande streak',
+    currentStreak: 'Streak',
     longestStreak: 'Längsta streak',
     personalRecords: 'Personliga rekord',
     recentPRs: 'Senaste PR',

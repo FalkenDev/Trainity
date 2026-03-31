@@ -36,7 +36,6 @@
     <div v-else class="hero-stats-row">
       <div v-for="stat in heroStats" :key="stat.key" class="hero-stat">
         <div class="d-flex align-center ga-1 mb-1">
-          <v-icon :color="stat.iconColor" size="14">{{ stat.icon }}</v-icon>
           <span class="text-caption text-textSecondary text-no-wrap">{{ stat.label }}</span>
         </div>
         <p
@@ -110,8 +109,6 @@ const heroStats = computed(() => {
   return [
     {
       key: 'workouts',
-      icon: 'mdi-dumbbell',
-      iconColor: 'primary',
       label: t('statistics.totalWorkouts'),
       value: o.totalWorkouts,
       displayValue: o.totalWorkouts.toLocaleString(),
@@ -120,8 +117,6 @@ const heroStats = computed(() => {
     },
     {
       key: 'volume',
-      icon: 'mdi-weight-kilogram',
-      iconColor: 'blue',
       label: t('statistics.totalVolume'),
       value: o.totalVolume,
       displayValue: formatVolume(o.totalVolume) + ' kg',
@@ -130,8 +125,6 @@ const heroStats = computed(() => {
     },
     {
       key: 'streak',
-      icon: 'mdi-fire',
-      iconColor: 'orange',
       label: t('statistics.currentStreak'),
       value: o.currentStreak,
       displayValue: `${o.currentStreak}`,

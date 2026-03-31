@@ -917,6 +917,8 @@ export default {
     completedSessions: 'Completed Sessions',
     scheduledSessions: 'Scheduled',
     workout: 'Workouts',
+    activity: 'Activities',
+    scheduled: 'Scheduled',
   },
   schedule: {
     registerWorkout: 'Register Workout',

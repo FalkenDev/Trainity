@@ -108,6 +108,7 @@ export class ScheduledSessionService {
       dayOfWeek: dto.dayOfWeek ?? null,
       isRecurring: dto.isRecurring,
       notes: dto.notes || null,
+      recurringStartDate: dto.isRecurring ? new Date() : null,
       recurringEndDate: (dto.isRecurring && dto.recurringEndDate)
         ? new Date(dto.recurringEndDate)
         : null,
@@ -141,6 +142,8 @@ export class ScheduledSessionService {
       if (s.isRecurring) {
         if (s.dayOfWeek !== dayOfWeek) return false;
         if (s.exceptionDates.includes(dateStr)) return false;
+        const startStr = this.toDateString(s.recurringStartDate);
+        if (startStr && dateStr < startStr) return false;
         if (s.recurringEndDate) {
           const endStr = this.toDateString(s.recurringEndDate);
           if (endStr && dateStr > endStr) return false;
@@ -180,11 +183,16 @@ export class ScheduledSessionService {
         if (s.isRecurring) {
           if (s.dayOfWeek !== dayOfWeek) { matches = false; }
           else if (s.exceptionDates.includes(dateStr)) { matches = false; }
-          else if (s.recurringEndDate) {
-            const endStr = this.toDateString(s.recurringEndDate);
-            matches = !endStr || dateStr <= endStr;
-          } else {
-            matches = true;
+          else {
+            const startStr = this.toDateString(s.recurringStartDate);
+            if (startStr && dateStr < startStr) {
+              matches = false;
+            } else if (s.recurringEndDate) {
+              const endStr = this.toDateString(s.recurringEndDate);
+              matches = !endStr || dateStr <= endStr;
+            } else {
+              matches = true;
+            }
           }
         } else {
           const sDate = this.toDateString(s.scheduledDate);

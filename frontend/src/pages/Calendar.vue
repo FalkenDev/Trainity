@@ -108,15 +108,15 @@
       <v-card-text class="d-flex align-center ga-4">
         <div class="d-flex align-center ga-2">
           <div class="activity-dot workout"></div>
-          <span class="text-caption text-textSecondary">Gym</span>
+          <span class="text-caption text-textSecondary">{{ $t('calendar.workout') }}</span>
         </div>
         <div class="d-flex align-center ga-2">
           <div class="activity-dot activity"></div>
-          <span class="text-caption text-textSecondary">Activity</span>
+          <span class="text-caption text-textSecondary">{{ $t('calendar.activity') }}</span>
         </div>
         <div class="d-flex align-center ga-2">
           <div class="activity-dot scheduled"></div>
-          <span class="text-caption text-textSecondary">Scheduled</span>
+          <span class="text-caption text-textSecondary">{{ $t('calendar.scheduled') }}</span>
         </div>
       </v-card-text>
     </v-card>
@@ -167,18 +167,15 @@
                   <v-chip size="x-small" color="blue" variant="flat">
                     {{ $t('schedule.scheduled') }}
                   </v-chip>
-                  <span v-if="session.isRecurring" class="text-caption text-textSecondary">
-                    <v-icon size="12">mdi-repeat</v-icon>
-                    {{ $t('schedule.recurring') }}
-                  </span>
                 </div>
               </div>
             </div>
             <div class="d-flex align-center ga-2">
               <v-btn
                 v-if="isSelectedDateToday"
-                size="small"
+                size="x-small"
                 color="primary"
+                density="compact"
                 variant="flat"
                 @click.stop="startScheduledSession(session)"
               >

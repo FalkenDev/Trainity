@@ -24,7 +24,11 @@
     "
   >
     <!-- Header -->
-    <BackHeader :title="workout?.title || ''" show-menu @close="isDialogMode ? emit('close') : $router.back()">
+    <BackHeader
+      :title="workout?.title || ''"
+      show-menu
+      @close="isDialogMode ? emit('close') : $router.back()"
+    >
       <template #menuAppend>
         <v-list
           class="bg-cardBg"
@@ -67,7 +71,9 @@
         :style="{ border: '1px solid rgb(var(--v-theme-borderColor))', boxShadow: 'none' }"
       >
         <p class="text-body-2 text-textSecondary mb-3">{{ hydrationError }}</p>
-        <v-btn color="primary" variant="tonal" @click="loadWorkout(effectiveWorkoutId)"> Retry </v-btn>
+        <v-btn color="primary" variant="tonal" @click="loadWorkout(effectiveWorkoutId)">
+          Retry
+        </v-btn>
       </v-card>
     </div>
 
@@ -188,7 +194,10 @@
                 </span>
               </p>
             </div>
-            <div v-if="exercise.exercise.primaryMuscleGroups?.length" class="flex-shrink-0 ml-2 d-flex ga-1 flex-wrap">
+            <div
+              v-if="exercise.exercise.primaryMuscleGroups?.length"
+              class="flex-shrink-0 ml-2 d-flex ga-1 flex-wrap"
+            >
               <v-chip
                 v-for="pm in exercise.exercise.primaryMuscleGroups"
                 :key="pm.id"
