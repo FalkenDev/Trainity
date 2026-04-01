@@ -60,7 +60,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'icons/*.png'],
+      includeAssets: ['favicon.ico', 'icons/*.png', 'apple-splash/*.png'],
       manifest: {
         name: 'Grindify',
         short_name: 'Grindify',
