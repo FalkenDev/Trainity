@@ -34,6 +34,7 @@ export interface Exercise {
   sets: number
   reps: number
   weight: number
+  setWeights: number[] | null
   pauseSeconds: number
   exerciseId: number
   exercise: {
@@ -103,6 +104,7 @@ export interface AddExerciseToWorkout {
   sets: number
   reps: number
   weight: number
+  setWeights?: number[] | null
   pauseSeconds: number
 }
 
@@ -110,6 +112,7 @@ export interface UpdateWorkoutExercise {
   sets?: number
   reps?: number
   weight?: number
+  setWeights?: number[] | null
   pauseSeconds?: number
 }
 

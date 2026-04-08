@@ -23,7 +23,6 @@
       <v-list-item
         v-for="option in options"
         :key="option.value"
-        :disabled="option.value === 'latest'"
         class="py-2 mx-3 my-2 rounded-lg bg-cardBg"
         style="border: 1px solid rgb(var(--v-theme-borderColor))"
         two-line

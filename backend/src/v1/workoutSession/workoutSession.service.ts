@@ -27,8 +27,18 @@ import { WorkoutSessionSet } from './workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutStatus } from '../types/WorkoutStatus.type';
 import { UserService } from '../user/user.service';
-import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
 import { StatisticsService } from '../statistics/statistics.service';
+
+export interface PreviousSetItem {
+  setNumber: number;
+  weight: number | null;
+  reps: number | null;
+}
+
+export interface PreviousSetsResponseItem {
+  exerciseId: number;
+  sets: PreviousSetItem[];
+}
 
 @Injectable()
 export class WorkoutSessionService {
@@ -78,6 +88,74 @@ export class WorkoutSessionService {
     }
 
     return session;
+  }
+
+  async getPreviousSets(
+    userId: number,
+    sessionId: number,
+  ): Promise<PreviousSetsResponseItem[]> {
+    const session = await this.sessionRepo.findOne({
+      where: { id: sessionId, user: { id: userId } },
+      relations: ['workout', 'exercises', 'exercises.exercise'],
+    });
+
+    if (!session) throw new NotFoundException('Session not found');
+
+    const workoutId = session.workout?.id;
+    const result: PreviousSetsResponseItem[] = [];
+
+    for (const sessionEx of session.exercises) {
+      const exerciseId = sessionEx.exercise?.id;
+      if (typeof exerciseId === 'undefined') continue;
+
+      let previousEx: WorkoutSessionExercise | null = null;
+
+      // Prefer: last finished session with same workout template
+      if (workoutId) {
+        previousEx = await this.sessionExerciseRepo
+          .createQueryBuilder('se')
+          .innerJoin('se.session', 'ws')
+          .leftJoinAndSelect('se.sets', 'sets')
+          .where('se.exercise.id = :exerciseId', { exerciseId })
+          .andWhere('ws.user.id = :userId', { userId })
+          .andWhere('ws.workout.id = :workoutId', { workoutId })
+          .andWhere('ws.status = :status', { status: 'finished' })
+          .andWhere('ws.id != :sessionId', { sessionId })
+          .orderBy('ws.endedAt', 'DESC')
+          .addOrderBy('sets.setNumber', 'ASC')
+          .getOne();
+      }
+
+      // Fallback: last finished session (any workout) with this exercise
+      if (!previousEx) {
+        previousEx = await this.sessionExerciseRepo
+          .createQueryBuilder('se')
+          .innerJoin('se.session', 'ws')
+          .leftJoinAndSelect('se.sets', 'sets')
+          .where('se.exercise.id = :exerciseId', { exerciseId })
+          .andWhere('ws.user.id = :userId', { userId })
+          .andWhere('ws.status = :status', { status: 'finished' })
+          .andWhere('ws.id != :sessionId', { sessionId })
+          .orderBy('ws.endedAt', 'DESC')
+          .addOrderBy('sets.setNumber', 'ASC')
+          .getOne();
+      }
+
+      if (previousEx?.sets?.length) {
+        result.push({
+          exerciseId,
+          sets: [...previousEx.sets]
+            .sort((a, b) => a.setNumber - b.setNumber)
+            .map((s) => ({
+              setNumber: s.setNumber,
+              weight: s.weight !== undefined ? Number(s.weight) : null,
+              reps: s.reps ?? null,
+            })),
+        });
+      }
+    }
+
+    return result;
   }
 
   async createSession(
@@ -443,7 +521,7 @@ export class WorkoutSessionService {
         for (const set of ex.sets ?? []) {
           exTotal += set.weight * set.reps;
         }
-        stats.push({ exerciseId: ex.exercise?.id, totalWeight: exTotal });
+        stats.push({ exerciseId: ex.exercise?.id ?? 0, totalWeight: exTotal });
         totalWeight += exTotal;
       }
 
@@ -481,6 +559,7 @@ export class WorkoutSessionService {
       const result = await manager.findOneOrFail(WorkoutSession, {
         where: { id: session.id },
         relations: [
+          'workout',
           'exercises',
           'exercises.sets',
           'exercises.exercise',

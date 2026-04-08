@@ -18,12 +18,14 @@ import { DataSource } from 'typeorm';
 
 import { User } from '../user/user.entity';
 import { Exercise } from '../exercise/exercise.entity';
+import { ExerciseMedia } from '../exercise/exerciseMedia.entity';
 import { Workout } from '../workout/workout.entity';
 import { WorkoutExercise } from '../workout/workoutExercise.entity';
 import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { MuscleGroup } from '../muscleGroup/muscleGroup.entity';
+import { ScheduledSession } from '../scheduledSession/scheduledSession.entity';
 import { Activity } from '../activity/activity.entity';
 import { ActivityLog } from '../activityLog/activityLog.entity';
 
@@ -43,12 +45,14 @@ const AppDataSource = new DataSource({
   entities: [
     User,
     Exercise,
+    ExerciseMedia,
     Workout,
     WorkoutExercise,
     WorkoutSession,
     WorkoutSessionExercise,
     WorkoutSessionSet,
     MuscleGroup,
+    ScheduledSession,
     Activity,
     ActivityLog,
   ],

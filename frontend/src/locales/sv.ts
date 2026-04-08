@@ -369,6 +369,7 @@ export default {
     caloriesBurned: 'Kalorier',
     exercisesCount: 'Övningar',
     exercises: 'Övningar',
+    saveAsWorkout: 'Spara som träningspass',
   },
   activity: {
     logActivity: 'Logga aktivitet',

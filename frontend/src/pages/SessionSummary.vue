@@ -139,7 +139,29 @@
       <v-btn color="primary" size="large" block :loading="isSaving" class="mt-2" @click="done">
         {{ $t('sessionSummary.done') }}
       </v-btn>
+
+      <!-- Save as Workout (only for empty workouts with exercises) -->
+      <v-btn
+        v-if="isEmptyWorkout"
+        color="primary"
+        variant="outlined"
+        size="large"
+        block
+        @click="saveAsWorkoutDialog = true"
+      >
+        <v-icon start>mdi-content-save-outline</v-icon>
+        {{ $t('workout.saveAsWorkout') }}
+      </v-btn>
     </div>
+
+    <!-- Save as Workout dialog -->
+    <v-dialog v-model="saveAsWorkoutDialog" fullscreen>
+      <CreateWorkout
+        v-if="saveAsWorkoutDialog && workoutInitialData"
+        :initial-data="workoutInitialData"
+        @close="saveAsWorkoutDialog = false"
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -149,6 +171,8 @@ import { updateWorkoutSession } from '@/services/workoutSession.service'
 import router from '@/router'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vuetify-sonner'
+import { mapSessionToWorkoutInitialData } from '@/utils/sessionToWorkout'
+import CreateWorkout from '@/components/Workout/CreateWorkout.vue'
 
 const { t } = useI18n({ useScope: 'global' })
 const workoutSessionStore = useWorkoutSessionStore()
@@ -165,6 +189,11 @@ const durationSeconds = summary?.durationSeconds ?? 0
 
 const caloriesInput = ref<number | null>(null)
 const isSaving = ref(false)
+const saveAsWorkoutDialog = ref(false)
+const isEmptyWorkout = computed(() => session?.workout == null && (session?.exercises?.length ?? 0) > 0)
+const workoutInitialData = computed(() =>
+  session ? mapSessionToWorkoutInitialData(session, durationSeconds) : undefined
+)
 
 // Derived stats
 const workoutName = computed(() => session?.workout?.title ?? t('sessionSummary.unknownWorkout'))

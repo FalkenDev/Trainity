@@ -154,10 +154,10 @@ export const useWorkoutSessionStore = defineStore(
       return liveSessions.value[sessionId]
     }
 
-    function initLiveSessionFromSnapshot(session: tempWorkoutSession) {
+    function initLiveSessionFromSnapshot(session: tempWorkoutSession): boolean {
       const sessionId = session.id
-      if (typeof sessionId === 'undefined') return
-      if (liveSessions.value[sessionId]) return
+      if (typeof sessionId === 'undefined') return false
+      if (liveSessions.value[sessionId]) return false
 
       // Treat exercises as "from server" only when at least one exercise has
       // recorded sets (i.e. a finished / resumed session).  A freshly-created
@@ -217,7 +217,7 @@ export const useWorkoutSessionStore = defineStore(
             for (let i = 1; i <= (base.sets || 1); i++) {
               sets.push({
                 set: i,
-                weight: base.weight ?? 0,
+                weight: ((base as any).setWeights as number[] | null | undefined)?.[i - 1] ?? base.weight ?? 0,
                 reps: base.reps ?? 0,
                 done: false,
                 previous: 'N/A',
@@ -236,6 +236,7 @@ export const useWorkoutSessionStore = defineStore(
       }
 
       liveSessions.value[sessionId] = { sessionId, exercises }
+      return true
     }
 
     function upsertExercise(sessionId: number, exerciseId: number) {
@@ -279,6 +280,48 @@ export const useWorkoutSessionStore = defineStore(
         done: false,
         previous: 'N/A',
       })
+    }
+
+    function applyPreviousSets(
+      sessionId: number,
+      data: { exerciseId: number; sets: { setNumber: number; weight: number | null; reps: number | null }[] }[]
+    ) {
+      const liveSession = liveSessions.value[sessionId]
+      if (!liveSession) return
+
+      for (const item of data) {
+        const liveEx = liveSession.exercises[item.exerciseId]
+        if (!liveEx) continue
+
+        // Match by array index — both sides are ordered by set number ascending
+        for (let i = 0; i < liveEx.sets.length; i++) {
+          const prevSet = item.sets[i]
+          if (!prevSet) break // No more previous sets; remaining stay 'N/A'
+          const w = prevSet.weight ?? 0
+          const r = prevSet.reps ?? 0
+          liveEx.sets[i].previous = `${w} × ${r}`
+        }
+      }
+    }
+
+    function applyPreviousSetsAsWeightAndReps(
+      sessionId: number,
+      data: { exerciseId: number; sets: { setNumber: number; weight: number | null; reps: number | null }[] }[]
+    ) {
+      const liveSession = liveSessions.value[sessionId]
+      if (!liveSession) return
+
+      for (const item of data) {
+        const liveEx = liveSession.exercises[item.exerciseId]
+        if (!liveEx) continue
+
+        for (let i = 0; i < liveEx.sets.length; i++) {
+          const prevSet = item.sets[i]
+          if (!prevSet) break // Previous had fewer sets — leave rest as template defaults
+          if (prevSet.weight !== null) liveEx.sets[i].weight = prevSet.weight
+          if (prevSet.reps !== null) liveEx.sets[i].reps = prevSet.reps
+        }
+      }
     }
 
     function deleteSet(sessionId: number, exerciseId: number, setNumber: number) {
@@ -381,6 +424,8 @@ export const useWorkoutSessionStore = defineStore(
       removeExercise,
       updateSet,
       addSet,
+      applyPreviousSets,
+      applyPreviousSetsAsWeightAndReps,
       deleteSet,
       updateExerciseMeta,
       clearLiveSession,

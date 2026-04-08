@@ -96,7 +96,7 @@ import type { FinishedExercisePayload, WorkoutSession } from '@/interfaces/worko
 import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface'
 
 import { fetchExerciseById } from '@/services/exercise.service'
-import { abandonWorkoutSession, finishWorkoutSession } from '@/services/workoutSession.service'
+import { abandonWorkoutSession, finishWorkoutSession, fetchPreviousSets } from '@/services/workoutSession.service'
 import type { Exercise as ExerciseDetailType } from '@/interfaces/Exercise.interface'
 
 const isAddExerciseOpen = ref(false)
@@ -152,7 +152,7 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
       // Use the live workout relation for default sets/reps/weight
       const workoutExById = new Map<
         number,
-        { sets: number; reps: number; weight: number; pauseSeconds?: number }
+        { sets: number; reps: number; weight: number; setWeights: number[] | null; pauseSeconds?: number }
       >()
       for (const base of workoutSession.value.workout?.exercises || []) {
         const exId = base.exerciseId ?? base.exercise?.id
@@ -161,6 +161,7 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
             sets: base.sets ?? 0,
             reps: base.reps ?? 0,
             weight: base.weight ?? 0,
+            setWeights: base.setWeights ?? null,
             pauseSeconds: base.pauseSeconds ?? 0,
           })
         }
@@ -173,6 +174,7 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
         const plannedSets = (snap?.sets ?? 0) || 1
         const plannedReps = (snap?.reps ?? 0) || 8
         const plannedWeight = (snap?.weight ?? 0) || 0
+        const setWeights = snap?.setWeights ?? null
         const pauseSeconds = snap?.pauseSeconds ?? 60
 
         workoutSessionStore.upsertExercise(sessionId.value, id)
@@ -184,7 +186,7 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
             workoutSessionStore.addSet(sessionId.value, id)
             workoutSessionStore.updateSet(sessionId.value, id, {
               set: i,
-              weight: plannedWeight,
+              weight: setWeights?.[i - 1] ?? plannedWeight,
               reps: plannedReps,
               done: false,
               previous: 'N/A',
@@ -355,7 +357,17 @@ watchEffect(async () => {
     return
   }
 
-  workoutSessionStore.initLiveSessionFromSnapshot(s)
+  const isFirstInit = workoutSessionStore.initLiveSessionFromSnapshot(s)
+
+  // Only apply previous-set data on first init — never on resume
+  if (isFirstInit) {
+    fetchPreviousSets(s.id).then(data => {
+      workoutSessionStore.applyPreviousSets(s.id, data)
+      if (s.workout?.defaultWeightAndReps === 'latest') {
+        workoutSessionStore.applyPreviousSetsAsWeightAndReps(s.id, data)
+      }
+    })
+  }
 
   const live = workoutSessionStore.getLiveSession(s.id)
   const idsFromLive = live ? Object.keys(live.exercises).map(Number) : []
@@ -408,6 +420,7 @@ watchEffect(async () => {
       sets: plannedSets,
       reps: plannedReps,
       weight: plannedWeight,
+      setWeights: baseWorkoutEx?.setWeights ?? null,
       pauseSeconds,
       exercise: {
         id: d.id,

@@ -19,25 +19,28 @@ import { IsNumber } from 'class-validator';
 export class WorkoutExerciseDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
-  order: number;
+  order!: number;
 
   @ApiProperty({ example: 3 })
   @IsNumber()
-  sets: number;
+  sets!: number;
 
   @ApiProperty({ example: 10 })
   @IsNumber()
-  reps: number;
+  reps!: number;
 
   @ApiProperty({ example: 60 })
   @IsNumber()
-  pauseSeconds: number;
+  pauseSeconds!: number;
 
   @ApiProperty({ example: 50 })
   @IsNumber()
-  weight: number;
+  weight!: number;
+
+  @ApiProperty({ example: [40, 60, 60], nullable: true })
+  setWeights!: number[] | null;
 
   @ApiProperty({ example: 5 })
   @IsNumber()
-  exerciseId: number;
+  exerciseId!: number;
 }

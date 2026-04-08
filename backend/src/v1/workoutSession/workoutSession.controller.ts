@@ -110,6 +110,16 @@ export class WorkoutSessionController {
     return this.sessionService.getOneSession(id, this.getUserId(req));
   }
 
+  @Get(':id/previous-sets')
+  @ApiOperation({ summary: 'Get previous sets for each exercise in a session' })
+  @ApiOkResponse({ description: 'Previous sets per exercise' })
+  getPreviousSets(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.sessionService.getPreviousSets(this.getUserId(req), id);
+  }
+
   @Put(':id')
   @ApiOperation({ summary: 'Update workout session' })
   @ApiOkResponse({ type: WorkoutSession })

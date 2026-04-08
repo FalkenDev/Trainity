@@ -24,7 +24,7 @@
       @save="saveWorkout"
     />
 
-    <v-form ref="formRef" class="mx-5 mt-2 pb-10">
+    <v-form class="mx-5 mt-2 pb-10">
       <!-- Workout Title -->
       <div>
         <v-label class="text-body-2 font-weight-bold text-textPrimary mb-1">
@@ -230,6 +230,7 @@ import type {
   WorkoutType,
   Workout,
   Exercise as WorkoutExercise,
+  UpdateWorkoutExercise,
 } from '@/interfaces/Workout.interface'
 import type { Exercise as ExerciseCatalog } from '@/interfaces/Exercise.interface'
 import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface'
@@ -247,6 +248,7 @@ import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
 import { displayExerciseName } from '@/utils/exerciseDisplay'
 import { useRouter } from 'vue-router'
+import type { WorkoutInitialData } from '@/utils/sessionToWorkout'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -254,6 +256,10 @@ const router = useRouter()
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
+
+const props = withDefaults(defineProps<{ initialData?: WorkoutInitialData }>(), {
+  initialData: undefined,
+})
 
 const workoutStore = useWorkoutStore()
 const muscleGroupStore = useMuscleGroupStore()
@@ -281,6 +287,16 @@ const form = reactive({
 })
 
 const selectedTargetMuscleIds = ref(new Set<number>())
+
+onMounted(() => {
+  if (props.initialData) {
+    if (props.initialData.time != null) form.time = props.initialData.time
+    if (props.initialData.exercises.length) {
+      // Shallow copy is sufficient; WorkoutExerciseInitialData contains only primitives.
+      form.exercises = props.initialData.exercises.map(ex => ({ ...ex }))
+    }
+  }
+})
 
 // -- Workout type items --
 const workoutTypeItems = computed(() => [
@@ -417,7 +433,7 @@ const saveWorkout = async () => {
             if (matchingWe.weight !== exForm.weight) changes.weight = exForm.weight
 
             if (Object.keys(changes).length > 0) {
-              await updateExerciseInWorkout(workoutId, matchingWe.id, changes)
+              await updateExerciseInWorkout(workoutId, matchingWe.id, changes as UpdateWorkoutExercise)
             }
           }
         }

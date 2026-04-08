@@ -374,6 +374,7 @@ export default {
     caloriesBurned: 'Calories',
     exercisesCount: 'Exercises',
     exercises: 'Exercises',
+    saveAsWorkout: 'Save as Workout',
   },
   activity: {
     logActivity: 'Log Activity',

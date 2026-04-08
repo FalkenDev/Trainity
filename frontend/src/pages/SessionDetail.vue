@@ -35,6 +35,9 @@
           width="160"
           :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
         >
+          <v-list-item v-if="isEmptyWorkout" @click="saveAsWorkoutDialog = true">
+            <v-list-item-title>{{ $t('workout.saveAsWorkout') }}</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="confirmDelete">
             <v-list-item-title class="text-error">{{
               $t('sessionDetail.deleteSession')
@@ -342,6 +345,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Save as Workout dialog -->
+    <v-dialog v-model="saveAsWorkoutDialog" fullscreen>
+      <CreateWorkout
+        v-if="saveAsWorkoutDialog && workoutInitialData"
+        :initial-data="workoutInitialData"
+        @close="saveAsWorkoutDialog = false"
+      />
+    </v-dialog>
   </div>
 </template>
 
@@ -357,6 +369,8 @@ import type { Exercise } from '@/interfaces/Exercise.interface'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ExerciseDetails from '@/components/Exercise/ExerciseDetails.vue'
+import { mapSessionToWorkoutInitialData } from '@/utils/sessionToWorkout'
+import CreateWorkout from '@/components/Workout/CreateWorkout.vue'
 
 const props = defineProps<{ sessionType?: 'workout' | 'activity'; sessionId?: number }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
@@ -378,6 +392,7 @@ const id = computed(() => props.sessionId ?? Number((route.params as Record<stri
 
 const deleteDialog = ref(false)
 const isDeleting = ref(false)
+const saveAsWorkoutDialog = ref(false)
 const exerciseDialog = ref(false)
 const selectedExercise = ref<Exercise | null>(null)
 
@@ -392,6 +407,29 @@ const workoutSession = computed<WorkoutSession | null>(() => {
   const sessions = (workoutSessionStore.workoutSessions as WorkoutSession[]) || []
   return sessions.find(s => s.id === id.value) ?? null
 })
+
+const isEmptyWorkout = computed(
+  () =>
+    type.value === 'workout' &&
+    workoutSession.value != null &&
+    workoutSession.value.workout == null &&
+    (workoutSession.value.exercises?.length ?? 0) > 0
+)
+
+const durationMinutes = computed(() => {
+  if (!workoutSession.value) return 0
+  const s = new Date(workoutSession.value.startedAt).getTime()
+  const e = workoutSession.value.endedAt
+    ? new Date(workoutSession.value.endedAt).getTime()
+    : Date.now()
+  return Math.max(0, Math.round((e - s) / 60000))
+})
+
+const workoutInitialData = computed(() =>
+  workoutSession.value
+    ? mapSessionToWorkoutInitialData(workoutSession.value, durationMinutes.value * 60) // convert minutes → seconds
+    : undefined
+)
 
 const activityLog = computed<ActivityLog | null>(() => {
   if (type.value !== 'activity') return null
@@ -433,12 +471,7 @@ const sessionNotes = computed(() => {
 
 const durationDisplay = computed(() => {
   if (type.value === 'workout' && workoutSession.value) {
-    const s = new Date(workoutSession.value.startedAt).getTime()
-    const e = workoutSession.value.endedAt
-      ? new Date(workoutSession.value.endedAt).getTime()
-      : Date.now()
-    const mins = Math.max(0, Math.round((e - s) / 60000))
-    return `${mins} ${t('units.minShort')}`
+    return `${durationMinutes.value} ${t('units.minShort')}`
   }
   if (type.value === 'activity' && activityLog.value) {
     return `${activityLog.value.duration} ${t('units.minShort')}`

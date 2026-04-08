@@ -14,7 +14,7 @@
  */
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsOptional, Min } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, Min } from 'class-validator';
 
 export class UpdateWorkoutExerciseDto {
   @ApiPropertyOptional({ example: 3 })
@@ -40,4 +40,9 @@ export class UpdateWorkoutExerciseDto {
   @IsNumber()
   @Min(0)
   pauseSeconds?: number;
+
+  @ApiPropertyOptional({ example: [40, 60, 60], isArray: true })
+  @IsOptional()
+  @IsArray()
+  setWeights?: number[];
 }

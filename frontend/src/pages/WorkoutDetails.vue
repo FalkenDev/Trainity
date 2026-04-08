@@ -188,7 +188,10 @@
               </p>
               <p class="text-body-2 text-textSecondary">
                 {{ $t('workout.setsTimesReps', { sets: exercise.sets, reps: exercise.reps }) }}
-                <span v-if="exercise.weight"> · {{ exercise.weight }}kg</span>
+                <span v-if="exercise.setWeights && exercise.setWeights.some(w => w > 0)">
+                  · {{ exercise.setWeights.join(' / ') }} kg
+                </span>
+                <span v-else-if="exercise.weight"> · {{ exercise.weight }}kg</span>
                 <span v-if="exercise.pauseSeconds">
                   · {{ $t('workout.pauseSeconds', { seconds: exercise.pauseSeconds }) }}
                 </span>

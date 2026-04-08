@@ -150,3 +150,26 @@ export const deleteWorkoutSession = async (sessionId: number): Promise<{ message
     throw new Error('Failed to delete workout session')
   }
 }
+
+export interface PreviousSetItem {
+  setNumber: number
+  weight: number | null
+  reps: number | null
+}
+
+export interface PreviousSetsItem {
+  exerciseId: number
+  sets: PreviousSetItem[]
+}
+
+export const fetchPreviousSets = async (sessionId: number): Promise<PreviousSetsItem[]> => {
+  try {
+    const data = await fetchWrapper<PreviousSetsItem[]>(
+      `${apiUrl}/workoutSessions/${sessionId}/previous-sets`
+    )
+    return Array.isArray(data) ? data : []
+  } catch (error) {
+    console.error('Error fetching previous sets:', error)
+    return []
+  }
+}

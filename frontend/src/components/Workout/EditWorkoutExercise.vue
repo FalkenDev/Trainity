@@ -137,16 +137,40 @@
               hide-details
               density="compact"
             />
-            <v-text-field
-              v-if="isViewWorkoutExercise"
-              v-model="editExercise.weight"
-              :label="$t('workoutList.weightKg')"
-              type="text"
-              inputmode="decimal"
-              variant="outlined"
-              hide-details
-              density="compact"
-            />
+            <div v-if="isViewWorkoutExercise && editExercise?.setWeights">
+              <p class="text-body-2 font-weight-bold text-textSecondary mb-2">
+                {{ $t('workoutList.weightKg') }}
+              </p>
+              <div
+                v-for="(_, i) in editExercise.setWeights"
+                :key="i"
+                class="d-flex align-center ga-2 mb-2"
+              >
+                <span class="text-body-2 text-textSecondary" style="min-width: 48px">
+                  {{ $t('table.set') }} {{ Number(i) + 1 }}
+                </span>
+                <v-text-field
+                  v-model.number="editExercise.setWeights[Number(i)]"
+                  type="text"
+                  inputmode="decimal"
+                  variant="outlined"
+                  hide-details
+                  density="compact"
+                  suffix="kg"
+                />
+                <v-btn
+                  v-if="Number(i) < editExercise.setWeights.length - 1"
+                  icon
+                  size="x-small"
+                  variant="text"
+                  title="Fill down"
+                  @click="fillDown(Number(i))"
+                >
+                  <v-icon size="18">mdi-arrow-down-bold</v-icon>
+                </v-btn>
+                <div v-else style="width: 28px" />
+              </div>
+            </div>
             <v-text-field
               v-model="editExercise.pauseSeconds"
               :label="$t('workoutList.pauseSeconds')"
@@ -210,6 +234,12 @@ const exerciseStore = useExerciseStore()
 const workoutStore = useWorkoutStore()
 const isLoading = ref<boolean>(false)
 
+const initSetWeights = (): number[] => {
+  const ex = props.selectedExercise
+  if (ex.setWeights && ex.setWeights.length > 0) return [...ex.setWeights]
+  return Array.from({ length: ex.sets || 1 }, () => ex.weight || 0)
+}
+
 const editExercise = ref<AddExerciseToWorkout | null>({
   exerciseId: Number(props.selectedExercise.exercise.id),
   sets: props.selectedExercise.sets,
@@ -217,7 +247,34 @@ const editExercise = ref<AddExerciseToWorkout | null>({
   pauseSeconds: props.selectedExercise?.pauseSeconds,
   order: props.selectedExercise?.order || 0,
   weight: props.selectedExercise?.weight || 0,
+  setWeights: initSetWeights(),
 })
+
+watch(
+  () => editExercise.value?.sets,
+  newSets => {
+    if (!editExercise.value) return
+    const n = parseIntInput(newSets) || 1
+    const current = editExercise.value.setWeights ?? []
+    if (current.length < n) {
+      const last = current[current.length - 1] ?? 0
+      editExercise.value.setWeights = [
+        ...current,
+        ...Array.from({ length: n - current.length }, () => last),
+      ]
+    } else if (current.length > n) {
+      editExercise.value.setWeights = current.slice(0, n)
+    }
+  }
+)
+
+function fillDown(fromIndex: number) {
+  if (!editExercise.value?.setWeights) return
+  const val = editExercise.value.setWeights[fromIndex]
+  for (let i = fromIndex + 1; i < editExercise.value.setWeights.length; i++) {
+    editExercise.value.setWeights[i] = val
+  }
+}
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -260,6 +317,9 @@ const removeExercise = async () => {
 const getSanitizedExerciseDataForWorkout = () => {
   if (!props.selectedExercise || !editExercise.value) return {}
 
+  const parsedSetWeights = (editExercise.value.setWeights ?? []).map(w => parseDecimalInput(w))
+  const firstSetWeight = parsedSetWeights[0] ?? 0
+
   const original = {
     sets: props.selectedExercise.sets,
     reps: props.selectedExercise.reps,
@@ -274,15 +334,20 @@ const getSanitizedExerciseDataForWorkout = () => {
     reps: parseIntInput(editExercise.value.reps),
     pauseSeconds: parseIntInput(editExercise.value.pauseSeconds),
     order: Number(editExercise.value.order || 0),
-    weight: parseDecimalInput(editExercise.value.weight),
+    weight: firstSetWeight,
     exerciseId: Number(editExercise.value.exerciseId || 0),
   }
 
-  return Object.fromEntries(
+  const changes: Record<string, unknown> = Object.fromEntries(
     (Object.entries(edited) as [keyof typeof edited, number][]).filter(
       ([key, value]) => (original as Record<string, number>)[key as string] !== value
     )
   )
+
+  // Always include setWeights — array diff is unreliable
+  changes.setWeights = parsedSetWeights
+
+  return changes
 }
 
 const updateExercise = async () => {

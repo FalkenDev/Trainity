@@ -4,6 +4,9 @@
   "type": "module",
   "version": "0.1.1",
   "license": "AGPL-3.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite --host",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -11,7 +14,9 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.ts --fix",
-    "generate-pwa-assets": "pwa-assets-generator --config pwa-assets.config.ts"
+    "generate-pwa-assets": "pwa-assets-generator --config pwa-assets.config.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@fontsource/roboto": "5.2.5",
@@ -56,6 +61,7 @@
     "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-vue-layouts-next": "^0.0.8",
     "vite-plugin-vuetify": "^2.1.1",
+    "vitest": "^4.1.3",
     "vue-router": "^4.5.0",
     "vue-tsc": "^3.2.5"
   }

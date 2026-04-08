@@ -24,7 +24,7 @@
       @save="saveWorkout"
     />
 
-    <v-form ref="formRef" class="mx-5 mt-2 pb-10">
+    <v-form class="mx-5 mt-2 pb-10">
       <!-- Workout Title -->
       <div>
         <v-label class="text-body-2 font-weight-bold text-textPrimary mb-1">
@@ -174,6 +174,7 @@
                       density="compact"
                       hide-details
                       type="number"
+                      @update:model-value="resizeSetWeights(exercise)"
                     />
                   </div>
                   <div class="w-100">
@@ -199,6 +200,40 @@
                       hide-details
                       type="number"
                     />
+                  </div>
+                </div>
+                <div class="w-100">
+                  <v-label class="text-body-2 font-weight-bold text-textSecondary mb-1">
+                    {{ $t('workoutList.weightKg') }}
+                  </v-label>
+                  <div
+                    v-for="(w, i) in exercise.setWeights"
+                    :key="i"
+                    class="d-flex align-center ga-2 mb-1"
+                  >
+                    <span class="text-body-2 text-textSecondary" style="min-width: 44px">
+                      {{ $t('table.set') }} {{ Number(i) + 1 }}
+                    </span>
+                    <v-text-field
+                      v-model.number="exercise.setWeights[Number(i)]"
+                      type="text"
+                      inputmode="decimal"
+                      variant="outlined"
+                      hide-details
+                      density="compact"
+                      suffix="kg"
+                    />
+                    <v-btn
+                      v-if="Number(i) < exercise.setWeights.length - 1"
+                      icon
+                      size="x-small"
+                      variant="text"
+                      title="Fill down"
+                      @click="fillDownWeight(exercise, Number(i))"
+                    >
+                      <v-icon size="18">mdi-arrow-down-bold</v-icon>
+                    </v-btn>
+                    <div v-else style="width: 28px" />
                   </div>
                 </div>
               </div>
@@ -243,6 +278,7 @@ import type {
   Workout,
   Exercise as WorkoutExercise,
   WorkoutType,
+  UpdateWorkoutExercise,
 } from '@/interfaces/Workout.interface'
 import type { Exercise as ExerciseCatalog } from '@/interfaces/Exercise.interface'
 import type { MuscleGroup } from '@/interfaces/MuscleGroup.interface'
@@ -290,6 +326,7 @@ interface ExerciseForm {
   sets: number
   reps: number
   weight: number
+  setWeights: number[]
   pauseSeconds: number
   order: number
 }
@@ -319,6 +356,9 @@ const initForm = () => {
     sets: ex.sets,
     reps: ex.reps,
     weight: ex.weight,
+    setWeights: ex.setWeights?.length
+      ? [...ex.setWeights]
+      : Array.from({ length: ex.sets }, () => ex.weight || 0),
     pauseSeconds: ex.pauseSeconds,
     order: idx + 1,
   }))
@@ -427,6 +467,7 @@ const onExerciseListSave = (newExerciseIds: number[]) => {
       sets: 3,
       reps: 10,
       weight: 0,
+      setWeights: [0, 0, 0],
       pauseSeconds: 60,
       order: form.exercises.length + 1,
     })
@@ -444,6 +485,24 @@ const onDragEnd = () => {
   form.exercises.forEach((ex, i) => {
     ex.order = i + 1
   })
+}
+
+function resizeSetWeights(exercise: ExerciseForm) {
+  const n = Math.max(1, exercise.sets || 1)
+  const current = exercise.setWeights
+  if (current.length < n) {
+    const last = current[current.length - 1] ?? 0
+    exercise.setWeights = [...current, ...Array.from({ length: n - current.length }, () => last)]
+  } else if (current.length > n) {
+    exercise.setWeights = current.slice(0, n)
+  }
+}
+
+function fillDownWeight(exercise: ExerciseForm, fromIndex: number) {
+  const val = exercise.setWeights[fromIndex]
+  for (let i = fromIndex + 1; i < exercise.setWeights.length; i++) {
+    exercise.setWeights[i] = val
+  }
 }
 
 // -- Save --
@@ -489,15 +548,21 @@ const saveWorkout = async () => {
           (we: WorkoutExercise) => we.exercise.id === exForm.exerciseId
         )
         if (matchingWe) {
-          const changes: Record<string, number> = {}
+          const changes: Record<string, unknown> = {}
           if (matchingWe.sets !== exForm.sets) changes.sets = exForm.sets
           if (matchingWe.reps !== exForm.reps) changes.reps = exForm.reps
           if (matchingWe.pauseSeconds !== exForm.pauseSeconds)
             changes.pauseSeconds = exForm.pauseSeconds
-          if (matchingWe.weight !== exForm.weight) changes.weight = exForm.weight
+          // Always send setWeights; keep weight in sync with first set
+          changes.setWeights = exForm.setWeights
+          changes.weight = exForm.setWeights[0] ?? 0
 
           if (Object.keys(changes).length > 0) {
-            await updateExerciseInWorkout(workoutId, matchingWe.id, changes)
+            await updateExerciseInWorkout(
+              workoutId,
+              matchingWe.id,
+              changes as UpdateWorkoutExercise
+            )
           }
         }
       }

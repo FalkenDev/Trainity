@@ -147,6 +147,11 @@ export class WorkoutService {
 
     Object.assign(workoutExercise, dto);
 
+    // Keep `weight` in sync with the first set's weight when setWeights is provided
+    if (dto.setWeights && dto.setWeights.length > 0) {
+      workoutExercise.weight = dto.setWeights[0];
+    }
+
     await this.workoutExerciseRepo.save(workoutExercise);
 
     return this.getWorkout(workoutId, userId);
@@ -299,6 +304,7 @@ export class WorkoutService {
             sets: we.sets,
             reps: we.reps,
             weight: we.weight,
+            setWeights: we.setWeights ?? null,
             pauseSeconds: we.pauseSeconds,
           }),
         );
@@ -347,6 +353,7 @@ export class WorkoutService {
             sets: e.sets,
             reps: e.reps,
             weight: e.weight,
+            setWeights: e.setWeights ?? null,
             pauseSeconds: e.pauseSeconds,
             exercise: {
               id: e.exercise.id,

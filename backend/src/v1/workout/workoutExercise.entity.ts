@@ -20,30 +20,33 @@ import { Exercise } from '../exercise/exercise.entity';
 @Entity()
 export class WorkoutExercise {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @ManyToOne(() => Workout, (workout) => workout.exercises, {
     onDelete: 'CASCADE',
   })
-  workout: Workout;
+  workout!: Workout;
 
   @ManyToOne(() => Exercise, { eager: true, onDelete: 'CASCADE' })
-  exercise: Exercise;
+  exercise!: Exercise;
 
   @Column()
-  order: number;
+  order!: number;
 
   @Column()
-  sets: number;
+  sets!: number;
 
   @Column()
-  reps: number;
+  reps!: number;
 
   @Column({ type: 'numeric', precision: 6, scale: 2, default: 0 })
-  weight: number;
+  weight!: number;
+
+  @Column({ type: 'jsonb', nullable: true, default: null })
+  setWeights!: number[] | null;
 
   @Column()
-  pauseSeconds: number;
+  pauseSeconds!: number;
 
   @Column({ type: 'decimal', precision: 6, scale: 2, nullable: true })
   distance?: number;
