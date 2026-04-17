@@ -45,13 +45,7 @@
         <v-label class="text-body-2 font-weight-bold text-textPrimary mb-1">
           {{ $t('sessionDetail.notes') }}
         </v-label>
-        <v-textarea
-          v-model="notes"
-          variant="outlined"
-          rows="3"
-          auto-grow
-          class="small-textarea"
-        />
+        <v-textarea v-model="notes" variant="outlined" rows="3" auto-grow class="small-textarea" />
       </div>
     </v-form>
   </div>

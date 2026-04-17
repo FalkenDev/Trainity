@@ -630,7 +630,10 @@ export class WorkoutSessionService {
     return this.sessionRepo.save(session);
   }
 
-  private getEndedAtFromDuration(startedAt: Date, durationMinutes: number): Date {
+  private getEndedAtFromDuration(
+    startedAt: Date,
+    durationMinutes: number,
+  ): Date {
     const endedAt = new Date(startedAt.getTime() + durationMinutes * 60_000);
     return this.validateEndedAt(startedAt, endedAt);
   }

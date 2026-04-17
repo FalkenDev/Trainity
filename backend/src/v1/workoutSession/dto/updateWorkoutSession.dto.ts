@@ -44,7 +44,8 @@ export class UpdateWorkoutSessionDto {
 
   @ApiPropertyOptional({
     example: 60,
-    description: 'Corrected total workout duration in minutes for finished sessions',
+    description:
+      'Corrected total workout duration in minutes for finished sessions',
   })
   @IsOptional()
   @Type(() => Number)

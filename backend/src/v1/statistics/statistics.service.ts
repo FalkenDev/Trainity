@@ -944,7 +944,8 @@ export class StatisticsService {
     }
 
     const durationMs =
-      new Date(session.endedAt).getTime() - new Date(session.startedAt).getTime();
+      new Date(session.endedAt).getTime() -
+      new Date(session.startedAt).getTime();
     return Math.round(durationMs / 60000);
   }
 
