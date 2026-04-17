@@ -43,6 +43,16 @@ export class UpdateWorkoutSessionDto {
   endedAt?: Date;
 
   @ApiPropertyOptional({
+    example: 60,
+    description: 'Corrected total workout duration in minutes for finished sessions',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  durationMinutes?: number;
+
+  @ApiPropertyOptional({
     example: 450,
     description: 'Calories burned during the session',
   })

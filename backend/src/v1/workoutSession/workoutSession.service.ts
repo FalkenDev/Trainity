@@ -28,6 +28,7 @@ import { Exercise } from '../exercise/exercise.entity';
 import { WorkoutStatus } from '../types/WorkoutStatus.type';
 import { UserService } from '../user/user.service';
 import { StatisticsService } from '../statistics/statistics.service';
+import { UpdateWorkoutSessionDto } from './dto/updateWorkoutSession.dto';
 
 export interface PreviousSetItem {
   setNumber: number;
@@ -57,6 +58,10 @@ export class WorkoutSessionService {
     private readonly userService: UserService,
     private readonly statisticsService: StatisticsService,
   ) {}
+
+  private roundToTwoDecimals(value: number): number {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  }
 
   async getAllSessions(userId: number): Promise<WorkoutSession[]> {
     return this.sessionRepo.find({ where: { user: { id: userId } } });
@@ -304,11 +309,12 @@ export class WorkoutSessionService {
           for (const s of ce.sets ?? []) {
             exTotal += s.weight * s.reps;
           }
+          exTotal = this.roundToTwoDecimals(exTotal);
           stats.push({ exerciseId: ce.exerciseId, totalWeight: exTotal });
           totalWeight += exTotal;
         }
 
-        saved.totalWeight = totalWeight;
+        saved.totalWeight = this.roundToTwoDecimals(totalWeight);
         saved.exerciseStats = stats;
         await manager.save(WorkoutSession, saved);
       }
@@ -521,13 +527,14 @@ export class WorkoutSessionService {
         for (const set of ex.sets ?? []) {
           exTotal += set.weight * set.reps;
         }
+        exTotal = this.roundToTwoDecimals(exTotal);
         stats.push({ exerciseId: ex.exercise?.id ?? 0, totalWeight: exTotal });
         totalWeight += exTotal;
       }
 
       session.status = 'finished';
       session.endedAt = new Date();
-      session.totalWeight = totalWeight;
+      session.totalWeight = this.roundToTwoDecimals(totalWeight);
       session.exerciseStats = stats;
 
       await manager.save(WorkoutSession, session);
@@ -575,7 +582,7 @@ export class WorkoutSessionService {
   async updateSession(
     sessionId: number,
     userId: number,
-    data: Partial<WorkoutSession>,
+    data: UpdateWorkoutSessionDto,
   ): Promise<WorkoutSession> {
     const session = await this.sessionRepo.findOne({
       where: { id: sessionId, user: { id: userId } },
@@ -583,8 +590,59 @@ export class WorkoutSessionService {
 
     if (!session) throw new NotFoundException('Session not found');
 
-    Object.assign(session, data);
+    if (session.status === WorkoutStatus.FINISHED) {
+      if (data.status !== undefined || data.endedAt !== undefined) {
+        throw new BadRequestException(
+          'Finished workout sessions can only be updated through notes, calories, or duration corrections.',
+        );
+      }
+
+      if (data.durationMinutes !== undefined) {
+        session.endedAt = this.getEndedAtFromDuration(
+          session.startedAt,
+          data.durationMinutes,
+        );
+      }
+    } else {
+      if (data.durationMinutes !== undefined) {
+        throw new BadRequestException(
+          'Duration corrections are only supported for finished workout sessions.',
+        );
+      }
+
+      if (data.status !== undefined) {
+        session.status = data.status;
+      }
+
+      if (data.endedAt !== undefined) {
+        session.endedAt = this.validateEndedAt(session.startedAt, data.endedAt);
+      }
+    }
+
+    if (data.notes !== undefined) {
+      session.notes = data.notes;
+    }
+
+    if (data.caloriesBurned !== undefined) {
+      session.caloriesBurned = data.caloriesBurned;
+    }
+
     return this.sessionRepo.save(session);
+  }
+
+  private getEndedAtFromDuration(startedAt: Date, durationMinutes: number): Date {
+    const endedAt = new Date(startedAt.getTime() + durationMinutes * 60_000);
+    return this.validateEndedAt(startedAt, endedAt);
+  }
+
+  private validateEndedAt(startedAt: Date, endedAt: Date): Date {
+    if (endedAt.getTime() <= startedAt.getTime()) {
+      throw new BadRequestException(
+        'Workout session end time must be after the start time.',
+      );
+    }
+
+    return endedAt;
   }
 
   async deleteSession(

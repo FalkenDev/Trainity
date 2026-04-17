@@ -21,6 +21,7 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
+import { ActivityLog } from '../activityLog/activityLog.entity';
 import { User } from '../user/user.entity';
 
 @Injectable()
@@ -36,6 +37,8 @@ export class StatisticsService {
     private readonly setRepo: Repository<WorkoutSessionSet>,
     @InjectRepository(Exercise)
     private readonly exerciseRepo: Repository<Exercise>,
+    @InjectRepository(ActivityLog)
+    private readonly activityLogRepo: Repository<ActivityLog>,
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
   ) {}
@@ -268,14 +271,20 @@ export class StatisticsService {
 
   // ─── Overview Statistics ─────────────────────────────────
   async getOverview(userId: number) {
-    const allSessions = await this.sessionRepo.find({
-      where: { user: { id: userId }, status: 'finished' as const },
-      relations: [
-        'exercises',
-        'exercises.exercise',
-        'exercises.exercise.muscleGroups',
-      ],
-    });
+    const [allSessions, activityLogs] = await Promise.all([
+      this.sessionRepo.find({
+        where: { user: { id: userId }, status: 'finished' as const },
+        relations: [
+          'exercises',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+        ],
+      }),
+      this.activityLogRepo.find({
+        where: { user: { id: userId } },
+        select: ['id', 'date', 'duration'],
+      }),
+    ]);
 
     const totalWorkouts = allSessions.length;
     let totalVolume = 0;
@@ -295,13 +304,9 @@ export class StatisticsService {
 
     for (const s of allSessions) {
       totalVolume += s.totalWeight ?? 0;
-      const dur =
-        s.endedAt && s.startedAt
-          ? new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()
-          : 0;
-      totalDuration += dur;
+      totalDuration += this.getSessionDurationMinutes(s);
 
-      const endDate = s.endedAt ?? s.startedAt;
+      const endDate = this.getSessionCompletionDate(s);
       if (endDate >= startOfWeek) workoutsThisWeek++;
       if (endDate >= startOfMonth) workoutsThisMonth++;
 
@@ -338,6 +343,10 @@ export class StatisticsService {
       }
     }
 
+    for (const log of activityLogs) {
+      totalDuration += log.duration ?? 0;
+    }
+
     // Use the persisted user streak (same as home page) instead of computing our own
     const user = await this.userRepo.findOne({ where: { id: userId } });
     const currentStreak = user?.currentStreak ?? 0;
@@ -353,12 +362,17 @@ export class StatisticsService {
     return {
       totalWorkouts,
       totalVolume,
-      totalDuration: Math.round(totalDuration / 60000),
+      totalDuration,
       workoutsThisWeek,
       workoutsThisMonth,
       averageSessionDuration:
         totalWorkouts > 0
-          ? Math.round(totalDuration / totalWorkouts / 60000)
+          ? Math.round(
+              allSessions.reduce(
+                (sum, session) => sum + this.getSessionDurationMinutes(session),
+                0,
+              ) / totalWorkouts,
+            )
           : 0,
       currentStreak,
       longestStreak,
@@ -669,13 +683,19 @@ export class StatisticsService {
     startDate.setDate(startDate.getDate() - weeks * 7);
     startDate.setHours(0, 0, 0, 0);
 
-    const sessions = await this.sessionRepo.find({
-      where: {
-        user: { id: userId },
-        status: 'finished' as const,
-      },
-      select: ['id', 'startedAt', 'endedAt', 'totalWeight'],
-    });
+    const [sessions, activityLogs] = await Promise.all([
+      this.sessionRepo.find({
+        where: {
+          user: { id: userId },
+          status: 'finished' as const,
+        },
+        select: ['id', 'startedAt', 'endedAt', 'totalWeight'],
+      }),
+      this.activityLogRepo.find({
+        where: { user: { id: userId } },
+        select: ['id', 'date', 'duration'],
+      }),
+    ]);
 
     // Build week buckets
     const weekBuckets = new Map<
@@ -703,7 +723,7 @@ export class StatisticsService {
     }
 
     for (const s of sessions) {
-      const endDate = s.endedAt ?? s.startedAt;
+      const endDate = this.getSessionCompletionDate(s);
       if (!endDate || new Date(endDate) < startDate) continue;
 
       const monday = this.getStartOfWeek(new Date(endDate));
@@ -712,11 +732,19 @@ export class StatisticsService {
       if (bucket) {
         bucket.workoutCount++;
         bucket.totalVolume += s.totalWeight ?? 0;
-        const dur =
-          s.endedAt && s.startedAt
-            ? new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()
-            : 0;
-        bucket.totalDuration += Math.round(dur / 60000);
+        bucket.totalDuration += this.getSessionDurationMinutes(s);
+      }
+    }
+
+    for (const log of activityLogs) {
+      const logDate = this.getActivityLogDate(log.date);
+      if (logDate < startDate) continue;
+
+      const monday = this.getStartOfWeek(logDate);
+      const key = monday.toISOString().split('T')[0];
+      const bucket = weekBuckets.get(key);
+      if (bucket) {
+        bucket.totalDuration += log.duration ?? 0;
       }
     }
 
@@ -737,13 +765,19 @@ export class StatisticsService {
     const lastMonthEnd = new Date(currentMonthStart);
     lastMonthEnd.setMilliseconds(-1);
 
-    const sessions = await this.sessionRepo.find({
-      where: {
-        user: { id: userId },
-        status: 'finished' as const,
-      },
-      select: ['id', 'startedAt', 'endedAt', 'totalWeight'],
-    });
+    const [sessions, activityLogs] = await Promise.all([
+      this.sessionRepo.find({
+        where: {
+          user: { id: userId },
+          status: 'finished' as const,
+        },
+        select: ['id', 'startedAt', 'endedAt', 'totalWeight'],
+      }),
+      this.activityLogRepo.find({
+        where: { user: { id: userId } },
+        select: ['id', 'date', 'duration'],
+      }),
+    ]);
 
     const aggregate = (filtered: typeof sessions) => {
       let workouts = 0;
@@ -752,36 +786,60 @@ export class StatisticsService {
       for (const s of filtered) {
         workouts++;
         volume += s.totalWeight ?? 0;
-        const dur =
-          s.endedAt && s.startedAt
-            ? new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()
-            : 0;
-        duration += Math.round(dur / 60000);
+        duration += this.getSessionDurationMinutes(s);
       }
       return { workouts, volume, duration };
     };
 
     const inRange = (s: WorkoutSession, start: Date, end: Date) => {
-      const d = s.endedAt ?? s.startedAt;
+      const d = this.getSessionCompletionDate(s);
       return d && new Date(d) >= start && new Date(d) < end;
     };
 
+    const activityDurationInRange = (start: Date, end: Date) =>
+      activityLogs.reduce((sum, log) => {
+        const logDate = this.getActivityLogDate(log.date);
+        if (logDate >= start && logDate < end) {
+          return sum + (log.duration ?? 0);
+        }
+        return sum;
+      }, 0);
+
+    const currentWeekly = aggregate(
+      sessions.filter((s) => inRange(s, currentWeekStart, now)),
+    );
+    currentWeekly.duration += activityDurationInRange(currentWeekStart, now);
+
+    const previousWeekly = aggregate(
+      sessions.filter((s) => inRange(s, lastWeekStart, currentWeekStart)),
+    );
+    previousWeekly.duration += activityDurationInRange(
+      lastWeekStart,
+      currentWeekStart,
+    );
+
+    const currentMonthly = aggregate(
+      sessions.filter((s) => inRange(s, currentMonthStart, now)),
+    );
+    currentMonthly.duration += activityDurationInRange(currentMonthStart, now);
+
+    const previousMonthEnd = new Date(currentMonthStart);
+    const previousMonthly = aggregate(
+      sessions.filter((s) => inRange(s, lastMonthStart, previousMonthEnd)),
+    );
+    previousMonthly.duration += activityDurationInRange(
+      lastMonthStart,
+      previousMonthEnd,
+    );
+
     return {
       weekly: {
-        current: aggregate(
-          sessions.filter((s) => inRange(s, currentWeekStart, now)),
-        ),
-        previous: aggregate(
-          sessions.filter((s) => inRange(s, lastWeekStart, currentWeekStart)),
-        ),
+        current: currentWeekly,
+        previous: previousWeekly,
       },
       monthly: {
-        current: aggregate(
-          sessions.filter((s) => inRange(s, currentMonthStart, now)),
-        ),
-        previous: aggregate(
-          sessions.filter((s) => inRange(s, lastMonthStart, lastMonthEnd)),
-        ),
+        current: currentMonthly,
+        previous: previousMonthly,
       },
     };
   }
@@ -874,5 +932,32 @@ export class StatisticsService {
     d.setDate(diff);
     d.setHours(0, 0, 0, 0);
     return d;
+  }
+
+  private getSessionCompletionDate(session: WorkoutSession): Date {
+    return new Date(session.endedAt ?? session.startedAt);
+  }
+
+  private getSessionDurationMinutes(session: WorkoutSession): number {
+    if (!session.endedAt || !session.startedAt) {
+      return 0;
+    }
+
+    const durationMs =
+      new Date(session.endedAt).getTime() - new Date(session.startedAt).getTime();
+    return Math.round(durationMs / 60000);
+  }
+
+  private getActivityLogDate(value: Date | string): Date {
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return new Date(`${value}T12:00:00`);
+    }
+
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) {
+      return date;
+    }
+
+    return new Date(`${value}T12:00:00`);
   }
 }

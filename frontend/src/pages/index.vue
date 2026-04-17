@@ -152,7 +152,9 @@
 
 <script lang="ts" setup>
 import { getStreakInfo } from '@/services/user.service'
+import type { ActivityLog } from '@/interfaces/Activity.interface'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
+import { useActivityStore } from '@/stores/activity.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { useScheduledSessionStore } from '@/stores/scheduledSession.store'
 import { startWorkoutSession } from '@/services/workoutSession.service'
@@ -164,6 +166,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const workoutSessionStore = useWorkoutSessionStore()
+const activityStore = useActivityStore()
 const authStore = useAuthStore()
 const scheduledSessionStore = useScheduledSessionStore()
 const streakInfo = ref<StreakInfo | null>(null)
@@ -188,6 +191,7 @@ const currentWeekRange = computed(() => {
 // Calculate total minutes for finished sessions this week
 const totalMinutesThisWeek = computed(() => {
   const sessions = workoutSessionStore.workoutSessions as WorkoutSession[]
+  const activityLogs = activityStore.activityLogs as ActivityLog[]
   const { start, end } = currentWeekRange.value
 
   let totalMinutes = 0
@@ -201,6 +205,13 @@ const totalMinutesThisWeek = computed(() => {
         const durationMinutes = Math.round((endTime - startTime) / (1000 * 60))
         totalMinutes += durationMinutes
       }
+    }
+  })
+
+  activityLogs.forEach((log: ActivityLog) => {
+    const logDate = new Date(`${log.date}T12:00:00`)
+    if (logDate >= start && logDate <= end) {
+      totalMinutes += log.duration
     }
   })
 

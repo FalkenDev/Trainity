@@ -24,5 +24,5 @@ export class AddRemoveExercisesDto {
   })
   @IsArray()
   @IsNumber({}, { each: true })
-  exerciseIds: number[];
+  exerciseIds!: number[];
 }

@@ -15,7 +15,11 @@
 
 // services/workoutSession.service.ts
 import { fetchWrapper } from '@/utils/fetchWrapper'
-import type { FinishSessionPayload, WorkoutSession } from '@/interfaces/workoutSession.interface'
+import type {
+  FinishSessionPayload,
+  UpdateWorkoutSessionDto,
+  WorkoutSession,
+} from '@/interfaces/workoutSession.interface'
 import type { LogPastWorkoutSessionDto } from '@/interfaces/ScheduledSession.interface'
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8393/v1'
@@ -104,7 +108,7 @@ export const getWorkoutSessionById = async (sessionId: number): Promise<WorkoutS
 
 export const updateWorkoutSession = async (
   sessionId: number,
-  sessionData: Partial<WorkoutSession>
+  sessionData: UpdateWorkoutSessionDto
 ): Promise<WorkoutSession> => {
   try {
     const data = await fetchWrapper<WorkoutSession>(`${apiUrl}/workoutSessions/${sessionId}`, {

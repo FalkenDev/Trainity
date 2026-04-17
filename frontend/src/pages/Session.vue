@@ -96,7 +96,11 @@ import type { FinishedExercisePayload, WorkoutSession } from '@/interfaces/worko
 import type { Exercise, WorkoutSet } from '@/interfaces/Workout.interface'
 
 import { fetchExerciseById } from '@/services/exercise.service'
-import { abandonWorkoutSession, finishWorkoutSession, fetchPreviousSets } from '@/services/workoutSession.service'
+import {
+  abandonWorkoutSession,
+  finishWorkoutSession,
+  fetchPreviousSets,
+} from '@/services/workoutSession.service'
 import type { Exercise as ExerciseDetailType } from '@/interfaces/Exercise.interface'
 
 const isAddExerciseOpen = ref(false)
@@ -152,7 +156,13 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
       // Use the live workout relation for default sets/reps/weight
       const workoutExById = new Map<
         number,
-        { sets: number; reps: number; weight: number; setWeights: number[] | null; pauseSeconds?: number }
+        {
+          sets: number
+          reps: number
+          weight: number
+          setWeights: number[] | null
+          pauseSeconds?: number
+        }
       >()
       for (const base of workoutSession.value.workout?.exercises || []) {
         const exId = base.exerciseId ?? base.exercise?.id
@@ -171,8 +181,8 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
         const details = await fetchExerciseById(id)
 
         const snap = workoutExById.get(id)
-        const plannedSets = (snap?.sets ?? 0) || 1
-        const plannedReps = (snap?.reps ?? 0) || 8
+        const plannedSets = (snap?.sets ?? 0) || 3
+        const plannedReps = (snap?.reps ?? 0) || 11
         const plannedWeight = (snap?.weight ?? 0) || 0
         const setWeights = snap?.setWeights ?? null
         const pauseSeconds = snap?.pauseSeconds ?? 60

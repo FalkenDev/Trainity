@@ -195,8 +195,9 @@
         <v-card
           v-for="event in completedForSelectedDate"
           :key="event.id"
-          class="bg-cardBg rounded-lg pa-4"
+          class="bg-cardBg rounded-lg pa-4 cursor-pointer"
           :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
+          @click="openCompletedSession(event)"
         >
           <div class="d-flex align-center ga-3">
             <v-avatar
@@ -688,6 +689,11 @@ async function onScheduleDeleted() {
 
 async function onScheduleStarted() {
   await Promise.all([fetchScheduledRange(), scheduledSessionStore.fetchForDate(selectedDate.value)])
+}
+
+function openCompletedSession(event: CalendarEvent) {
+  if (event.type === 'scheduled') return
+  router.push(`/session-history/${event.type}/${event.sessionId}`)
 }
 </script>
 

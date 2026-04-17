@@ -20,11 +20,11 @@ import { Type } from 'class-transformer';
 class ExerciseOrder {
   @ApiProperty({ description: 'The workout exercise ID', example: 1 })
   @IsNumber()
-  workoutExerciseId: number;
+  workoutExerciseId!: number;
 
   @ApiProperty({ description: 'The new order position', example: 1 })
   @IsNumber()
-  order: number;
+  order!: number;
 }
 
 export class ReorderExercisesDto {
@@ -40,5 +40,5 @@ export class ReorderExercisesDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ExerciseOrder)
-  exercises: ExerciseOrder[];
+  exercises!: ExerciseOrder[];
 }

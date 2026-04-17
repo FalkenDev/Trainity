@@ -18,48 +18,48 @@ import { MuscleGroupResponseDto } from 'src/v1/muscleGroup/dto/muscleGroupRespon
 
 export class PrimaryMuscleGroupSnapshotDto {
   @ApiProperty()
-  id: number;
+  id!: number;
 
   @ApiProperty()
-  name: string;
+  name!: string;
 }
 
 export class ExerciseSnapshotDto {
   @ApiProperty()
-  id: number;
+  id!: number;
 
   @ApiProperty()
-  name: string;
+  name!: string;
 
   @ApiProperty({ required: false })
   description?: string;
 
   @ApiProperty({ type: [PrimaryMuscleGroupSnapshotDto] })
-  primaryMuscleGroups: PrimaryMuscleGroupSnapshotDto[];
+  primaryMuscleGroups!: PrimaryMuscleGroupSnapshotDto[];
 
   @ApiProperty({ type: [MuscleGroupResponseDto] })
-  muscleGroups: MuscleGroupResponseDto[];
+  muscleGroups!: MuscleGroupResponseDto[];
 }
 
 export class WorkoutExerciseSnapshotDto {
   @ApiProperty()
-  id: number;
+  id!: number;
 
   @ApiProperty()
-  order: number;
+  order!: number;
 
   @ApiProperty()
-  sets: number;
+  sets!: number;
 
   @ApiProperty()
-  reps: number;
+  reps!: number;
 
   @ApiProperty()
-  weight: number;
+  weight!: number;
 
   @ApiProperty()
-  pauseSeconds: number;
+  pauseSeconds!: number;
 
   @ApiProperty({ type: ExerciseSnapshotDto })
-  exercise: ExerciseSnapshotDto;
+  exercise!: ExerciseSnapshotDto;
 }

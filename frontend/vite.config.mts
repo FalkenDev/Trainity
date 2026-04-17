@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 // Plugins
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
@@ -10,7 +12,7 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // Utilities
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/

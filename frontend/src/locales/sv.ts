@@ -807,9 +807,11 @@ export default {
   sessionDetail: {
     workoutSession: 'Träningssession',
     activityLog: 'Aktivitetslogg',
+    editWorkoutSession: 'Redigera träningssession',
     sessionFallback: 'Session #{id}',
     activityFallback: 'Aktivitet #{id}',
     duration: 'Varaktighet',
+    durationMinutes: 'Varaktighet (minuter)',
     totalWeight: 'Total vikt',
     exercises: 'Övningar',
     distance: 'Distans',
@@ -831,6 +833,8 @@ export default {
     started: 'Startade',
     ended: 'Avslutade',
     abandoned: 'Avbruten',
+    updated: 'Passet uppdaterades!',
+    failedToUpdate: 'Kunde inte uppdatera pass',
   },
   workoutList: {
     title: 'Träningspass',

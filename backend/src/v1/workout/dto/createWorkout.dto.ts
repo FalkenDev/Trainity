@@ -25,7 +25,7 @@ import {
 export class CreateWorkoutDto {
   @ApiProperty({ example: 'Push Day A' })
   @IsString()
-  title: string;
+  title!: string;
 
   @ApiProperty({ example: 'Chest, shoulders, triceps', required: false })
   @IsOptional()

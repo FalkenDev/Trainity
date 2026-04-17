@@ -38,6 +38,14 @@ export interface FinishSessionPayload {
   notes?: string
 }
 
+export interface UpdateWorkoutSessionDto {
+  notes?: string
+  caloriesBurned?: number | null
+  durationMinutes?: number
+  status?: 'in_progress' | 'finished' | 'abandoned'
+  endedAt?: string
+}
+
 export interface WorkoutSession {
   id: number
   userId: number

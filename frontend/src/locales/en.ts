@@ -814,9 +814,11 @@ export default {
   sessionDetail: {
     workoutSession: 'Workout session',
     activityLog: 'Activity log',
+    editWorkoutSession: 'Edit workout session',
     sessionFallback: 'Session #{id}',
     activityFallback: 'Activity #{id}',
     duration: 'Duration',
+    durationMinutes: 'Duration (minutes)',
     totalWeight: 'Total weight',
     exercises: 'Exercises',
     distance: 'Distance',
@@ -838,6 +840,8 @@ export default {
     started: 'Started',
     ended: 'Ended',
     abandoned: 'Abandoned',
+    updated: 'Session updated successfully!',
+    failedToUpdate: 'Failed to update session',
   },
   workoutList: {
     title: 'Workouts',

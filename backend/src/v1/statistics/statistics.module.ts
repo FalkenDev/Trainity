@@ -22,6 +22,7 @@ import { WorkoutSession } from '../workoutSession/workoutSession.entity';
 import { WorkoutSessionExercise } from '../workoutSession/workoutSessionExercise.entity';
 import { WorkoutSessionSet } from '../workoutSession/workoutSessionSet.entity';
 import { Exercise } from '../exercise/exercise.entity';
+import { ActivityLog } from '../activityLog/activityLog.entity';
 import { User } from '../user/user.entity';
 
 @Module({
@@ -32,6 +33,7 @@ import { User } from '../user/user.entity';
       WorkoutSessionExercise,
       WorkoutSessionSet,
       Exercise,
+      ActivityLog,
       User,
     ]),
   ],

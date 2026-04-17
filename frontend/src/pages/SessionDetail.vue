@@ -35,6 +35,9 @@
           width="160"
           :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
         >
+          <v-list-item v-if="canEditSession" @click="openEditDialog">
+            <v-list-item-title>{{ $t('common.edit') }}</v-list-item-title>
+          </v-list-item>
           <v-list-item v-if="isEmptyWorkout" @click="saveAsWorkoutDialog = true">
             <v-list-item-title>{{ $t('workout.saveAsWorkout') }}</v-list-item-title>
           </v-list-item>
@@ -323,6 +326,24 @@
       />
     </v-dialog>
 
+    <v-dialog v-model="editActivityDialog" fullscreen>
+      <EditActivityLog
+        v-if="editActivityDialog && activityLog"
+        :log="activityLog"
+        @close="editActivityDialog = false"
+        @saved="handleActivitySaved"
+      />
+    </v-dialog>
+
+    <v-dialog v-model="editWorkoutDialog" fullscreen>
+      <EditWorkoutSessionDialog
+        v-if="editWorkoutDialog && workoutSession"
+        :session="workoutSession"
+        @close="editWorkoutDialog = false"
+        @saved="handleWorkoutSaved"
+      />
+    </v-dialog>
+
     <!-- Delete confirm dialog -->
     <v-dialog v-model="deleteDialog" max-width="360">
       <v-card
@@ -359,9 +380,10 @@
 
 <script setup lang="ts">
 import BackHeader from '@/components/BackHeader.vue'
+import EditActivityLog from '@/components/Activity/EditActivityLog.vue'
 import { useWorkoutSessionStore } from '@/stores/workoutSession.store'
 import { useActivityStore } from '@/stores/activity.store'
-import { deleteActivityLog } from '@/services/activityLog.service'
+import { deleteActivityLog, fetchActivityLogById } from '@/services/activityLog.service'
 import { getWorkoutSessionById } from '@/services/workoutSession.service'
 import type { WorkoutSession } from '@/interfaces/workoutSession.interface'
 import type { ActivityLog } from '@/interfaces/Activity.interface'
@@ -371,6 +393,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ExerciseDetails from '@/components/Exercise/ExerciseDetails.vue'
 import { mapSessionToWorkoutInitialData } from '@/utils/sessionToWorkout'
 import CreateWorkout from '@/components/Workout/CreateWorkout.vue'
+import EditWorkoutSessionDialog from '@/components/Session/EditWorkoutSessionDialog.vue'
 
 const props = defineProps<{ sessionType?: 'workout' | 'activity'; sessionId?: number }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
@@ -394,10 +417,13 @@ const deleteDialog = ref(false)
 const isDeleting = ref(false)
 const saveAsWorkoutDialog = ref(false)
 const exerciseDialog = ref(false)
+const editActivityDialog = ref(false)
+const editWorkoutDialog = ref(false)
 const selectedExercise = ref<Exercise | null>(null)
 
 // Local ref for the session being viewed — does NOT write into the shared store
 const localWorkoutSession = ref<WorkoutSession | null>(null)
+const localActivityLog = ref<ActivityLog | null>(null)
 
 const workoutSession = computed<WorkoutSession | null>(() => {
   if (type.value !== 'workout') return null
@@ -433,8 +459,19 @@ const workoutInitialData = computed(() =>
 
 const activityLog = computed<ActivityLog | null>(() => {
   if (type.value !== 'activity') return null
+  if (localActivityLog.value && localActivityLog.value.id === id.value) {
+    return localActivityLog.value
+  }
   const logs = (activityStore.activityLogs as ActivityLog[]) || []
   return logs.find(l => l.id === id.value) ?? null
+})
+
+const canEditSession = computed(() => {
+  if (type.value === 'activity') {
+    return activityLog.value != null
+  }
+
+  return workoutSession.value?.status === 'finished'
 })
 
 const sessionIcon = computed(() => {
@@ -529,6 +566,47 @@ function confirmDelete() {
   deleteDialog.value = true
 }
 
+function openEditDialog() {
+  if (type.value === 'activity') {
+    editActivityDialog.value = true
+    return
+  }
+
+  if (workoutSession.value?.status === 'finished') {
+    editWorkoutDialog.value = true
+  }
+}
+
+async function loadSessionDetail() {
+  if (type.value === 'workout') {
+    localWorkoutSession.value = await getWorkoutSessionById(id.value)
+    return
+  }
+
+  localActivityLog.value = await fetchActivityLogById(id.value)
+}
+
+async function refreshSessionDetail() {
+  await loadSessionDetail()
+
+  if (type.value === 'workout') {
+    await workoutSessionStore.setWorkoutSessions(true)
+    return
+  }
+
+  await activityStore.fetchActivityLogs(true)
+}
+
+async function handleActivitySaved() {
+  await refreshSessionDetail()
+  editActivityDialog.value = false
+}
+
+async function handleWorkoutSaved() {
+  await refreshSessionDetail()
+  editWorkoutDialog.value = false
+}
+
 async function executeDelete() {
   isDeleting.value = true
   try {
@@ -550,18 +628,19 @@ async function executeDelete() {
 }
 
 onMounted(async () => {
-  if (type.value === 'workout') {
-    localWorkoutSession.value = await getWorkoutSessionById(id.value)
-  } else {
-    activityStore.fetchActivityLogs()
-  }
+  await loadSessionDetail()
 })
 
 watch(
-  () => props.sessionId,
-  async newId => {
-    if (newId !== undefined && props.sessionType === 'workout') {
-      localWorkoutSession.value = await getWorkoutSessionById(newId)
+  () => [props.sessionId, props.sessionType],
+  async ([newId]) => {
+    if (newId !== undefined) {
+      await loadSessionDetail()
+      return
+    }
+
+    if (type.value === 'activity' && !activityLog.value) {
+      await activityStore.fetchActivityLogs(true)
     }
   }
 )
