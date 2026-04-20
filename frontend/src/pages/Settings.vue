@@ -120,47 +120,35 @@
           class="bg-cardBg rounded-lg"
           :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
         >
-          <v-list-item
-            class="px-5 border-b"
-            @click="isPrivacyPolicyOpen = true"
-          >
+          <v-list-item class="px-5 border-b" @click="isPrivacyPolicyOpen = true">
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
               <p>{{ $t('settings.privacyPolicy') }}</p>
               <v-icon>mdi-chevron-right</v-icon>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item
-            class="px-5 border-b"
-            @click="isTermsOpen = true"
-          >
+          <v-list-item class="px-5 border-b" @click="isTermsOpen = true">
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
               <p>{{ $t('settings.termsAndConditions') }}</p>
               <v-icon>mdi-chevron-right</v-icon>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item
-            class="px-5 border-b"
-            @click="isImprintOpen = true"
-          >
+          <v-list-item class="px-5 border-b" @click="isImprintOpen = true">
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
               <p>{{ $t('settings.imprint') }}</p>
               <v-icon>mdi-chevron-right</v-icon>
             </v-list-item-title>
           </v-list-item>
-          <v-list-item
-            class="px-5"
-            @click="exportUserData"
-          >
+          <v-list-item class="px-5" @click="exportUserData">
             <v-list-item-title class="d-flex flex-row justify-space-between align-center">
               <div>
                 <p>{{ $t('settings.exportData') }}</p>
-                <p class="text-caption text-textSecondary">{{ $t('settings.exportDataDescription') }}</p>
               </div>
               <v-icon>mdi-download</v-icon>
             </v-list-item-title>
           </v-list-item>
         </v-list>
       </div>
+      <v-btn variant="outlined" @click="setPreferenceDialogToOpen('logout')">Logout</v-btn>
     </div>
 
     <!-- Account Edit Dialog -->
@@ -399,7 +387,6 @@ const preferencesList = [
   { titleKey: 'settings.darkMode', showArrow: false, disabled: false, type: 'darkMode' },
   { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language' },
   { titleKey: 'settings.helpAndSupport', showArrow: true, disabled: false, type: 'contact' },
-  { titleKey: 'settings.logout', showArrow: false, disabled: false, type: 'logout' },
 ]
 
 onMounted(() => {

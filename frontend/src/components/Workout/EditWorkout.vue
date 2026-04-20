@@ -299,6 +299,7 @@ import { toast } from 'vuetify-sonner'
 import { useI18n } from 'vue-i18n'
 import { displayExerciseName } from '@/utils/exerciseDisplay'
 import router from '@/router'
+import { parseDecimalInput } from '@/utils/decimalInput'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -355,10 +356,10 @@ const initForm = () => {
     workoutExerciseId: ex.id,
     sets: ex.sets,
     reps: ex.reps,
-    weight: ex.weight,
+    weight: parseDecimalInput(ex.weight),
     setWeights: ex.setWeights?.length
-      ? [...ex.setWeights]
-      : Array.from({ length: ex.sets }, () => ex.weight || 0),
+      ? ex.setWeights.map(weight => parseDecimalInput(weight))
+      : Array.from({ length: ex.sets }, () => parseDecimalInput(ex.weight)),
     pauseSeconds: ex.pauseSeconds,
     order: idx + 1,
   }))
@@ -553,9 +554,10 @@ const saveWorkout = async () => {
           if (matchingWe.reps !== exForm.reps) changes.reps = exForm.reps
           if (matchingWe.pauseSeconds !== exForm.pauseSeconds)
             changes.pauseSeconds = exForm.pauseSeconds
+          const normalizedSetWeights = exForm.setWeights.map(weight => parseDecimalInput(weight))
           // Always send setWeights; keep weight in sync with first set
-          changes.setWeights = exForm.setWeights
-          changes.weight = exForm.setWeights[0] ?? 0
+          changes.setWeights = normalizedSetWeights
+          changes.weight = normalizedSetWeights[0] ?? 0
 
           if (Object.keys(changes).length > 0) {
             await updateExerciseInWorkout(

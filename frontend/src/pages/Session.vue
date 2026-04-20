@@ -224,6 +224,12 @@ async function updateWorkoutSessionExercises(newExerciseIds: number[]) {
           },
         } as Exercise)
       }
+
+      const previousSets = await fetchPreviousSets(sessionId.value, toAdd)
+      workoutSessionStore.applyPreviousSets(sessionId.value, previousSets)
+      if (workoutSession.value.workout?.defaultWeightAndReps === 'latest') {
+        workoutSessionStore.applyPreviousSetsAsWeightAndReps(sessionId.value, previousSets)
+      }
     }
   } finally {
     isLoading.value = false

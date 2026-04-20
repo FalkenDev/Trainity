@@ -98,6 +98,7 @@ export class WorkoutSessionService {
   async getPreviousSets(
     userId: number,
     sessionId: number,
+    exerciseIds?: number[],
   ): Promise<PreviousSetsResponseItem[]> {
     const session = await this.sessionRepo.findOne({
       where: { id: sessionId, user: { id: userId } },
@@ -108,11 +109,17 @@ export class WorkoutSessionService {
 
     const workoutId = session.workout?.id;
     const result: PreviousSetsResponseItem[] = [];
+    const targetExerciseIds =
+      exerciseIds && exerciseIds.length > 0
+        ? [...new Set(exerciseIds)]
+        : session.exercises
+            .map((sessionEx) => sessionEx.exercise?.id)
+            .filter(
+              (exerciseId): exerciseId is number =>
+                typeof exerciseId === 'number',
+            );
 
-    for (const sessionEx of session.exercises) {
-      const exerciseId = sessionEx.exercise?.id;
-      if (typeof exerciseId === 'undefined') continue;
-
+    for (const exerciseId of targetExerciseIds) {
       let previousEx: WorkoutSessionExercise | null = null;
 
       // Prefer: last finished session with same workout template

@@ -23,6 +23,7 @@ import {
   Body,
   Req,
   Patch,
+  Query,
   UseGuards,
   ParseIntPipe,
   UnauthorizedException,
@@ -115,9 +116,19 @@ export class WorkoutSessionController {
   @ApiOkResponse({ description: 'Previous sets per exercise' })
   getPreviousSets(
     @Param('id', ParseIntPipe) id: number,
+    @Query('exerciseIds') exerciseIds: string | undefined,
     @Req() req: RequestWithUser,
   ) {
-    return this.sessionService.getPreviousSets(this.getUserId(req), id);
+    const parsedExerciseIds = exerciseIds
+      ?.split(',')
+      .map((value) => Number(value.trim()))
+      .filter((value) => Number.isInteger(value) && value > 0);
+
+    return this.sessionService.getPreviousSets(
+      this.getUserId(req),
+      id,
+      parsedExerciseIds,
+    );
   }
 
   @Put(':id')

@@ -166,10 +166,18 @@ export interface PreviousSetsItem {
   sets: PreviousSetItem[]
 }
 
-export const fetchPreviousSets = async (sessionId: number): Promise<PreviousSetsItem[]> => {
+export const fetchPreviousSets = async (
+  sessionId: number,
+  exerciseIds?: number[]
+): Promise<PreviousSetsItem[]> => {
   try {
+    const params = new URLSearchParams()
+    if (exerciseIds?.length) {
+      params.set('exerciseIds', exerciseIds.join(','))
+    }
+    const query = params.toString()
     const data = await fetchWrapper<PreviousSetsItem[]>(
-      `${apiUrl}/workoutSessions/${sessionId}/previous-sets`
+      `${apiUrl}/workoutSessions/${sessionId}/previous-sets${query ? `?${query}` : ''}`
     )
     return Array.isArray(data) ? data : []
   } catch (error) {
