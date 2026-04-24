@@ -243,11 +243,7 @@ const DeltaChip: FunctionalComponent<{
   if (diff === 0 && current === 0 && previous === 0) return null
 
   const percent =
-    previous === 0
-      ? current > 0
-        ? 100
-        : 0
-      : Math.round(((current - previous) / previous) * 100)
+    previous === 0 ? (current > 0 ? 100 : 0) : Math.round(((current - previous) / previous) * 100)
 
   const isPositive = diff >= 0
   const color = isPositive ? 'success' : 'error'
