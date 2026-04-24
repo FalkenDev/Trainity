@@ -82,10 +82,16 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
+function asNumber(value: unknown): number {
+  const numeric = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(numeric) ? numeric : 0
+}
+
 function formatVolume(v: number): string {
-  if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M kg`
-  if (v >= 1000) return `${(v / 1000).toFixed(1)}K kg`
-  return `${v} kg`
+  const safeVolume = asNumber(v)
+  if (safeVolume >= 1000000) return `${(safeVolume / 1000000).toFixed(1)}M kg`
+  if (safeVolume >= 1000) return `${(safeVolume / 1000).toFixed(1)}K kg`
+  return `${safeVolume} kg`
 }
 
 function formatWeekLabel(dateStr: string): string {
@@ -95,31 +101,33 @@ function formatWeekLabel(dateStr: string): string {
 
 const latestWeekVolume = computed(() => {
   if (props.trends.length === 0) return 0
-  return props.trends[props.trends.length - 1].totalVolume
+  return asNumber(props.trends[props.trends.length - 1].totalVolume)
 })
 
 const weekOverWeekDelta = computed(() => {
   if (props.trends.length < 2) return null
-  const current = props.trends[props.trends.length - 1].totalVolume
-  const previous = props.trends[props.trends.length - 2].totalVolume
+  const current = asNumber(props.trends[props.trends.length - 1].totalVolume)
+  const previous = asNumber(props.trends[props.trends.length - 2].totalVolume)
   if (previous === 0 && current === 0) return null
   if (previous === 0) return 100
   return Math.round(((current - previous) / previous) * 100)
 })
 
 const chartData = computed(() => {
-  const maxVolume = Math.max(...props.trends.map(t => t.totalVolume), 1)
+  const safeVolumes = props.trends.map(t => asNumber(t.totalVolume))
+  const maxVolume = Math.max(...safeVolumes, 1)
 
   return {
     labels: props.trends.map(t => formatWeekLabel(t.weekStart)),
     datasets: [
       {
         label: t('statistics.totalVolume'),
-        data: props.trends.map(t => t.totalVolume),
+        data: safeVolumes,
         backgroundColor: props.trends.map((trend, idx) => {
           // Highlight the latest bar with full primary, others with lower opacity
           const isLatest = idx === props.trends.length - 1
-          const intensity = 0.25 + (trend.totalVolume / maxVolume) * 0.75
+          const trendVolume = asNumber(trend.totalVolume)
+          const intensity = 0.25 + (trendVolume / maxVolume) * 0.75
           if (isLatest) return '#ABFF1A'
           return `rgba(171, 255, 26, ${intensity * 0.6})`
         }),

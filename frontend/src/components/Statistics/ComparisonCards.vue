@@ -191,10 +191,16 @@ defineProps<{
   comparison: ComparisonStats | null
 }>()
 
+function asNumber(value: unknown): number {
+  const numeric = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(numeric) ? numeric : 0
+}
+
 function formatVolume(v: number): string {
-  if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M kg`
-  if (v >= 1000) return `${(v / 1000).toFixed(1)}K kg`
-  return `${v} kg`
+  const safeVolume = asNumber(v)
+  if (safeVolume >= 1000000) return `${(safeVolume / 1000000).toFixed(1)}M kg`
+  if (safeVolume >= 1000) return `${(safeVolume / 1000).toFixed(1)}K kg`
+  return `${safeVolume} kg`
 }
 
 function formatDuration(minutes: number): string {
@@ -231,15 +237,17 @@ const DeltaChip: FunctionalComponent<{
   previous: number
   label: string
 }> = props => {
-  const diff = props.current - props.previous
-  if (diff === 0 && props.current === 0 && props.previous === 0) return null
+  const current = asNumber(props.current)
+  const previous = asNumber(props.previous)
+  const diff = current - previous
+  if (diff === 0 && current === 0 && previous === 0) return null
 
   const percent =
-    props.previous === 0
-      ? props.current > 0
+    previous === 0
+      ? current > 0
         ? 100
         : 0
-      : Math.round(((props.current - props.previous) / props.previous) * 100)
+      : Math.round(((current - previous) / previous) * 100)
 
   const isPositive = diff >= 0
   const color = isPositive ? 'success' : 'error'

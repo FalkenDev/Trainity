@@ -82,16 +82,24 @@ function setRef(key: string, el: HTMLElement | null) {
   if (el) refs.value[key] = el
 }
 
+function asNumber(value: unknown): number {
+  const numeric = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(numeric) ? numeric : 0
+}
+
 function formatVolume(v: number): string {
-  if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`
-  if (v >= 1000) return `${(v / 1000).toFixed(1)}K`
-  return `${v}`
+  const safeVolume = asNumber(v)
+  if (safeVolume >= 1000000) return `${(safeVolume / 1000000).toFixed(1)}M`
+  if (safeVolume >= 1000) return `${(safeVolume / 1000).toFixed(1)}K`
+  return `${safeVolume}`
 }
 
 function computeDelta(current: number, previous: number): number | null {
-  if (previous === 0 && current === 0) return null
-  if (previous === 0) return 100
-  return Math.round(((current - previous) / previous) * 100)
+  const safeCurrent = asNumber(current)
+  const safePrevious = asNumber(previous)
+  if (safePrevious === 0 && safeCurrent === 0) return null
+  if (safePrevious === 0) return 100
+  return Math.round(((safeCurrent - safePrevious) / safePrevious) * 100)
 }
 
 const heroStats = computed(() => {
@@ -110,15 +118,15 @@ const heroStats = computed(() => {
     {
       key: 'workouts',
       label: t('statistics.totalWorkouts'),
-      value: o.totalWorkouts,
-      displayValue: o.totalWorkouts.toLocaleString(),
+      value: asNumber(o.totalWorkouts),
+      displayValue: asNumber(o.totalWorkouts).toLocaleString(),
       delta: weeklyWorkoutDelta,
       deltaDisplay: weeklyWorkoutDelta !== null ? `${Math.abs(weeklyWorkoutDelta)}%` : '',
     },
     {
       key: 'volume',
       label: t('statistics.totalVolume'),
-      value: o.totalVolume,
+      value: asNumber(o.totalVolume),
       displayValue: formatVolume(o.totalVolume) + ' kg',
       delta: weeklyVolumeDelta,
       deltaDisplay: weeklyVolumeDelta !== null ? `${Math.abs(weeklyVolumeDelta)}%` : '',
@@ -126,8 +134,8 @@ const heroStats = computed(() => {
     {
       key: 'streak',
       label: t('statistics.currentStreak'),
-      value: o.currentStreak,
-      displayValue: `${o.currentStreak}`,
+      value: asNumber(o.currentStreak),
+      displayValue: `${asNumber(o.currentStreak)}`,
       delta: null,
       deltaDisplay: '',
     },

@@ -220,7 +220,7 @@ export class StatisticsService {
         id: ws.id,
         date: ws.endedAt ?? ws.startedAt,
         duration: Math.round(durationMs / 60000),
-        totalVolume: ws.totalWeight,
+        totalVolume: this.toNumber(ws.totalWeight),
         exerciseCount: (ws.exercises ?? []).length,
         notes: ws.notes,
       };
@@ -248,7 +248,7 @@ export class StatisticsService {
           ? new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()
           : 0;
       totalDuration += dur;
-      totalVolume += s.totalWeight ?? 0;
+      totalVolume += this.toNumber(s.totalWeight);
       const endDate = s.endedAt ?? s.startedAt;
       if (!lastPerformed || endDate > lastPerformed) lastPerformed = endDate;
       if (!firstPerformed || endDate < firstPerformed) firstPerformed = endDate;
@@ -303,7 +303,7 @@ export class StatisticsService {
     >();
 
     for (const s of allSessions) {
-      totalVolume += s.totalWeight ?? 0;
+      totalVolume += this.toNumber(s.totalWeight);
       totalDuration += this.getSessionDurationMinutes(s);
 
       const endDate = this.getSessionCompletionDate(s);
@@ -320,7 +320,7 @@ export class StatisticsService {
           exerciseCount.set(ex.exercise.id, curr);
 
           // Compute volume for this exercise across sets (approximate per muscle group)
-          const exVolume = s.totalWeight ?? 0;
+          const exVolume = this.toNumber(s.totalWeight);
           const mgCount = (ex.exercise.muscleGroups ?? []).length || 1;
           const volPerMg = exVolume / mgCount;
 
@@ -595,7 +595,7 @@ export class StatisticsService {
         id: s.id,
         date: s.endedAt ?? s.startedAt,
         duration: Math.round(durMs / 60000),
-        totalVolume: s.totalWeight,
+        totalVolume: this.toNumber(s.totalWeight),
       };
     });
 
@@ -731,7 +731,7 @@ export class StatisticsService {
       const bucket = weekBuckets.get(key);
       if (bucket) {
         bucket.workoutCount++;
-        bucket.totalVolume += s.totalWeight ?? 0;
+        bucket.totalVolume += this.toNumber(s.totalWeight);
         bucket.totalDuration += this.getSessionDurationMinutes(s);
       }
     }
@@ -785,7 +785,7 @@ export class StatisticsService {
       let duration = 0;
       for (const s of filtered) {
         workouts++;
-        volume += s.totalWeight ?? 0;
+        volume += this.toNumber(s.totalWeight);
         duration += this.getSessionDurationMinutes(s);
       }
       return { workouts, volume, duration };
@@ -960,5 +960,18 @@ export class StatisticsService {
     }
 
     return new Date(`${value}T12:00:00`);
+  }
+
+  private toNumber(value: unknown): number {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number.parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
   }
 }
