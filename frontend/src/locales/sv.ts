@@ -208,6 +208,53 @@ export default {
     notSet: 'Ej angivet',
     data: 'Data',
     memberSince: 'Medlem sedan {date}',
+    versionHistory: 'Versionshistorik',
+    versionHistorySubtitle:
+      'Jämför vad som är installerat på den här enheten, vad som är utrullat på servern och den senaste versionshistoriken.',
+    installedOnThisDevice: 'Installerad på den här enheten',
+    deployedOnServer: 'Utrullad på servern',
+    latestRelease: 'Senaste release',
+    releaseHistory: 'Versionshistorik',
+    checkForUpdates: 'Sök efter uppdateringar',
+    refreshVersionStatus: 'Uppdatera versionsstatus',
+    versionBuildDetails: 'Commit {commit} • Byggd {builtAt}',
+    versionChannelLabel: 'Kanal: {channel}',
+    versionChannelStable: 'Stabil',
+    versionChannelEdge: 'Edge',
+    versionChannelLocal: 'Lokal',
+    versionStatusUnavailable: 'Versionsmetadata är inte tillgänglig.',
+    versionHistoryFetchedAt: 'Senast kontrollerad {time}',
+    versionHistoryMissingDeployedVersion:
+      'Den utrullade serverversionen kunde inte läsas från /version.json just nu.',
+    versionHistoryDeviceCurrent:
+      'Den här enheten kör samma bygge som för närvarande är utrullat.',
+    versionHistoryDeviceUpdateAvailable:
+      'En nyare utrullad version finns tillgänglig. Den här enheten använder fortfarande en äldre cachad PWA-version.',
+    versionHistoryInstalledAhead:
+      'Den här enheten kör ett nyare eller utvecklingsbygge än versionen som för närvarande är utrullad.',
+    versionHistoryVersionsDiffer:
+      'Installerade och utrullade versioner skiljer sig, men de kunde inte jämföras som stabila release-taggar.',
+    versionHistoryServerCurrent:
+      'Den utrullade serverversionen matchar den senaste officiella releasen.',
+    versionHistoryServerBehindLatest:
+      'En nyare officiell release finns, men servern har inte utrullat den ännu.',
+    versionHistoryDeployedAheadOfRelease:
+      'Den utrullade versionen är nyare än den senaste publicerade release-metadatan. Det kan hända vid pre-release eller utvecklingsflöden.',
+    versionHistoryReleaseMismatch:
+      'Release-metadata finns, men den utrullade versionen kunde inte jämföras på ett tydligt sätt.',
+    versionHistoryReleaseProxyUnavailable:
+      'Versionshistorik kunde inte hämtas från GitHub just nu.',
+    versionHistoryReleaseProxyUnconfigured:
+      'Versionshistorik är inte konfigurerad för den här installationen.',
+    versionHistoryPrerelease: 'Förhandsversion',
+    versionHistoryUpdateReady: 'En uppdaterad PWA-version är redo att installeras på den här enheten.',
+    versionHistoryNoUpdateFound:
+      'Ingen nyare PWA-uppdatering hittades för den här enheten.',
+    versionHistoryUpdateCheckUnavailable:
+      'Det gick inte att söka efter uppdateringar just nu. Försök igen när appen är online.',
+    noReleaseHistory: 'Ingen versionshistorik är tillgänglig ännu.',
+    noReleaseNotes: 'Inga release notes angavs för den här releasen.',
+    viewReleaseOnGitHub: 'Visa på GitHub',
   },
   auth: {
     loginFailed: 'Inloggningen misslyckades. Kontrollera dina uppgifter.',

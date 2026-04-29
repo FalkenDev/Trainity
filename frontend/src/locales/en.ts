@@ -210,6 +210,49 @@ export default {
     notSet: 'Not set',
     data: 'Data',
     memberSince: 'Member since {date}',
+    versionHistory: 'Version history',
+    versionHistorySubtitle: 'Compare what is installed on this device, what is deployed on the server, and the latest release history.',
+    installedOnThisDevice: 'Installed on this device',
+    deployedOnServer: 'Deployed on server',
+    latestRelease: 'Latest release',
+    releaseHistory: 'Release history',
+    checkForUpdates: 'Check for updates',
+    refreshVersionStatus: 'Refresh version status',
+    versionBuildDetails: 'Commit {commit} • Built {builtAt}',
+    versionChannelLabel: 'Channel: {channel}',
+    versionChannelStable: 'Stable',
+    versionChannelEdge: 'Edge',
+    versionChannelLocal: 'Local',
+    versionStatusUnavailable: 'Version metadata is unavailable.',
+    versionHistoryFetchedAt: 'Last checked {time}',
+    versionHistoryMissingDeployedVersion:
+      'The deployed server version could not be read from /version.json right now.',
+    versionHistoryDeviceCurrent: 'This device is running the same build that is currently deployed.',
+    versionHistoryDeviceUpdateAvailable:
+      'A newer deployed version is available. This device still has an older cached PWA build.',
+    versionHistoryInstalledAhead:
+      'This device is running a newer or development build than the version currently deployed.',
+    versionHistoryVersionsDiffer:
+      'Installed and deployed versions differ, but they could not be compared as stable release tags.',
+    versionHistoryServerCurrent: 'The deployed server build matches the latest official release.',
+    versionHistoryServerBehindLatest:
+      'A newer official release exists, but the server has not deployed it yet.',
+    versionHistoryDeployedAheadOfRelease:
+      'The deployed build is newer than the latest published release metadata. This can happen during pre-release or development flows.',
+    versionHistoryReleaseMismatch:
+      'Release metadata is available, but the deployed version could not be compared cleanly.',
+    versionHistoryReleaseProxyUnavailable:
+      'Release history could not be fetched from GitHub right now.',
+    versionHistoryReleaseProxyUnconfigured:
+      'Release history is not configured for this deployment.',
+    versionHistoryPrerelease: 'Prerelease',
+    versionHistoryUpdateReady: 'An updated PWA build is ready to install on this device.',
+    versionHistoryNoUpdateFound: 'No newer PWA update was found for this device.',
+    versionHistoryUpdateCheckUnavailable:
+      'Could not check for updates right now. Try again when the app is online.',
+    noReleaseHistory: 'No release history is available yet.',
+    noReleaseNotes: 'No release notes were provided for this release.',
+    viewReleaseOnGitHub: 'View on GitHub',
   },
   auth: {
     gymAccess: 'Gym Access',

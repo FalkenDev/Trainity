@@ -185,6 +185,10 @@
       <LanguageDialog @close="isLanguageDialogOpen = false" />
     </v-dialog>
 
+    <v-dialog v-model="isVersionHistoryOpen" fullscreen transition="slide-y-transition" persistent>
+      <VersionHistoryDialog @close="isVersionHistoryOpen = false" />
+    </v-dialog>
+
     <!-- Goals Dialog -->
     <v-dialog v-model="isGoalsDialogOpen" fullscreen transition="slide-y-transition" persistent>
       <GoalsDialog
@@ -212,6 +216,7 @@ import { useTheme } from 'vuetify'
 import PrivacyPolicyDialog from '@/components/legal/PrivacyPolicyDialog.vue'
 import TermsAndConditionsDialog from '@/components/legal/TermsAndConditionsDialog.vue'
 import ImprintDialog from '@/components/legal/ImprintDialog.vue'
+import VersionHistoryDialog from '@/components/Settings/VersionHistoryDialog.vue'
 
 const authStore = useAuthStore()
 const appStore = useAppStore()
@@ -234,6 +239,7 @@ const isWorkoutListOpen = ref(false)
 const isAccountDialogOpen = ref(false)
 const isAppearanceOpen = ref(false)
 const isLanguageDialogOpen = ref(false)
+const isVersionHistoryOpen = ref(false)
 const isGoalsDialogOpen = ref(false)
 const isPrivacyPolicyOpen = ref(false)
 const isTermsOpen = ref(false)
@@ -302,6 +308,9 @@ const setPreferenceDialogToOpen = async (type?: string) => {
       break
     case 'language':
       isLanguageDialogOpen.value = true
+      break
+    case 'versionHistory':
+      isVersionHistoryOpen.value = true
       break
     case 'contact':
       window.location.href = `mailto:${import.meta.env.VITE_CONTACT_EMAIL ?? ''}`
@@ -386,6 +395,7 @@ const preferencesList = [
   { titleKey: 'settings.goals', showArrow: true, disabled: false, type: 'goals' },
   { titleKey: 'settings.darkMode', showArrow: false, disabled: false, type: 'darkMode' },
   { titleKey: 'settings.language', showArrow: true, disabled: false, type: 'language' },
+  { titleKey: 'settings.versionHistory', showArrow: true, disabled: false, type: 'versionHistory' },
   { titleKey: 'settings.helpAndSupport', showArrow: true, disabled: false, type: 'contact' },
 ]
 

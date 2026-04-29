@@ -4,7 +4,17 @@ FROM node:22-bookworm-slim AS development
 WORKDIR /app
 
 ARG VITE_API_URL
+ARG VITE_CONTACT_EMAIL
+ARG VERSION=0.0.0
+ARG GIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ARG CHANNEL=local
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_CONTACT_EMAIL=$VITE_CONTACT_EMAIL
+ENV APP_VERSION=$VERSION
+ENV APP_GIT_SHA=$GIT_SHA
+ENV APP_BUILD_TIME=$BUILD_TIME
+ENV APP_CHANNEL=$CHANNEL
 
 COPY ./frontend/package*.json ./
 RUN npm ci
@@ -20,7 +30,17 @@ FROM node:22-bookworm-slim AS builder
 WORKDIR /app
 
 ARG VITE_API_URL
+ARG VITE_CONTACT_EMAIL
+ARG VERSION=0.0.0
+ARG GIT_SHA=unknown
+ARG BUILD_TIME=unknown
+ARG CHANNEL=local
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_CONTACT_EMAIL=$VITE_CONTACT_EMAIL
+ENV APP_VERSION=$VERSION
+ENV APP_GIT_SHA=$GIT_SHA
+ENV APP_BUILD_TIME=$BUILD_TIME
+ENV APP_CHANNEL=$CHANNEL
 
 COPY ./frontend/package*.json ./
 RUN npm ci
@@ -41,6 +61,13 @@ RUN echo 'server { \
   # Service worker - must always revalidate \
   location /sw.js { \
     add_header Cache-Control "no-cache"; \
+    try_files $uri =404; \
+  } \
+  \
+  # Build version metadata - must always revalidate \
+  location = /version.json { \
+    add_header Cache-Control "no-cache"; \
+    add_header Content-Type "application/json"; \
     try_files $uri =404; \
   } \
   \

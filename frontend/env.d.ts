@@ -10,4 +10,11 @@ declare module '*.vue' {
 	export default component
 }
 
+declare const __APP_BUILD_INFO__: {
+	version: string
+	gitSha: string
+	builtAt: string
+	channel: string
+}
+
 declare const __APP_VERSION__: string

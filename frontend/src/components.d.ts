@@ -60,6 +60,7 @@ declare module 'vue' {
     StatisticsHeroCard: typeof import('./components/Statistics/StatisticsHeroCard.vue')['default']
     TermsAndConditionsDialog: typeof import('./components/legal/TermsAndConditionsDialog.vue')['default']
     TimerDialog: typeof import('./components/Session/TimerDialog.vue')['default']
+    VersionHistoryDialog: typeof import('./components/Settings/VersionHistoryDialog.vue')['default']
     WeeklyVolumeChart: typeof import('./components/Statistics/WeeklyVolumeChart.vue')['default']
     WeightAndRepsSettings: typeof import('./components/Workout/WeightAndRepsSettings.vue')['default']
     WeightLogDialog: typeof import('./components/WeightLogDialog.vue')['default']

@@ -219,6 +219,83 @@ FRONTEND_URL=https://yourdomain.com
 
 > **Note:** If `REQUIRE_EMAIL_VERIFICATION=false` and no Resend credentials are set, password reset emails will fail silently. Configure Resend if you want password reset to work.
 
+## Versioned Releases & Deploys
+
+Grindify now supports a version-aware release flow for self-hosting. The canonical version is the git tag in `vX.Y.Z` format, and the same version is used for GitHub Releases, frontend build metadata, `/version.json`, and Docker image tags.
+
+### Release order
+
+1. Merge release-ready changes to your target branch.
+2. Create and push a tag such as `v1.2.3`.
+3. Let GitHub Actions publish these image tags to GHCR:
+   - `ghcr.io/falkendev/grindify-api:v1.2.3`
+   - `ghcr.io/falkendev/grindify-api:latest`
+   - `ghcr.io/falkendev/grindify-frontend:v1.2.3`
+   - `ghcr.io/falkendev/grindify-frontend:latest`
+4. Create a GitHub Release for the same tag and add release notes.
+5. Deploy that exact version from Homelab.
+
+### Homelab deploy command
+
+Use an explicit version when deploying Grindify from Homelab:
+
+```bash
+ansible-playbook ansible/playbooks/deploy-stack.yml -e "stack=projects/grindify version=v1.2.3"
+```
+
+The playbook persists `IMAGE_TAG=v1.2.3` into the live Grindify `.env` before it runs Compose pull and up. Grindify deploys now fail fast if `version` is omitted.
+
+### Build metadata and update status
+
+The frontend image bakes a `/version.json` file that includes:
+
+- `version`
+- `gitSha`
+- `builtAt`
+- `channel`
+
+The Settings version history dialog compares three values:
+
+- `installedVersion`: the build currently installed on the device or cached by the PWA
+- `deployedVersion`: the version served by the live frontend at `/version.json`
+- `latestReleaseVersion`: the latest official GitHub Release returned by the backend proxy
+
+Status interpretation:
+
+- `installedVersion == deployedVersion`: this device is current for the deployed server build
+- `installedVersion < deployedVersion`: this device still has an older cached PWA build and should update
+- `deployedVersion < latestReleaseVersion`: a newer official release exists but the server has not deployed it yet
+- `installedVersion > latestReleaseVersion`: the device is on a development or pre-release build; this is shown as a neutral mismatch
+
+### GitHub Releases proxy
+
+The backend exposes release history through `GET /v1/releases`. By default it resolves to the `FalkenDev/Grindify` repository unless you override these variables:
+
+```env
+GITHUB_RELEASES_OWNER=FalkenDev
+GITHUB_RELEASES_REPO=Grindify
+GITHUB_RELEASES_TOKEN=
+```
+
+Use `GITHUB_RELEASES_TOKEN` if you want higher GitHub API limits for self-hosted deployments.
+
+### Troubleshooting
+
+- If Compose cannot pull a tag, confirm the GitHub Actions release build finished and that the requested `vX.Y.Z` image exists in GHCR.
+- If the Settings dialog shows no latest release, confirm a GitHub Release exists for the same tag and that the backend release proxy is configured.
+- If the dialog says an update is available on this device, open the built-in PWA update prompt or use the manual Check for updates action.
+- If `/version.json` is missing, confirm the frontend image was built from the updated `Dockerfile.frontend` and deployed successfully.
+
+### Rollback
+
+To roll back, redeploy any older published tag:
+
+```bash
+ansible-playbook ansible/playbooks/deploy-stack.yml -e "stack=projects/grindify version=v1.2.2"
+```
+
+Because the frontend image carries its own `/version.json`, rollback metadata follows the image tag automatically.
+
 ## Contributing
 
 Contributions are welcome. Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting a Pull Request.

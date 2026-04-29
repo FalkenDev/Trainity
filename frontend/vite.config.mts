@@ -12,12 +12,32 @@ import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // Utilities
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
+
+const appBuildInfo = {
+  version: process.env.APP_VERSION || process.env.npm_package_version || '0.0.0',
+  gitSha: process.env.APP_GIT_SHA || 'unknown',
+  builtAt: process.env.APP_BUILD_TIME || new Date().toISOString(),
+  channel: process.env.APP_CHANNEL || 'local',
+}
+
+const versionManifestPlugin: Plugin = {
+  name: 'version-manifest',
+  apply: 'build' as const,
+  generateBundle() {
+    this.emitFile({
+      type: 'asset',
+      fileName: 'version.json',
+      source: JSON.stringify(appBuildInfo, null, 2),
+    })
+  },
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    versionManifestPlugin,
     VueRouter({
       dts: 'src/typed-router.d.ts',
     }),
@@ -161,7 +181,8 @@ export default defineConfig({
   },
   define: {
     'process.env': {},
-    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '0.0.0'),
+    __APP_VERSION__: JSON.stringify(appBuildInfo.version),
+    __APP_BUILD_INFO__: JSON.stringify(appBuildInfo),
   },
   resolve: {
     alias: {
