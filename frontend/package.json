@@ -2,7 +2,7 @@
   "name": "frontend",
   "private": true,
   "type": "module",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "license": "AGPL-3.0",
   "engines": {
     "node": ">=20"
