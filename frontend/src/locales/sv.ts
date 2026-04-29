@@ -835,6 +835,11 @@ export default {
     abandoned: 'Avbruten',
     updated: 'Passet uppdaterades!',
     failedToUpdate: 'Kunde inte uppdatera pass',
+    editExerciseSets: 'Redigera set',
+    editExerciseSetsTitle: 'Redigera set — {name}',
+    addSet: 'Lägg till set',
+    setsUpdated: 'Set uppdaterades!',
+    failedToUpdateSets: 'Kunde inte uppdatera set',
   },
   workoutList: {
     title: 'Träningspass',

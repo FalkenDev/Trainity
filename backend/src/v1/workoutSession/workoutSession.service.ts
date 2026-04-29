@@ -669,6 +669,114 @@ export class WorkoutSessionService {
     return { message: 'Workout session deleted' };
   }
 
+  async updateSessionExerciseSets(
+    sessionId: number,
+    sessionExerciseId: number,
+    userId: number,
+    sets: {
+      setNumber: number;
+      weight?: number;
+      reps?: number;
+      rpe?: number;
+      notes?: string;
+    }[],
+  ): Promise<WorkoutSession> {
+    return this.dataSource.transaction(async (manager) => {
+      const session = await manager.findOne(WorkoutSession, {
+        where: { id: sessionId, user: { id: userId } },
+        relations: ['exercises', 'exercises.sets', 'exercises.exercise'],
+      });
+
+      if (!session) throw new NotFoundException('Session not found');
+
+      if (session.status !== WorkoutStatus.FINISHED) {
+        throw new BadRequestException(
+          'Sets can only be edited on finished workout sessions.',
+        );
+      }
+
+      const sessionExercise = session.exercises.find(
+        (e) => e.id === sessionExerciseId,
+      );
+      if (!sessionExercise)
+        throw new NotFoundException('Exercise not found in session');
+
+      // Replace sets
+      if (sessionExercise.sets?.length) {
+        await manager.remove(WorkoutSessionSet, sessionExercise.sets);
+      }
+
+      const newSets = sets.map((s) =>
+        manager.create(WorkoutSessionSet, {
+          setNumber: s.setNumber,
+          weight: s.weight,
+          reps: s.reps,
+          rpe: s.rpe,
+          notes: s.notes,
+          sessionExercise,
+        }),
+      );
+
+      if (newSets.length) {
+        await manager.save(WorkoutSessionSet, newSets);
+      }
+
+      sessionExercise.sets = newSets;
+
+      // Recalculate totalWeight & exerciseStats
+      let totalWeight = 0;
+      const stats: { exerciseId: number; totalWeight: number }[] = [];
+      for (const ex of session.exercises) {
+        let exTotal = 0;
+        for (const set of ex.sets ?? []) {
+          exTotal += (Number(set.weight) || 0) * (set.reps ?? 0);
+        }
+        exTotal = this.roundToTwoDecimals(exTotal);
+        stats.push({
+          exerciseId: ex.exercise?.id ?? 0,
+          totalWeight: exTotal,
+        });
+        totalWeight += exTotal;
+      }
+
+      session.totalWeight = this.roundToTwoDecimals(totalWeight);
+      session.exerciseStats = stats;
+      await manager.save(WorkoutSession, session);
+
+      // Re-run personal records
+      const exercisesForRecords = session.exercises
+        .filter((ex) => ex.exercise?.id && ex.sets?.length)
+        .map((ex) => ({
+          exerciseId: ex.exercise.id,
+          sets: ex.sets.map((s) => ({
+            weight: Number(s.weight) || 0,
+            reps: s.reps ?? 0,
+            rpe: s.rpe,
+          })),
+        }));
+
+      if (exercisesForRecords.length) {
+        await this.statisticsService.computeAndUpsertRecords(
+          userId,
+          sessionId,
+          exercisesForRecords,
+        );
+      }
+
+      return manager.findOneOrFail(WorkoutSession, {
+        where: { id: session.id },
+        relations: [
+          'workout',
+          'exercises',
+          'exercises.sets',
+          'exercises.exercise',
+          'exercises.exercise.muscleGroups',
+        ],
+        withDeleted: true,
+      });
+    });
+  }
+
   async abandonSession(
     sessionId: number,
     userId: number,

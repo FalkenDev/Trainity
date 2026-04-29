@@ -438,7 +438,6 @@ const duplicate = async () => {
 
 .sticky-btn-wrapper {
   position: fixed;
-  bottom: env(safe-area-inset-bottom, 0px);
   left: 0;
   right: 0;
   z-index: 10;

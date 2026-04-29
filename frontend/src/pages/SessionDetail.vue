@@ -197,6 +197,15 @@
                       {{ $t(`muscleGroups.${pm.name}`) }}
                     </v-chip>
                   </template>
+                  <v-btn
+                    v-if="workoutSession?.status === 'finished'"
+                    variant="text"
+                    size="small"
+                    color="primary"
+                    @click.stop="openEditExerciseSets(ex)"
+                  >
+                    {{ $t('sessionDetail.editExerciseSets') }}
+                  </v-btn>
                   <v-icon color="grey-lighten-1" size="16">mdi-chevron-right</v-icon>
                 </div>
               </div>
@@ -344,6 +353,16 @@
       />
     </v-dialog>
 
+    <v-dialog v-model="editExerciseSetsDialog" fullscreen>
+      <EditSessionExerciseSetsDialog
+        v-if="editExerciseSetsDialog && selectedSessionExercise && workoutSession"
+        :session-id="workoutSession.id"
+        :exercise="selectedSessionExercise"
+        @close="editExerciseSetsDialog = false"
+        @saved="handleExerciseSetsSaved"
+      />
+    </v-dialog>
+
     <!-- Delete confirm dialog -->
     <v-dialog v-model="deleteDialog" max-width="360">
       <v-card
@@ -394,6 +413,7 @@ import ExerciseDetails from '@/components/Exercise/ExerciseDetails.vue'
 import { mapSessionToWorkoutInitialData } from '@/utils/sessionToWorkout'
 import CreateWorkout from '@/components/Workout/CreateWorkout.vue'
 import EditWorkoutSessionDialog from '@/components/Session/EditWorkoutSessionDialog.vue'
+import EditSessionExerciseSetsDialog from '@/components/Session/EditSessionExerciseSetsDialog.vue'
 
 const props = defineProps<{ sessionType?: 'workout' | 'activity'; sessionId?: number }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
@@ -419,7 +439,9 @@ const saveAsWorkoutDialog = ref(false)
 const exerciseDialog = ref(false)
 const editActivityDialog = ref(false)
 const editWorkoutDialog = ref(false)
+const editExerciseSetsDialog = ref(false)
 const selectedExercise = ref<Exercise | null>(null)
+const selectedSessionExercise = ref<WorkoutSession['exercises'][number] | null>(null)
 
 // Local ref for the session being viewed — does NOT write into the shared store
 const localWorkoutSession = ref<WorkoutSession | null>(null)
@@ -573,8 +595,14 @@ function openEditDialog() {
   }
 
   if (workoutSession.value?.status === 'finished') {
+    selectedSessionExercise.value = null
     editWorkoutDialog.value = true
   }
+}
+
+function openEditExerciseSets(exercise: WorkoutSession['exercises'][number]) {
+  selectedSessionExercise.value = exercise
+  editExerciseSetsDialog.value = true
 }
 
 async function loadSessionDetail() {
@@ -605,6 +633,11 @@ async function handleActivitySaved() {
 async function handleWorkoutSaved() {
   await refreshSessionDetail()
   editWorkoutDialog.value = false
+}
+
+async function handleExerciseSetsSaved() {
+  await refreshSessionDetail()
+  editExerciseSetsDialog.value = false
 }
 
 async function executeDelete() {

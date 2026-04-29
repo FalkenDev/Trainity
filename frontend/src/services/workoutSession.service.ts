@@ -185,3 +185,19 @@ export const fetchPreviousSets = async (
     return []
   }
 }
+
+  export const updateSessionExerciseSets = async (
+    sessionId: number,
+    sessionExerciseId: number,
+    sets: { setNumber: number; weight?: number; reps?: number; rpe?: number; notes?: string }[]
+  ): Promise<WorkoutSession> => {
+    const data = await fetchWrapper<WorkoutSession>(
+      `${apiUrl}/workoutSessions/${sessionId}/exercises/${sessionExerciseId}/sets`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sets }),
+      }
+    )
+    return data
+  }

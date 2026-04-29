@@ -43,6 +43,7 @@ import { AddExerciseToSessionDto } from './dto/addExerciseToSession.dto';
 import { LogPastWorkoutSessionDto } from './dto/logPastWorkoutSession.dto';
 import { WorkoutSession } from './workoutSession.entity';
 import { UpdateWorkoutSessionDto } from './dto/updateWorkoutSession.dto';
+import { UpdateSessionExerciseSetsDto } from './dto/updateSessionExerciseSets.dto';
 
 @ApiTags('workout-sessions')
 @ApiBearerAuth()
@@ -165,6 +166,25 @@ export class WorkoutSessionController {
     return this.sessionService.addExerciseToSession(
       id,
       dto.exerciseId,
+      this.getUserId(req),
+      dto.sets,
+    );
+  }
+
+  @Patch(':id/exercises/:exerciseId/sets')
+  @ApiOperation({
+    summary: 'Update sets for an exercise in a finished session',
+  })
+  @ApiOkResponse({ type: WorkoutSession })
+  updateExerciseSets(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('exerciseId', ParseIntPipe) exerciseId: number,
+    @Body() dto: UpdateSessionExerciseSetsDto,
+    @Req() req: RequestWithUser,
+  ): Promise<WorkoutSession> {
+    return this.sessionService.updateSessionExerciseSets(
+      id,
+      exerciseId,
       this.getUserId(req),
       dto.sets,
     );

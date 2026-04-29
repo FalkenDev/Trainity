@@ -28,6 +28,7 @@ declare module 'vue' {
     EditActivityLog: typeof import('./components/Activity/EditActivityLog.vue')['default']
     EditExercise: typeof import('./components/Exercise/EditExercise.vue')['default']
     EditPersonalInfoDialog: typeof import('./components/Settings/EditPersonalInfoDialog.vue')['default']
+    EditSessionExerciseSetsDialog: typeof import('./components/Session/EditSessionExerciseSetsDialog.vue')['default']
     EditSetDialog: typeof import('./components/Session/EditSetDialog.vue')['default']
     EditWorkout: typeof import('./components/Workout/EditWorkout.vue')['default']
     EditWorkoutExercise: typeof import('./components/Workout/EditWorkoutExercise.vue')['default']

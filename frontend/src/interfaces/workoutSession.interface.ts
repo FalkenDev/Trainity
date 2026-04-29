@@ -55,9 +55,11 @@ export interface WorkoutSession {
   notes?: string
   workout?: Workout | null
   exercises: {
+    id: number
     exerciseId: number
     exercise?: UserExercise
     sets: PerformedSet[]
+    notes?: string
   }[]
   totalWeight: number
   exerciseStats: {
@@ -85,15 +87,11 @@ export interface tempWorkoutSession {
   notes?: string
   workout?: Workout | null
   exercises?: {
+    id?: number
     exerciseId?: number
     exercise?: UserExercise
     sets?: PerformedSet[]
-  }[]
-  totalWeight?: number
-  exerciseStats?: {
-    exerciseId?: number
-    totalWeight?: number
-    id?: number
+    notes?: string
   }[]
   createdAt?: string
   updatedAt?: string

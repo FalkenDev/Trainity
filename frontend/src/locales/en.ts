@@ -842,6 +842,11 @@ export default {
     abandoned: 'Abandoned',
     updated: 'Session updated successfully!',
     failedToUpdate: 'Failed to update session',
+    editExerciseSets: 'Edit sets',
+    editExerciseSetsTitle: 'Edit sets — {name}',
+    addSet: 'Add set',
+    setsUpdated: 'Sets updated successfully!',
+    failedToUpdateSets: 'Failed to update sets',
   },
   workoutList: {
     title: 'Workouts',
