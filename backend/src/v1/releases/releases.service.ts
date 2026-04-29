@@ -65,7 +65,9 @@ export class ReleasesService {
         Accept: 'application/vnd.github+json',
         'User-Agent': 'Grindify Release Proxy',
       });
-      const token = this.configService.get<string>('GITHUB_RELEASES_TOKEN')?.trim();
+      const token = this.configService
+        .get<string>('GITHUB_RELEASES_TOKEN')
+        ?.trim();
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
@@ -97,8 +99,8 @@ export class ReleasesService {
       }
 
       const releases = payload
-        .filter(release => Boolean(release.tag_name))
-        .map(release => ({
+        .filter((release) => Boolean(release.tag_name))
+        .map((release) => ({
           tagName: String(release.tag_name),
           name: release.name?.trim() || String(release.tag_name),
           publishedAt: release.published_at ?? null,
@@ -107,14 +109,17 @@ export class ReleasesService {
           htmlUrl: release.html_url ?? null,
         }));
 
-      const latestStableRelease = releases.find(release => !release.prerelease);
+      const latestStableRelease = releases.find(
+        (release) => !release.prerelease,
+      );
 
       return {
         status: 'ok',
         source: 'github',
         repo: `${repo.owner}/${repo.name}`,
         fetchedAt: new Date().toISOString(),
-        latestReleaseVersion: latestStableRelease?.tagName ?? releases[0]?.tagName ?? null,
+        latestReleaseVersion:
+          latestStableRelease?.tagName ?? releases[0]?.tagName ?? null,
         releases,
         message: null,
       };
@@ -131,11 +136,17 @@ export class ReleasesService {
   }
 
   private getConfiguredRepo(): { owner: string; name: string } | null {
-    const configuredOwner = this.configService.get<string>('GITHUB_RELEASES_OWNER');
-    const configuredRepo = this.configService.get<string>('GITHUB_RELEASES_REPO');
+    const configuredOwner = this.configService.get<string>(
+      'GITHUB_RELEASES_OWNER',
+    );
+    const configuredRepo = this.configService.get<string>(
+      'GITHUB_RELEASES_REPO',
+    );
 
-    const owner = configuredOwner === undefined ? 'FalkenDev' : configuredOwner.trim();
-    const name = configuredRepo === undefined ? 'Grindify' : configuredRepo.trim();
+    const owner =
+      configuredOwner === undefined ? 'FalkenDev' : configuredOwner.trim();
+    const name =
+      configuredRepo === undefined ? 'Grindify' : configuredRepo.trim();
 
     if (!owner || !name) {
       return null;

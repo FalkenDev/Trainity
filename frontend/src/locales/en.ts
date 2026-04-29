@@ -152,6 +152,7 @@ export default {
     avatarPlaceholder: 'Click to upload avatar',
     avatarHelper: 'JPEG, PNG, or WebP. Recommended: 400x400px',
     useRpe: 'Show RPE',
+    versionStatus: 'Version status',
     useRpeHint: 'Rate of Perceived Exertion (1-10)',
     weightAndProgression: 'Weight and progression',
     achievements: 'Achievements',
@@ -211,7 +212,8 @@ export default {
     data: 'Data',
     memberSince: 'Member since {date}',
     versionHistory: 'Version history',
-    versionHistorySubtitle: 'Compare what is installed on this device, what is deployed on the server, and the latest release history.',
+    versionHistorySubtitle:
+      'Compare what is installed on this device, what is deployed on the server, and the latest release history.',
     installedOnThisDevice: 'Installed on this device',
     deployedOnServer: 'Deployed on server',
     latestRelease: 'Latest release',
@@ -227,7 +229,8 @@ export default {
     versionHistoryFetchedAt: 'Last checked {time}',
     versionHistoryMissingDeployedVersion:
       'The deployed server version could not be read from /version.json right now.',
-    versionHistoryDeviceCurrent: 'This device is running the same build that is currently deployed.',
+    versionHistoryDeviceCurrent:
+      'This device is running the same build that is currently deployed.',
     versionHistoryDeviceUpdateAvailable:
       'A newer deployed version is available. This device still has an older cached PWA build.',
     versionHistoryInstalledAhead:

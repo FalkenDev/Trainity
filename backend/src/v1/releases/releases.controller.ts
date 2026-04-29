@@ -15,7 +15,10 @@
 
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ReleasesService, type ReleaseHistoryResponse } from './releases.service';
+import {
+  ReleasesService,
+  type ReleaseHistoryResponse,
+} from './releases.service';
 
 @ApiTags('releases')
 @Controller('releases')

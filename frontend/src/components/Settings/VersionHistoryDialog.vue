@@ -19,157 +19,253 @@
 
     <v-progress-linear v-if="isRefreshing" color="primary" indeterminate />
 
-    <v-card-text class="pa-5 d-flex flex-column ga-5 version-history-content">
-      <v-card
-        color="cardBg"
-        class="pa-5 rounded-xl d-flex flex-column align-center text-center ga-4 version-history-hero"
-        :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
-      >
-        <v-avatar size="88" color="avatarBg">
-          <v-img :src="logoUrl" alt="Grindify logo" />
-        </v-avatar>
+    <v-container class="flex-grow-1 overflow-y-auto pa-4" fluid>
+      <v-row dense>
+        <v-col cols="12">
+          <div variant="flat">
+            <div class="d-flex align-center ga-4 mb-4">
+              <v-avatar rounded="0" size="72" color="avatarBg">
+                <v-img :src="logoUrl" alt="Grindify logo" />
+              </v-avatar>
 
-        <div>
-          <h2 class="text-h5 font-weight-bold">Grindify</h2>
-          <p class="text-body-2 text-medium-emphasis">
-            {{ $t('settings.versionHistorySubtitle') }}
-          </p>
-        </div>
+              <div class="min-w-0">
+                <h2 class="text-h6 font-weight-bold mb-1">Grindify</h2>
 
-        <div class="summary-grid w-100">
-          <div class="summary-card">
-            <p class="text-caption text-medium-emphasis text-uppercase">
-              {{ $t('settings.installedOnThisDevice') }}
+                <div class="d-flex flex-wrap ga-2">
+                  <v-chip color="primary" variant="tonal" size="small">
+                    {{ installedBuildInfo.version }}
+                  </v-chip>
+
+                  <v-chip variant="tonal" size="small">
+                    {{ formatChannel(installedBuildInfo.channel) }}
+                  </v-chip>
+                </div>
+              </div>
+            </div>
+
+            <p class="text-body-2 text-medium-emphasis mb-4">
+              {{ $t('settings.versionHistorySubtitle') }}
             </p>
-            <p class="text-h6 font-weight-bold">{{ installedBuildInfo.version }}</p>
-            <p class="text-body-2 text-medium-emphasis">
-              {{ $t('settings.versionBuildDetails', {
-                commit: formatShortSha(installedBuildInfo.gitSha),
-                builtAt: formatExactTime(installedBuildInfo.builtAt),
-              }) }}
-            </p>
-            <p class="text-body-2 text-medium-emphasis">
-              {{ $t('settings.versionChannelLabel', { channel: formatChannel(installedBuildInfo.channel) }) }}
-            </p>
+
+            <v-alert
+              v-if="deviceStatus"
+              :type="deviceStatus.type"
+              variant="tonal"
+              density="comfortable"
+              rounded="lg"
+              class="mb-4"
+            >
+              {{ deviceStatus.message }}
+            </v-alert>
+
+            <v-row dense>
+              <v-col cols="12" sm="6">
+                <v-btn
+                  color="primary"
+                  block
+                  size="large"
+                  :loading="isCheckingForUpdates || isRefreshing"
+                  @click="handleCheckForUpdates"
+                >
+                  {{ $t('settings.checkForUpdates') }}
+                </v-btn>
+              </v-col>
+
+              <v-col cols="12" sm="6">
+                <v-btn
+                  variant="tonal"
+                  block
+                  size="large"
+                  :loading="isRefreshing"
+                  @click="refreshData"
+                >
+                  {{ $t('settings.refreshVersionStatus') }}
+                </v-btn>
+              </v-col>
+            </v-row>
           </div>
+        </v-col>
 
-          <div class="summary-card">
-            <p class="text-caption text-medium-emphasis text-uppercase">
-              {{ $t('settings.deployedOnServer') }}
-            </p>
-            <p class="text-h6 font-weight-bold">{{ deployedVersionLabel }}</p>
-            <p class="text-body-2 text-medium-emphasis">
-              {{ deployedBuildInfo
-                ? $t('settings.versionBuildDetails', {
-                    commit: formatShortSha(deployedBuildInfo.gitSha),
-                    builtAt: formatExactTime(deployedBuildInfo.builtAt),
-                  })
-                : $t('settings.versionStatusUnavailable') }}
-            </p>
-            <p v-if="deployedBuildInfo" class="text-body-2 text-medium-emphasis">
-              {{ $t('settings.versionChannelLabel', { channel: formatChannel(deployedBuildInfo.channel) }) }}
-            </p>
-          </div>
+        <v-col cols="12" class="py-5">
+          <v-card color="cardBg" rounded="xl" variant="flat" class="border overflow-hidden">
+            <v-card-title class="text-subtitle-1 font-weight-bold pb-0">
+              {{ $t('settings.versionStatus') }}
+            </v-card-title>
 
-          <div class="summary-card">
-            <p class="text-caption text-medium-emphasis text-uppercase">
-              {{ $t('settings.latestRelease') }}
-            </p>
-            <p class="text-h6 font-weight-bold">{{ latestReleaseLabel }}</p>
-            <p class="text-body-2 text-medium-emphasis">
-              {{ latestReleaseEntry
-                ? formatReleaseStatusLine(latestReleaseEntry, true)
-                : releaseHistory.message || $t('settings.versionStatusUnavailable') }}
-            </p>
-            <p v-if="releaseHistory.repo" class="text-body-2 text-medium-emphasis">
-              {{ releaseHistory.repo }}
-            </p>
-          </div>
-        </div>
+            <v-card-subtitle class="pt-1">
+              {{
+                $t('settings.versionHistoryFetchedAt', {
+                  time: formatExactTime(releaseHistory.fetchedAt),
+                })
+              }}
+            </v-card-subtitle>
 
-        <div class="d-flex flex-wrap justify-center ga-3">
-          <v-btn
-            color="primary"
-            :loading="isCheckingForUpdates || isRefreshing"
-            @click="handleCheckForUpdates"
-          >
-            {{ $t('settings.checkForUpdates') }}
-          </v-btn>
-          <v-btn variant="outlined" :loading="isRefreshing" @click="refreshData">
-            {{ $t('settings.refreshVersionStatus') }}
-          </v-btn>
-        </div>
-      </v-card>
+            <v-list bg-color="transparent" lines="three" density="comfortable">
+              <v-list-item>
+                <template #prepend>
+                  <v-avatar color="primary" variant="tonal" size="40">
+                    <v-icon icon="mdi-cellphone" />
+                  </v-avatar>
+                </template>
 
-      <v-alert
-        v-if="deviceStatus"
-        class="status-alert"
-        :type="deviceStatus.type"
-        variant="tonal"
-        prominent
-      >
-        {{ deviceStatus.message }}
-      </v-alert>
+                <v-list-item-title class="font-weight-medium">
+                  {{ $t('settings.installedOnThisDevice') }}
+                </v-list-item-title>
 
-      <v-alert
-        v-if="releaseStatus"
-        class="status-alert"
-        :type="releaseStatus.type"
-        variant="tonal"
-        prominent
-      >
-        {{ releaseStatus.message }}
-      </v-alert>
+                <v-list-item-subtitle>
+                  {{
+                    $t('settings.versionBuildDetails', {
+                      commit: formatShortSha(installedBuildInfo.gitSha),
+                      builtAt: formatExactTime(installedBuildInfo.builtAt),
+                    })
+                  }}
+                </v-list-item-subtitle>
 
-      <div class="d-flex flex-column ga-3">
-        <div class="d-flex justify-space-between align-center ga-3 flex-wrap">
-          <div>
-            <h2 class="text-h6">{{ $t('settings.releaseHistory') }}</h2>
-            <p class="text-body-2 text-medium-emphasis">
-              {{ $t('settings.versionHistoryFetchedAt', { time: formatExactTime(releaseHistory.fetchedAt) }) }}
-            </p>
-          </div>
-        </div>
+                <template #append>
+                  <v-chip color="primary" variant="tonal" size="small">
+                    {{ installedBuildInfo.version }}
+                  </v-chip>
+                </template>
+              </v-list-item>
 
-        <v-card
-          v-for="(release, index) in releaseHistory.releases"
-          :key="release.tagName"
-          color="cardBg"
-          class="pa-4 rounded-xl d-flex flex-column ga-3 release-card"
-          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
-        >
-          <div class="d-flex justify-space-between align-start ga-3 flex-wrap release-card-header">
-            <div class="d-flex flex-column ga-1 release-card-copy">
-              <h3 class="text-subtitle-1 font-weight-bold">{{ release.name || release.tagName }}</h3>
-              <p class="text-body-2 text-medium-emphasis">
-                {{ formatReleaseStatusLine(release, index === latestStableReleaseIndex) }}
+              <v-divider inset />
+
+              <v-list-item>
+                <template #prepend>
+                  <v-avatar color="secondary" variant="tonal" size="40">
+                    <v-icon icon="mdi-server" />
+                  </v-avatar>
+                </template>
+
+                <v-list-item-title class="font-weight-medium">
+                  {{ $t('settings.deployedOnServer') }}
+                </v-list-item-title>
+
+                <v-list-item-subtitle>
+                  {{
+                    deployedBuildInfo
+                      ? $t('settings.versionBuildDetails', {
+                          commit: formatShortSha(deployedBuildInfo.gitSha),
+                          builtAt: formatExactTime(deployedBuildInfo.builtAt),
+                        })
+                      : $t('settings.versionStatusUnavailable')
+                  }}
+                </v-list-item-subtitle>
+
+                <template #append>
+                  <v-chip variant="tonal" size="small">
+                    {{ deployedVersionLabel }}
+                  </v-chip>
+                </template>
+              </v-list-item>
+
+              <v-divider inset />
+
+              <v-list-item>
+                <template #prepend>
+                  <v-avatar color="success" variant="tonal" size="40">
+                    <v-icon icon="mdi-tag-outline" />
+                  </v-avatar>
+                </template>
+
+                <v-list-item-title class="font-weight-medium">
+                  {{ $t('settings.latestRelease') }}
+                </v-list-item-title>
+
+                <v-list-item-subtitle>
+                  {{
+                    latestReleaseEntry
+                      ? formatReleaseStatusLine(latestReleaseEntry, true)
+                      : releaseHistory.message || $t('settings.versionStatusUnavailable')
+                  }}
+                </v-list-item-subtitle>
+
+                <template #append>
+                  <v-chip color="success" variant="tonal" size="small">
+                    {{ latestReleaseLabel }}
+                  </v-chip>
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-col>
+
+        <v-col v-if="releaseStatus" cols="12">
+          <v-alert :type="releaseStatus.type" variant="tonal" density="comfortable" rounded="lg">
+            {{ releaseStatus.message }}
+          </v-alert>
+        </v-col>
+
+        <v-col cols="12">
+          <div class="d-flex align-start justify-space-between ga-3 mb-3">
+            <div>
+              <h3 class="text-subtitle-1 font-weight-bold">
+                {{ $t('settings.releaseHistory') }}
+              </h3>
+
+              <p class="text-caption text-medium-emphasis mb-0">
+                {{ releaseHistory.repo || $t('settings.versionStatusUnavailable') }}
               </p>
             </div>
-            <v-chip class="release-card-tag" color="primary" variant="tonal">{{ release.tagName }}</v-chip>
           </div>
 
-          <div class="text-body-2 release-notes" v-html="renderReleaseBody(release.body)" />
+          <v-expansion-panels
+            v-if="releaseHistory.releases.length"
+            v-model="openedRelease"
+            variant="accordion"
+          >
+            <v-expansion-panel
+              v-for="(release, index) in releaseHistory.releases"
+              :key="release.tagName"
+              color="cardBg"
+              class="border"
+            >
+              <v-expansion-panel-title class="py-3">
+                <div class="d-flex align-start justify-space-between ga-3 w-100">
+                  <div class="min-w-0">
+                    <p class="text-subtitle-2 font-weight-bold mb-1 text-wrap">
+                      {{ release.name || release.tagName }}
+                    </p>
 
-          <div v-if="release.htmlUrl" class="d-flex justify-end">
-            <v-btn variant="text" color="primary" :href="release.htmlUrl" target="_blank">
-              {{ $t('settings.viewReleaseOnGitHub') }}
-            </v-btn>
-          </div>
-        </v-card>
+                    <p class="text-caption text-medium-emphasis mb-0 text-wrap">
+                      {{ formatReleaseStatusLine(release, index === latestStableReleaseIndex) }}
+                    </p>
+                  </div>
 
-        <v-card
-          v-if="!releaseHistory.releases.length"
-          color="cardBg"
-          class="pa-4 rounded-xl"
-          :style="{ border: '1px solid rgb(var(--v-theme-borderColor))' }"
-        >
-          <p class="text-body-2 text-medium-emphasis">{{ $t('settings.noReleaseHistory') }}</p>
-        </v-card>
-      </div>
-    </v-card-text>
+                  <v-chip color="primary" variant="tonal" size="small" class="flex-shrink-0">
+                    {{ release.tagName }}
+                  </v-chip>
+                </div>
+              </v-expansion-panel-title>
+
+              <v-expansion-panel-text>
+                <div class="text-body-2 release-notes" v-html="renderReleaseBody(release.body)" />
+
+                <div v-if="release.htmlUrl" class="d-flex justify-end mt-3">
+                  <v-btn
+                    variant="text"
+                    color="primary"
+                    :href="release.htmlUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ $t('settings.viewReleaseOnGitHub') }}
+                  </v-btn>
+                </div>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+
+          <v-card v-else color="cardBg" rounded="xl" variant="flat" class="pa-4 border">
+            <p class="text-body-2 text-medium-emphasis mb-0">
+              {{ $t('settings.noReleaseHistory') }}
+            </p>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-card>
 </template>
-
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import DOMPurify from 'dompurify'
@@ -196,6 +292,7 @@ const emit = defineEmits<{
 const { t, locale } = useI18n({ useScope: 'global' })
 const { needRefresh, checkForUpdates, isCheckingForUpdates } = usePWA()
 
+const openedRelease = ref<number | null>(0)
 const installedBuildInfo = getInstalledBuildInfo()
 const deployedBuildInfo = ref<AppBuildInfo | null>(null)
 const isRefreshing = ref(false)
@@ -215,7 +312,7 @@ const latestReleaseEntry = computed(() => {
   if (!releaseHistory.value.latestReleaseVersion) return null
   return (
     releaseHistory.value.releases.find(
-      release => release.tagName === releaseHistory.value.latestReleaseVersion,
+      release => release.tagName === releaseHistory.value.latestReleaseVersion
     ) ?? null
   )
 })
@@ -280,7 +377,7 @@ const releaseStatus = computed(() => {
 
   const comparison = compareVersions(
     deployedBuildInfo.value.version,
-    releaseHistory.value.latestReleaseVersion,
+    releaseHistory.value.latestReleaseVersion
   )
 
   if (comparison === 0) {
@@ -492,60 +589,9 @@ onMounted(() => {
   void refreshData()
 })
 </script>
-
 <style scoped>
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  grid-auto-rows: max-content;
-  gap: 12px;
-  align-items: start;
-}
-
-.version-history-content {
-  flex: 1 1 auto;
-  min-block-size: 0;
-  overflow-y: auto;
-  align-items: stretch;
-}
-
-.version-history-hero {
-  flex-shrink: 0;
-  height: auto !important;
-}
-
-.summary-card {
-  border: 1px solid rgb(var(--v-theme-borderColor));
-  border-radius: 16px;
-  padding: 16px;
-  text-align: left;
-  background: rgba(var(--v-theme-surface), 0.4);
-  block-size: fit-content;
-  flex-shrink: 0;
-}
-
-.release-card {
-  inline-size: 100%;
-  flex-shrink: 0;
-  height: auto !important;
-}
-
-.release-card-header {
-  inline-size: 100%;
-}
-
-.release-card-copy {
-  flex: 1 1 260px;
+.min-w-0 {
   min-inline-size: 0;
-}
-
-.release-card-copy > * {
-  overflow-wrap: anywhere;
-}
-
-.release-card-tag {
-  flex: 0 0 auto;
-  align-self: flex-start;
 }
 
 .release-notes {
@@ -620,21 +666,8 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-.status-alert {
-  min-block-size: 72px;
-  flex-shrink: 0;
-}
-
-.status-alert :deep(.v-alert__content),
-.status-alert :deep(.v-alert__prepend),
-.status-alert :deep(.v-alert__append),
-.status-alert :deep(.v-alert__close) {
-  align-self: center;
-}
-
-@media (min-width: 840px) {
-  .summary-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+:deep(.v-list-item__append) {
+  align-self: flex-start;
+  padding-top: 4px;
 }
 </style>

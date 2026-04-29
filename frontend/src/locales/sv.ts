@@ -222,12 +222,12 @@ export default {
     versionChannelStable: 'Stabil',
     versionChannelEdge: 'Edge',
     versionChannelLocal: 'Lokal',
+    versionStatus: 'Versionsstatus',
     versionStatusUnavailable: 'Versionsmetadata är inte tillgänglig.',
     versionHistoryFetchedAt: 'Senast kontrollerad {time}',
     versionHistoryMissingDeployedVersion:
       'Den utrullade serverversionen kunde inte läsas från /version.json just nu.',
-    versionHistoryDeviceCurrent:
-      'Den här enheten kör samma bygge som för närvarande är utrullat.',
+    versionHistoryDeviceCurrent: 'Den här enheten kör samma bygge som för närvarande är utrullat.',
     versionHistoryDeviceUpdateAvailable:
       'En nyare utrullad version finns tillgänglig. Den här enheten använder fortfarande en äldre cachad PWA-version.',
     versionHistoryInstalledAhead:
@@ -247,9 +247,9 @@ export default {
     versionHistoryReleaseProxyUnconfigured:
       'Versionshistorik är inte konfigurerad för den här installationen.',
     versionHistoryPrerelease: 'Förhandsversion',
-    versionHistoryUpdateReady: 'En uppdaterad PWA-version är redo att installeras på den här enheten.',
-    versionHistoryNoUpdateFound:
-      'Ingen nyare PWA-uppdatering hittades för den här enheten.',
+    versionHistoryUpdateReady:
+      'En uppdaterad PWA-version är redo att installeras på den här enheten.',
+    versionHistoryNoUpdateFound: 'Ingen nyare PWA-uppdatering hittades för den här enheten.',
     versionHistoryUpdateCheckUnavailable:
       'Det gick inte att söka efter uppdateringar just nu. Försök igen när appen är online.',
     noReleaseHistory: 'Ingen versionshistorik är tillgänglig ännu.',
